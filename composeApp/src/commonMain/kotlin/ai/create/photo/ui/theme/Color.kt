@@ -1,4 +1,4 @@
-package ai.create.photo.ui
+package ai.create.photo.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
