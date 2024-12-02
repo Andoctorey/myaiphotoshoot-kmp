@@ -77,6 +77,7 @@ kotlin {
             implementation(libs.material.navigation)
 
             implementation(libs.filekit.compose)
+            implementation(libs.kermit)
         }
 
         desktopMain.dependencies {

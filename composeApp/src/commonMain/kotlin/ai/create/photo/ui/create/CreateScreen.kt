@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import co.touchlab.kermit.Logger
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
@@ -34,7 +35,7 @@ fun CreateScreen() {
             type = PickerType.Image,
             mode = PickerMode.Multiple()
         ) { files ->
-            // Handle picked files
+            Logger.i { "Selected files: ${files?.joinToString { it.name }}" }
         }
 
         Button(onClick = { launcher.launch() }) {
