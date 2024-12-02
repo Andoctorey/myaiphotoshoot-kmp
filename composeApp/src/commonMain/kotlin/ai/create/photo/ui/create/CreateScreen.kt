@@ -13,6 +13,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.core.PickerMode
+import io.github.vinceglb.filekit.core.PickerType
 import org.jetbrains.compose.resources.stringResource
 import photocreateai.composeapp.generated.resources.*
 
@@ -26,13 +29,18 @@ fun CreateScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Button(
-            onClick = {
-            },
-        ) {
+        val launcher = rememberFilePickerLauncher(
+            title = stringResource(Res.string.add_your_photos),
+            type = PickerType.Image,
+            mode = PickerMode.Multiple()
+        ) { files ->
+            // Handle picked files
+        }
+
+        Button(onClick = { launcher.launch() }) {
             Text(
                 text = stringResource(Res.string.add_your_photos),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
         }
     }
