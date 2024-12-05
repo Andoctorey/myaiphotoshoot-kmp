@@ -58,6 +58,7 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.multidex)
         }
 
         // https://www.jetbrains.com/help/kotlin-multiplatform-dev/whats-new-compose-170.html#across-platforms
@@ -78,6 +79,8 @@ kotlin {
 
             implementation(libs.filekit.compose)
             implementation(libs.kermit)
+
+            implementation(libs.firebase.auth)
         }
 
         desktopMain.dependencies {

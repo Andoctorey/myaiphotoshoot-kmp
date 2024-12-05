@@ -1,5 +1,6 @@
 package ai.create.photo.ui.create
 
+import ai.create.photo.data.firebase.auth.Auth
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,8 +19,10 @@ import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.*
 
+@Preview
 @Composable
 fun CreateScreen() {
     Column(
@@ -36,6 +39,15 @@ fun CreateScreen() {
             mode = PickerMode.Multiple()
         ) { files ->
             Logger.i { "Selected files: ${files?.joinToString { it.name }}" }
+        }
+
+        Button(onClick = {
+            Auth().userId
+        }) {
+            Text(
+                text = "Login",
+                textAlign = TextAlign.Center,
+            )
         }
 
         Button(onClick = { launcher.launch() }) {
