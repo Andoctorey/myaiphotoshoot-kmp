@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    kotlin("native.cocoapods")
 }
 
 kotlin {
@@ -17,6 +18,13 @@ kotlin {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
+    }
+
+    cocoapods {
+        // pod --version
+        version = "1.16.2"
+        ios.deploymentTarget = "13.5"
+        pod("FirebaseCore")
     }
     
     listOf(
@@ -29,7 +37,7 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     jvm("desktop")
     
     @OptIn(ExperimentalWasmDsl::class)
@@ -131,4 +139,8 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
     }
+}
+
+tasks.named("embedAndSignAppleFrameworkForXcode") {
+    enabled = false
 }
