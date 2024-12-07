@@ -1,6 +1,5 @@
 package ai.create.photo.ui.create
 
-import ai.create.photo.data.firebase.auth.Auth
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,7 +19,8 @@ import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import photocreateai.composeapp.generated.resources.*
+import photocreateai.composeapp.generated.resources.Res
+import photocreateai.composeapp.generated.resources.add_your_photos
 
 @Preview
 @Composable
@@ -42,7 +42,6 @@ fun CreateScreen() {
         }
 
         Button(onClick = {
-            Auth().userId
         }) {
             Text(
                 text = "Login",

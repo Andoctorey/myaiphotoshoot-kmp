@@ -9,7 +9,6 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    kotlin("native.cocoapods")
 }
 
 kotlin {
@@ -20,13 +19,6 @@ kotlin {
         }
     }
 
-    cocoapods {
-        // pod --version
-        version = "1.16.2"
-        ios.deploymentTarget = "13.5"
-        pod("FirebaseCore")
-    }
-    
     listOf(
         iosX64(),
         iosArm64(),
@@ -35,11 +27,13 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+            freeCompilerArgs += listOf("-Xbinary=bundleId=ai.create.photo")
         }
     }
 
     jvm("desktop")
-    
+
+    // ./gradlew kotlinUpgradeYarnLock
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         moduleName = "composeApp"
@@ -87,8 +81,6 @@ kotlin {
 
             implementation(libs.filekit.compose)
             implementation(libs.kermit)
-
-            implementation(libs.firebase.auth)
         }
 
         desktopMain.dependencies {
@@ -139,8 +131,4 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
     }
-}
-
-tasks.named("embedAndSignAppleFrameworkForXcode") {
-    enabled = false
 }
