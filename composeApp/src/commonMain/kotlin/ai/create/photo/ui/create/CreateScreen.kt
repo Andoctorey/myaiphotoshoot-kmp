@@ -1,5 +1,6 @@
 package ai.create.photo.ui.create
 
+import ai.create.photo.supabase.Supabase
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,6 +43,7 @@ fun CreateScreen() {
         }
 
         Button(onClick = {
+            Supabase.init()
         }) {
             Text(
                 text = "Login",

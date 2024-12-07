@@ -54,25 +54,12 @@ kotlin {
     }
 
     sourceSets {
-        val desktopMain by getting
 
-        val commonJvmMain by creating {
-            dependencies {
-                implementation(libs.ktor.client.cio)
-            }
-        }
-
-        jvmMain {
-            dependsOn(commonJvmMain)
-        }
-
-        androidMain {
-            dependsOn(commonJvmMain)
-            dependencies {
+        androidMain.dependencies {
                 implementation(compose.preview)
                 implementation(libs.androidx.activity.compose)
                 implementation(libs.androidx.multidex)
-            }
+            implementation(libs.ktor.client.cio)
         }
 
         iosMain.dependencies {
@@ -84,9 +71,11 @@ kotlin {
             implementation(libs.ktor.client.js)
         }
 
+        val desktopMain by getting
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
+            implementation(libs.ktor.client.cio)
         }
 
         // https://www.jetbrains.com/help/kotlin-multiplatform-dev/whats-new-compose-170.html#across-platforms
