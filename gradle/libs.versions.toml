@@ -6,11 +6,13 @@ android-targetSdk = "34"
 androidx-activityCompose = "1.9.3"
 androidx-lifecycle = "2.8.4"
 androidx-navigation = "2.7.0-alpha06"
+supabase = "3.0.3"
 compose-multiplatform = "1.7.1"
 filekitCompose = "0.8.7"
-kermit = "2.0.4"
+kermit = "2.0.5"
 kotlin = "2.1.0"
 kotlinx-coroutines = "1.9.0"
+ktorClientCio = "3.0.2"
 materialNavigation = "1.7.0-beta02"
 multidex = "2.0.1"
 
@@ -22,8 +24,15 @@ androidx-lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", nam
 androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 androidx-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "androidx-navigation" }
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktorClientCio" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktorClientCio" }
+ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktorClientCio" }
 material-navigation = { module = "org.jetbrains.compose.material:material-navigation", version.ref = "materialNavigation" }
 kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
+supabase-auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt", version.ref = "supabase" }
+supabase-postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt", version.ref = "supabase" }
+supabase-realtime-kt = { module = "io.github.jan-tennert.supabase:realtime-kt", version.ref = "supabase" }
+supabase-storage-kt = { module = "io.github.jan-tennert.supabase:storage-kt", version.ref = "supabase" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

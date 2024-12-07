@@ -33,7 +33,6 @@ kotlin {
 
     jvm("desktop")
 
-    // ./gradlew kotlinUpgradeYarnLock
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         moduleName = "composeApp"
@@ -53,14 +52,41 @@ kotlin {
         }
         binaries.executable()
     }
-    
+
     sourceSets {
         val desktopMain by getting
-        
-        androidMain.dependencies {
-            implementation(compose.preview)
-            implementation(libs.androidx.activity.compose)
-            implementation(libs.androidx.multidex)
+
+        val commonJvmMain by creating {
+            dependencies {
+                implementation(libs.ktor.client.cio)
+            }
+        }
+
+        jvmMain {
+            dependsOn(commonJvmMain)
+        }
+
+        androidMain {
+            dependsOn(commonJvmMain)
+            dependencies {
+                implementation(compose.preview)
+                implementation(libs.androidx.activity.compose)
+                implementation(libs.androidx.multidex)
+            }
+        }
+
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
+        }
+
+        // ./gradlew kotlinUpgradeYarnLock
+        wasmJsMain.dependencies {
+            implementation(libs.ktor.client.js)
+        }
+
+        desktopMain.dependencies {
+            implementation(compose.desktop.currentOs)
+            implementation(libs.kotlinx.coroutines.swing)
         }
 
         // https://www.jetbrains.com/help/kotlin-multiplatform-dev/whats-new-compose-170.html#across-platforms
@@ -79,13 +105,14 @@ kotlin {
 
             implementation(libs.material.navigation)
 
+            implementation(libs.supabase.postgrest.kt)
+            implementation(libs.supabase.auth.kt)
+            implementation(libs.supabase.realtime.kt)
+            implementation(libs.supabase.storage.kt)
+
+            // third-party
             implementation(libs.filekit.compose)
             implementation(libs.kermit)
-        }
-
-        desktopMain.dependencies {
-            implementation(compose.desktop.currentOs)
-            implementation(libs.kotlinx.coroutines.swing)
         }
     }
 }
