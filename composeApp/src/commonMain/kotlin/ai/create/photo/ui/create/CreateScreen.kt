@@ -1,19 +1,18 @@
 package ai.create.photo.ui.create
 
-import ai.create.photo.supabase.Supabase
+import StatefulButton
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import co.touchlab.kermit.Logger
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerMode
@@ -25,7 +24,9 @@ import photocreateai.composeapp.generated.resources.add_your_photos
 
 @Preview
 @Composable
-fun CreateScreen() {
+fun CreateScreen(
+    viewModel: CreateViewModel = viewModel { CreateViewModel() },
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -42,20 +43,18 @@ fun CreateScreen() {
             Logger.i { "Selected files: ${files?.joinToString { it.name }}" }
         }
 
-        Button(onClick = {
-            Supabase.init()
-        }) {
-            Text(
-                text = "Login",
-                textAlign = TextAlign.Center,
-            )
+        val state = viewModel.uiState
+        LaunchedEffect(state) {
+            Logger.v { state.toString() }
         }
 
-        Button(onClick = { launcher.launch() }) {
-            Text(
-                text = stringResource(Res.string.add_your_photos),
-                textAlign = TextAlign.Center,
-            )
-        }
+        StatefulButton(
+            text = stringResource(Res.string.add_your_photos),
+            isLoading = state.loading,
+            errorMessage = state.uploadError,
+            onClick = {
+                launcher.launch()
+            },
+        )
     }
 }
