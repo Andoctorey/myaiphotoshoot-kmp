@@ -5,4 +5,5 @@
     <string name="tab_3">Settings</string>
     <string name="back_button">Back</string>
     <string name="add_your_photos">Add your photos</string>
+    <string name="upload_guidelines_message">Select and upload at least 10 high-quality, clear photos of yourself (ideally 15–20) from your gallery. Choose images with varied angles, different lighting conditions, and simple, solid-colored clothing. Make sure you are the only person in each photo, keep the background uncluttered, and include natural, relaxed expressions.</string>
 </resources>

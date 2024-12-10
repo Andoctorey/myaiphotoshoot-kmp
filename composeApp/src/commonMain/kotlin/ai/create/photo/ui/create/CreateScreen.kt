@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -33,6 +34,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.add_your_photos
+import photocreateai.composeapp.generated.resources.upload_guidelines_message
 
 @Preview
 @Composable
@@ -40,7 +42,7 @@ fun CreateScreen(
     viewModel: CreateViewModel = viewModel { CreateViewModel() },
 ) {
     Box(
-        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
+        modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
     ) {
         val launcher = rememberFilePickerLauncher(
             title = stringResource(Res.string.add_your_photos),
@@ -53,8 +55,10 @@ fun CreateScreen(
 
         val state = viewModel.uiState
 
+        Placeholder(modifier = Modifier.align(Alignment.TopStart))
+
         AddPhotosFab(
-            modifier = Modifier.align(Alignment.BottomCenter),
+            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
             uploadProgress = state.uploadProgress,
             errorMessage = state.uploadError,
         ) {
@@ -64,7 +68,20 @@ fun CreateScreen(
 }
 
 @Composable
-fun AddPhotosFab(
+private fun Placeholder(modifier: Modifier) {
+    Column(
+        modifier = modifier.verticalScroll(rememberScrollState()).safeDrawingPadding()
+            .padding(vertical = 82.dp), // fab
+    ) {
+        Text(
+            text = stringResource(Res.string.upload_guidelines_message),
+            style = MaterialTheme.typography.bodyMedium,
+        )
+    }
+}
+
+@Composable
+private fun AddPhotosFab(
     modifier: Modifier, uploadProgress: Int, errorMessage: String?, onClick: () -> Unit
 ) {
     Column(
