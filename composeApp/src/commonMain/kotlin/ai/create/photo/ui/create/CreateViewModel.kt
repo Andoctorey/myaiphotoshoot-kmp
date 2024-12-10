@@ -23,7 +23,7 @@ class CreateViewModel : ViewModel() {
         Logger.i { "Selected files: ${files.joinToString { it.name }}" }
         if (files.isEmpty()) return@launch
 
-        uiState = uiState.copy(loading = true, uploadProgress = 0, uploadError = null)
+        uiState = uiState.copy(uploadProgress = 1, uploadError = null)
 
         val totalFiles = files.size
         var completedFiles = 0
@@ -31,7 +31,7 @@ class CreateViewModel : ViewModel() {
             supabase.uploadPhoto(file).catch {
                 Logger.e("upload failed", it)
                 uiState = uiState.copy(
-                    loading = false,
+                    uploadProgress = 0,
                     uploadError = it.message ?: "Unknown error"
                 )
             }.collect { status ->
@@ -49,9 +49,6 @@ class CreateViewModel : ViewModel() {
                         val overallProgress =
                             ((completedFiles.toFloat() / totalFiles) * 100).toInt()
                         uiState = uiState.copy(uploadProgress = overallProgress)
-                        if (completedFiles == totalFiles) {
-                            uiState = uiState.copy(loading = false)
-                        }
                     }
                 }
             }

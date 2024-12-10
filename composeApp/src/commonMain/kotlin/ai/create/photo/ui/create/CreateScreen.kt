@@ -1,22 +1,31 @@
 package ai.create.photo.ui.create
 
-import StatefulButton
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import co.touchlab.kermit.Logger
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
@@ -30,13 +39,8 @@ import photocreateai.composeapp.generated.resources.add_your_photos
 fun CreateScreen(
     viewModel: CreateViewModel = viewModel { CreateViewModel() },
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+    Box(
+        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
     ) {
         val launcher = rememberFilePickerLauncher(
             title = stringResource(Res.string.add_your_photos),
@@ -48,25 +52,65 @@ fun CreateScreen(
         }
 
         val state = viewModel.uiState
-        LaunchedEffect(state) {
-            Logger.v { state.toString() }
-        }
 
-        if (state.loading && state.uploadProgress > 0) {
+        AddPhotosFab(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            uploadProgress = state.uploadProgress,
+            errorMessage = state.uploadError,
+        ) {
+            launcher.launch()
+        }
+    }
+}
+
+@Composable
+fun AddPhotosFab(
+    modifier: Modifier, uploadProgress: Int, errorMessage: String?, onClick: () -> Unit
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Bottom,
+    ) {
+        val isLoading = uploadProgress in 1 until 100 || errorMessage != null
+        if (uploadProgress in 1 until 100) {
             Text(
-                text = "${state.uploadProgress}%",
+                text = "${uploadProgress}%",
                 fontSize = 12.sp,
             )
-            LinearProgressIndicator(progress = { state.uploadProgress / 100f })
+            LinearProgressIndicator(progress = { uploadProgress / 100f })
         } else {
-            StatefulButton(
-                text = stringResource(Res.string.add_your_photos),
-                isLoading = state.loading,
-                errorMessage = state.uploadError,
-                onClick = {
-                    launcher.launch()
-                },
-            )
+            if (errorMessage != null) {
+                Text(
+                    fontSize = 12.sp,
+                    text = errorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            ExtendedFloatingActionButton(
+                onClick = { if (!isLoading) onClick() },
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AddAPhoto,
+                        contentDescription = "error",
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(
+                        text = stringResource(Res.string.add_your_photos),
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            }
         }
     }
 }
