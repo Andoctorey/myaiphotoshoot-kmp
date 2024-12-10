@@ -108,7 +108,7 @@ kotlin {
 
 android {
     namespace = "ai.create.photo"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    compileSdk = libs.versions.android.targetSdk.get().toInt()
 
     defaultConfig {
         applicationId = "ai.create.photo"
