@@ -21,7 +21,17 @@ class CreateViewModel : ViewModel() {
 
     init {
         uiState = uiState.copy(isLoading = true)
-        SupabaseAuth.authStatus
+        viewModelScope.launch {
+            try {
+                SupabaseAuth.signInAnonymously()
+            } catch (e: Exception) {
+                Logger.e("Sign in failed", e)
+                uiState = uiState.copy(
+                    isLoading = false,
+                    loadingError = e.message ?: "Unknown error"
+                )
+            }
+        }
     }
 
     fun uploadPhotos(files: PlatformFiles) = viewModelScope.launch {

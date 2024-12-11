@@ -14,7 +14,7 @@ object SupabaseAuth {
 
     init {
         MainScope().launch {
-            supabase.auth.signInAnonymously()
+
         }
     }
 
@@ -25,4 +25,8 @@ object SupabaseAuth {
     val userId: String
         get() = (authStatus.value as? Authenticated)?.session?.user?.id
             ?: throw IllegalStateException("Please sign in")
+
+    suspend fun signInAnonymously() {
+        supabase.auth.signInAnonymously()
+    }
 }
