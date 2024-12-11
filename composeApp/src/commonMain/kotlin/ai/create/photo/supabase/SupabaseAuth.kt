@@ -27,6 +27,7 @@ object SupabaseAuth {
             ?: throw IllegalStateException("Please sign in")
 
     suspend fun signInAnonymously() {
+        supabase.auth.signOut()
         supabase.auth.signInAnonymously()
     }
 }

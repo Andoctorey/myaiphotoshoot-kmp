@@ -1,6 +1,7 @@
 package ai.create.photo.ui.create
 
 import ai.create.photo.supabase.SupabaseAuth
+import ai.create.photo.supabase.SupabaseDatabase
 import ai.create.photo.supabase.SupabaseStorage
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,6 +16,10 @@ import kotlinx.coroutines.launch
 
 class CreateViewModel : ViewModel() {
 
+    private val uploadPhotoUseCase = UploadPhotoUseCase(
+        storage = SupabaseStorage,
+        database = SupabaseDatabase,
+    )
 
     var uiState by mutableStateOf(CreateUiState())
         private set
@@ -43,7 +48,7 @@ class CreateViewModel : ViewModel() {
         val totalFiles = files.size
         var completedFiles = 0
         for (file in files) {
-            SupabaseStorage.uploadPhoto(file).catch {
+            uploadPhotoUseCase(file).catch {
                 Logger.e("upload failed", it)
                 uiState = uiState.copy(
                     uploadProgress = 0,
