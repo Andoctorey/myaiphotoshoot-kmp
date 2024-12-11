@@ -1,5 +1,7 @@
 package ai.create.photo.ui.create
 
+import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
+import ai.create.photo.ui.compose.LoadingPlaceholder
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +12,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -43,6 +47,7 @@ fun CreateScreen(
 ) {
     Box(
         modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
+        contentAlignment = Alignment.Center,
     ) {
         val launcher = rememberFilePickerLauncher(
             title = stringResource(Res.string.add_your_photos),
@@ -55,7 +60,16 @@ fun CreateScreen(
 
         val state = viewModel.uiState
 
-        Placeholder(modifier = Modifier.align(Alignment.TopStart))
+        if (state.isLoading) {
+            Spacer(modifier = Modifier.height(20.dp))
+            LoadingPlaceholder()
+        } else if (state.loadingError != null) {
+            ErrorMessagePlaceHolder(state.loadingError)
+        } else if (state.photos.isNullOrEmpty()) {
+            Placeholder(modifier = Modifier.align(Alignment.TopStart))
+        } else {
+            Photos(state.photos)
+        }
 
         AddPhotosFab(
             modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
@@ -130,4 +144,25 @@ private fun AddPhotosFab(
             }
         }
     }
+}
+
+
+@Composable
+private fun Photos(photos: List<CreateUiState.Photo>) {
+    LazyVerticalStaggeredGrid(
+        columns = StaggeredGridCells.Adaptive(minSize = 128.dp),
+        verticalItemSpacing = 4.dp,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = Modifier.fillMaxSize(),
+
+        ) {
+        items(photos.size, key = { photos[it] }) { item ->
+            Photo(photos[item])
+        }
+    }
+}
+
+@Composable
+private fun Photo(photo: CreateUiState.Photo) {
+    Text(text = photo.url ?: "")
 }

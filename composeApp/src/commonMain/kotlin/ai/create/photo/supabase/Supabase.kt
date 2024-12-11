@@ -47,7 +47,7 @@ object Supabase {
             ?: throw IllegalStateException("Please sign in")
 
     suspend fun uploadPhoto(file: PlatformFile): Flow<UploadStatus> {
-        val filePath = "${userId}/${file.name}"
+        val filePath = "${userId}/folder1/${file.name}"
         Logger.i("uploadPhoto $filePath, size: ${file.getSize()}")
         return supabase.storage
             .from("photos")

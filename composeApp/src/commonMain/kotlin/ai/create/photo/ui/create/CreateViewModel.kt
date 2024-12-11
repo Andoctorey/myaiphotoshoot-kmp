@@ -19,6 +19,10 @@ class CreateViewModel : ViewModel() {
     var uiState by mutableStateOf(CreateUiState())
         private set
 
+    init {
+        uiState = uiState.copy(isLoading = true)
+    }
+
     fun uploadPhotos(files: PlatformFiles) = viewModelScope.launch {
         Logger.i { "Selected files: ${files.joinToString { it.name }}" }
         if (files.isEmpty()) return@launch
