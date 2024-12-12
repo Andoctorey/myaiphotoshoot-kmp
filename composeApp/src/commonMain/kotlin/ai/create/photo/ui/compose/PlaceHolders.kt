@@ -53,6 +53,7 @@ fun ErrorMessagePlaceHolder(errorMessage: String) {
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
+            .padding(horizontal = 24.dp)
             .safeDrawingPadding(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally

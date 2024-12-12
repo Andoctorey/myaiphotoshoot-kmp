@@ -54,7 +54,7 @@ class CreateViewModel : ViewModel() {
     }
 
     private fun loadPhotos() = viewModelScope.launch {
-        uiState = uiState.copy(isLoading = true)
+        uiState = uiState.copy(isLoading = uiState.photos == null)
         try {
             val files = SupabaseDatabase.getFiles().getOrThrow()
             val filePaths = files.map { it.filePath }
