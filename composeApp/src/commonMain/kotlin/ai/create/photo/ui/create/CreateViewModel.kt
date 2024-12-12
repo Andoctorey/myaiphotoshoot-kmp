@@ -9,6 +9,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
+import io.github.jan.supabase.auth.status.RefreshFailureCause
+import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.storage.UploadStatus
 import io.github.vinceglb.filekit.core.PlatformFiles
 import kotlinx.coroutines.flow.catch
@@ -25,10 +27,22 @@ class CreateViewModel : ViewModel() {
         private set
 
     init {
-        uiState = uiState.copy(isLoading = true)
         viewModelScope.launch {
             try {
-                SupabaseAuth.signInAnonymously()
+                SupabaseAuth.sessionStatus.collect {
+                    when (it) {
+                        is SessionStatus.Authenticated -> loadPhotos()
+                        is SessionStatus.NotAuthenticated -> SupabaseAuth.signInAnonymously()
+                        is SessionStatus.Initializing -> uiState = uiState.copy(isLoading = true)
+                        is SessionStatus.RefreshFailure -> {
+                            val cause = it.cause
+                            when (cause) {
+                                is RefreshFailureCause.NetworkError -> throw cause.exception
+                                is RefreshFailureCause.InternalServerError -> throw cause.exception
+                            }
+                        }
+                    }
+                }
             } catch (e: Exception) {
                 Logger.e("Sign in failed", e)
                 uiState = uiState.copy(
@@ -36,6 +50,31 @@ class CreateViewModel : ViewModel() {
                     loadingError = e.message ?: "Unknown error"
                 )
             }
+        }
+    }
+
+    fun loadPhotos() = viewModelScope.launch {
+        uiState = uiState.copy(isLoading = true)
+        try {
+            val files = SupabaseDatabase.getFiles().getOrThrow()
+            val filePaths = files.map { it.filePath }
+            val urls = SupabaseStorage.getFileUrls(filePaths).getOrThrow()
+            uiState = uiState.copy(
+                isLoading = false,
+                photos = files.mapIndexed { index, file ->
+                    CreateUiState.Photo(
+                        id = file.id,
+                        createdAt = file.createdAt,
+                        url = urls[index].path
+                    )
+                }
+            )
+        } catch (e: Exception) {
+            Logger.e("Loading photos failed", e)
+            uiState = uiState.copy(
+                isLoading = false,
+                loadingError = e.message ?: "Unknown error"
+            )
         }
     }
 
@@ -66,6 +105,7 @@ class CreateViewModel : ViewModel() {
 
                     is UploadStatus.Success -> {
                         completedFiles++
+                        loadPhotos()
                         val overallProgress =
                             ((completedFiles.toFloat() / totalFiles) * 100).toInt()
                         uiState = uiState.copy(uploadProgress = overallProgress)

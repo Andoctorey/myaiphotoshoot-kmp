@@ -1,6 +1,7 @@
 package ai.create.photo.ui.create
 
 import androidx.compose.runtime.Immutable
+import kotlinx.datetime.Instant
 
 @Immutable
 data class CreateUiState(
@@ -14,6 +15,8 @@ data class CreateUiState(
 
     @Immutable
     data class Photo(
-        val url: String? = null,
+        val id: String,
+        val url: String,
+        val createdAt: Instant,
     )
 }

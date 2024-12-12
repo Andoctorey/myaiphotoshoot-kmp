@@ -164,5 +164,5 @@ private fun Photos(photos: List<CreateUiState.Photo>) {
 
 @Composable
 private fun Photo(photo: CreateUiState.Photo) {
-    Text(text = photo.url ?: "")
+    Text(text = photo.url)
 }
