@@ -53,7 +53,7 @@ class CreateViewModel : ViewModel() {
         }
     }
 
-    fun loadPhotos() = viewModelScope.launch {
+    private fun loadPhotos() = viewModelScope.launch {
         uiState = uiState.copy(isLoading = true)
         try {
             val files = SupabaseDatabase.getFiles().getOrThrow()
@@ -65,7 +65,7 @@ class CreateViewModel : ViewModel() {
                     CreateUiState.Photo(
                         id = file.id,
                         createdAt = file.createdAt,
-                        url = urls[index].path
+                        url = urls[index].signedURL
                     )
                 }
             )
@@ -99,7 +99,7 @@ class CreateViewModel : ViewModel() {
                         val currentFileProgress =
                             status.totalBytesSend.toFloat() / status.contentLength * 100
                         val overallProgress =
-                            (((completedFiles) + currentFileProgress / 100) / totalFiles) * 100
+                            (((completedFiles) + currentFileProgress / 100) / totalFiles) * 100 - 1// waiting for db
                         uiState = uiState.copy(uploadProgress = overallProgress.toInt())
                     }
 

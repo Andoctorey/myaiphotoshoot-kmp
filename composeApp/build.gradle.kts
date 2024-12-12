@@ -101,6 +101,9 @@ kotlin {
             implementation(libs.supabase.realtime.kt)
             implementation(libs.supabase.storage.kt)
 
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.ktor)
+
             // third-party
             implementation(libs.filekit.compose)
             implementation(libs.kermit)

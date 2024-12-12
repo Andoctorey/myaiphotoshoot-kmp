@@ -5,19 +5,26 @@ import ai.create.photo.ui.compose.LoadingPlaceholder
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.outlined.Downloading
+import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -26,11 +33,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil3.compose.AsyncImage
+import coil3.compose.LocalPlatformContext
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
@@ -46,7 +59,7 @@ fun CreateScreen(
     viewModel: CreateViewModel = viewModel { CreateViewModel() },
 ) {
     Box(
-        modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
+        modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
         contentAlignment = Alignment.Center,
     ) {
         val launcher = rememberFilePickerLauncher(
@@ -150,13 +163,17 @@ private fun AddPhotosFab(
 @Composable
 private fun Photos(photos: List<CreateUiState.Photo>) {
     LazyVerticalStaggeredGrid(
-        columns = StaggeredGridCells.Adaptive(minSize = 128.dp),
-        verticalItemSpacing = 4.dp,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
         modifier = Modifier.fillMaxSize(),
+        columns = StaggeredGridCells.Adaptive(minSize = 512.dp),
+        verticalItemSpacing = 8.dp,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(vertical = 8.dp),
+    ) {
+        item {
+            Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
+        }
 
-        ) {
-        items(photos.size, key = { photos[it] }) { item ->
+        items(photos.size, key = { photos[it].id }) { item ->
             Photo(photos[item])
         }
     }
@@ -164,5 +181,16 @@ private fun Photos(photos: List<CreateUiState.Photo>) {
 
 @Composable
 private fun Photo(photo: CreateUiState.Photo) {
-    Text(text = photo.url)
+    AsyncImage(
+        modifier = Modifier.clip(RoundedCornerShape(8.dp)),
+        model = ImageRequest.Builder(LocalPlatformContext.current)
+            .data(photo.url)
+            .memoryCacheKey(photo.id)
+            .diskCacheKey(photo.id)
+            .crossfade(true)
+            .build(),
+        placeholder = rememberVectorPainter(image = Icons.Outlined.Downloading),
+        error = rememberVectorPainter(image = Icons.Outlined.ErrorOutline),
+        contentDescription = "photo",
+    )
 }

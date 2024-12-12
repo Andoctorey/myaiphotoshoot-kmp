@@ -5,6 +5,7 @@ import ai.create.photo.supabase.SupabaseAuth.userId
 import ai.create.photo.supabase.model.UserFile
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 
 object SupabaseDatabase {
@@ -23,7 +24,9 @@ object SupabaseDatabase {
     suspend fun getFiles(): Result<List<UserFile>> = runCatching {
         supabase
             .from(USER_FILES_TABLE)
-            .select()
+            .select {
+                order(column = "created_at", order = Order.DESCENDING)
+            }
             .decodeList<UserFile>()
             .also {
                 Logger.i("getFiles result ${it.size}: ${it.joinToString()}")
