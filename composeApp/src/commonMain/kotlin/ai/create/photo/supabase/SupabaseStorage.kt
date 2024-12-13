@@ -33,4 +33,9 @@ object SupabaseStorage {
             path = "${userId}/$PHOTOS_FOLDER/${filePath}",
             expiresIn = 3650.days,
         )
+
+    suspend fun deleteFile(path: String) {
+        Logger.i("delete file from storage $path")
+        supabase.storage.from(BUCKET).delete(path)
+    }
 }

@@ -13,11 +13,14 @@ data class CreateUiState(
 
     val uploadProgress: Int = 0,
     val uploadError: Throwable? = null,
+
+    val deleteError: Throwable? = null,
 ) {
 
     @Immutable
     data class Photo(
         val id: String,
+        val path: String,
         val url: String,
         val createdAt: Instant,
     )

@@ -32,4 +32,13 @@ object SupabaseDatabase {
                 Logger.i("getFiles result ${it.size}: ${it.joinToString()}")
             }
     }
+
+    suspend fun deleteFile(id: String) {
+        Logger.i("delete file from db $id")
+        supabase.from(USER_FILES_TABLE).delete {
+            filter {
+                eq("id", id)
+            }
+        }
+    }
 }

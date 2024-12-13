@@ -3,6 +3,7 @@ package ai.create.photo.ui.create
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.compose.getFriendlyError
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,11 +24,14 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -38,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -87,7 +92,9 @@ fun CreateScreen(
         } else if (state.photos.isNullOrEmpty()) {
             Placeholder(modifier = Modifier.align(Alignment.Center))
         } else {
-            Photos(state.photos, state.listState)
+            Photos(state.photos, state.listState) {
+                viewModel.deletePhoto(it)
+            }
         }
 
         AddPhotosFab(
@@ -170,7 +177,11 @@ private fun AddPhotosFab(
 
 
 @Composable
-private fun Photos(photos: List<CreateUiState.Photo>, listState: LazyStaggeredGridState) {
+private fun Photos(
+    photos: List<CreateUiState.Photo>,
+    listState: LazyStaggeredGridState,
+    onDelete: (CreateUiState.Photo) -> Unit,
+) {
     LazyVerticalStaggeredGrid(
         state = listState,
         modifier = Modifier.fillMaxSize(),
@@ -183,13 +194,13 @@ private fun Photos(photos: List<CreateUiState.Photo>, listState: LazyStaggeredGr
         }
 
         items(photos.size, key = { photos[it].id }) { item ->
-            Photo(photos[item])
+            Photo(photos[item], onDelete)
         }
     }
 }
 
 @Composable
-private fun Photo(photo: CreateUiState.Photo) {
+private fun Photo(photo: CreateUiState.Photo, onDelete: (CreateUiState.Photo) -> Unit) {
     var loading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<Throwable?>(null) }
 
@@ -209,17 +220,36 @@ private fun Photo(photo: CreateUiState.Photo) {
         }
     }
 
-    AsyncImage(
-        model = ImageRequest.Builder(LocalPlatformContext.current)
-            .data(photo.url)
-            .crossfade(true)
-            .build(),
-        contentScale = ContentScale.FillWidth,
-        onSuccess = { loading = false },
-        onError = {
-            Logger.e("error loading image", it.result.throwable)
-            error = it.result.throwable
-        },
-        contentDescription = "photo",
-    )
+    Box(modifier = Modifier.fillMaxWidth()) {
+        AsyncImage(
+            modifier = Modifier.fillMaxWidth(),
+            model = ImageRequest.Builder(LocalPlatformContext.current)
+                .data(photo.url)
+                .crossfade(true)
+                .build(),
+            contentScale = ContentScale.FillWidth,
+            onSuccess = { loading = false },
+            onError = {
+                Logger.e("error loading image", it.result.throwable)
+                error = it.result.throwable
+            },
+            contentDescription = "photo",
+        )
+
+        if (!loading && error == null) {
+            IconButton(
+                onClick = { onDelete(photo) },
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+                    .background(Color.Black.copy(alpha = 0.5f), shape = CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "delete",
+                    tint = Color.White,
+                )
+            }
+        }
+    }
 }

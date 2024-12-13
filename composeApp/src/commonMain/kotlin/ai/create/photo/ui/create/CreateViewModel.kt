@@ -12,6 +12,7 @@ import io.github.jan.supabase.storage.UploadStatus
 import io.github.vinceglb.filekit.core.PlatformFiles
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import kotlin.math.min
 
 class CreateViewModel : SessionViewModel() {
 
@@ -49,6 +50,7 @@ class CreateViewModel : SessionViewModel() {
                     CreateUiState.Photo(
                         id = file.id,
                         createdAt = file.createdAt,
+                        path = file.filePath,
                         url = file.signedUrl,
                     )
                 }
@@ -77,8 +79,8 @@ class CreateViewModel : SessionViewModel() {
                         val currentFileProgress =
                             status.totalBytesSend.toFloat() / status.contentLength * 100
                         val overallProgress =
-                            (((completedFiles) + currentFileProgress / 100) / totalFiles) * 100 - 1// waiting for db
-                        uiState = uiState.copy(uploadProgress = overallProgress.toInt())
+                            (((completedFiles) + currentFileProgress / 100) / totalFiles) * 100
+                        uiState = uiState.copy(uploadProgress = min(overallProgress.toInt() - 5, 0))
                     }
 
                     is UploadStatus.Success -> {
@@ -90,6 +92,18 @@ class CreateViewModel : SessionViewModel() {
                     }
                 }
             }
+        }
+    }
+
+    fun deletePhoto(photo: CreateUiState.Photo) = viewModelScope.launch {
+        val photos = uiState.photos ?: return@launch
+        uiState = uiState.copy(photos = photos.filter { it.id != photo.id })
+        try {
+            SupabaseDatabase.deleteFile(photo.id)
+            SupabaseStorage.deleteFile(photo.path)
+        } catch (e: Exception) {
+            Logger.e("Delete photo failed", e)
+            uiState = uiState.copy(photos = photos)
         }
     }
 }
