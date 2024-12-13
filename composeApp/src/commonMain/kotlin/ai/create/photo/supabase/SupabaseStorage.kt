@@ -33,7 +33,7 @@ object SupabaseStorage {
         supabase.storage
             .from(BUCKET)
             .createSignedUrls(
-                expiresIn = 3.minutes,
+                expiresIn = 30.minutes,
                 filePaths.map { "${userId}/$PHOTOS_FOLDER/${it}" }
             )
             .also { Logger.i("getFileUrls count ${it.size}") }
