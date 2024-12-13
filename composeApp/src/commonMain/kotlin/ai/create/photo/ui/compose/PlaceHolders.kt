@@ -26,12 +26,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.jan.supabase.exceptions.HttpRequestException
+import io.ktor.util.network.UnresolvedAddressException
+import kotlinx.io.IOException
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import photocreateai.composeapp.generated.resources.Res
+import photocreateai.composeapp.generated.resources.connection_error
 
 @Preview
-@Composable
-private fun LoadingPlaceholderPreview() = LoadingPlaceholder()
-
 @Composable
 fun LoadingPlaceholder() {
     CircularProgressIndicator(
@@ -41,14 +44,17 @@ fun LoadingPlaceholder() {
     )
 }
 
+@Composable
+fun Throwable.getFriendlyError() = when (this) {
+    is HttpRequestException -> stringResource(Res.string.connection_error)
+    is IOException -> stringResource(Res.string.connection_error)
+    is UnresolvedAddressException -> stringResource(Res.string.connection_error)
+    else -> this.message.toString()
+}
+
 @Preview
 @Composable
-private fun ErrorMessagePlaceHolderPreview() =
-    ErrorMessagePlaceHolder("Error message Error message Error message")
-
-
-@Composable
-fun ErrorMessagePlaceHolder(errorMessage: String) {
+fun ErrorMessagePlaceHolder(errorMessage: Throwable) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -61,12 +67,12 @@ fun ErrorMessagePlaceHolder(errorMessage: String) {
         Icon(
             modifier = Modifier.size(48.dp),
             imageVector = Icons.Outlined.ErrorOutline,
-            contentDescription = errorMessage,
+            contentDescription = errorMessage.message,
             tint = MaterialTheme.colorScheme.error,
         )
         Spacer(modifier = Modifier.height(24.dp))
         Text(
-            text = errorMessage,
+            text = errorMessage.getFriendlyError(),
             color = MaterialTheme.colorScheme.error,
             fontSize = 24.sp,
             textAlign = TextAlign.Center,
@@ -75,10 +81,6 @@ fun ErrorMessagePlaceHolder(errorMessage: String) {
 }
 
 @Preview
-@Composable
-private fun ErrorMessagePreview() =
-    ErrorMessage("Error message Error message Error message Error message")
-
 @Composable
 fun ErrorMessage(errorMessage: String) {
     Row(

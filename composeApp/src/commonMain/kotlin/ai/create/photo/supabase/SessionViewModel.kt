@@ -42,7 +42,7 @@ abstract class SessionViewModel : ViewModel() {
             }
         } catch (e: Exception) {
             Logger.e("Sign in failed", e)
-            onError(e.message ?: "Unknown error")
+            onError(e)
         }
     }
 
@@ -51,5 +51,5 @@ abstract class SessionViewModel : ViewModel() {
 
     abstract fun onAuthenticated()
 
-    abstract fun onError(error: String)
+    abstract fun onError(error: Throwable)
 }

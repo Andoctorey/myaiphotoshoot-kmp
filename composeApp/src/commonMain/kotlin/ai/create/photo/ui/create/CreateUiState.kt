@@ -7,12 +7,12 @@ import kotlinx.datetime.Instant
 @Immutable
 data class CreateUiState(
     val isLoading: Boolean = false,
-    val loadingError: String? = null,
+    val loadingError: Throwable? = null,
     val photos: List<Photo>? = null,
     val listState: LazyStaggeredGridState = LazyStaggeredGridState(),
 
     val uploadProgress: Int = 0,
-    val uploadError: String? = null,
+    val uploadError: Throwable? = null,
 ) {
 
     @Immutable

@@ -2,6 +2,7 @@ package ai.create.photo.ui.create
 
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.LoadingPlaceholder
+import ai.create.photo.ui.compose.getFriendlyError
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,6 +44,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import co.touchlab.kermit.Logger
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
@@ -114,7 +116,7 @@ private fun Placeholder(modifier: Modifier) {
 
 @Composable
 private fun AddPhotosFab(
-    modifier: Modifier, uploadProgress: Int, errorMessage: String?, onClick: () -> Unit
+    modifier: Modifier, uploadProgress: Int, errorMessage: Throwable?, onClick: () -> Unit
 ) {
     Column(
         modifier = modifier,
@@ -132,7 +134,7 @@ private fun AddPhotosFab(
             if (errorMessage != null) {
                 Text(
                     fontSize = 12.sp,
-                    text = errorMessage,
+                    text = errorMessage.getFriendlyError(),
                     color = MaterialTheme.colorScheme.error,
                     textAlign = TextAlign.Center,
                     maxLines = 1,
@@ -187,7 +189,7 @@ private fun Photos(photos: List<CreateUiState.Photo>, listState: LazyStaggeredGr
 @Composable
 private fun Photo(photo: CreateUiState.Photo) {
     var loading by remember { mutableStateOf(true) }
-    var error by remember { mutableStateOf<String?>(null) }
+    var error by remember { mutableStateOf<Throwable?>(null) }
 
     if (error != null) {
         Box(
@@ -214,7 +216,10 @@ private fun Photo(photo: CreateUiState.Photo) {
             .build(),
         contentScale = ContentScale.FillWidth,
         onSuccess = { loading = false },
-        onError = { error = it.result.throwable.message ?: "Unknown error" },
+        onError = {
+            Logger.e("error loading image", it.result.throwable)
+            error = it.result.throwable
+        },
         contentDescription = "photo",
     )
 }

@@ -35,7 +35,7 @@ class CreateViewModel : SessionViewModel() {
         loadPhotos()
     }
 
-    override fun onError(error: String) {
+    override fun onError(error: Throwable) {
         uiState.copy(loadingError = error)
     }
 
@@ -57,10 +57,7 @@ class CreateViewModel : SessionViewModel() {
             )
         } catch (e: Exception) {
             Logger.e("Loading photos failed", e)
-            uiState = uiState.copy(
-                isLoading = false,
-                loadingError = e.message ?: "Unknown error"
-            )
+            uiState = uiState.copy(isLoading = false, loadingError = e)
         }
     }
 
@@ -75,10 +72,7 @@ class CreateViewModel : SessionViewModel() {
         for (file in files) {
             uploadPhotoUseCase(userId, file).catch {
                 Logger.e("upload failed", it)
-                uiState = uiState.copy(
-                    uploadProgress = 0,
-                    uploadError = it.message ?: "Unknown error"
-                )
+                uiState = uiState.copy(uploadProgress = 0, uploadError = it)
             }.collect { status ->
                 when (status) {
                     is UploadStatus.Progress -> {
