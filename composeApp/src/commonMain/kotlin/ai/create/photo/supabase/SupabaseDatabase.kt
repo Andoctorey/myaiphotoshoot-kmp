@@ -14,7 +14,8 @@ object SupabaseDatabase {
     suspend fun saveFile(userId: String, filePath: String): Result<PostgrestResult> = runCatching {
         val photoData = mapOf(
             "user_id" to userId,
-            "file_path" to filePath
+            "file_path" to filePath,
+            "signed_url" to SupabaseStorage.createSignedUrl(userId, filePath),
         )
         Logger.i("save file to db $filePath")
         supabase.from(USER_FILES_TABLE).upsert(photoData)

@@ -210,8 +210,6 @@ private fun Photo(photo: CreateUiState.Photo) {
     AsyncImage(
         model = ImageRequest.Builder(LocalPlatformContext.current)
             .data(photo.url)
-            .memoryCacheKey(photo.id)
-            .diskCacheKey(photo.id)
             .crossfade(true)
             .build(),
         contentScale = ContentScale.FillWidth,

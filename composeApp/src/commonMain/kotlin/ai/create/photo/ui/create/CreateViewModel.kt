@@ -43,15 +43,13 @@ class CreateViewModel : SessionViewModel() {
         uiState = uiState.copy(isLoading = uiState.photos == null)
         try {
             val files = SupabaseDatabase.getFiles().getOrThrow()
-            val filePaths = files.map { it.filePath }
-            val urls = SupabaseStorage.getFileUrls(userId, filePaths).getOrThrow()
             uiState = uiState.copy(
                 isLoading = false,
-                photos = files.mapIndexed { index, file ->
+                photos = files.map { file ->
                     CreateUiState.Photo(
                         id = file.id,
                         createdAt = file.createdAt,
-                        url = urls[index].signedURL
+                        url = file.signedUrl,
                     )
                 }
             )
