@@ -124,27 +124,29 @@ private fun AddPhotosFab(
         verticalArrangement = Arrangement.Bottom,
     ) {
         val isLoading = uploadProgress in 1 until 100 || errorMessage != null
-        if (uploadProgress in 1 until 100) {
+        if (errorMessage != null) {
             Text(
-                text = "${uploadProgress}%",
                 fontSize = 12.sp,
+                text = errorMessage.getFriendlyError(),
+                color = MaterialTheme.colorScheme.error,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
-            LinearProgressIndicator(progress = { uploadProgress / 100f })
-        } else {
-            if (errorMessage != null) {
-                Text(
-                    fontSize = 12.sp,
-                    text = errorMessage.getFriendlyError(),
-                    color = MaterialTheme.colorScheme.error,
-                    textAlign = TextAlign.Center,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-            ExtendedFloatingActionButton(
-                onClick = { if (!isLoading) onClick() },
-            ) {
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+        ExtendedFloatingActionButton(
+            onClick = { if (!isLoading) onClick() },
+        ) {
+            if (uploadProgress in 1 until 100) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "${uploadProgress}%",
+                        fontSize = 12.sp,
+                    )
+                    LinearProgressIndicator(progress = { uploadProgress / 100f })
+                }
+            } else {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
