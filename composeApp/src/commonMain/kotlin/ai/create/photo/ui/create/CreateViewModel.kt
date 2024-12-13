@@ -12,7 +12,7 @@ import io.github.jan.supabase.storage.UploadStatus
 import io.github.vinceglb.filekit.core.PlatformFiles
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
-import kotlin.math.min
+import kotlin.math.max
 
 class CreateViewModel : SessionViewModel() {
 
@@ -80,7 +80,7 @@ class CreateViewModel : SessionViewModel() {
                             status.totalBytesSend.toFloat() / status.contentLength * 100
                         val overallProgress =
                             (((completedFiles) + currentFileProgress / 100) / totalFiles) * 100
-                        uiState = uiState.copy(uploadProgress = min(overallProgress.toInt() - 5, 0))
+                        uiState = uiState.copy(uploadProgress = max(overallProgress.toInt() - 5, 1))
                     }
 
                     is UploadStatus.Success -> {

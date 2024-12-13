@@ -194,33 +194,41 @@ private fun Photos(
         }
 
         items(photos.size, key = { photos[it].id }) { item ->
-            Photo(photos[item], onDelete)
+            Photo(
+                modifier = Modifier.animateItem(),
+                photo = photos[item],
+                onDelete = onDelete
+            )
         }
     }
 }
 
 @Composable
-private fun Photo(photo: CreateUiState.Photo, onDelete: (CreateUiState.Photo) -> Unit) {
+private fun Photo(
+    modifier: Modifier,
+    photo: CreateUiState.Photo,
+    onDelete: (CreateUiState.Photo) -> Unit
+) {
     var loading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<Throwable?>(null) }
 
     if (error != null) {
         Box(
-            modifier = Modifier.fillMaxWidth().aspectRatio(1f),
+            modifier = modifier.fillMaxWidth().aspectRatio(1f),
             contentAlignment = Alignment.Center,
         ) {
             ErrorMessagePlaceHolder(error!!)
         }
     } else if (loading) {
         Box(
-            modifier = Modifier.fillMaxWidth().aspectRatio(1f),
+            modifier = modifier.fillMaxWidth().aspectRatio(1f),
             contentAlignment = Alignment.Center,
         ) {
             LoadingPlaceholder()
         }
     }
 
-    Box(modifier = Modifier.fillMaxWidth()) {
+    Box(modifier = modifier.fillMaxWidth()) {
         AsyncImage(
             modifier = Modifier.fillMaxWidth(),
             model = ImageRequest.Builder(LocalPlatformContext.current)
