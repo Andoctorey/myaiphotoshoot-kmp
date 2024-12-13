@@ -1,22 +1,19 @@
 package ai.create.photo.ui.create
 
-import ai.create.photo.supabase.SupabaseAuth
+import ai.create.photo.supabase.SessionViewModel
 import ai.create.photo.supabase.SupabaseDatabase
 import ai.create.photo.supabase.SupabaseStorage
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
-import io.github.jan.supabase.auth.status.RefreshFailureCause
-import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.storage.UploadStatus
 import io.github.vinceglb.filekit.core.PlatformFiles
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
-class CreateViewModel : ViewModel() {
+class CreateViewModel : SessionViewModel() {
 
     private val uploadPhotoUseCase = UploadPhotoUseCase(
         storage = SupabaseStorage,
@@ -27,30 +24,19 @@ class CreateViewModel : ViewModel() {
         private set
 
     init {
-        viewModelScope.launch {
-            try {
-                SupabaseAuth.sessionStatus.collect {
-                    when (it) {
-                        is SessionStatus.Authenticated -> loadPhotos()
-                        is SessionStatus.NotAuthenticated -> SupabaseAuth.signInAnonymously()
-                        is SessionStatus.Initializing -> uiState = uiState.copy(isLoading = true)
-                        is SessionStatus.RefreshFailure -> {
-                            val cause = it.cause
-                            when (cause) {
-                                is RefreshFailureCause.NetworkError -> throw cause.exception
-                                is RefreshFailureCause.InternalServerError -> throw cause.exception
-                            }
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                Logger.e("Sign in failed", e)
-                uiState = uiState.copy(
-                    isLoading = false,
-                    loadingError = e.message ?: "Unknown error"
-                )
-            }
-        }
+        loadSession()
+    }
+
+    override fun onAuthInitializing() {
+        uiState = uiState.copy(isLoading = true)
+    }
+
+    override fun onAuthenticated() {
+        loadPhotos()
+    }
+
+    override fun onError(error: String) {
+        uiState.copy(loadingError = error)
     }
 
     private fun loadPhotos() = viewModelScope.launch {
@@ -58,7 +44,7 @@ class CreateViewModel : ViewModel() {
         try {
             val files = SupabaseDatabase.getFiles().getOrThrow()
             val filePaths = files.map { it.filePath }
-            val urls = SupabaseStorage.getFileUrls(filePaths).getOrThrow()
+            val urls = SupabaseStorage.getFileUrls(userId, filePaths).getOrThrow()
             uiState = uiState.copy(
                 isLoading = false,
                 photos = files.mapIndexed { index, file ->
@@ -87,7 +73,7 @@ class CreateViewModel : ViewModel() {
         val totalFiles = files.size
         var completedFiles = 0
         for (file in files) {
-            uploadPhotoUseCase(file).catch {
+            uploadPhotoUseCase(userId, file).catch {
                 Logger.e("upload failed", it)
                 uiState = uiState.copy(
                     uploadProgress = 0,

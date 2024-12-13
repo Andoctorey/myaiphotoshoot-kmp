@@ -1,7 +1,6 @@
 package ai.create.photo.supabase
 
 import ai.create.photo.supabase.Supabase.supabase
-import ai.create.photo.supabase.SupabaseAuth.userId
 import ai.create.photo.supabase.model.UserFile
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.postgrest.from
@@ -12,7 +11,7 @@ object SupabaseDatabase {
 
     private const val USER_FILES_TABLE = "user_files"
 
-    suspend fun saveFile(filePath: String): Result<PostgrestResult> = runCatching {
+    suspend fun saveFile(userId: String, filePath: String): Result<PostgrestResult> = runCatching {
         val photoData = mapOf(
             "user_id" to userId,
             "file_path" to filePath

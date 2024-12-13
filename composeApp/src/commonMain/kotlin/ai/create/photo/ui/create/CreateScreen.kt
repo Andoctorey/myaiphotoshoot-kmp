@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
@@ -54,6 +55,7 @@ import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.add_your_photos
 import photocreateai.composeapp.generated.resources.upload_guidelines_message
 
+
 @Preview
 @Composable
 fun CreateScreen(
@@ -80,7 +82,7 @@ fun CreateScreen(
         } else if (state.loadingError != null) {
             ErrorMessagePlaceHolder(state.loadingError)
         } else if (state.photos.isNullOrEmpty()) {
-            Placeholder(modifier = Modifier.align(Alignment.TopStart))
+            Placeholder(modifier = Modifier.align(Alignment.Center))
         } else {
             Photos(state.photos)
         }
@@ -98,12 +100,13 @@ fun CreateScreen(
 @Composable
 private fun Placeholder(modifier: Modifier) {
     Column(
-        modifier = modifier.verticalScroll(rememberScrollState()).safeDrawingPadding()
+        modifier = modifier.widthIn(max = 600.dp)
+            .verticalScroll(rememberScrollState()).safeDrawingPadding()
             .padding(horizontal = 24.dp, vertical = 82.dp), // fab
     ) {
         Text(
             text = stringResource(Res.string.upload_guidelines_message),
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyLarge,
         )
     }
 }

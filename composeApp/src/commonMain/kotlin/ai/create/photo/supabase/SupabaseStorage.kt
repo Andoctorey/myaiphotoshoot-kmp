@@ -1,7 +1,6 @@
 package ai.create.photo.supabase
 
 import ai.create.photo.supabase.Supabase.supabase
-import ai.create.photo.supabase.SupabaseAuth.userId
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.storage.SignedUrl
 import io.github.jan.supabase.storage.UploadStatus
@@ -16,7 +15,7 @@ object SupabaseStorage {
     private const val BUCKET = "photos"
     private const val PHOTOS_FOLDER = "folder1"
 
-    suspend fun uploadPhoto(file: PlatformFile): Flow<UploadStatus> {
+    suspend fun uploadPhoto(userId: String, file: PlatformFile): Flow<UploadStatus> {
         val filePath = "${userId}/$PHOTOS_FOLDER/${file.name}"
         Logger.i("uploadPhoto $filePath, size: ${file.getSize()}")
         return supabase.storage
@@ -29,7 +28,7 @@ object SupabaseStorage {
             }
     }
 
-    suspend fun getFileUrls(filePaths: List<String>) = runCatching {
+    suspend fun getFileUrls(userId: String, filePaths: List<String>) = runCatching {
         if (filePaths.isEmpty()) return@runCatching emptyList<SignedUrl>()
         supabase.storage
             .from(BUCKET)
