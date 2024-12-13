@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsTopHeight
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.rememberScrollState
@@ -84,7 +85,7 @@ fun CreateScreen(
         } else if (state.photos.isNullOrEmpty()) {
             Placeholder(modifier = Modifier.align(Alignment.Center))
         } else {
-            Photos(state.photos)
+            Photos(state.photos, state.listState)
         }
 
         AddPhotosFab(
@@ -165,8 +166,9 @@ private fun AddPhotosFab(
 
 
 @Composable
-private fun Photos(photos: List<CreateUiState.Photo>) {
+private fun Photos(photos: List<CreateUiState.Photo>, listState: LazyStaggeredGridState) {
     LazyVerticalStaggeredGrid(
+        state = listState,
         modifier = Modifier.fillMaxSize(),
         columns = StaggeredGridCells.Adaptive(minSize = 540.dp),
         verticalItemSpacing = 4.dp,

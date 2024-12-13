@@ -1,5 +1,6 @@
 package ai.create.photo.ui.create
 
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
 
@@ -8,6 +9,7 @@ data class CreateUiState(
     val isLoading: Boolean = false,
     val loadingError: String? = null,
     val photos: List<Photo>? = null,
+    val listState: LazyStaggeredGridState = LazyStaggeredGridState(),
 
     val uploadProgress: Int = 0,
     val uploadError: String? = null,
