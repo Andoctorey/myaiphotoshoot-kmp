@@ -1,6 +1,7 @@
 package ai.create.photo.ui.main
 
 import ai.create.photo.ui.add.AddScreen
+import ai.create.photo.ui.create.CreateScreen
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.*
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -50,7 +51,7 @@ fun MainApp(
     ) {
         when (currentDestination) {
             AppNavigationRoutes.TAB1 -> AddScreen()
-            AppNavigationRoutes.TAB2 -> {}
+            AppNavigationRoutes.TAB2 -> CreateScreen()
             AppNavigationRoutes.TAB3 -> {}
             AppNavigationRoutes.TAB4 -> {}
         }

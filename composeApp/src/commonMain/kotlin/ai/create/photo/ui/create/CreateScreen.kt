@@ -1,0 +1,35 @@
+package ai.create.photo.ui.create
+
+import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
+import ai.create.photo.ui.compose.LoadingPlaceholder
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import org.jetbrains.compose.ui.tooling.preview.Preview
+
+
+@Preview
+@Composable
+fun CreateScreen(
+    viewModel: CreateViewModel = viewModel { CreateViewModel() },
+) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        val state = viewModel.uiState
+
+        if (state.isLoading) {
+            Spacer(modifier = Modifier.height(20.dp))
+            LoadingPlaceholder()
+        } else if (state.loadingError != null) {
+            ErrorMessagePlaceHolder(state.loadingError)
+        }
+    }
+}
