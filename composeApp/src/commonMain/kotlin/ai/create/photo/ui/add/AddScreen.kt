@@ -1,4 +1,4 @@
-package ai.create.photo.ui.create
+package ai.create.photo.ui.add
 
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.LoadingPlaceholder
@@ -66,8 +66,8 @@ import photocreateai.composeapp.generated.resources.upload_guidelines_message
 
 @Preview
 @Composable
-fun CreateScreen(
-    viewModel: CreateViewModel = viewModel { CreateViewModel() },
+fun AddScreen(
+    viewModel: AddViewModel = viewModel { AddViewModel() },
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -178,9 +178,9 @@ private fun AddPhotosFab(
 
 @Composable
 private fun Photos(
-    photos: List<CreateUiState.Photo>,
+    photos: List<AddUiState.Photo>,
     listState: LazyStaggeredGridState,
-    onDelete: (CreateUiState.Photo) -> Unit,
+    onDelete: (AddUiState.Photo) -> Unit,
 ) {
     LazyVerticalStaggeredGrid(
         state = listState,
@@ -206,8 +206,8 @@ private fun Photos(
 @Composable
 private fun Photo(
     modifier: Modifier,
-    photo: CreateUiState.Photo,
-    onDelete: (CreateUiState.Photo) -> Unit
+    photo: AddUiState.Photo,
+    onDelete: (AddUiState.Photo) -> Unit
 ) {
     var loading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<Throwable?>(null) }

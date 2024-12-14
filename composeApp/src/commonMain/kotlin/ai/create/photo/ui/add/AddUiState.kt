@@ -1,11 +1,11 @@
-package ai.create.photo.ui.create
+package ai.create.photo.ui.add
 
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
 
 @Immutable
-data class CreateUiState(
+data class AddUiState(
     val isLoading: Boolean = false,
     val loadingError: Throwable? = null,
     val photos: List<Photo>? = null,
