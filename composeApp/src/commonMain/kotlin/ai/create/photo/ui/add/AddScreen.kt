@@ -130,7 +130,7 @@ private fun AddPhotosFab(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom,
     ) {
-        val isLoading = uploadProgress in 1 until 100 || errorMessage != null
+        val isLoading = uploadProgress in 1 until 100
         if (errorMessage != null) {
             Text(
                 fontSize = 12.sp,
