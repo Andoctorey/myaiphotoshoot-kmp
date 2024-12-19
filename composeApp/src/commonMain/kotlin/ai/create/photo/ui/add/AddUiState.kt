@@ -15,6 +15,8 @@ data class AddUiState(
     val uploadError: Throwable? = null,
 
     val deleteError: Throwable? = null,
+
+    val showMenu: Boolean = false,
 ) {
 
     @Immutable

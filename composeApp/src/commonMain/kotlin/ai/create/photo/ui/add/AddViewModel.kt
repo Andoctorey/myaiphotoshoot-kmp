@@ -95,6 +95,10 @@ class AddViewModel : SessionViewModel() {
         }
     }
 
+    fun toggleMenu() {
+        uiState = uiState.copy(showMenu = !uiState.showMenu)
+    }
+
     fun deletePhoto(photo: AddUiState.Photo) = viewModelScope.launch {
         val photos = uiState.photos ?: return@launch
         uiState = uiState.copy(photos = photos.filter { it.id != photo.id })

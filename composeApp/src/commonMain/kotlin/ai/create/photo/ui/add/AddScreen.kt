@@ -3,6 +3,7 @@ package ai.create.photo.ui.add
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.compose.getFriendlyError
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,11 +30,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -104,6 +107,8 @@ fun AddScreen(
         ) {
             launcher.launch()
         }
+
+        FabMenu(Modifier.align(Alignment.BottomEnd), state.showMenu, viewModel::toggleMenu)
     }
 }
 
@@ -258,6 +263,51 @@ private fun Photo(
                     tint = Color.White,
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun FabMenu(modifier: Modifier, showMenu: Boolean, toggleMenu: () -> Unit) {
+    Column(modifier = modifier.padding(24.dp), horizontalAlignment = Alignment.End) {
+        Crossfade(targetState = showMenu) {
+            if (!it) return@Crossfade
+            Column(horizontalAlignment = Alignment.End) {
+                ExtendedFloatingActionButton(
+                    onClick = {},
+                ) {
+                    Text(
+                        text = "Train AI Model",
+//                        text = stringResource(Res.string.add_your_photos),
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        fontSize = 13.sp,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                ExtendedFloatingActionButton(
+                    onClick = {},
+                ) {
+                    Text(
+                        text = "Delete Photo Set",
+//                        text = stringResource(Res.string.add_your_photos),
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        fontSize = 13.sp,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+        SmallFloatingActionButton(
+            onClick = toggleMenu,
+        ) {
+            Icon(
+                imageVector = if (showMenu) Icons.Default.Close else Icons.Default.Settings,
+                contentDescription = "settings",
+            )
         }
     }
 }
