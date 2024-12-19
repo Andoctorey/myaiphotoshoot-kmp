@@ -15,6 +15,7 @@ object SupabaseDatabase {
         val photoData = mapOf(
             "user_id" to userId,
             "file_path" to filePath,
+            "folder" to SupabaseStorage.PHOTOS_FOLDER,
             "signed_url" to SupabaseStorage.createSignedUrl(userId, filePath),
         )
         Logger.i("save file to db $filePath")

@@ -12,7 +12,7 @@ import kotlin.time.Duration.Companion.days
 object SupabaseStorage {
 
     private const val BUCKET = "photos"
-    private const val PHOTOS_FOLDER = "folder1"
+    const val PHOTOS_FOLDER = "set1"
 
     suspend fun uploadPhoto(userId: String, file: PlatformFile): Flow<UploadStatus> {
         val filePath = "${userId}/$PHOTOS_FOLDER/${file.name}"
