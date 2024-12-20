@@ -76,6 +76,7 @@ import photocreateai.composeapp.generated.resources.add_your_photos
 import photocreateai.composeapp.generated.resources.create_ai_model
 import photocreateai.composeapp.generated.resources.create_photo_set
 import photocreateai.composeapp.generated.resources.delete_photo_set
+import photocreateai.composeapp.generated.resources.photo_set
 import photocreateai.composeapp.generated.resources.upload_guidelines_message
 import photocreateai.composeapp.generated.resources.upload_more_photos
 
@@ -108,6 +109,9 @@ fun AddScreen(
             ErrorMessagePlaceHolder(state.loadingError)
         } else if (photos.isNullOrEmpty()) {
             Placeholder(modifier = Modifier.align(Alignment.Center))
+            if (state.folder == null) {
+                viewModel.setFolderDefaultValue(stringResource(Res.string.photo_set))
+            }
         } else {
             LaunchedEffect(state.scrollToTop) {
                 if (state.scrollToTop && state.listState.firstVisibleItemIndex > 1) {
@@ -313,8 +317,8 @@ fun FabMenu(
         Crossfade(targetState = showMenu) {
             if (!it) return@Crossfade
             Column(horizontalAlignment = Alignment.End) {
-                if (showPhotoSets) {
-                    PhotoSets()
+                if (showPhotoSets && folders != null) {
+                    PhotoSets(folders)
                     Spacer(modifier = Modifier.height(8.dp))
                     ExtendedFloatingActionButton(
                         onClick = {},
@@ -355,16 +359,8 @@ fun FabMenu(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PhotoSets() {
-    val options =
-        mutableListOf(
-            "Option 1 Option 1 ",
-            "Option 2",
-            "Option 3",
-            "Option 4",
-            "Option 5",
-            "Option 6"
-        )
+fun PhotoSets(folders: List<String>) {
+    val options = folders.toMutableList()
     options.add(stringResource(Res.string.create_photo_set))
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(options[0]) }

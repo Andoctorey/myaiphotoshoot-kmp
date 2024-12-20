@@ -67,13 +67,14 @@ class AddViewModel : SessionViewModel() {
     fun uploadPhotos(files: PlatformFiles) = viewModelScope.launch {
         Logger.i { "Selected files: ${files.joinToString { it.name }}" }
         if (files.isEmpty()) return@launch
+        val folder = uiState.folder!!
 
         uiState = uiState.copy(uploadProgress = 1, uploadError = null, showMenu = false)
 
         val totalFiles = files.size
         var completedFiles = 0
         for (file in files) {
-            uploadPhotoUseCase(userId, file).catch {
+            uploadPhotoUseCase(userId, folder, file).catch {
                 Logger.e("upload failed", it)
                 uiState = uiState.copy(uploadProgress = 0, uploadError = it)
             }.collect { status ->
@@ -135,5 +136,15 @@ class AddViewModel : SessionViewModel() {
 
     fun resetScrollToTop() {
         uiState = uiState.copy(scrollToTop = false)
+    }
+
+    fun setFolderDefaultValue(folder: String) {
+        uiState = uiState.copy(folder = folder + " " + getNewFolderNumber())
+    }
+
+    fun getNewFolderNumber(): Int {
+        val folders = uiState.folders ?: return 1
+        val folderNumbers = folders.map { it.filter { it.isDigit() }.toInt() }
+        return (folderNumbers.maxOrNull() ?: 1) + 1
     }
 }

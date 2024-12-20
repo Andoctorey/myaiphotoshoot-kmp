@@ -11,12 +11,16 @@ object SupabaseDatabase {
 
     private const val USER_FILES_TABLE = "user_files"
 
-    suspend fun saveFile(userId: String, filePath: String): Result<PostgrestResult> = runCatching {
+    suspend fun saveFile(
+        userId: String,
+        folder: String,
+        filePath: String
+    ): Result<PostgrestResult> = runCatching {
         val photoData = mapOf(
             "user_id" to userId,
             "file_path" to filePath,
-            "folder" to SupabaseStorage.PHOTOS_FOLDER,
-            "signed_url" to SupabaseStorage.createSignedUrl(userId, filePath),
+            "folder" to folder,
+            "signed_url" to SupabaseStorage.createSignedUrl(userId, folder, filePath),
         )
         Logger.i("save file to db $filePath")
         supabase.from(USER_FILES_TABLE).upsert(photoData)
