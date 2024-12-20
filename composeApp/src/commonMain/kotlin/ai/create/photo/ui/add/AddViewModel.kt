@@ -41,19 +41,21 @@ class AddViewModel : SessionViewModel() {
     }
 
     private fun loadPhotos() = viewModelScope.launch {
-        uiState = uiState.copy(isLoading = uiState.photos == null)
+        uiState = uiState.copy(isLoading = uiState.photosByFolder == null)
         try {
             val files = SupabaseDatabase.getFiles().getOrThrow()
             uiState = uiState.copy(
                 isLoading = false,
-                photos = files.map { file ->
+                photosByFolder = files.map { file ->
                     AddUiState.Photo(
                         id = file.id,
                         createdAt = file.createdAt,
                         path = file.filePath,
+                        folder = file.folder,
                         url = file.signedUrl,
                     )
-                }
+                }.groupBy { it.folder },
+                folder = uiState.folder ?: files.lastOrNull()?.folder,
             )
         } catch (e: Exception) {
             Logger.e("Loading photos failed", e)
@@ -65,7 +67,7 @@ class AddViewModel : SessionViewModel() {
         Logger.i { "Selected files: ${files.joinToString { it.name }}" }
         if (files.isEmpty()) return@launch
 
-        uiState = uiState.copy(uploadProgress = 1, uploadError = null)
+        uiState = uiState.copy(uploadProgress = 1, uploadError = null, showMenu = false)
 
         val totalFiles = files.size
         var completedFiles = 0
@@ -100,21 +102,26 @@ class AddViewModel : SessionViewModel() {
     }
 
     fun deletePhoto(photo: AddUiState.Photo) = viewModelScope.launch {
-        val photos = uiState.photos ?: return@launch
-        uiState = uiState.copy(photos = photos.filter { it.id != photo.id })
+        val photosByFolder = uiState.photosByFolder ?: return@launch
+        val photosInFolder = photosByFolder[photo.folder] ?: return@launch
+        val updatedPhotos = photosInFolder.filter { it.id != photo.id }
+        val updatedPhotosByFolder = photosByFolder.toMutableMap().apply {
+            put(photo.folder, updatedPhotos)
+        }
+        uiState = uiState.copy(photosByFolder = updatedPhotosByFolder, showMenu = false)
         try {
             SupabaseDatabase.deleteFile(photo.id)
             SupabaseStorage.deleteFile(photo.path)
         } catch (e: Exception) {
             Logger.e("Delete photo failed", e)
-            uiState = uiState.copy(photos = photos)
+            uiState = uiState.copy(photosByFolder = photosByFolder)
         }
     }
 
     fun createModel() {
         uiState = uiState.copy(showMenu = false)
 
-        val photos = uiState.photos
+        val photos = uiState.displayingPhotos
         if (photos.isNullOrEmpty() || photos.size < 10) {
             uiState = uiState.copy(showUploadMorePhotosPopup = true)
             return

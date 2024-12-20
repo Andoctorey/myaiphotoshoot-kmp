@@ -8,7 +8,8 @@ import kotlinx.datetime.Instant
 data class AddUiState(
     val isLoading: Boolean = false,
     val loadingError: Throwable? = null,
-    val photos: List<Photo>? = null,
+    val folder: String? = null,
+    val photosByFolder: Map<String, List<Photo>>? = null,
     val listState: LazyStaggeredGridState = LazyStaggeredGridState(),
 
     val uploadProgress: Int = 0,
@@ -20,10 +21,17 @@ data class AddUiState(
     val showUploadMorePhotosPopup: Boolean = false,
 ) {
 
+    val displayingPhotos: List<Photo>?
+        get() = photosByFolder?.get(folder)
+
+    val folders: List<String>?
+        get() = photosByFolder?.keys?.toList()
+
     @Immutable
     data class Photo(
         val id: String,
         val path: String,
+        val folder: String,
         val url: String,
         val createdAt: Instant,
     )

@@ -99,15 +99,16 @@ fun AddScreen(
 
         val state = viewModel.uiState
 
+        val photos = state.displayingPhotos
         if (state.isLoading) {
             Spacer(modifier = Modifier.height(20.dp))
             LoadingPlaceholder()
         } else if (state.loadingError != null) {
             ErrorMessagePlaceHolder(state.loadingError)
-        } else if (state.photos.isNullOrEmpty()) {
+        } else if (photos.isNullOrEmpty()) {
             Placeholder(modifier = Modifier.align(Alignment.Center))
         } else {
-            Photos(state.photos, state.listState) {
+            Photos(photos, state.listState) {
                 viewModel.deletePhoto(it)
             }
         }
@@ -122,7 +123,8 @@ fun AddScreen(
 
         FabMenu(
             modifier = Modifier.align(Alignment.BottomEnd),
-            photos = state.photos,
+            showPhotoSets = !state.photosByFolder.isNullOrEmpty(),
+            folders = state.folders,
             showMenu = state.showMenu,
             toggleMenu = viewModel::toggleMenu,
             createModel = viewModel::createModel,
@@ -294,7 +296,8 @@ private fun Photo(
 @Composable
 fun FabMenu(
     modifier: Modifier,
-    photos: List<AddUiState.Photo>?,
+    showPhotoSets: Boolean,
+    folders: List<String>?,
     showMenu: Boolean,
     toggleMenu: () -> Unit,
     createModel: () -> Unit,
@@ -303,7 +306,7 @@ fun FabMenu(
         Crossfade(targetState = showMenu) {
             if (!it) return@Crossfade
             Column(horizontalAlignment = Alignment.End) {
-                if (!photos.isNullOrEmpty()) {
+                if (showPhotoSets) {
                     PhotoSets()
                     Spacer(modifier = Modifier.height(8.dp))
                     ExtendedFloatingActionButton(
