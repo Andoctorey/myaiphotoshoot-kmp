@@ -47,6 +47,7 @@ import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -108,6 +109,12 @@ fun AddScreen(
         } else if (photos.isNullOrEmpty()) {
             Placeholder(modifier = Modifier.align(Alignment.Center))
         } else {
+            LaunchedEffect(state.scrollToTop) {
+                if (state.scrollToTop && state.listState.firstVisibleItemIndex > 1) {
+                    state.listState.animateScrollToItem(0)
+                }
+                viewModel.resetScrollToTop()
+            }
             Photos(photos, state.listState) {
                 viewModel.deletePhoto(it)
             }

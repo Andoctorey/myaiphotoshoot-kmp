@@ -11,6 +11,7 @@ data class AddUiState(
     val folder: String? = null,
     val photosByFolder: Map<String, List<Photo>>? = null,
     val listState: LazyStaggeredGridState = LazyStaggeredGridState(),
+    val scrollToTop: Boolean = false,
 
     val uploadProgress: Int = 0,
     val uploadError: Throwable? = null,

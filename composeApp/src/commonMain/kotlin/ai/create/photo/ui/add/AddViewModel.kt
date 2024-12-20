@@ -56,6 +56,7 @@ class AddViewModel : SessionViewModel() {
                     )
                 }.groupBy { it.folder },
                 folder = uiState.folder ?: files.lastOrNull()?.folder,
+                scrollToTop = true,
             )
         } catch (e: Exception) {
             Logger.e("Loading photos failed", e)
@@ -130,5 +131,9 @@ class AddViewModel : SessionViewModel() {
 
     fun hideUploadMorePhotosPopup() {
         uiState = uiState.copy(showUploadMorePhotosPopup = false)
+    }
+
+    fun resetScrollToTop() {
+        uiState = uiState.copy(scrollToTop = false)
     }
 }
