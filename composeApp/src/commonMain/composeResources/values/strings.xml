@@ -8,4 +8,8 @@
     <string name="add_your_photos">Add your photos</string>
     <string name="upload_guidelines_message">Select and upload at least 10 high-quality, clear photos of yourself (ideally 15–20) from your gallery. Choose images with varied angles, different lighting conditions, and simple, solid-colored clothing. Make sure you are the only person in each photo, keep the background uncluttered, and include natural, relaxed expressions.</string>
     <string name="connection_error">Problem connecting with server. Please check your connection.</string>
+    <string name="create_ai_model">Create AI model</string>
+    <string name="create_photo_set">Create Photo Set</string>
+    <string name="delete_photo_set">Delete Photo Set</string>
+    <string name="upload_more_photos">Oops! It looks like you need to upload at least 10 photos before training your model. Try taking some selfies in portrait mode from different angles to get started. 📸😊</string>
 </resources>

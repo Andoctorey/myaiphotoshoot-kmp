@@ -33,6 +33,8 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -70,7 +72,11 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.add_your_photos
+import photocreateai.composeapp.generated.resources.create_ai_model
+import photocreateai.composeapp.generated.resources.create_photo_set
+import photocreateai.composeapp.generated.resources.delete_photo_set
 import photocreateai.composeapp.generated.resources.upload_guidelines_message
+import photocreateai.composeapp.generated.resources.upload_more_photos
 
 
 @Preview
@@ -114,7 +120,19 @@ fun AddScreen(
             launcher.launch()
         }
 
-        FabMenu(Modifier.align(Alignment.BottomEnd), state.showMenu, viewModel::toggleMenu)
+        FabMenu(
+            modifier = Modifier.align(Alignment.BottomEnd),
+            photos = state.photos,
+            showMenu = state.showMenu,
+            toggleMenu = viewModel::toggleMenu,
+            createModel = viewModel::createModel,
+        )
+
+        if (state.showUploadMorePhotosPopup) {
+            ShowUploadMorePhotosPopup {
+                viewModel.hideUploadMorePhotosPopup()
+            }
+        }
     }
 }
 
@@ -274,32 +292,37 @@ private fun Photo(
 }
 
 @Composable
-fun FabMenu(modifier: Modifier, showMenu: Boolean, toggleMenu: () -> Unit) {
+fun FabMenu(
+    modifier: Modifier,
+    photos: List<AddUiState.Photo>?,
+    showMenu: Boolean,
+    toggleMenu: () -> Unit,
+    createModel: () -> Unit,
+) {
     Column(modifier = modifier.padding(24.dp), horizontalAlignment = Alignment.End) {
         Crossfade(targetState = showMenu) {
             if (!it) return@Crossfade
             Column(horizontalAlignment = Alignment.End) {
-                PhotoSets()
-                Spacer(modifier = Modifier.height(8.dp))
-                ExtendedFloatingActionButton(
-                    onClick = {},
-                ) {
-                    Text(
-                        text = "Train AI Model",
-//                        text = stringResource(Res.string.add_your_photos),
-                        textAlign = TextAlign.Center,
-                        maxLines = 1,
-                        fontSize = 13.sp,
-                        overflow = TextOverflow.Ellipsis,
-                    )
+                if (!photos.isNullOrEmpty()) {
+                    PhotoSets()
+                    Spacer(modifier = Modifier.height(8.dp))
+                    ExtendedFloatingActionButton(
+                        onClick = {},
+                    ) {
+                        Text(
+                            text = stringResource(Res.string.delete_photo_set),
+                            textAlign = TextAlign.Center,
+                            maxLines = 1,
+                            fontSize = 13.sp,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-                ExtendedFloatingActionButton(
-                    onClick = {},
-                ) {
+
+                ExtendedFloatingActionButton(onClick = createModel) {
                     Text(
-                        text = "Delete Photo Set",
-//                        text = stringResource(Res.string.add_your_photos),
+                        text = stringResource(Res.string.create_ai_model),
                         textAlign = TextAlign.Center,
                         maxLines = 1,
                         fontSize = 13.sp,
@@ -324,7 +347,15 @@ fun FabMenu(modifier: Modifier, showMenu: Boolean, toggleMenu: () -> Unit) {
 @Composable
 fun PhotoSets() {
     val options =
-        listOf("Option 1 Option 1 ", "Option 2", "Option 3", "Option 4", "Option 5", "Option 6")
+        mutableListOf(
+            "Option 1 Option 1 ",
+            "Option 2",
+            "Option 3",
+            "Option 4",
+            "Option 5",
+            "Option 6"
+        )
+    options.add(stringResource(Res.string.create_photo_set))
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(options[0]) }
 
@@ -368,4 +399,18 @@ fun PhotoSets() {
             }
         }
     }
+}
+
+
+@Composable
+private fun ShowUploadMorePhotosPopup(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        text = { Text(text = stringResource(Res.string.upload_more_photos)) },
+        confirmButton = {
+            Button(onClick = onDismiss) {
+                Text("OK")
+            }
+        }
+    )
 }

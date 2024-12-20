@@ -110,4 +110,18 @@ class AddViewModel : SessionViewModel() {
             uiState = uiState.copy(photos = photos)
         }
     }
+
+    fun createModel() {
+        uiState = uiState.copy(showMenu = false)
+
+        val photos = uiState.photos
+        if (photos.isNullOrEmpty() || photos.size < 10) {
+            uiState = uiState.copy(showUploadMorePhotosPopup = true)
+            return
+        }
+    }
+
+    fun hideUploadMorePhotosPopup() {
+        uiState = uiState.copy(showUploadMorePhotosPopup = false)
+    }
 }
