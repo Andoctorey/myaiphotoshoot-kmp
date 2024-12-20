@@ -29,13 +29,19 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -273,6 +279,8 @@ fun FabMenu(modifier: Modifier, showMenu: Boolean, toggleMenu: () -> Unit) {
         Crossfade(targetState = showMenu) {
             if (!it) return@Crossfade
             Column(horizontalAlignment = Alignment.End) {
+                PhotoSets()
+                Spacer(modifier = Modifier.height(8.dp))
                 ExtendedFloatingActionButton(
                     onClick = {},
                 ) {
@@ -308,6 +316,56 @@ fun FabMenu(modifier: Modifier, showMenu: Boolean, toggleMenu: () -> Unit) {
                 imageVector = if (showMenu) Icons.Default.Close else Icons.Default.Settings,
                 contentDescription = "settings",
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PhotoSets() {
+    val options =
+        listOf("Option 1 Option 1 ", "Option 2", "Option 3", "Option 4", "Option 5", "Option 6")
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOption by remember { mutableStateOf(options[0]) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded }
+    ) {
+        ExtendedFloatingActionButton(
+            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable),
+            onClick = {},
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = selectedOption,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    fontSize = 13.sp,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            Icon(
+                imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
+                contentDescription = "error",
+                tint = MaterialTheme.colorScheme.onSurface,
+            )
+        }
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            options.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option) },
+                    onClick = {
+                        selectedOption = option
+                        expanded = false
+                    }
+                )
+            }
         }
     }
 }
