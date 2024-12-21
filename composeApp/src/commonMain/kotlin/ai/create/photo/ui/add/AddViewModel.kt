@@ -44,6 +44,8 @@ class AddViewModel : SessionViewModel() {
         uiState = uiState.copy(isLoading = uiState.photosByFolder == null)
         try {
             val files = SupabaseDatabase.getFiles().getOrThrow()
+            val folder = uiState.folder ?: files.lastOrNull()?.folder
+            Logger.i("folder: $folder")
             uiState = uiState.copy(
                 isLoading = false,
                 photosByFolder = files.map { file ->
@@ -55,7 +57,7 @@ class AddViewModel : SessionViewModel() {
                         url = file.signedUrl,
                     )
                 }.groupBy { it.folder },
-                folder = uiState.folder ?: files.lastOrNull()?.folder,
+                folder = folder,
                 scrollToTop = true,
             )
         } catch (e: Exception) {

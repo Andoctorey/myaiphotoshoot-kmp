@@ -139,6 +139,7 @@ fun AddScreen(
         FabMenu(
             modifier = Modifier.align(Alignment.BottomEnd),
             showPhotoSets = !state.photosByFolder.isNullOrEmpty(),
+            selectedFolder = state.folder ?: defaultFolderName,
             folders = state.folders,
             showMenu = state.showMenu,
             toggleMenu = viewModel::toggleMenu,
@@ -321,6 +322,7 @@ private fun Photo(
 fun FabMenu(
     modifier: Modifier,
     showPhotoSets: Boolean,
+    selectedFolder: String,
     folders: List<String>?,
     showMenu: Boolean,
     toggleMenu: () -> Unit,
@@ -334,7 +336,12 @@ fun FabMenu(
             if (!it) return@Crossfade
             Column(horizontalAlignment = Alignment.End) {
                 if (showPhotoSets && folders != null) {
-                    PhotoSets(folders, selectFolder = selectFolder, createFolder = createFolder)
+                    PhotoSets(
+                        folders = folders,
+                        selectedFolder = selectedFolder,
+                        selectFolder = selectFolder,
+                        createFolder = createFolder
+                    )
                     Spacer(modifier = Modifier.height(8.dp))
                     ExtendedFloatingActionButton(onClick = deleteFolder) {
                         Text(
@@ -373,11 +380,16 @@ fun FabMenu(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PhotoSets(folders: List<String>, selectFolder: (String) -> Unit, createFolder: () -> Unit) {
+fun PhotoSets(
+    folders: List<String>,
+    selectedFolder: String,
+    selectFolder: (String) -> Unit,
+    createFolder: () -> Unit
+) {
     val options = folders.toMutableList()
     options.add(stringResource(Res.string.create_photo_set))
     var expanded by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf(options[0]) }
+    var selectedOption by remember { mutableStateOf(selectedFolder) }
 
     ExposedDropdownMenuBox(
         expanded = expanded,
