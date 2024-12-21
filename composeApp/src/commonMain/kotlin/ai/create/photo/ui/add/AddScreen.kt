@@ -34,6 +34,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -101,6 +102,7 @@ fun AddScreen(
             if (files == null) return@rememberFilePickerLauncher
             viewModel.uploadPhotos(files)
         }
+        val onAddPhotoClick = { launcher.launch() }
 
         val state = viewModel.uiState
         val defaultFolderName = stringResource(Res.string.photo_set)
@@ -128,20 +130,32 @@ fun AddScreen(
             }
         }
 
-        AddPhotosFab(
-            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
-            uploadProgress = state.uploadProgress,
-            errorMessage = state.uploadError,
-        ) {
-            launcher.launch()
+        if ((photos?.size ?: 0) >= 10) {
+            CreateModelFab(
+                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
+                extended = true,
+            ) {
+                viewModel.createModel()
+            }
+        } else {
+            AddPhotosFab(
+                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
+                extended = true,
+                uploadProgress = state.uploadProgress,
+                uploadError = state.uploadError,
+                onClick = onAddPhotoClick,
+            )
         }
 
         FabMenu(
             modifier = Modifier.align(Alignment.BottomEnd),
-            showPhotoSets = !state.photosByFolder.isNullOrEmpty(),
+            photos = state.displayingPhotos,
             selectedFolder = state.folder ?: defaultFolderName,
             folders = state.folders,
+            uploadProgress = state.uploadProgress,
+            uploadError = state.uploadError,
             showMenu = state.showMenu,
+            onAddPhotoClick = onAddPhotoClick,
             toggleMenu = viewModel::toggleMenu,
             createModel = viewModel::createModel,
             selectFolder = viewModel::selectFolder,
@@ -179,7 +193,11 @@ private fun Placeholder(modifier: Modifier) {
 
 @Composable
 private fun AddPhotosFab(
-    modifier: Modifier, uploadProgress: Int, errorMessage: Throwable?, onClick: () -> Unit
+    modifier: Modifier = Modifier,
+    extended: Boolean = false,
+    uploadProgress: Int,
+    uploadError: Throwable?,
+    onClick: () -> Unit
 ) {
     Column(
         modifier = modifier,
@@ -187,10 +205,10 @@ private fun AddPhotosFab(
         verticalArrangement = Arrangement.Bottom,
     ) {
         val isLoading = uploadProgress in 1 until 100
-        if (errorMessage != null) {
+        if (uploadError != null) {
             Text(
                 fontSize = 12.sp,
-                text = errorMessage.getFriendlyError(),
+                text = uploadError.getFriendlyError(),
                 color = MaterialTheme.colorScheme.error,
                 textAlign = TextAlign.Center,
                 maxLines = 1,
@@ -213,20 +231,52 @@ private fun AddPhotosFab(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.AddAPhoto,
-                        contentDescription = "error",
-                        tint = MaterialTheme.colorScheme.onSurface,
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
+                    if (extended) {
+                        Icon(
+                            imageVector = Icons.Default.AddAPhoto,
+                            contentDescription = stringResource(Res.string.add_your_photos),
+                            tint = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                    }
                     Text(
                         text = stringResource(Res.string.add_your_photos),
                         textAlign = TextAlign.Center,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
+                        fontSize = if (extended) 14.sp else 13.sp,
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun CreateModelFab(
+    modifier: Modifier = Modifier,
+    extended: Boolean = false,
+    createModel: () -> Unit
+) {
+    ExtendedFloatingActionButton(modifier = modifier, onClick = createModel) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (extended) {
+                Icon(
+                    imageVector = Icons.Default.Face,
+                    contentDescription = stringResource(Res.string.create_ai_model),
+                    tint = MaterialTheme.colorScheme.onSurface,
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+            }
+            Text(
+                text = stringResource(Res.string.create_ai_model),
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                fontSize = if (extended) 14.sp else 13.sp,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }
@@ -321,10 +371,13 @@ private fun Photo(
 @Composable
 fun FabMenu(
     modifier: Modifier,
-    showPhotoSets: Boolean,
+    photos: List<AddUiState.Photo>?,
     selectedFolder: String,
     folders: List<String>?,
+    uploadProgress: Int,
+    uploadError: Throwable?,
     showMenu: Boolean,
+    onAddPhotoClick: () -> Unit,
     toggleMenu: () -> Unit,
     createModel: () -> Unit,
     selectFolder: (String) -> Unit,
@@ -335,7 +388,7 @@ fun FabMenu(
         Crossfade(targetState = showMenu) {
             if (!it) return@Crossfade
             Column(horizontalAlignment = Alignment.End) {
-                if (showPhotoSets && folders != null) {
+                if ((photos?.size ?: 0) >= 1 && folders != null) {
                     PhotoSets(
                         folders = folders,
                         selectedFolder = selectedFolder,
@@ -355,14 +408,14 @@ fun FabMenu(
                     Spacer(modifier = Modifier.height(8.dp))
                 }
 
-                ExtendedFloatingActionButton(onClick = createModel) {
-                    Text(
-                        text = stringResource(Res.string.create_ai_model),
-                        textAlign = TextAlign.Center,
-                        maxLines = 1,
-                        fontSize = 13.sp,
-                        overflow = TextOverflow.Ellipsis,
+                if ((photos?.size ?: 0) >= 10) {
+                    AddPhotosFab(
+                        uploadProgress = uploadProgress,
+                        uploadError = uploadError,
+                        onClick = onAddPhotoClick
                     )
+                } else {
+                    CreateModelFab(createModel = createModel)
                 }
                 Spacer(modifier = Modifier.height(8.dp))
             }
