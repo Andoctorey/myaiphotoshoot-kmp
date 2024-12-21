@@ -102,6 +102,7 @@ kotlin {
             implementation(libs.supabase.auth.kt)
             implementation(libs.supabase.realtime.kt)
             implementation(libs.supabase.storage.kt)
+            implementation(libs.supabase.functions.kt)
 
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor)

@@ -24,5 +24,6 @@ object Supabase {
         install(Auth)
         install(Storage)
         install(Realtime)
+        install(Realtime)
     }
 }

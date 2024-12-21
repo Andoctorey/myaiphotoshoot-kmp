@@ -2,6 +2,7 @@ package ai.create.photo.ui.add
 
 import ai.create.photo.supabase.SessionViewModel
 import ai.create.photo.supabase.SupabaseDatabase
+import ai.create.photo.supabase.SupabaseFunction
 import ai.create.photo.supabase.SupabaseStorage
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -120,13 +121,22 @@ class AddViewModel : SessionViewModel() {
         }
     }
 
-    fun createModel() {
+    fun createModel() = viewModelScope.launch {
         uiState = uiState.copy(showMenu = false)
 
         val photos = uiState.displayingPhotos
         if (photos.isNullOrEmpty() || photos.size < 10) {
             uiState = uiState.copy(showUploadMorePhotosPopup = true)
-            return
+            return@launch
+        }
+
+        try {
+            uiState = uiState.copy(showMenu = false)
+            val folder = uiState.folder!!
+            SupabaseFunction.createAiModel(folder)
+        } catch (e: Exception) {
+            Logger.e("createAiModel failed", e)
+            uiState = uiState.copy(error = e)
         }
     }
 
