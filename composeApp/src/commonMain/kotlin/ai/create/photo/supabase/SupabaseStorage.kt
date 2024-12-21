@@ -41,4 +41,9 @@ object SupabaseStorage {
         Logger.i("delete file from storage $path")
         supabase.storage.from(BUCKET).delete(path)
     }
+
+    suspend fun deleteFolder(folder: String) {
+        Logger.i("delete folder from storage $folder")
+        supabase.storage.from(BUCKET).delete(folder)
+    }
 }

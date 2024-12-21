@@ -16,7 +16,7 @@ data class AddUiState(
     val uploadProgress: Int = 0,
     val uploadError: Throwable? = null,
 
-    val deleteError: Throwable? = null,
+    val error: Throwable? = null,
 
     val showMenu: Boolean = false,
     val showUploadMorePhotosPopup: Boolean = false,

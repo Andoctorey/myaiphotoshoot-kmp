@@ -46,4 +46,13 @@ object SupabaseDatabase {
             }
         }
     }
+
+    suspend fun deleteFolder(folder: String) {
+        Logger.i("delete folder from db $folder")
+        supabase.from(USER_FILES_TABLE).delete {
+            filter {
+                eq("folder", folder)
+            }
+        }
+    }
 }

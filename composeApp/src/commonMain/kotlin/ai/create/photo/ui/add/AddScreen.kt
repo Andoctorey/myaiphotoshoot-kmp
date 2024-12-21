@@ -32,6 +32,7 @@ import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -77,6 +78,7 @@ import photocreateai.composeapp.generated.resources.create_ai_model
 import photocreateai.composeapp.generated.resources.create_photo_set
 import photocreateai.composeapp.generated.resources.delete_photo_set
 import photocreateai.composeapp.generated.resources.photo_set
+import photocreateai.composeapp.generated.resources.unknown_error
 import photocreateai.composeapp.generated.resources.upload_guidelines_message
 import photocreateai.composeapp.generated.resources.upload_more_photos
 
@@ -139,11 +141,18 @@ fun AddScreen(
             showMenu = state.showMenu,
             toggleMenu = viewModel::toggleMenu,
             createModel = viewModel::createModel,
+            deleteFolder = viewModel::deleteFolder,
         )
 
         if (state.showUploadMorePhotosPopup) {
             ShowUploadMorePhotosPopup {
                 viewModel.hideUploadMorePhotosPopup()
+            }
+        }
+
+        if (state.error != null) {
+            ErrorPopup(state.error) {
+                viewModel.hideErrorPopup()
             }
         }
     }
@@ -312,6 +321,7 @@ fun FabMenu(
     showMenu: Boolean,
     toggleMenu: () -> Unit,
     createModel: () -> Unit,
+    deleteFolder: () -> Unit,
 ) {
     Column(modifier = modifier.padding(24.dp), horizontalAlignment = Alignment.End) {
         Crossfade(targetState = showMenu) {
@@ -321,7 +331,7 @@ fun FabMenu(
                     PhotoSets(folders)
                     Spacer(modifier = Modifier.height(8.dp))
                     ExtendedFloatingActionButton(
-                        onClick = {},
+                        onClick = deleteFolder,
                     ) {
                         Text(
                             text = stringResource(Res.string.delete_photo_set),
@@ -413,6 +423,20 @@ private fun ShowUploadMorePhotosPopup(onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         text = { Text(text = stringResource(Res.string.upload_more_photos)) },
+        confirmButton = {
+            Button(onClick = onDismiss) {
+                Text("OK")
+            }
+        }
+    )
+}
+
+@Composable
+private fun ErrorPopup(e: Throwable, onDismiss: () -> Unit) {
+    AlertDialog(
+        icon = { Icon(Icons.Default.Error, contentDescription = "error") },
+        onDismissRequest = onDismiss,
+        text = { Text(text = e.message ?: stringResource(Res.string.unknown_error)) },
         confirmButton = {
             Button(onClick = onDismiss) {
                 Text("OK")
