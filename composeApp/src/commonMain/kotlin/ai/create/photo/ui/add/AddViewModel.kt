@@ -138,8 +138,8 @@ class AddViewModel : SessionViewModel() {
         uiState = uiState.copy(scrollToTop = false)
     }
 
-    fun setFolderDefaultValue(folder: String) {
-        uiState = uiState.copy(folder = folder + " " + getNewFolderNumber())
+    fun setFolderDefaultValue(folderName: String) {
+        uiState = uiState.copy(folder = folderName + " " + getNewFolderNumber())
     }
 
     fun getNewFolderNumber(): Int {
@@ -164,5 +164,13 @@ class AddViewModel : SessionViewModel() {
 
     fun hideErrorPopup() {
         uiState = uiState.copy(error = null)
+    }
+
+    fun selectFolder(folder: String) {
+        uiState = uiState.copy(showMenu = false, folder = folder)
+    }
+
+    fun createFolder(folderName: String) {
+        uiState = uiState.copy(showMenu = false, folder = folderName + " " + getNewFolderNumber())
     }
 }

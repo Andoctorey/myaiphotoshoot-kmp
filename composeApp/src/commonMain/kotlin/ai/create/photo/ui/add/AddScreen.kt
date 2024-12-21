@@ -102,6 +102,7 @@ fun AddScreen(
         }
 
         val state = viewModel.uiState
+        val defaultFolderName = stringResource(Res.string.photo_set)
 
         val photos = state.displayingPhotos
         if (state.isLoading) {
@@ -112,7 +113,7 @@ fun AddScreen(
         } else if (photos.isNullOrEmpty()) {
             Placeholder(modifier = Modifier.align(Alignment.Center))
             if (state.folder == null) {
-                viewModel.setFolderDefaultValue(stringResource(Res.string.photo_set))
+                viewModel.setFolderDefaultValue(defaultFolderName)
             }
         } else {
             LaunchedEffect(state.scrollToTop) {
@@ -141,6 +142,8 @@ fun AddScreen(
             showMenu = state.showMenu,
             toggleMenu = viewModel::toggleMenu,
             createModel = viewModel::createModel,
+            selectFolder = viewModel::selectFolder,
+            createFolder = { viewModel.createFolder(defaultFolderName) },
             deleteFolder = viewModel::deleteFolder,
         )
 
@@ -321,6 +324,8 @@ fun FabMenu(
     showMenu: Boolean,
     toggleMenu: () -> Unit,
     createModel: () -> Unit,
+    selectFolder: (String) -> Unit,
+    createFolder: () -> Unit,
     deleteFolder: () -> Unit,
 ) {
     Column(modifier = modifier.padding(24.dp), horizontalAlignment = Alignment.End) {
@@ -328,11 +333,9 @@ fun FabMenu(
             if (!it) return@Crossfade
             Column(horizontalAlignment = Alignment.End) {
                 if (showPhotoSets && folders != null) {
-                    PhotoSets(folders)
+                    PhotoSets(folders, selectFolder = selectFolder, createFolder = createFolder)
                     Spacer(modifier = Modifier.height(8.dp))
-                    ExtendedFloatingActionButton(
-                        onClick = deleteFolder,
-                    ) {
+                    ExtendedFloatingActionButton(onClick = deleteFolder) {
                         Text(
                             text = stringResource(Res.string.delete_photo_set),
                             textAlign = TextAlign.Center,
@@ -369,7 +372,7 @@ fun FabMenu(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PhotoSets(folders: List<String>) {
+fun PhotoSets(folders: List<String>, selectFolder: (String) -> Unit, createFolder: () -> Unit) {
     val options = folders.toMutableList()
     options.add(stringResource(Res.string.create_photo_set))
     var expanded by remember { mutableStateOf(false) }
@@ -381,7 +384,7 @@ fun PhotoSets(folders: List<String>) {
     ) {
         ExtendedFloatingActionButton(
             modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable),
-            onClick = {},
+            onClick = { },
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -410,6 +413,8 @@ fun PhotoSets(folders: List<String>) {
                     onClick = {
                         selectedOption = option
                         expanded = false
+                        if (options.last() == selectedOption) createFolder()
+                        else selectFolder(selectedOption)
                     }
                 )
             }
