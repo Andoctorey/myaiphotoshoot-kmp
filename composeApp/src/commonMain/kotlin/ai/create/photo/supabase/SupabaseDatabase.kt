@@ -23,7 +23,9 @@ object SupabaseDatabase {
             "signed_url" to SupabaseStorage.createSignedUrl(userId, folder, filePath),
         )
         Logger.i("save file to db $filePath")
-        supabase.from(USER_FILES_TABLE).upsert(photoData)
+        supabase.from(USER_FILES_TABLE).upsert(photoData) {
+            onConflict = "user_id, file_path, folder"
+        }
     }
 
     suspend fun getFiles(): Result<List<UserFile>> = runCatching {
