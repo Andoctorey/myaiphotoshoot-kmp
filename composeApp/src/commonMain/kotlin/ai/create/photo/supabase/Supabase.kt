@@ -2,6 +2,7 @@ package ai.create.photo.supabase
 
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.functions.Functions
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.serializer.KotlinXSerializer
@@ -24,6 +25,6 @@ object Supabase {
         install(Auth)
         install(Storage)
         install(Realtime)
-        install(Realtime)
+        install(Functions)
     }
 }

@@ -2,7 +2,6 @@ package ai.create.photo.ui.add
 
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.LoadingPlaceholder
-import ai.create.photo.ui.compose.getFriendlyError
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -134,6 +133,7 @@ fun AddScreen(
             CreateModelFab(
                 modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
                 extended = true,
+                createModelStatus = state.createModelStatus,
             ) {
                 viewModel.createModel()
             }
@@ -142,7 +142,6 @@ fun AddScreen(
                 modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
                 extended = true,
                 uploadProgress = state.uploadProgress,
-                uploadError = state.uploadError,
                 onClick = onAddPhotoClick,
             )
         }
@@ -153,7 +152,7 @@ fun AddScreen(
             selectedFolder = state.folder ?: defaultFolderName,
             folders = state.folders,
             uploadProgress = state.uploadProgress,
-            uploadError = state.uploadError,
+            createModelStatus = state.createModelStatus,
             showMenu = state.showMenu,
             onAddPhotoClick = onAddPhotoClick,
             toggleMenu = viewModel::toggleMenu,
@@ -169,8 +168,8 @@ fun AddScreen(
             }
         }
 
-        if (state.error != null) {
-            ErrorPopup(state.error) {
+        if (state.errorPopup != null) {
+            ErrorPopup(state.errorPopup) {
                 viewModel.hideErrorPopup()
             }
         }
@@ -196,7 +195,6 @@ private fun AddPhotosFab(
     modifier: Modifier = Modifier,
     extended: Boolean = false,
     uploadProgress: Int,
-    uploadError: Throwable?,
     onClick: () -> Unit
 ) {
     Column(
@@ -205,17 +203,6 @@ private fun AddPhotosFab(
         verticalArrangement = Arrangement.Bottom,
     ) {
         val isLoading = uploadProgress in 1 until 100
-        if (uploadError != null) {
-            Text(
-                fontSize = 12.sp,
-                text = uploadError.getFriendlyError(),
-                color = MaterialTheme.colorScheme.error,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-        }
         ExtendedFloatingActionButton(
             onClick = { if (!isLoading) onClick() },
         ) {
@@ -256,6 +243,7 @@ private fun AddPhotosFab(
 fun CreateModelFab(
     modifier: Modifier = Modifier,
     extended: Boolean = false,
+    createModelStatus: CreateModelStatus,
     createModel: () -> Unit
 ) {
     ExtendedFloatingActionButton(modifier = modifier, onClick = createModel) {
@@ -375,7 +363,7 @@ fun FabMenu(
     selectedFolder: String,
     folders: List<String>?,
     uploadProgress: Int,
-    uploadError: Throwable?,
+    createModelStatus: CreateModelStatus,
     showMenu: Boolean,
     onAddPhotoClick: () -> Unit,
     toggleMenu: () -> Unit,
@@ -411,11 +399,10 @@ fun FabMenu(
                 if ((photos?.size ?: 0) >= 10) {
                     AddPhotosFab(
                         uploadProgress = uploadProgress,
-                        uploadError = uploadError,
                         onClick = onAddPhotoClick
                     )
                 } else {
-                    CreateModelFab(createModel = createModel)
+                    CreateModelFab(createModel = createModel, createModelStatus = createModelStatus)
                 }
                 Spacer(modifier = Modifier.height(8.dp))
             }

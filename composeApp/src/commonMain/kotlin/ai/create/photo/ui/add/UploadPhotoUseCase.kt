@@ -12,7 +12,7 @@ class UploadPhotoUseCase(
     private val database: SupabaseDatabase
 ) {
 
-    operator fun invoke(userId: String, folder: String, file: PlatformFile): Flow<UploadStatus> =
+    fun invoke(userId: String, folder: String, file: PlatformFile): Flow<UploadStatus> =
         flow {
         var successfulResponse: UploadStatus? = null
             storage.uploadPhoto(userId, folder, file)
