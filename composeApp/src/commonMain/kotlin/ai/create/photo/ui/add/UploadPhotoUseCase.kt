@@ -14,22 +14,22 @@ class UploadPhotoUseCase(
 
     fun invoke(userId: String, folder: String, file: PlatformFile): Flow<UploadStatus> =
         flow {
-        var successfulResponse: UploadStatus? = null
+            var successfulResponse: UploadStatus? = null
             storage.uploadPhoto(userId, folder, file)
-            .collect { response ->
-                if (response is UploadStatus.Success) {
-                    successfulResponse = response
-                } else {
-                    emit(response)
+                .collect { response ->
+                    if (response is UploadStatus.Success) {
+                        successfulResponse = response
+                    } else {
+                        emit(response)
+                    }
                 }
+
+            val filePath = (successfulResponse as? UploadStatus.Success)?.response?.path
+                ?: throw Exception("File path is null after upload")
+            database.saveFile(userId, folder, filePath).onFailure {
+                throw it
             }
 
-        val filePath = (successfulResponse as? UploadStatus.Success)?.response?.path
-            ?: throw Exception("File path is null after upload")
-            database.saveFile(userId, folder, filePath).onFailure {
-            throw it
+            emit(successfulResponse)
         }
-
-        emit(successfulResponse)
-    }
 }

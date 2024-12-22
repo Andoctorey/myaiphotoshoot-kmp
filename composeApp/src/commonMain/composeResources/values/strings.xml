@@ -14,4 +14,5 @@
     <string name="delete_photo_set">Delete Photo Set</string>
     <string name="upload_more_photos">Oops! It looks like you need to upload at least 10 photos before training your model. Try taking some selfies in portrait mode from different angles to get started. 📸😊</string>
     <string name="unknown_error">Unknown error</string>
+    <string name="uploading_photos">Uploading photos</string>">
 </resources>

@@ -21,11 +21,6 @@ class AddViewModel : SessionViewModel() {
         database = SupabaseDatabase,
     )
 
-    private val createModelUseCase = CreateModelUseCase(
-        storage = SupabaseStorage,
-        database = SupabaseDatabase,
-    )
-
     var uiState by mutableStateOf(AddUiState())
         private set
 
@@ -134,15 +129,7 @@ class AddViewModel : SessionViewModel() {
             return@launch
         }
 
-        uiState = uiState.copy(showMenu = false)
-        uiState.folder!!
-
-        createModelUseCase.invoke(photos).catch {
-            Logger.e("createAiModel failed", it)
-            uiState = uiState.copy(errorPopup = it)
-        }.collect {
-
-        }
+        uiState = uiState.copy(creatingModel = true)
     }
 
     fun hideUploadMorePhotosPopup() {

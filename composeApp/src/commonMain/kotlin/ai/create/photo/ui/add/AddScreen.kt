@@ -82,6 +82,7 @@ import photocreateai.composeapp.generated.resources.photo_set
 import photocreateai.composeapp.generated.resources.unknown_error
 import photocreateai.composeapp.generated.resources.upload_guidelines_message
 import photocreateai.composeapp.generated.resources.upload_more_photos
+import photocreateai.composeapp.generated.resources.uploading_photos
 
 
 @Preview
@@ -133,7 +134,7 @@ fun AddScreen(
             CreateModelFab(
                 modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
                 extended = true,
-                createModelStatus = state.createModelStatus,
+                creatingModel = state.creatingModel,
             ) {
                 viewModel.createModel()
             }
@@ -152,7 +153,7 @@ fun AddScreen(
             selectedFolder = state.folder ?: defaultFolderName,
             folders = state.folders,
             uploadProgress = state.uploadProgress,
-            createModelStatus = state.createModelStatus,
+            creatingModel = state.creatingModel,
             showMenu = state.showMenu,
             onAddPhotoClick = onAddPhotoClick,
             toggleMenu = viewModel::toggleMenu,
@@ -243,28 +244,45 @@ private fun AddPhotosFab(
 fun CreateModelFab(
     modifier: Modifier = Modifier,
     extended: Boolean = false,
-    createModelStatus: CreateModelStatus,
+    creatingModel: Boolean,
     createModel: () -> Unit
 ) {
-    ExtendedFloatingActionButton(modifier = modifier, onClick = createModel) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Bottom,
+    ) {
+        ExtendedFloatingActionButton(
+            onClick = { if (!creatingModel) createModel() },
         ) {
-            if (extended) {
-                Icon(
-                    imageVector = Icons.Default.Face,
-                    contentDescription = stringResource(Res.string.create_ai_model),
-                    tint = MaterialTheme.colorScheme.onSurface,
-                )
-                Spacer(modifier = Modifier.width(16.dp))
+            if (creatingModel) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    LoadingPlaceholder()
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(
+                        text = stringResource(Res.string.uploading_photos),
+                    )
+                }
+            } else {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (extended) {
+                        Icon(
+                            imageVector = Icons.Default.Face,
+                            contentDescription = stringResource(Res.string.create_ai_model),
+                            tint = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                    }
+                    Text(
+                        text = stringResource(Res.string.create_ai_model),
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontSize = if (extended) 14.sp else 13.sp,
+                    )
+                }
             }
-            Text(
-                text = stringResource(Res.string.create_ai_model),
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                fontSize = if (extended) 14.sp else 13.sp,
-                overflow = TextOverflow.Ellipsis,
-            )
         }
     }
 }
@@ -363,7 +381,7 @@ fun FabMenu(
     selectedFolder: String,
     folders: List<String>?,
     uploadProgress: Int,
-    createModelStatus: CreateModelStatus,
+    creatingModel: Boolean,
     showMenu: Boolean,
     onAddPhotoClick: () -> Unit,
     toggleMenu: () -> Unit,
@@ -396,15 +414,20 @@ fun FabMenu(
                     Spacer(modifier = Modifier.height(8.dp))
                 }
 
-                if ((photos?.size ?: 0) >= 10) {
-                    AddPhotosFab(
-                        uploadProgress = uploadProgress,
-                        onClick = onAddPhotoClick
-                    )
-                } else {
-                    CreateModelFab(createModel = createModel, createModelStatus = createModelStatus)
+                if ((photos?.size ?: 0) <= 30) {
+                    if ((photos?.size ?: 0) >= 10) {
+                        AddPhotosFab(
+                            uploadProgress = uploadProgress,
+                            onClick = onAddPhotoClick
+                        )
+                    } else {
+                        CreateModelFab(
+                            createModel = createModel,
+                            creatingModel = creatingModel,
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
-                Spacer(modifier = Modifier.height(8.dp))
             }
         }
         SmallFloatingActionButton(

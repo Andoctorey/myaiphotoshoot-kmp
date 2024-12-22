@@ -13,7 +13,7 @@ data class AddUiState(
     val listState: LazyStaggeredGridState = LazyStaggeredGridState(),
     val scrollToTop: Boolean = false,
     val uploadProgress: Int = 0,
-    val createModelStatus: CreateModelStatus = CreateModelStatus.Idle,
+    val creatingModel: Boolean = false,
 
     val errorPopup: Throwable? = null,
 
