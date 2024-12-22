@@ -13,7 +13,7 @@ import java.awt.Dimension
 fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
-        title = "PhotoCreateAi",
+        title = "My AI Photo Shoot",
     ) {
         SetMinimumWindowSize(width = 100.dp, height = 200.dp)
         App()
