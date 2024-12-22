@@ -390,7 +390,7 @@ fun FabMenu(
         Crossfade(targetState = showMenu) {
             if (!it) return@Crossfade
             Column(horizontalAlignment = Alignment.End) {
-                if ((photos?.size ?: 0) >= 1 && photoSets != null) {
+                if (photoSets != null && (photoSets.isNotEmpty() || (photos?.size ?: 0) >= 1)) {
                     PhotoSets(
                         photoSets = photoSets,
                         selectedPhotoSet = photoSet,
@@ -492,7 +492,7 @@ fun PhotoSets(
                     onClick = {
                         selectedOption = option
                         expanded = false
-                        if (selectedOption == -1) createPhotoSet()
+                        if (selectedOption == 0) createPhotoSet()
                         else selectPhotoSet(selectedOption)
                     }
                 )
