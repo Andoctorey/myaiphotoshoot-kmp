@@ -6,11 +6,11 @@ import io.github.jan.supabase.functions.functions
 
 object SupabaseFunction {
 
-    suspend fun createAiModel(folder: String) {
-        Logger.i("createAiModel for $folder")
+    suspend fun createAiModel(photoSet: Int) {
+        Logger.i("createAiModel for $photoSet")
         supabase.functions.invoke(
             function = "training",
-            body = mapOf("folder" to folder)
+            body = mapOf("photo_set" to photoSet)
         )
     }
 }

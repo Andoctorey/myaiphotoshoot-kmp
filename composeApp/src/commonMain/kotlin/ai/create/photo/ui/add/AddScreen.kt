@@ -105,7 +105,6 @@ fun AddScreen(
         val onAddPhotoClick = { launcher.launch() }
 
         val state = viewModel.uiState
-        val defaultFolderName = stringResource(Res.string.photo_set)
 
         val photos = state.displayingPhotos
         if (state.isLoading) {
@@ -115,9 +114,6 @@ fun AddScreen(
             ErrorMessagePlaceHolder(state.loadingError)
         } else if (photos.isNullOrEmpty()) {
             Placeholder(modifier = Modifier.align(Alignment.Center))
-            if (state.folder == null) {
-                viewModel.setFolderDefaultValue(defaultFolderName)
-            }
         } else {
             LaunchedEffect(state.scrollToTop) {
                 if (state.scrollToTop && state.listState.firstVisibleItemIndex > 1) {
@@ -150,17 +146,17 @@ fun AddScreen(
         FabMenu(
             modifier = Modifier.align(Alignment.BottomEnd),
             photos = state.displayingPhotos,
-            selectedFolder = state.folder ?: defaultFolderName,
-            folders = state.folders,
+            photoSets = state.photoSets,
             uploadProgress = state.uploadProgress,
             creatingModel = state.creatingModel,
             showMenu = state.showMenu,
             onAddPhotoClick = onAddPhotoClick,
             toggleMenu = viewModel::toggleMenu,
             createModel = viewModel::createModel,
-            selectFolder = viewModel::selectFolder,
-            createFolder = { viewModel.createFolder(defaultFolderName) },
-            deleteFolder = viewModel::deleteFolder,
+            photoSet = state.photoSet,
+            selectPhotoSet = viewModel::selectPhotoSet,
+            createPhotoSet = viewModel::createPhotoSet,
+            deletePhotoSet = viewModel::deletePhotoSet,
         )
 
         if (state.showUploadMorePhotosPopup) {
@@ -378,31 +374,31 @@ private fun Photo(
 fun FabMenu(
     modifier: Modifier,
     photos: List<AddUiState.Photo>?,
-    selectedFolder: String,
-    folders: List<String>?,
     uploadProgress: Int,
     creatingModel: Boolean,
     showMenu: Boolean,
     onAddPhotoClick: () -> Unit,
     toggleMenu: () -> Unit,
     createModel: () -> Unit,
-    selectFolder: (String) -> Unit,
-    createFolder: () -> Unit,
-    deleteFolder: () -> Unit,
+    photoSet: Int,
+    photoSets: List<Int>?,
+    selectPhotoSet: (Int) -> Unit,
+    createPhotoSet: () -> Unit,
+    deletePhotoSet: () -> Unit,
 ) {
     Column(modifier = modifier.padding(24.dp), horizontalAlignment = Alignment.End) {
         Crossfade(targetState = showMenu) {
             if (!it) return@Crossfade
             Column(horizontalAlignment = Alignment.End) {
-                if ((photos?.size ?: 0) >= 1 && folders != null) {
+                if ((photos?.size ?: 0) >= 1 && photoSets != null) {
                     PhotoSets(
-                        folders = folders,
-                        selectedFolder = selectedFolder,
-                        selectFolder = selectFolder,
-                        createFolder = createFolder
+                        photoSets = photoSets,
+                        selectedPhotoSet = photoSet,
+                        selectPhotoSet = selectPhotoSet,
+                        createPhotoSet = createPhotoSet
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    ExtendedFloatingActionButton(onClick = deleteFolder) {
+                    ExtendedFloatingActionButton(onClick = deletePhotoSet) {
                         Text(
                             text = stringResource(Res.string.delete_photo_set),
                             textAlign = TextAlign.Center,
@@ -444,16 +440,17 @@ fun FabMenu(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhotoSets(
-    folders: List<String>,
-    selectedFolder: String,
-    selectFolder: (String) -> Unit,
-    createFolder: () -> Unit
+    photoSets: List<Int>,
+    selectedPhotoSet: Int,
+    selectPhotoSet: (Int) -> Unit,
+    createPhotoSet: () -> Unit
 ) {
-    val options = folders.toMutableList()
-    options.add(stringResource(Res.string.create_photo_set))
+    val options = photoSets.toMutableList()
+    options.add(0)
     var expanded by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf(selectedFolder) }
-
+    var selectedOption by remember { mutableStateOf(selectedPhotoSet) }
+    val photoSetString = stringResource(Res.string.photo_set)
+    val createPhotoSetString = stringResource(Res.string.create_photo_set)
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded }
@@ -466,7 +463,8 @@ fun PhotoSets(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = selectedOption,
+                    text = if (selectedOption == 0) createPhotoSetString
+                    else "$photoSetString $selectedOption",
                     textAlign = TextAlign.Center,
                     maxLines = 1,
                     fontSize = 13.sp,
@@ -485,12 +483,17 @@ fun PhotoSets(
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(option) },
+                    text = {
+                        Text(
+                            text = if (option == 0) createPhotoSetString
+                            else "$photoSetString $option",
+                        )
+                    },
                     onClick = {
                         selectedOption = option
                         expanded = false
-                        if (options.last() == selectedOption) createFolder()
-                        else selectFolder(selectedOption)
+                        if (selectedOption == -1) createPhotoSet()
+                        else selectPhotoSet(selectedOption)
                     }
                 )
             }

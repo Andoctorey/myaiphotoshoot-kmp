@@ -15,10 +15,10 @@ object SupabaseStorage {
 
     suspend fun uploadPhoto(
         userId: String,
-        folder: String,
+        photoSet: Int,
         file: PlatformFile
     ): Flow<UploadStatus> {
-        val filePath = "${userId}/$folder/${file.name}"
+        val filePath = "${userId}/$photoSet/${file.name}"
         Logger.i("uploadPhoto $filePath, size: ${file.getSize()}")
         return supabase.storage
             .from(BUCKET)
@@ -30,10 +30,10 @@ object SupabaseStorage {
             }
     }
 
-    suspend fun createSignedUrl(userId: String, folder: String, filePath: String) = supabase.storage
+    suspend fun createSignedUrl(userId: String, photoSet: Int, filePath: String) = supabase.storage
         .from(BUCKET)
         .createSignedUrl(
-            path = "${userId}/$folder/${filePath}",
+            path = "${userId}/$photoSet/${filePath}",
             expiresIn = 3650.days,
         )
 
@@ -42,8 +42,8 @@ object SupabaseStorage {
         supabase.storage.from(BUCKET).delete(path)
     }
 
-    suspend fun deleteFolder(folder: String) {
-        Logger.i("delete folder from storage $folder")
-        supabase.storage.from(BUCKET).delete(folder)
+    suspend fun deletePhotoSet(userId: String, photoSet: Int) {
+        Logger.i("delete photoSet from storage $photoSet")
+        supabase.storage.from(BUCKET).delete("${userId}/$photoSet")
     }
 }

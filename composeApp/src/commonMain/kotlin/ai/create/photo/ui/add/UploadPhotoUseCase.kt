@@ -12,10 +12,10 @@ class UploadPhotoUseCase(
     private val database: SupabaseDatabase
 ) {
 
-    fun invoke(userId: String, folder: String, file: PlatformFile): Flow<UploadStatus> =
+    fun invoke(userId: String, photoSet: Int, file: PlatformFile): Flow<UploadStatus> =
         flow {
             var successfulResponse: UploadStatus? = null
-            storage.uploadPhoto(userId, folder, file)
+            storage.uploadPhoto(userId, photoSet, file)
                 .collect { response ->
                     if (response is UploadStatus.Success) {
                         successfulResponse = response
@@ -26,7 +26,7 @@ class UploadPhotoUseCase(
 
             val filePath = (successfulResponse as? UploadStatus.Success)?.response?.path
                 ?: throw Exception("File path is null after upload")
-            database.saveFile(userId, folder, filePath).onFailure {
+            database.saveFile(userId, photoSet, filePath).onFailure {
                 throw it
             }
 

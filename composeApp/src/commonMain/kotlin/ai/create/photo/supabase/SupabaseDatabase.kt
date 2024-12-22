@@ -13,25 +13,28 @@ object SupabaseDatabase {
 
     suspend fun saveFile(
         userId: String,
-        folder: String,
+        photoSet: Int,
         filePath: String
     ): Result<PostgrestResult> = runCatching {
         val photoData = mapOf(
             "user_id" to userId,
             "file_path" to filePath,
-            "folder" to folder,
-            "signed_url" to SupabaseStorage.createSignedUrl(userId, folder, filePath),
+            "photo_set" to photoSet.toString(),
+            "signed_url" to SupabaseStorage.createSignedUrl(userId, photoSet, filePath),
         )
         Logger.i("save file to db $filePath")
         supabase.from(USER_FILES_TABLE).upsert(photoData) {
-            onConflict = "user_id, file_path, folder"
+            onConflict = "user_id, file_path, photo_set"
         }
     }
 
-    suspend fun getFiles(): Result<List<UserFile>> = runCatching {
+    suspend fun getFiles(userId: String): Result<List<UserFile>> = runCatching {
         supabase
             .from(USER_FILES_TABLE)
             .select {
+                filter {
+                    eq("user_id", userId)
+                }
                 order(column = "created_at", order = Order.DESCENDING)
             }
             .decodeList<UserFile>()
@@ -49,11 +52,12 @@ object SupabaseDatabase {
         }
     }
 
-    suspend fun deleteFolder(folder: String) {
-        Logger.i("delete folder from db $folder")
+    suspend fun deletePhotoSet(userId: String, photoSet: Int) {
+        Logger.i("delete photoSet from db $photoSet")
         supabase.from(USER_FILES_TABLE).delete {
             filter {
-                eq("folder", folder)
+                eq("user_id", userId)
+                eq("photo_set", photoSet)
             }
         }
     }
