@@ -92,6 +92,7 @@ import photocreateai.composeapp.generated.resources.upload_more_photos
 @Composable
 fun AddScreen(
     viewModel: AddViewModel = viewModel { AddViewModel() },
+    generatePhotos: () -> Unit,
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -139,9 +140,9 @@ fun AddScreen(
                     modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
                     extended = true,
                     trainingStatus = state.trainingStatus,
-                ) {
-                    viewModel.createModel()
-                }
+                    createModel = viewModel::createModel,
+                    generatePhotos = generatePhotos,
+                )
             } else {
                 AddPhotosFab(
                     modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
@@ -161,6 +162,7 @@ fun AddScreen(
                 onAddPhotoClick = onAddPhotoClick,
                 toggleMenu = viewModel::toggleMenu,
                 createModel = viewModel::createModel,
+                generatePhotos = generatePhotos,
                 photoSet = state.photoSet,
                 selectPhotoSet = viewModel::selectPhotoSet,
                 createPhotoSet = viewModel::createPhotoSet,
@@ -250,7 +252,8 @@ fun CreateModelFab(
     modifier: Modifier = Modifier,
     extended: Boolean = false,
     trainingStatus: TrainingStatus?,
-    createModel: () -> Unit
+    createModel: () -> Unit,
+    generatePhotos: () -> Unit,
 ) {
 
     Column(
@@ -259,7 +262,13 @@ fun CreateModelFab(
         verticalArrangement = Arrangement.Bottom,
     ) {
         ExtendedFloatingActionButton(
-            onClick = { if (trainingStatus == null) createModel() },
+            onClick = {
+                when (trainingStatus) {
+                    TrainingStatus.SUCCEEDED -> generatePhotos()
+                    TrainingStatus.PROCESSING -> {}
+                    null -> createModel()
+                }
+            },
         ) {
             when (trainingStatus) {
                 TrainingStatus.SUCCEEDED -> {
@@ -415,6 +424,7 @@ fun FabMenu(
     onAddPhotoClick: () -> Unit,
     toggleMenu: () -> Unit,
     createModel: () -> Unit,
+    generatePhotos: () -> Unit,
     photoSet: Int,
     photoSets: List<Int>?,
     selectPhotoSet: (Int) -> Unit,
@@ -453,8 +463,9 @@ fun FabMenu(
                         )
                     } else {
                         CreateModelFab(
-                            createModel = createModel,
                             trainingStatus = trainingStatus,
+                            createModel = createModel,
+                            generatePhotos = generatePhotos,
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))

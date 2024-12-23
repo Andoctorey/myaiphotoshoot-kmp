@@ -50,7 +50,9 @@ fun MainApp(
         }
     ) {
         when (currentDestination) {
-            AppNavigationRoutes.TAB1 -> AddScreen()
+            AppNavigationRoutes.TAB1 -> AddScreen(
+                generatePhotos = { currentDestination = AppNavigationRoutes.TAB2 }
+            )
             AppNavigationRoutes.TAB2 -> CreateScreen()
             AppNavigationRoutes.TAB3 -> {}
             AppNavigationRoutes.TAB4 -> {}
