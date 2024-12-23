@@ -7,7 +7,7 @@ import io.github.jan.supabase.postgrest.from
 
 object UserTrainingsRepository {
 
-    private const val USER_TRAININGS_TABLE = "user_training"
+    private const val USER_TRAININGS_TABLE = "user_trainings"
 
     suspend fun getTraining(userId: String, photoSet: Int): Result<UserTraining?> = runCatching {
         supabase
@@ -18,7 +18,7 @@ object UserTrainingsRepository {
                     eq("photo_set", photoSet)
                 }
             }
-            .decodeSingle<UserTraining>()
+            .decodeSingleOrNull<UserTraining>()
             .also {
                 Logger.i("getTraining: $it")
             }

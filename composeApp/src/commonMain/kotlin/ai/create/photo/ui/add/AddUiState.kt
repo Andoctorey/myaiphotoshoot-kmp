@@ -1,19 +1,22 @@
 package ai.create.photo.ui.add
 
+import ai.create.photo.supabase.model.TrainingStatus
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
 
 @Immutable
 data class AddUiState(
-    val isLoading: Boolean = false,
+    val isLoadingPhotos: Boolean = false,
     val loadingError: Throwable? = null,
     val photoSet: Int = 1,
     val photosByPhotoSet: Map<Int, List<Photo>>? = null,
     val listState: LazyStaggeredGridState = LazyStaggeredGridState(),
     val scrollToTop: Boolean = false,
     val uploadProgress: Int = 0,
-    val creatingModel: Boolean = false,
+
+    val isLoadingTraining: Boolean = false,
+    val trainingStatus: TrainingStatus? = null,
 
     val errorPopup: Throwable? = null,
 

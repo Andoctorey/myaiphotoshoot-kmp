@@ -1,5 +1,6 @@
 package ai.create.photo.ui.add
 
+import ai.create.photo.supabase.model.TrainingStatus
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import androidx.compose.animation.Crossfade
@@ -34,6 +35,7 @@ import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.ModeEdit
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -77,12 +79,13 @@ import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.add_your_photos
 import photocreateai.composeapp.generated.resources.create_ai_model
 import photocreateai.composeapp.generated.resources.create_photo_set
+import photocreateai.composeapp.generated.resources.create_photos
+import photocreateai.composeapp.generated.resources.creating_ai_model
 import photocreateai.composeapp.generated.resources.delete_photo_set
 import photocreateai.composeapp.generated.resources.photo_set
 import photocreateai.composeapp.generated.resources.unknown_error
 import photocreateai.composeapp.generated.resources.upload_guidelines_message
 import photocreateai.composeapp.generated.resources.upload_more_photos
-import photocreateai.composeapp.generated.resources.uploading_photos
 
 
 @Preview
@@ -107,7 +110,7 @@ fun AddScreen(
         val state = viewModel.uiState
 
         val photos = state.displayingPhotos
-        if (state.isLoading) {
+        if (state.isLoadingPhotos) {
             Spacer(modifier = Modifier.height(20.dp))
             LoadingPlaceholder()
         } else if (state.loadingError != null) {
@@ -126,38 +129,44 @@ fun AddScreen(
             }
         }
 
-        if ((photos?.size ?: 0) >= 10) {
-            CreateModelFab(
+        if (state.isLoadingTraining) {
+            LoadingPlaceholder(
                 modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
-                extended = true,
-                creatingModel = state.creatingModel,
-            ) {
-                viewModel.createModel()
-            }
+            )
         } else {
-            AddPhotosFab(
-                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
-                extended = true,
+            if ((photos?.size ?: 0) >= 10) {
+                CreateModelFab(
+                    modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
+                    extended = true,
+                    trainingStatus = state.trainingStatus,
+                ) {
+                    viewModel.createModel()
+                }
+            } else {
+                AddPhotosFab(
+                    modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
+                    extended = true,
+                    uploadProgress = state.uploadProgress,
+                    onClick = onAddPhotoClick,
+                )
+            }
+
+            FabMenu(
+                modifier = Modifier.align(Alignment.BottomEnd),
+                photos = state.displayingPhotos,
+                photoSets = state.photoSets,
                 uploadProgress = state.uploadProgress,
-                onClick = onAddPhotoClick,
+                trainingStatus = state.trainingStatus,
+                showMenu = state.showMenu,
+                onAddPhotoClick = onAddPhotoClick,
+                toggleMenu = viewModel::toggleMenu,
+                createModel = viewModel::createModel,
+                photoSet = state.photoSet,
+                selectPhotoSet = viewModel::selectPhotoSet,
+                createPhotoSet = viewModel::createPhotoSet,
+                deletePhotoSet = viewModel::deletePhotoSet,
             )
         }
-
-        FabMenu(
-            modifier = Modifier.align(Alignment.BottomEnd),
-            photos = state.displayingPhotos,
-            photoSets = state.photoSets,
-            uploadProgress = state.uploadProgress,
-            creatingModel = state.creatingModel,
-            showMenu = state.showMenu,
-            onAddPhotoClick = onAddPhotoClick,
-            toggleMenu = viewModel::toggleMenu,
-            createModel = viewModel::createModel,
-            photoSet = state.photoSet,
-            selectPhotoSet = viewModel::selectPhotoSet,
-            createPhotoSet = viewModel::createPhotoSet,
-            deletePhotoSet = viewModel::deletePhotoSet,
-        )
 
         if (state.showUploadMorePhotosPopup) {
             ShowUploadMorePhotosPopup {
@@ -240,7 +249,7 @@ private fun AddPhotosFab(
 fun CreateModelFab(
     modifier: Modifier = Modifier,
     extended: Boolean = false,
-    creatingModel: Boolean,
+    trainingStatus: TrainingStatus?,
     createModel: () -> Unit
 ) {
 
@@ -250,33 +259,59 @@ fun CreateModelFab(
         verticalArrangement = Arrangement.Bottom,
     ) {
         ExtendedFloatingActionButton(
-            onClick = { if (!creatingModel) createModel() },
+            onClick = { if (trainingStatus == null) createModel() },
         ) {
-            if (creatingModel) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    LoadingPlaceholder()
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Text(
-                        text = stringResource(Res.string.uploading_photos),
-                    )
-                }
-            } else {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (extended) {
-                        Icon(
-                            imageVector = Icons.Default.Face,
-                            contentDescription = stringResource(Res.string.create_ai_model),
-                            tint = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Spacer(modifier = Modifier.width(16.dp))
+            when (trainingStatus) {
+                TrainingStatus.SUCCEEDED -> {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (extended) {
+                                Icon(
+                                    imageVector = Icons.Default.ModeEdit,
+                                    contentDescription = stringResource(Res.string.create_ai_model),
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                )
+                                Spacer(modifier = Modifier.width(16.dp))
+                            }
+                            Text(
+                                text = stringResource(Res.string.create_photos),
+                                textAlign = TextAlign.Center,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                fontSize = if (extended) 14.sp else 13.sp,
+                            )
+                        }
                     }
-                    Text(
-                        text = stringResource(Res.string.create_ai_model),
-                        textAlign = TextAlign.Center,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        fontSize = if (extended) 14.sp else 13.sp,
-                    )
+                }
+
+                TrainingStatus.PROCESSING -> {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        LoadingPlaceholder()
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(
+                            text = stringResource(Res.string.creating_ai_model),
+                        )
+                    }
+                }
+
+                else -> {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (extended) {
+                            Icon(
+                                imageVector = Icons.Default.Face,
+                                contentDescription = stringResource(Res.string.create_ai_model),
+                                tint = MaterialTheme.colorScheme.onSurface,
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                        }
+                        Text(
+                            text = stringResource(Res.string.create_ai_model),
+                            textAlign = TextAlign.Center,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontSize = if (extended) 14.sp else 13.sp,
+                        )
+                    }
                 }
             }
         }
@@ -375,7 +410,7 @@ fun FabMenu(
     modifier: Modifier,
     photos: List<AddUiState.Photo>?,
     uploadProgress: Int,
-    creatingModel: Boolean,
+    trainingStatus: TrainingStatus?,
     showMenu: Boolean,
     onAddPhotoClick: () -> Unit,
     toggleMenu: () -> Unit,
@@ -419,7 +454,7 @@ fun FabMenu(
                     } else {
                         CreateModelFab(
                             createModel = createModel,
-                            creatingModel = creatingModel,
+                            trainingStatus = trainingStatus,
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
@@ -520,7 +555,12 @@ private fun ErrorPopup(e: Throwable, onDismiss: () -> Unit) {
     AlertDialog(
         icon = { Icon(Icons.Default.Error, contentDescription = "error") },
         onDismissRequest = onDismiss,
-        text = { Text(text = e.message ?: stringResource(Res.string.unknown_error)) },
+        text = {
+            Text(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                text = e.message ?: stringResource(Res.string.unknown_error)
+            )
+        },
         confirmButton = {
             Button(onClick = onDismiss) {
                 Text("OK")

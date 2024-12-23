@@ -36,9 +36,9 @@ import photocreateai.composeapp.generated.resources.connection_error
 
 @Preview
 @Composable
-fun LoadingPlaceholder() {
+fun LoadingPlaceholder(modifier: Modifier = Modifier) {
     CircularProgressIndicator(
-        modifier = Modifier.size(ButtonDefaults.MinHeight),
+        modifier = modifier.size(ButtonDefaults.MinHeight),
         color = MaterialTheme.colorScheme.primary,
         strokeWidth = 4.dp,
     )

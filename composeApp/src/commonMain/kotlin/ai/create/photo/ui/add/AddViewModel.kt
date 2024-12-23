@@ -4,6 +4,8 @@ import ai.create.photo.supabase.SessionViewModel
 import ai.create.photo.supabase.SupabaseFunction
 import ai.create.photo.supabase.SupabaseStorage
 import ai.create.photo.supabase.database.UserFilesRepository
+import ai.create.photo.supabase.database.UserTrainingsRepository
+import ai.create.photo.supabase.model.TrainingStatus
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,6 +13,8 @@ import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.storage.UploadStatus
 import io.github.vinceglb.filekit.core.PlatformFiles
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlin.math.max
@@ -30,11 +34,12 @@ class AddViewModel : SessionViewModel() {
     }
 
     override fun onAuthInitializing() {
-        uiState = uiState.copy(isLoading = true)
+        uiState = uiState.copy(isLoadingPhotos = true)
     }
 
     override fun onAuthenticated() {
         loadPhotos()
+        loadTraining()
     }
 
     override fun onError(error: Throwable) {
@@ -42,11 +47,11 @@ class AddViewModel : SessionViewModel() {
     }
 
     private fun loadPhotos() = viewModelScope.launch {
-        uiState = uiState.copy(isLoading = uiState.photosByPhotoSet == null)
+        uiState = uiState.copy(isLoadingPhotos = uiState.photosByPhotoSet == null)
         try {
             val files = UserFilesRepository.getFiles(userId).getOrThrow()
             uiState = uiState.copy(
-                isLoading = false,
+                isLoadingPhotos = false,
                 photosByPhotoSet = files.map { file ->
                     AddUiState.Photo(
                         id = file.id,
@@ -61,7 +66,26 @@ class AddViewModel : SessionViewModel() {
             )
         } catch (e: Exception) {
             Logger.e("Loading photos failed", e)
-            uiState = uiState.copy(isLoading = false, loadingError = e)
+            uiState = uiState.copy(isLoadingPhotos = false, loadingError = e)
+        }
+    }
+
+    private fun loadTraining(): Job = viewModelScope.launch {
+        uiState = uiState.copy(isLoadingTraining = true)
+        try {
+            val userTraining =
+                UserTrainingsRepository.getTraining(userId, uiState.photoSet).getOrThrow()
+            uiState = uiState.copy(
+                isLoadingTraining = false,
+                trainingStatus = userTraining?.status,
+            )
+            if (userTraining?.status == TrainingStatus.PROCESSING) {
+                delay(100 * 1000)
+                loadTraining()
+            }
+        } catch (e: Exception) {
+            Logger.e("Loading training failed", e)
+            uiState = uiState.copy(isLoadingTraining = false, errorPopup = e)
         }
     }
 
@@ -129,12 +153,13 @@ class AddViewModel : SessionViewModel() {
             return@launch
         }
 
-        uiState = uiState.copy(creatingModel = true)
+        uiState = uiState.copy(trainingStatus = TrainingStatus.PROCESSING)
         try {
             SupabaseFunction.createAiModel(uiState.photoSet)
+            loadTraining()
         } catch (e: Exception) {
             Logger.e("Create model failed", e)
-            uiState = uiState.copy(errorPopup = e)
+            uiState = uiState.copy(trainingStatus = null, errorPopup = e)
         }
     }
 
