@@ -1,7 +1,7 @@
 package ai.create.photo.ui.add
 
-import ai.create.photo.supabase.SupabaseDatabase
 import ai.create.photo.supabase.SupabaseStorage
+import ai.create.photo.supabase.database.UserFilesRepository
 import io.github.jan.supabase.storage.UploadStatus
 import io.github.vinceglb.filekit.core.PlatformFile
 import kotlinx.coroutines.flow.Flow
@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.flow
 
 class UploadPhotoUseCase(
     private val storage: SupabaseStorage,
-    private val database: SupabaseDatabase
+    private val database: UserFilesRepository
 ) {
 
     fun invoke(userId: String, photoSet: Int, file: PlatformFile): Flow<UploadStatus> =

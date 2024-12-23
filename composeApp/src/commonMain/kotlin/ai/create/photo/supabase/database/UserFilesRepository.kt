@@ -1,13 +1,14 @@
-package ai.create.photo.supabase
+package ai.create.photo.supabase.database
 
 import ai.create.photo.supabase.Supabase.supabase
+import ai.create.photo.supabase.SupabaseStorage
 import ai.create.photo.supabase.model.UserFile
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 
-object SupabaseDatabase {
+object UserFilesRepository {
 
     private const val USER_FILES_TABLE = "user_files"
 

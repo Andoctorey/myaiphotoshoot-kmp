@@ -1,8 +1,9 @@
 package ai.create.photo.ui.add
 
 import ai.create.photo.supabase.SessionViewModel
-import ai.create.photo.supabase.SupabaseDatabase
+import ai.create.photo.supabase.SupabaseFunction
 import ai.create.photo.supabase.SupabaseStorage
+import ai.create.photo.supabase.database.UserFilesRepository
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -18,7 +19,7 @@ class AddViewModel : SessionViewModel() {
 
     private val uploadPhotoUseCase = UploadPhotoUseCase(
         storage = SupabaseStorage,
-        database = SupabaseDatabase,
+        database = UserFilesRepository,
     )
 
     var uiState by mutableStateOf(AddUiState())
@@ -43,7 +44,7 @@ class AddViewModel : SessionViewModel() {
     private fun loadPhotos() = viewModelScope.launch {
         uiState = uiState.copy(isLoading = uiState.photosByPhotoSet == null)
         try {
-            val files = SupabaseDatabase.getFiles(userId).getOrThrow()
+            val files = UserFilesRepository.getFiles(userId).getOrThrow()
             uiState = uiState.copy(
                 isLoading = false,
                 photosByPhotoSet = files.map { file ->
@@ -111,7 +112,7 @@ class AddViewModel : SessionViewModel() {
         }
         uiState = uiState.copy(photosByPhotoSet = updatedPhotosByPhotoSet, showMenu = false)
         try {
-            SupabaseDatabase.deleteFile(photo.id)
+            UserFilesRepository.deleteFile(photo.id)
             SupabaseStorage.deleteFile("$userId/${photo.photoSet}/${photo.path}")
         } catch (e: Exception) {
             Logger.e("Delete photo failed, $photo", e)
@@ -129,6 +130,12 @@ class AddViewModel : SessionViewModel() {
         }
 
         uiState = uiState.copy(creatingModel = true)
+        try {
+            SupabaseFunction.createAiModel(uiState.photoSet)
+        } catch (e: Exception) {
+            Logger.e("Create model failed", e)
+            uiState = uiState.copy(errorPopup = e)
+        }
     }
 
     fun hideUploadMorePhotosPopup() {
@@ -144,7 +151,7 @@ class AddViewModel : SessionViewModel() {
 
         val photoSet = uiState.photoSet
         try {
-            SupabaseDatabase.deletePhotoSet(userId, photoSet)
+            UserFilesRepository.deletePhotoSet(userId, photoSet)
             SupabaseStorage.deletePhotoSet(userId, photoSet)
             loadPhotos()
         } catch (e: Exception) {
