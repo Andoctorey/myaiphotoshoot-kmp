@@ -56,7 +56,7 @@ class AddViewModel : SessionViewModel() {
                     AddUiState.Photo(
                         id = file.id,
                         createdAt = file.createdAt,
-                        path = file.filePath,
+                        fileName = file.fileName,
                         photoSet = file.photoSet,
                         url = file.signedUrl,
                     )
@@ -137,7 +137,7 @@ class AddViewModel : SessionViewModel() {
         uiState = uiState.copy(photosByPhotoSet = updatedPhotosByPhotoSet, showMenu = false)
         try {
             UserFilesRepository.deleteFile(photo.id)
-            SupabaseStorage.deleteFile("$userId/${photo.photoSet}/${photo.path}")
+            SupabaseStorage.deleteFile("$userId/${photo.photoSet}/${photo.fileName}")
         } catch (e: Exception) {
             Logger.e("Delete photo failed, $photo", e)
             uiState = uiState.copy(photosByPhotoSet = photosByPhotoSet, errorPopup = e)
@@ -176,8 +176,15 @@ class AddViewModel : SessionViewModel() {
 
         val photoSet = uiState.photoSet
         try {
-            UserFilesRepository.deletePhotoSet(userId, photoSet)
-            SupabaseStorage.deletePhotoSet(userId, photoSet)
+            val photos = uiState.photosByPhotoSet?.get(photoSet) ?: return@launch
+            val ids = mutableListOf<String>()
+            val paths = mutableListOf<String>()
+            photos.forEach {
+                ids.add(it.id)
+                paths.add("$userId/$photoSet/${it.fileName}")
+            }
+            UserFilesRepository.deleteFiles(ids)
+            SupabaseStorage.deleteFiles(paths)
             loadPhotos()
         } catch (e: Exception) {
             Logger.e("Delete photoSet failed: $photoSet", e)

@@ -15,17 +15,18 @@ object UserFilesRepository {
     suspend fun saveFile(
         userId: String,
         photoSet: Int,
-        filePath: String
+        fileName: String
     ): Result<PostgrestResult> = runCatching {
         val photoData = mapOf(
             "user_id" to userId,
-            "file_path" to filePath,
+            "file_name" to fileName,
             "photo_set" to photoSet.toString(),
-            "signed_url" to SupabaseStorage.createSignedUrl(userId, photoSet, filePath),
+            "type" to "input_image",
+            "signed_url" to SupabaseStorage.createSignedUrl(userId, photoSet, fileName),
         )
-        Logger.i("save file to db $filePath")
+        Logger.i("save file to db $fileName")
         supabase.from(USER_FILES_TABLE).upsert(photoData) {
-            onConflict = "user_id, file_path, photo_set"
+            onConflict = "user_id, file_name, photo_set, type"
         }
     }
 
@@ -35,6 +36,7 @@ object UserFilesRepository {
             .select {
                 filter {
                     eq("user_id", userId)
+                    eq("type", "input_image")
                 }
                 order(column = "created_at", order = Order.DESCENDING)
             }
@@ -53,12 +55,11 @@ object UserFilesRepository {
         }
     }
 
-    suspend fun deletePhotoSet(userId: String, photoSet: Int) {
-        Logger.i("delete photoSet from db $photoSet")
+    suspend fun deleteFiles(ids: List<String>) {
+        Logger.i("delete files from db ${ids.joinToString()}")
         supabase.from(USER_FILES_TABLE).delete {
             filter {
-                eq("user_id", userId)
-                eq("photo_set", photoSet)
+                isIn("id", ids)
             }
         }
     }

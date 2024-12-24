@@ -33,7 +33,7 @@ data class AddUiState(
     @Immutable
     data class Photo(
         val id: String,
-        val path: String,
+        val fileName: String,
         val photoSet: Int,
         val url: String,
         val createdAt: Instant,

@@ -24,9 +24,9 @@ class UploadPhotoUseCase(
                     }
                 }
 
-            val filePath = (successfulResponse as? UploadStatus.Success)?.response?.path
+            val fileName = (successfulResponse as? UploadStatus.Success)?.response?.path
                 ?: throw Exception("File path is null after upload")
-            database.saveFile(userId, photoSet, filePath).onFailure {
+            database.saveFile(userId, photoSet, fileName).onFailure {
                 throw it
             }
 

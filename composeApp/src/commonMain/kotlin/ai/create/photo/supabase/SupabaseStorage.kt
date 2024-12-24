@@ -42,16 +42,8 @@ object SupabaseStorage {
         supabase.storage.from(BUCKET).delete(path)
     }
 
-    suspend fun deletePhotoSet(userId: String, photoSet: Int) {
-        val path = "${userId}/$photoSet/"
-        Logger.i("Deleting photoSet from storage: $path")
-        val files = supabase.storage.from(BUCKET).list(path)
-        if (files.isNotEmpty()) {
-            val filePaths = files.map { "$path${it.name}" }
-            supabase.storage.from(BUCKET).delete(filePaths)
-            Logger.i("Successfully deleted ${filePaths.size} files in $path")
-        } else {
-            Logger.i("No files found in $path to delete.")
-        }
+    suspend fun deleteFiles(paths: List<String>) {
+        Logger.i("delete files from storage ${paths.joinToString()}")
+        supabase.storage.from(BUCKET).delete(paths)
     }
 }

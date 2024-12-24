@@ -3,6 +3,7 @@ package ai.create.photo.ui.add
 import ai.create.photo.supabase.model.TrainingStatus
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.LoadingPlaceholder
+import ai.create.photo.ui.compose.getFriendlyError
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -79,11 +80,9 @@ import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.add_your_photos
 import photocreateai.composeapp.generated.resources.create_ai_model
 import photocreateai.composeapp.generated.resources.create_photo_set
-import photocreateai.composeapp.generated.resources.create_photos
 import photocreateai.composeapp.generated.resources.creating_ai_model
 import photocreateai.composeapp.generated.resources.delete_photo_set
 import photocreateai.composeapp.generated.resources.photo_set
-import photocreateai.composeapp.generated.resources.unknown_error
 import photocreateai.composeapp.generated.resources.upload_guidelines_message
 import photocreateai.composeapp.generated.resources.upload_more_photos
 
@@ -283,7 +282,7 @@ fun CreateModelFab(
                                 Spacer(modifier = Modifier.width(16.dp))
                             }
                             Text(
-                                text = stringResource(Res.string.create_photos),
+                                text = stringResource(Res.string.create_ai_model),
                                 textAlign = TextAlign.Center,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -569,7 +568,7 @@ private fun ErrorPopup(e: Throwable, onDismiss: () -> Unit) {
         text = {
             Text(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
-                text = e.message ?: stringResource(Res.string.unknown_error)
+                text = e.getFriendlyError()
             )
         },
         confirmButton = {
