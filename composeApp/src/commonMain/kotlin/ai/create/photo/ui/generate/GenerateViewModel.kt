@@ -22,7 +22,11 @@ class GenerateViewModel : SessionViewModel() {
     override fun onAuthenticated() {
     }
 
-    override fun onError(error: Throwable) {
-        uiState.copy(loadingError = error)
+    override fun onAuthError(error: Throwable) {
+        uiState = uiState.copy(loadingError = error)
+    }
+
+    fun onPromptChanged(prompt: String) {
+        uiState = uiState.copy(prompt = prompt)
     }
 }

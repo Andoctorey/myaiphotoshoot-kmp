@@ -34,9 +34,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Mood
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
@@ -224,43 +224,38 @@ private fun AddPhotosFab(
     uploadProgress: Int,
     onClick: () -> Unit
 ) {
-    Column(
+    val isLoading = uploadProgress in 1 until 100
+    ExtendedFloatingActionButton(
         modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Bottom,
+        onClick = { if (!isLoading) onClick() },
     ) {
-        val isLoading = uploadProgress in 1 until 100
-        ExtendedFloatingActionButton(
-            onClick = { if (!isLoading) onClick() },
-        ) {
-            if (uploadProgress in 1 until 100) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "${uploadProgress}%",
-                        fontSize = 12.sp,
+        if (uploadProgress in 1 until 100) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "${uploadProgress}%",
+                    fontSize = 12.sp,
+                )
+                LinearProgressIndicator(progress = { uploadProgress / 100f })
+            }
+        } else {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                if (extended) {
+                    Icon(
+                        imageVector = Icons.Default.AddAPhoto,
+                        contentDescription = stringResource(Res.string.add_your_photos),
+                        tint = MaterialTheme.colorScheme.onSurface,
                     )
-                    LinearProgressIndicator(progress = { uploadProgress / 100f })
+                    Spacer(modifier = Modifier.width(16.dp))
                 }
-            } else {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    if (extended) {
-                        Icon(
-                            imageVector = Icons.Default.AddAPhoto,
-                            contentDescription = stringResource(Res.string.add_your_photos),
-                            tint = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Spacer(modifier = Modifier.width(16.dp))
-                    }
-                    Text(
-                        text = stringResource(Res.string.add_your_photos),
-                        textAlign = TextAlign.Center,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        fontSize = if (extended) 14.sp else 13.sp,
-                    )
-                }
+                Text(
+                    text = stringResource(Res.string.add_your_photos),
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = if (extended) 14.sp else 13.sp,
+                )
             }
         }
     }
@@ -275,76 +270,68 @@ fun CreateModelFab(
     onCreatingModelClick: () -> Unit,
     generatePhotos: () -> Unit,
 ) {
-
-    Column(
+    ExtendedFloatingActionButton(
         modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Bottom,
-    ) {
-        ExtendedFloatingActionButton(
-            onClick = {
-                when (trainingStatus) {
-                    TrainingStatus.SUCCEEDED -> generatePhotos()
-                    TrainingStatus.PROCESSING -> onCreatingModelClick()
-                    null -> createModel()
-                }
-            },
-        ) {
+        onClick = {
             when (trainingStatus) {
-                TrainingStatus.SUCCEEDED -> {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            if (extended) {
-                                Icon(
-                                    imageVector = Icons.Default.Mood,
-                                    contentDescription = stringResource(Res.string.create_ai_model),
-                                    tint = MaterialTheme.colorScheme.onSurface,
-                                )
-                                Spacer(modifier = Modifier.width(16.dp))
-                            }
-                            Text(
-                                text = stringResource(Res.string.generate_photos),
-                                textAlign = TextAlign.Center,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                fontSize = if (extended) 14.sp else 13.sp,
-                            )
-                        }
-                    }
-                }
-
-                TrainingStatus.PROCESSING -> {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            color = MaterialTheme.colorScheme.primary,
-                            strokeWidth = 2.dp,
+                TrainingStatus.SUCCEEDED -> generatePhotos()
+                TrainingStatus.PROCESSING -> onCreatingModelClick()
+                null -> createModel()
+            }
+        },
+    ) {
+        when (trainingStatus) {
+            TrainingStatus.SUCCEEDED -> {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (extended) {
+                        Icon(
+                            imageVector = Icons.Default.Brush,
+                            contentDescription = stringResource(Res.string.create_ai_model),
+                            tint = MaterialTheme.colorScheme.onSurface,
                         )
                         Spacer(modifier = Modifier.width(16.dp))
-                        Text(
-                            text = stringResource(Res.string.creating_ai_model),
-                        )
                     }
+                    Text(
+                        text = stringResource(Res.string.generate_photos),
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontSize = if (extended) 14.sp else 13.sp,
+                    )
                 }
+            }
 
-                else -> {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        if (extended) {
-                            Icon(
-                                imageVector = Icons.Default.Face,
-                                contentDescription = stringResource(Res.string.create_ai_model),
-                                tint = MaterialTheme.colorScheme.onSurface,
-                            )
-                            Spacer(modifier = Modifier.width(16.dp))
-                        }
-                        Text(
-                            text = stringResource(Res.string.create_ai_model),
-                            textAlign = TextAlign.Center,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            fontSize = if (extended) 14.sp else 13.sp,
+            TrainingStatus.PROCESSING -> {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.primary,
+                        strokeWidth = 2.dp,
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(
+                        text = stringResource(Res.string.creating_ai_model),
+                    )
+                }
+            }
+
+            else -> {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (extended) {
+                        Icon(
+                            imageVector = Icons.Default.Mood,
+                            contentDescription = stringResource(Res.string.create_ai_model),
+                            tint = MaterialTheme.colorScheme.onSurface,
                         )
+                        Spacer(modifier = Modifier.width(16.dp))
                     }
+                    Text(
+                        text = stringResource(Res.string.create_ai_model),
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontSize = if (extended) 14.sp else 13.sp,
+                    )
                 }
             }
         }

@@ -43,7 +43,7 @@ class AddViewModel : SessionViewModel() {
         loadTraining()
     }
 
-    override fun onError(error: Throwable) {
+    override fun onAuthError(error: Throwable) {
         uiState = uiState.copy(isLoadingPhotos = false, loadingError = error)
     }
 

@@ -6,4 +6,6 @@ import androidx.compose.runtime.Immutable
 data class GenerateUiState(
     val isLoading: Boolean = false,
     val loadingError: Throwable? = null,
+
+    val prompt: String = ""
 )
