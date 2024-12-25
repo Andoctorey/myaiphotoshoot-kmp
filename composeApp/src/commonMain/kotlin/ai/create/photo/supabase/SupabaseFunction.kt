@@ -13,4 +13,15 @@ object SupabaseFunction {
             body = mapOf("photo_set" to photoSet)
         )
     }
+
+    suspend fun generatePhoto(prompt: String) {
+        Logger.i("generatePhoto for $prompt")
+        supabase.functions.invoke(
+            function = "generate",
+            body = mapOf(
+//                "training_id" to photoSet,
+                "prompt" to prompt
+            )
+        )
+    }
 }

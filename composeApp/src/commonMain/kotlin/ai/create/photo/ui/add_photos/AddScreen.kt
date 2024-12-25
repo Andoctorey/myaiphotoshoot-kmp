@@ -2,8 +2,8 @@ package ai.create.photo.ui.add_photos
 
 import ai.create.photo.supabase.model.TrainingStatus
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
+import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
-import ai.create.photo.ui.compose.getFriendlyError
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -36,7 +36,6 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Mood
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
@@ -85,7 +84,7 @@ import photocreateai.composeapp.generated.resources.create_photo_set
 import photocreateai.composeapp.generated.resources.creating_ai_model
 import photocreateai.composeapp.generated.resources.creating_model_hint
 import photocreateai.composeapp.generated.resources.delete_photo_set
-import photocreateai.composeapp.generated.resources.generate_photos
+import photocreateai.composeapp.generated.resources.generate_photo
 import photocreateai.composeapp.generated.resources.photo_set
 import photocreateai.composeapp.generated.resources.upload_guidelines_message
 
@@ -292,7 +291,7 @@ fun CreateModelFab(
                         Spacer(modifier = Modifier.width(16.dp))
                     }
                     Text(
-                        text = stringResource(Res.string.generate_photos),
+                        text = stringResource(Res.string.generate_photo),
                         textAlign = TextAlign.Center,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -583,25 +582,6 @@ private fun CreatingModelPopup(onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         text = { Text(text = stringResource(Res.string.creating_model_hint)) },
-        confirmButton = {
-            Button(onClick = onDismiss) {
-                Text("OK")
-            }
-        }
-    )
-}
-
-@Composable
-private fun ErrorPopup(e: Throwable, onDismiss: () -> Unit) {
-    AlertDialog(
-        icon = { Icon(Icons.Default.Error, contentDescription = "error") },
-        onDismissRequest = onDismiss,
-        text = {
-            Text(
-                modifier = Modifier.verticalScroll(rememberScrollState()),
-                text = e.getFriendlyError()
-            )
-        },
         confirmButton = {
             Button(onClick = onDismiss) {
                 Text("OK")

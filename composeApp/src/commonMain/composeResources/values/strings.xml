@@ -14,7 +14,7 @@
     <string name="unknown_error">Unknown error</string>
     <string name="create_ai_model">Create AI model ($9.99)</string>
     <string name="creating_ai_model">Creating AI model</string>
-    <string name="generate_photos">Generate Photos</string>
+    <string name="generate_photo">Generate Photo</string>
     <string name="creating_model_hint">This process usually takes about an hour, so feel free to close the app and check back later.</string>
     <string name="generate_prompt">Describe your look</string>
 </resources>
