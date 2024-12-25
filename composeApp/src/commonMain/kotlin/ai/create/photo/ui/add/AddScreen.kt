@@ -80,6 +80,7 @@ import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.add_your_photos
 import photocreateai.composeapp.generated.resources.create_ai_model
 import photocreateai.composeapp.generated.resources.create_photo_set
+import photocreateai.composeapp.generated.resources.create_photos
 import photocreateai.composeapp.generated.resources.creating_ai_model
 import photocreateai.composeapp.generated.resources.delete_photo_set
 import photocreateai.composeapp.generated.resources.photo_set
@@ -282,7 +283,7 @@ fun CreateModelFab(
                                 Spacer(modifier = Modifier.width(16.dp))
                             }
                             Text(
-                                text = stringResource(Res.string.create_ai_model),
+                                text = stringResource(Res.string.create_photos),
                                 textAlign = TextAlign.Center,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,

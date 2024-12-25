@@ -43,7 +43,7 @@ class AddViewModel : SessionViewModel() {
     }
 
     override fun onError(error: Throwable) {
-        uiState.copy(loadingError = error)
+        uiState = uiState.copy(isLoadingPhotos = false, loadingError = error)
     }
 
     private fun loadPhotos() = viewModelScope.launch {
@@ -56,7 +56,7 @@ class AddViewModel : SessionViewModel() {
                     AddUiState.Photo(
                         id = file.id,
                         createdAt = file.createdAt,
-                        fileName = file.fileName,
+                        name = file.fileName,
                         photoSet = file.photoSet,
                         url = file.signedUrl,
                     )
@@ -137,7 +137,7 @@ class AddViewModel : SessionViewModel() {
         uiState = uiState.copy(photosByPhotoSet = updatedPhotosByPhotoSet, showMenu = false)
         try {
             UserFilesRepository.deleteFile(photo.id)
-            SupabaseStorage.deleteFile("$userId/${photo.photoSet}/${photo.fileName}")
+            SupabaseStorage.deleteFile("$userId/${photo.photoSet}/${photo.name}")
         } catch (e: Exception) {
             Logger.e("Delete photo failed, $photo", e)
             uiState = uiState.copy(photosByPhotoSet = photosByPhotoSet, errorPopup = e)
@@ -181,7 +181,7 @@ class AddViewModel : SessionViewModel() {
             val paths = mutableListOf<String>()
             photos.forEach {
                 ids.add(it.id)
-                paths.add("$userId/$photoSet/${it.fileName}")
+                paths.add("$userId/$photoSet/${it.name}")
             }
             UserFilesRepository.deleteFiles(ids)
             SupabaseStorage.deleteFiles(paths)

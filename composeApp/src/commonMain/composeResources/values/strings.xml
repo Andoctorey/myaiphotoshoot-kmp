@@ -14,4 +14,5 @@
     <string name="unknown_error">Unknown error</string>
     <string name="create_ai_model">Create AI model ($9.99)</string>
     <string name="creating_ai_model">Creating AI model</string>
+    <string name="create_photos">Create Photos</string>
 </resources>
