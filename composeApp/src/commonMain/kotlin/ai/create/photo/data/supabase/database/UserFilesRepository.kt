@@ -30,7 +30,7 @@ object UserFilesRepository {
         }
     }
 
-    suspend fun getFiles(userId: String): Result<List<UserFile>> = runCatching {
+    suspend fun getInputPhotos(userId: String): Result<List<UserFile>> = runCatching {
         Supabase.supabase
             .from(USER_FILES_TABLE)
             .select {
@@ -42,7 +42,23 @@ object UserFilesRepository {
             }
             .decodeList<UserFile>()
             .also {
-                Logger.i("getFiles result ${it.size}: ${it.joinToString()}")
+                Logger.i("getInputPhotos: ${it.size}")
+            }
+    }
+
+    suspend fun getOutputPhotos(userId: String): Result<List<UserFile>> = runCatching {
+        Supabase.supabase
+            .from(USER_FILES_TABLE)
+            .select {
+                filter {
+                    eq("user_id", userId)
+                    eq("type", "output_image")
+                }
+                order(column = "created_at", order = Order.DESCENDING)
+            }
+            .decodeList<UserFile>()
+            .also {
+                Logger.i("getOutputPhotos: ${it.size}")
             }
     }
 

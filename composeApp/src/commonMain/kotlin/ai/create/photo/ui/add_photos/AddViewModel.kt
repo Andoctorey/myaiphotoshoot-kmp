@@ -51,7 +51,7 @@ class AddViewModel : SessionViewModel() {
     private fun loadPhotos() = viewModelScope.launch {
         uiState = uiState.copy(isLoadingPhotos = uiState.photosByPhotoSet == null)
         try {
-            val files = UserFilesRepository.getFiles(userId).getOrThrow()
+            val files = UserFilesRepository.getInputPhotos(userId).getOrThrow()
             uiState = uiState.copy(
                 isLoadingPhotos = false,
                 photosByPhotoSet = files.map { file ->
@@ -81,6 +81,7 @@ class AddViewModel : SessionViewModel() {
             uiState = uiState.copy(
                 isLoadingTraining = false,
                 trainingStatus = userTraining?.status,
+                loadingError = null,
             )
             if (userTraining?.status == TrainingStatus.SUCCEEDED) {
                 MemoryStore.trainingId = userTraining.id
