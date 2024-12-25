@@ -37,7 +37,7 @@ import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.ModeEdit
+import androidx.compose.material.icons.filled.Mood
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -94,7 +94,7 @@ import photocreateai.composeapp.generated.resources.upload_guidelines_message
 @Composable
 fun AddScreen(
     viewModel: AddViewModel = viewModel { AddViewModel() },
-    generatePhotos: () -> Unit,
+    openCreatePhotosScreen: () -> Unit,
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -133,17 +133,18 @@ fun AddScreen(
             }
         }
 
-        if (photos != null) {
-            if (photos.size >= 10) {
+        if (!state.isLoadingPhotos && photos != null) {
+            if (!state.isLoadingTraining && photos.size >= 10) {
                 CreateModelFab(
                     modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
                     extended = true,
                     trainingStatus = state.trainingStatus,
                     createModel = viewModel::createModel,
                     onCreatingModelClick = viewModel::onCreatingModelClick,
-                    generatePhotos = generatePhotos,
+                    generatePhotos = openCreatePhotosScreen,
                 )
             } else {
+                Logger.i("AddPhotosFab, state:$state")
                 AddPhotosFab(
                     modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
                     extended = true,
@@ -164,7 +165,7 @@ fun AddScreen(
                     toggleMenu = viewModel::toggleMenu,
                     createModel = viewModel::createModel,
                     onCreatingModelClick = viewModel::onCreatingModelClick,
-                    generatePhotos = generatePhotos,
+                    generatePhotos = openCreatePhotosScreen,
                     photoSet = state.photoSet,
                     selectPhotoSet = viewModel::selectPhotoSet,
                     createPhotoSet = viewModel::createPhotoSet,
@@ -188,6 +189,15 @@ fun AddScreen(
         if (state.errorPopup != null) {
             ErrorPopup(state.errorPopup) {
                 viewModel.hideErrorPopup()
+            }
+        }
+
+        if (!state.openedCreatePhotosScreen) {
+            LaunchedEffect(state.trainingStatus) {
+                if (state.trainingStatus == TrainingStatus.SUCCEEDED) {
+                    viewModel.openedCreatePhotosScreen()
+                    openCreatePhotosScreen()
+                }
             }
         }
     }
@@ -286,7 +296,7 @@ fun CreateModelFab(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             if (extended) {
                                 Icon(
-                                    imageVector = Icons.Default.ModeEdit,
+                                    imageVector = Icons.Default.Mood,
                                     contentDescription = stringResource(Res.string.create_ai_model),
                                     tint = MaterialTheme.colorScheme.onSurface,
                                 )

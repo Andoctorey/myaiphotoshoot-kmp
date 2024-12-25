@@ -215,4 +215,8 @@ class AddViewModel : SessionViewModel() {
     fun createPhotoSet() {
         uiState = uiState.copy(showMenu = false, photoSet = (uiState.photoSets?.max() ?: 0) + 1)
     }
+
+    fun openedCreatePhotosScreen() {
+        uiState = uiState.copy(openedCreatePhotosScreen = true)
+    }
 }
