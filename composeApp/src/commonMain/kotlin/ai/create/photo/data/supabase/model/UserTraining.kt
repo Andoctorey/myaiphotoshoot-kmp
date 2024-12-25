@@ -1,4 +1,4 @@
-package ai.create.photo.supabase.model
+package ai.create.photo.data.supabase.model
 
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName

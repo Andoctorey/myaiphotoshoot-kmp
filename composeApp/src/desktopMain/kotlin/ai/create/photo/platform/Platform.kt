@@ -1,5 +1,8 @@
 package ai.create.photo.platform
 
+import ai.create.photo.data.platform.Platform
+import ai.create.photo.data.platform.Platforms
+
 
 class DesktopPlatform : Platform {
     override val platform = Platforms.DESKTOP

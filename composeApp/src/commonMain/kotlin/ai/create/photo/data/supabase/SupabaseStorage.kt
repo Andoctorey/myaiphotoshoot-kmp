@@ -1,6 +1,5 @@
-package ai.create.photo.supabase
+package ai.create.photo.data.supabase
 
-import ai.create.photo.supabase.Supabase.supabase
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.storage.UploadStatus
 import io.github.jan.supabase.storage.storage
@@ -20,7 +19,7 @@ object SupabaseStorage {
     ): Flow<UploadStatus> {
         val filePath = "${userId}/$photoSet/${file.name}"
         Logger.i("uploadPhoto $filePath, size: ${file.getSize()}")
-        return supabase.storage
+        return Supabase.supabase.storage
             .from(BUCKET)
             .uploadAsFlow(
                 path = filePath,
@@ -30,7 +29,8 @@ object SupabaseStorage {
             }
     }
 
-    suspend fun createSignedUrl(userId: String, photoSet: Int, filePath: String) = supabase.storage
+    suspend fun createSignedUrl(userId: String, photoSet: Int, filePath: String) =
+        Supabase.supabase.storage
         .from(BUCKET)
         .createSignedUrl(
             path = "${userId}/$photoSet/${filePath}",
@@ -39,11 +39,11 @@ object SupabaseStorage {
 
     suspend fun deleteFile(path: String) {
         Logger.i("delete file from storage $path")
-        supabase.storage.from(BUCKET).delete(path)
+        Supabase.supabase.storage.from(BUCKET).delete(path)
     }
 
     suspend fun deleteFiles(paths: List<String>) {
         Logger.i("delete files from storage ${paths.joinToString()}")
-        supabase.storage.from(BUCKET).delete(paths)
+        Supabase.supabase.storage.from(BUCKET).delete(paths)
     }
 }

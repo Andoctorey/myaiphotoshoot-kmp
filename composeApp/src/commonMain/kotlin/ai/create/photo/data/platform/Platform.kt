@@ -1,4 +1,4 @@
-package ai.create.photo.platform
+package ai.create.photo.data.platform
 
 
 enum class Platforms {

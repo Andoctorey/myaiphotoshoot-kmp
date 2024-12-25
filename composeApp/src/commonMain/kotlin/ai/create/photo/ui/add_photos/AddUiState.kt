@@ -1,6 +1,6 @@
 package ai.create.photo.ui.add_photos
 
-import ai.create.photo.supabase.model.TrainingStatus
+import ai.create.photo.data.supabase.model.TrainingStatus
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant

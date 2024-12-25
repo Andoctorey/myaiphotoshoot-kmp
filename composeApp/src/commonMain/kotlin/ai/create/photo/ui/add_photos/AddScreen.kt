@@ -1,6 +1,6 @@
 package ai.create.photo.ui.add_photos
 
-import ai.create.photo.supabase.model.TrainingStatus
+import ai.create.photo.data.supabase.model.TrainingStatus
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder

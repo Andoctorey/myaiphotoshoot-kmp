@@ -1,11 +1,11 @@
 package ai.create.photo.ui.add_photos
 
-import ai.create.photo.supabase.SessionViewModel
-import ai.create.photo.supabase.SupabaseFunction
-import ai.create.photo.supabase.SupabaseStorage
-import ai.create.photo.supabase.database.UserFilesRepository
-import ai.create.photo.supabase.database.UserTrainingsRepository
-import ai.create.photo.supabase.model.TrainingStatus
+import ai.create.photo.data.supabase.SessionViewModel
+import ai.create.photo.data.supabase.SupabaseFunction
+import ai.create.photo.data.supabase.SupabaseStorage
+import ai.create.photo.data.supabase.database.UserFilesRepository
+import ai.create.photo.data.supabase.database.UserTrainingsRepository
+import ai.create.photo.data.supabase.model.TrainingStatus
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue

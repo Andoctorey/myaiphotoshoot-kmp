@@ -1,6 +1,5 @@
-package ai.create.photo.supabase
+package ai.create.photo.data.supabase
 
-import ai.create.photo.supabase.Supabase.supabase
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
@@ -11,7 +10,7 @@ import kotlinx.coroutines.launch
 
 abstract class SessionViewModel : ViewModel() {
 
-    val auth = supabase.auth
+    val auth = Supabase.supabase.auth
 
     lateinit var userId: String
 

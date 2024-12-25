@@ -1,8 +1,8 @@
-package ai.create.photo.supabase.database
+package ai.create.photo.data.supabase.database
 
-import ai.create.photo.supabase.Supabase.supabase
-import ai.create.photo.supabase.SupabaseStorage
-import ai.create.photo.supabase.model.UserFile
+import ai.create.photo.data.supabase.Supabase
+import ai.create.photo.data.supabase.SupabaseStorage
+import ai.create.photo.data.supabase.model.UserFile
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
@@ -25,13 +25,13 @@ object UserFilesRepository {
             "signed_url" to SupabaseStorage.createSignedUrl(userId, photoSet, fileName),
         )
         Logger.i("save file to db $fileName")
-        supabase.from(USER_FILES_TABLE).upsert(photoData) {
+        Supabase.supabase.from(USER_FILES_TABLE).upsert(photoData) {
             onConflict = "user_id, file_name, photo_set, type"
         }
     }
 
     suspend fun getFiles(userId: String): Result<List<UserFile>> = runCatching {
-        supabase
+        Supabase.supabase
             .from(USER_FILES_TABLE)
             .select {
                 filter {
@@ -48,7 +48,7 @@ object UserFilesRepository {
 
     suspend fun deleteFile(id: String) {
         Logger.i("delete file from db $id")
-        supabase.from(USER_FILES_TABLE).delete {
+        Supabase.supabase.from(USER_FILES_TABLE).delete {
             filter {
                 eq("id", id)
             }
@@ -57,7 +57,7 @@ object UserFilesRepository {
 
     suspend fun deleteFiles(ids: List<String>) {
         Logger.i("delete files from db ${ids.joinToString()}")
-        supabase.from(USER_FILES_TABLE).delete {
+        Supabase.supabase.from(USER_FILES_TABLE).delete {
             filter {
                 isIn("id", ids)
             }

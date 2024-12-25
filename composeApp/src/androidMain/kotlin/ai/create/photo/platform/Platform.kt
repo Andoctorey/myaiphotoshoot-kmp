@@ -1,5 +1,7 @@
 package ai.create.photo.platform
 
+import ai.create.photo.data.platform.Platform
+import ai.create.photo.data.platform.Platforms
 import android.os.Build
 
 class AndroidPlatform : Platform {

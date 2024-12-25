@@ -1,7 +1,7 @@
 package ai.create.photo.ui.add_photos
 
-import ai.create.photo.supabase.SupabaseStorage
-import ai.create.photo.supabase.database.UserFilesRepository
+import ai.create.photo.data.supabase.SupabaseStorage
+import ai.create.photo.data.supabase.database.UserFilesRepository
 import io.github.jan.supabase.storage.UploadStatus
 import io.github.vinceglb.filekit.core.PlatformFile
 import kotlinx.coroutines.flow.Flow

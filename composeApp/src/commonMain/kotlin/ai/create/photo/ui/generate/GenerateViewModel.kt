@@ -1,7 +1,7 @@
 package ai.create.photo.ui.generate
 
-import ai.create.photo.supabase.SessionViewModel
-import ai.create.photo.supabase.SupabaseFunction
+import ai.create.photo.data.supabase.SessionViewModel
+import ai.create.photo.data.supabase.SupabaseFunction
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -35,9 +35,10 @@ class GenerateViewModel : SessionViewModel() {
     }
 
     fun generatePhoto() = viewModelScope.launch {
+        val trainingId = uiState.trainingId ?: return@launch
         uiState = uiState.copy(isGenerating = true)
         try {
-            SupabaseFunction.generatePhoto(uiState.prompt)
+            SupabaseFunction.generatePhoto(trainingId, uiState.prompt)
         } catch (e: Exception) {
             Logger.e("Generate photo failed", e)
             uiState = uiState.copy(isGenerating = false, errorPopup = e)

@@ -1,5 +1,7 @@
 package ai.create.photo.platform
 
+import ai.create.photo.data.platform.Platform
+import ai.create.photo.data.platform.Platforms
 import kotlinx.browser.window
 
 class WebPlatform : Platform {
