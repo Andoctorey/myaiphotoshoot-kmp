@@ -1,4 +1,4 @@
-package ai.create.photo.ui.add
+package ai.create.photo.ui.add_photos
 
 import ai.create.photo.supabase.SupabaseStorage
 import ai.create.photo.supabase.database.UserFilesRepository

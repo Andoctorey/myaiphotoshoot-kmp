@@ -1,4 +1,4 @@
-package ai.create.photo.ui.add
+package ai.create.photo.ui.add_photos
 
 import ai.create.photo.supabase.SessionViewModel
 import ai.create.photo.supabase.SupabaseFunction

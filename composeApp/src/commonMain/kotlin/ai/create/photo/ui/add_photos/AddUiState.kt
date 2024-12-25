@@ -1,4 +1,4 @@
-package ai.create.photo.ui.add
+package ai.create.photo.ui.add_photos
 
 import ai.create.photo.supabase.model.TrainingStatus
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState

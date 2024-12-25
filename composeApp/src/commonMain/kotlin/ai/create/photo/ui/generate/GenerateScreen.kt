@@ -1,4 +1,4 @@
-package ai.create.photo.ui.create
+package ai.create.photo.ui.generate
 
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.LoadingPlaceholder
@@ -17,7 +17,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Preview
 @Composable
 fun CreateScreen(
-    viewModel: CreateViewModel = viewModel { CreateViewModel() },
+    viewModel: GenerateViewModel = viewModel { GenerateViewModel() },
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),

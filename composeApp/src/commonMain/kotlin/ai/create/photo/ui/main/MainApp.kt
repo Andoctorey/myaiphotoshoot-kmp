@@ -1,7 +1,7 @@
 package ai.create.photo.ui.main
 
-import ai.create.photo.ui.add.AddScreen
-import ai.create.photo.ui.create.CreateScreen
+import ai.create.photo.ui.add_photos.AddScreen
+import ai.create.photo.ui.generate.CreateScreen
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.*
 import androidx.compose.material3.ExperimentalMaterial3Api

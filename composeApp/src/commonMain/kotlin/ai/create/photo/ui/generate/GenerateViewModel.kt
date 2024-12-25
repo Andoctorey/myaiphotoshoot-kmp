@@ -1,14 +1,14 @@
-package ai.create.photo.ui.create
+package ai.create.photo.ui.generate
 
 import ai.create.photo.supabase.SessionViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
-class CreateViewModel : SessionViewModel() {
+class GenerateViewModel : SessionViewModel() {
 
 
-    var uiState by mutableStateOf(CreateUiState())
+    var uiState by mutableStateOf(GenerateUiState())
         private set
 
     init {

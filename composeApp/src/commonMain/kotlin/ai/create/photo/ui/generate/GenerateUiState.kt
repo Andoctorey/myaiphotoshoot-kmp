@@ -1,9 +1,9 @@
-package ai.create.photo.ui.create
+package ai.create.photo.ui.generate
 
 import androidx.compose.runtime.Immutable
 
 @Immutable
-data class CreateUiState(
+data class GenerateUiState(
     val isLoading: Boolean = false,
     val loadingError: Throwable? = null,
 )
