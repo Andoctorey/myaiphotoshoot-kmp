@@ -26,7 +26,7 @@ data class AddUiState(
 ) {
 
     val displayingPhotos: List<Photo>?
-        get() = photosByPhotoSet?.get(this@AddUiState.photoSet)
+        get() = photosByPhotoSet?.get(this@AddUiState.photoSet) ?: emptyList()
 
     val photoSets: List<Int>?
         get() = photosByPhotoSet?.keys?.toList()

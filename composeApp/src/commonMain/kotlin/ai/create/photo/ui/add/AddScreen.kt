@@ -473,7 +473,7 @@ fun FabMenu(
                     Spacer(modifier = Modifier.height(8.dp))
                 }
 
-                if ((photos?.size ?: 0) <= 30) {
+                if (trainingStatus == null && (photos?.size ?: 0) <= 30) {
                     if ((photos?.size ?: 0) >= 10) {
                         AddPhotosFab(
                             uploadProgress = uploadProgress,
