@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -40,6 +41,7 @@ import androidx.compose.material.icons.filled.ModeEdit
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -82,10 +84,10 @@ import photocreateai.composeapp.generated.resources.create_ai_model
 import photocreateai.composeapp.generated.resources.create_photo_set
 import photocreateai.composeapp.generated.resources.create_photos
 import photocreateai.composeapp.generated.resources.creating_ai_model
+import photocreateai.composeapp.generated.resources.creating_model_hint
 import photocreateai.composeapp.generated.resources.delete_photo_set
 import photocreateai.composeapp.generated.resources.photo_set
 import photocreateai.composeapp.generated.resources.upload_guidelines_message
-import photocreateai.composeapp.generated.resources.upload_more_photos
 
 
 @Preview
@@ -125,22 +127,20 @@ fun AddScreen(
                 }
                 viewModel.resetScrollToTop()
             }
-            Photos(photos, state.listState) {
+            val hideDeletePhotoButton = state.isLoadingTraining || state.trainingStatus != null
+            Photos(photos, state.listState, hideDeletePhotoButton) {
                 viewModel.deletePhoto(it)
             }
         }
 
-        if (state.isLoadingTraining) {
-            LoadingPlaceholder(
-                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
-            )
-        } else {
-            if ((photos?.size ?: 0) >= 10) {
+        if (photos != null) {
+            if (photos.size >= 10) {
                 CreateModelFab(
                     modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
                     extended = true,
                     trainingStatus = state.trainingStatus,
                     createModel = viewModel::createModel,
+                    onCreatingModelClick = viewModel::onCreatingModelClick,
                     generatePhotos = generatePhotos,
                 )
             } else {
@@ -152,27 +152,36 @@ fun AddScreen(
                 )
             }
 
-            FabMenu(
-                modifier = Modifier.align(Alignment.BottomEnd),
-                photos = state.displayingPhotos,
-                photoSets = state.photoSets,
-                uploadProgress = state.uploadProgress,
-                trainingStatus = state.trainingStatus,
-                showMenu = state.showMenu,
-                onAddPhotoClick = onAddPhotoClick,
-                toggleMenu = viewModel::toggleMenu,
-                createModel = viewModel::createModel,
-                generatePhotos = generatePhotos,
-                photoSet = state.photoSet,
-                selectPhotoSet = viewModel::selectPhotoSet,
-                createPhotoSet = viewModel::createPhotoSet,
-                deletePhotoSet = viewModel::deletePhotoSet,
-            )
+            if (!state.isLoadingTraining && state.trainingStatus != TrainingStatus.PROCESSING) {
+                FabMenu(
+                    modifier = Modifier.align(Alignment.BottomEnd),
+                    photos = state.displayingPhotos,
+                    photoSets = state.photoSets,
+                    uploadProgress = state.uploadProgress,
+                    trainingStatus = state.trainingStatus,
+                    showMenu = state.showMenu,
+                    onAddPhotoClick = onAddPhotoClick,
+                    toggleMenu = viewModel::toggleMenu,
+                    createModel = viewModel::createModel,
+                    onCreatingModelClick = viewModel::onCreatingModelClick,
+                    generatePhotos = generatePhotos,
+                    photoSet = state.photoSet,
+                    selectPhotoSet = viewModel::selectPhotoSet,
+                    createPhotoSet = viewModel::createPhotoSet,
+                    deletePhotoSet = viewModel::deletePhotoSet,
+                )
+            }
         }
 
         if (state.showUploadMorePhotosPopup) {
-            ShowUploadMorePhotosPopup {
+            CreatingModelPopup {
                 viewModel.hideUploadMorePhotosPopup()
+            }
+        }
+
+        if (state.showCreatingModelPopup) {
+            UploadMorePhotosPopup {
+                viewModel.hideCreatingModelClick()
             }
         }
 
@@ -253,6 +262,7 @@ fun CreateModelFab(
     extended: Boolean = false,
     trainingStatus: TrainingStatus?,
     createModel: () -> Unit,
+    onCreatingModelClick: () -> Unit,
     generatePhotos: () -> Unit,
 ) {
 
@@ -265,7 +275,7 @@ fun CreateModelFab(
             onClick = {
                 when (trainingStatus) {
                     TrainingStatus.SUCCEEDED -> generatePhotos()
-                    TrainingStatus.PROCESSING -> {}
+                    TrainingStatus.PROCESSING -> onCreatingModelClick()
                     null -> createModel()
                 }
             },
@@ -295,7 +305,11 @@ fun CreateModelFab(
 
                 TrainingStatus.PROCESSING -> {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        LoadingPlaceholder()
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = MaterialTheme.colorScheme.primary,
+                            strokeWidth = 2.dp,
+                        )
                         Spacer(modifier = Modifier.width(16.dp))
                         Text(
                             text = stringResource(Res.string.creating_ai_model),
@@ -332,6 +346,7 @@ fun CreateModelFab(
 private fun Photos(
     photos: List<AddUiState.Photo>,
     listState: LazyStaggeredGridState,
+    hideDeletePhotoButton: Boolean,
     onDelete: (AddUiState.Photo) -> Unit,
 ) {
     LazyVerticalStaggeredGrid(
@@ -349,6 +364,7 @@ private fun Photos(
             Photo(
                 modifier = Modifier.animateItem(),
                 photo = photos[item],
+                hideDeletePhotoButton = hideDeletePhotoButton,
                 onDelete = onDelete
             )
         }
@@ -359,6 +375,7 @@ private fun Photos(
 private fun Photo(
     modifier: Modifier,
     photo: AddUiState.Photo,
+    hideDeletePhotoButton: Boolean,
     onDelete: (AddUiState.Photo) -> Unit
 ) {
     var loading by remember { mutableStateOf(true) }
@@ -396,7 +413,7 @@ private fun Photo(
             contentDescription = "photo",
         )
 
-        if (!loading && error == null) {
+        if (!hideDeletePhotoButton && !loading && error == null) {
             IconButton(
                 onClick = { onDelete(photo) },
                 modifier = Modifier
@@ -424,6 +441,7 @@ fun FabMenu(
     onAddPhotoClick: () -> Unit,
     toggleMenu: () -> Unit,
     createModel: () -> Unit,
+    onCreatingModelClick: () -> Unit,
     generatePhotos: () -> Unit,
     photoSet: Int,
     photoSets: List<Int>?,
@@ -465,6 +483,7 @@ fun FabMenu(
                         CreateModelFab(
                             trainingStatus = trainingStatus,
                             createModel = createModel,
+                            onCreatingModelClick = onCreatingModelClick,
                             generatePhotos = generatePhotos,
                         )
                     }
@@ -549,10 +568,24 @@ fun PhotoSets(
 
 
 @Composable
-private fun ShowUploadMorePhotosPopup(onDismiss: () -> Unit) {
+private fun UploadMorePhotosPopup(onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        text = { Text(text = stringResource(Res.string.upload_more_photos)) },
+        text = { Text(text = stringResource(Res.string.creating_model_hint)) },
+        confirmButton = {
+            Button(onClick = onDismiss) {
+                Text("OK")
+            }
+        }
+    )
+}
+
+
+@Composable
+private fun CreatingModelPopup(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        text = { Text(text = stringResource(Res.string.creating_model_hint)) },
         confirmButton = {
             Button(onClick = onDismiss) {
                 Text("OK")

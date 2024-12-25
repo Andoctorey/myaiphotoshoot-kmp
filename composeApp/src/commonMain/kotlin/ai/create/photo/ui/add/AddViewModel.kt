@@ -15,6 +15,7 @@ import io.github.jan.supabase.storage.UploadStatus
 import io.github.vinceglb.filekit.core.PlatformFiles
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlin.math.max
@@ -71,6 +72,7 @@ class AddViewModel : SessionViewModel() {
     }
 
     private fun loadTraining(): Job = viewModelScope.launch {
+        Logger.i("loadTraining")
         uiState = uiState.copy(isLoadingTraining = true)
         try {
             val userTraining =
@@ -79,13 +81,15 @@ class AddViewModel : SessionViewModel() {
                 isLoadingTraining = false,
                 trainingStatus = userTraining?.status,
             )
-            if (userTraining?.status == TrainingStatus.PROCESSING) {
-                delay(100 * 1000)
-                loadTraining()
-            }
         } catch (e: Exception) {
             Logger.e("Loading training failed", e)
             uiState = uiState.copy(isLoadingTraining = false, errorPopup = e)
+        }
+        if (uiState.trainingStatus == TrainingStatus.PROCESSING) {
+            delay(100 * 1000)
+            ensureActive()
+            if (uiState.isLoadingPhotos) return@launch
+            loadTraining()
         }
     }
 
@@ -161,6 +165,14 @@ class AddViewModel : SessionViewModel() {
             Logger.e("Create model failed", e)
             uiState = uiState.copy(trainingStatus = null, errorPopup = e)
         }
+    }
+
+    fun onCreatingModelClick() {
+        uiState = uiState.copy(showCreatingModelPopup = true)
+    }
+
+    fun hideCreatingModelClick() {
+        uiState = uiState.copy(showCreatingModelPopup = false)
     }
 
     fun hideUploadMorePhotosPopup() {

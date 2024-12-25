@@ -15,4 +15,5 @@
     <string name="create_ai_model">Create AI model ($9.99)</string>
     <string name="creating_ai_model">Creating AI model</string>
     <string name="create_photos">Create Photos</string>
+    <string name="creating_model_hint">This process usually takes about an hour, so feel free to close the app and check back later.</string>
 </resources>
