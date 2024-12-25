@@ -1,7 +1,5 @@
 package ai.create.photo.platform
 
-import ai.create.photo.data.platform.Platform
-import ai.create.photo.data.platform.Platforms
 import platform.UIKit.UIDevice
 
 class IOSPlatform : Platform {

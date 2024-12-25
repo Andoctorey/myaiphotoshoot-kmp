@@ -39,9 +39,9 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.create_ai_model
-import photocreateai.composeapp.generated.resources.creating_ai_model
 import photocreateai.composeapp.generated.resources.generate_photo
 import photocreateai.composeapp.generated.resources.generate_prompt
+import photocreateai.composeapp.generated.resources.generating_photo
 
 
 @Preview
@@ -106,7 +106,7 @@ private fun GenerateFab(modifier: Modifier, isGenerating: Boolean, onClick: () -
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
-                    text = stringResource(Res.string.creating_ai_model),
+                    text = stringResource(Res.string.generating_photo),
                 )
             }
         } else {

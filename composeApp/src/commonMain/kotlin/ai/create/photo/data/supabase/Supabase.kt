@@ -1,7 +1,7 @@
 package ai.create.photo.data.supabase
 
-import ai.create.photo.data.platform.Platforms
-import ai.create.photo.data.platform.platform
+import ai.create.photo.platform.Platforms
+import ai.create.photo.platform.platform
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.createSupabaseClient
