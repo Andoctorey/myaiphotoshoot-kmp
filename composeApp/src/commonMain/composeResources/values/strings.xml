@@ -1,6 +1,6 @@
 <resources>
     <string name="tab_1">Add</string>
-    <string name="tab_2">Create</string>
+    <string name="tab_2">Generate</string>
     <string name="tab_3">Gallery</string>
     <string name="tab_4">Settings</string>
     <string name="back_button">Back</string>
@@ -14,6 +14,6 @@
     <string name="unknown_error">Unknown error</string>
     <string name="create_ai_model">Create AI model ($9.99)</string>
     <string name="creating_ai_model">Creating AI model</string>
-    <string name="create_photos">Create Photos</string>
+    <string name="generate_photos">Generate Photos</string>
     <string name="creating_model_hint">This process usually takes about an hour, so feel free to close the app and check back later.</string>
 </resources>
