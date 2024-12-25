@@ -20,5 +20,6 @@ data class GalleryUiState(
         val name: String,
         val photoSet: Int,
         val url: String,
+        val prompt: String,
     )
 }

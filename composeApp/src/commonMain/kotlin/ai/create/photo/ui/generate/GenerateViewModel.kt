@@ -25,6 +25,7 @@ class GenerateViewModel : SessionViewModel() {
     }
 
     override fun onAuthenticated() {
+        uiState = uiState.copy(isLoading = false)
     }
 
     override fun onAuthError(error: Throwable) {

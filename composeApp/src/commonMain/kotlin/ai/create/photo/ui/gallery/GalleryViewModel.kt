@@ -1,11 +1,12 @@
 package ai.create.photo.ui.gallery
 
 import ai.create.photo.data.supabase.SessionViewModel
-import ai.create.photo.data.supabase.database.UserFilesRepository
+import ai.create.photo.data.supabase.database.UserGenerationsRepository
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.launch
 
 class GalleryViewModel : SessionViewModel() {
@@ -32,21 +33,23 @@ class GalleryViewModel : SessionViewModel() {
     fun loadGallery() = viewModelScope.launch {
         uiState = uiState.copy(isLoading = true)
         try {
-            val files = UserFilesRepository.getOutputPhotos(userId).getOrThrow()
+            val generations = UserGenerationsRepository.getGenerations(userId).getOrThrow()
             uiState = uiState.copy(
                 isLoading = false,
                 loadingError = null,
-                photos = files.map { file ->
+                photos = generations.map {
                     GalleryUiState.Photo(
-                        id = file.id,
-                        createdAt = file.createdAt,
-                        name = file.fileName,
-                        photoSet = file.photoSet,
-                        url = file.signedUrl,
+                        id = it.id,
+                        createdAt = it.createdAt,
+                        name = it.file!!.fileName,
+                        photoSet = it.file.photoSet,
+                        prompt = it.prompt,
+                        url = it.file.signedUrl,
                     )
                 }
             )
         } catch (e: Exception) {
+            Logger.e("Load gallery failed", e)
             uiState = uiState.copy(isLoading = false, loadingError = e)
         }
     }
