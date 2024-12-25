@@ -1,6 +1,7 @@
 package ai.create.photo.ui.main
 
 import ai.create.photo.ui.add_photos.AddScreen
+import ai.create.photo.ui.gallery.GalleryScreen
 import ai.create.photo.ui.generate.CreateScreen
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.*
@@ -54,7 +55,7 @@ fun MainApp(
                 openCreatePhotosScreen = { currentDestination = AppNavigationRoutes.TAB2 }
             )
             AppNavigationRoutes.TAB2 -> CreateScreen()
-            AppNavigationRoutes.TAB3 -> {}
+            AppNavigationRoutes.TAB3 -> GalleryScreen()
             AppNavigationRoutes.TAB4 -> {}
         }
     }

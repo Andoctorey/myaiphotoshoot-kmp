@@ -1,14 +1,17 @@
 package ai.create.photo.ui.gallery
 
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
 
 @Immutable
 data class GalleryUiState(
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val loadingError: Throwable? = null,
 
     val photos: List<Photo>? = null,
+
+    val listState: LazyStaggeredGridState = LazyStaggeredGridState(),
 ) {
     @Immutable
     data class Photo(

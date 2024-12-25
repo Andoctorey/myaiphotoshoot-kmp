@@ -2,36 +2,140 @@ package ai.create.photo.ui.gallery
 
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.LoadingPlaceholder
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsTopHeight
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import co.touchlab.kermit.Logger
+import coil3.compose.AsyncImage
+import coil3.compose.LocalPlatformContext
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
 @Preview
 @Composable
-fun CreateScreen(
+fun GalleryScreen(
     viewModel: GalleryViewModel = viewModel { GalleryViewModel() },
 ) {
+    val state = viewModel.uiState
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (!state.isLoading && event == Lifecycle.Event.ON_RESUME) {
+                viewModel.loadGallery()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
-        val state = viewModel.uiState
-
         if (state.isLoading) {
             Spacer(modifier = Modifier.height(20.dp))
             LoadingPlaceholder()
         } else if (state.loadingError != null) {
             ErrorMessagePlaceHolder(state.loadingError)
-        } else {
-
+        } else if (state.photos != null) {
+            Photos(state.photos, state.listState)
         }
+    }
+}
+
+@Composable
+private fun Photos(
+    photos: List<GalleryUiState.Photo>,
+    listState: LazyStaggeredGridState,
+) {
+    LazyVerticalStaggeredGrid(
+        state = listState,
+        modifier = Modifier.fillMaxSize(),
+        columns = StaggeredGridCells.Adaptive(minSize = 540.dp),
+        verticalItemSpacing = 4.dp,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        item(span = StaggeredGridItemSpan.FullLine) {
+            Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
+        }
+
+        items(photos.size, key = { photos[it].id }) { item ->
+            Photo(
+                modifier = Modifier.animateItem(),
+                photo = photos[item],
+            )
+        }
+    }
+}
+
+@Composable
+private fun Photo(
+    modifier: Modifier,
+    photo: GalleryUiState.Photo,
+) {
+    var loading by remember { mutableStateOf(true) }
+    var error by remember { mutableStateOf<Throwable?>(null) }
+
+    if (error != null) {
+        Box(
+            modifier = modifier.fillMaxWidth().aspectRatio(1f),
+            contentAlignment = Alignment.Center,
+        ) {
+            ErrorMessagePlaceHolder(error!!)
+        }
+    } else if (loading) {
+        Box(
+            modifier = modifier.fillMaxWidth().aspectRatio(1f),
+            contentAlignment = Alignment.Center,
+        ) {
+            LoadingPlaceholder()
+        }
+    }
+
+    Box(modifier = modifier.fillMaxWidth()) {
+        AsyncImage(
+            modifier = Modifier.fillMaxWidth(),
+            model = ImageRequest.Builder(LocalPlatformContext.current)
+                .data(photo.url)
+                .crossfade(true)
+                .build(),
+            contentScale = ContentScale.FillWidth,
+            onSuccess = { loading = false },
+            onError = {
+                Logger.e("error loading image", it.result.throwable)
+                error = it.result.throwable
+            },
+            contentDescription = "photo",
+        )
     }
 }

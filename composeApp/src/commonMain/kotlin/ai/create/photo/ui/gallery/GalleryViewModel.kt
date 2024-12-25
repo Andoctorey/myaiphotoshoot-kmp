@@ -10,7 +10,6 @@ import kotlinx.coroutines.launch
 
 class GalleryViewModel : SessionViewModel() {
 
-
     var uiState by mutableStateOf(GalleryUiState())
         private set
 
@@ -30,7 +29,7 @@ class GalleryViewModel : SessionViewModel() {
         uiState = uiState.copy(loadingError = error)
     }
 
-    private fun loadGallery() = viewModelScope.launch {
+    fun loadGallery() = viewModelScope.launch {
         uiState = uiState.copy(isLoading = true)
         try {
             val files = UserFilesRepository.getOutputPhotos(userId).getOrThrow()

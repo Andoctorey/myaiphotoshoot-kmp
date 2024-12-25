@@ -15,7 +15,7 @@ abstract class SessionViewModel : ViewModel() {
     lateinit var userId: String
 
     fun loadSession() = viewModelScope.launch {
-        Logger.i("loadSession")
+        Logger.i("loadSession from ${this@SessionViewModel}")
         try {
             auth.sessionStatus.collect {
                 Logger.i("Auth status: $it")

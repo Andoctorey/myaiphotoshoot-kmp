@@ -14,7 +14,7 @@ object SupabaseFunction {
     }
 
     suspend fun generatePhoto(trainingId: String, prompt: String) {
-        Logger.i("generatePhoto for $prompt")
+        Logger.i("generatePhoto trainingId: $trainingId, prompt: $prompt")
         Supabase.supabase.functions.invoke(
             function = "generate",
             body = mapOf(
