@@ -10,7 +10,13 @@ data class LoginUiState(
 
     val email: String = "",
     val isInvalidEmail: Boolean = false,
+
     val isSendingOtp: Boolean = false,
     val enterOtp: Boolean = false,
 
+    val otp: String = "",
+    val isIncorrectOtp: Boolean = false,
+
+    val isVerifyingOtp: Boolean = false,
+    val isVerified: Boolean = false
 )
