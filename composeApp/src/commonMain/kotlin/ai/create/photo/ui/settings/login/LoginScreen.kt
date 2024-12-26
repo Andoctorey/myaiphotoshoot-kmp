@@ -22,6 +22,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -49,10 +51,16 @@ fun LoginScreen(
         } else if (state.loadingError != null) {
             ErrorMessagePlaceHolder(state.loadingError)
         } else {
+            val keyboardController = LocalSoftwareKeyboardController.current
+            val focusManager = LocalFocusManager.current
             Screen(
                 email = state.email,
                 onEmailChanged = viewModel::onEmailChanged,
-                sendOtp = viewModel::sendOtp,
+                sendOtp = {
+                    keyboardController?.hide()
+                    focusManager.clearFocus()
+                    viewModel.sendOtp()
+                },
                 isInvalidEmail = state.isInvalidEmail,
             )
         }

@@ -11,5 +11,6 @@ data class LoginUiState(
     val email: String = "",
     val isInvalidEmail: Boolean = false,
     val isSendingOtp: Boolean = false,
+    val enterOtp: Boolean = false,
 
 )

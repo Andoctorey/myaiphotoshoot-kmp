@@ -1,9 +1,13 @@
 package ai.create.photo.ui.settings.login
 
 import ai.create.photo.data.supabase.SessionViewModel
+import ai.create.photo.data.supabase.SupabaseAuth
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
+import kotlinx.coroutines.launch
 
 class LoginViewModel : SessionViewModel() {
 
@@ -34,11 +38,19 @@ class LoginViewModel : SessionViewModel() {
         uiState = uiState.copy(email = email, isInvalidEmail = false)
     }
 
-    fun sendOtp() {
+    fun sendOtp() = viewModelScope.launch {
         uiState = uiState.copy(isInvalidEmail = false, isSendingOtp = true)
         if (!isValidEmail(uiState.email)) {
             uiState = uiState.copy(isInvalidEmail = true, isSendingOtp = false)
-            return
+            return@launch
+        }
+
+        try {
+            SupabaseAuth.signInWithEmailOtp(uiState.email)
+            uiState = uiState.copy(isSendingOtp = false, enterOtp = true)
+        } catch (e: Exception) {
+            Logger.e("Create model failed", e)
+            uiState = uiState.copy(isSendingOtp = false, errorPopup = e)
         }
     }
 
