@@ -8,7 +8,6 @@ data class GenerateUiState(
     val loadingError: Throwable? = null,
 
     val prompt: String = "",
-    val generationsInProgress: Int = 0,
 
     val errorPopup: Throwable? = null,
 )

@@ -1,6 +1,7 @@
 package ai.create.photo.ui.main
 
 import ai.create.photo.ui.add_photos.AddScreen
+import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.gallery.GalleryScreen
 import ai.create.photo.ui.generate.GenerateScreen
 import androidx.compose.foundation.layout.Box
@@ -11,10 +12,8 @@ import androidx.compose.material3.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -84,18 +83,21 @@ fun MainApp(
                 openCreatePhotosScreen = { currentDestination = AppNavigationRoutes.TAB2 }
             )
 
-            AppNavigationRoutes.TAB2 -> GenerateScreen {
-                viewModel.onGenerationsInProgressChanged(it)
+            AppNavigationRoutes.TAB2 -> GenerateScreen { prompt ->
+                viewModel.generatePhoto(prompt)
             }
 
             AppNavigationRoutes.TAB3 -> {
-                val generationInProgress by remember {
-                    derivedStateOf { state.generationsInProgress != 0 }
-                }
-                GalleryScreen(generationInProgress = generationInProgress)
+                GalleryScreen(generationInProgress = state.generationsInProgress != 0)
             }
 
             AppNavigationRoutes.TAB4 -> {}
+        }
+    }
+
+    if (state.errorPopup != null) {
+        ErrorPopup(state.errorPopup) {
+            viewModel.hideErrorPopup()
         }
     }
 

@@ -42,7 +42,7 @@ fun GalleryScreen(
     generationInProgress: Boolean,
 ) {
     LaunchedEffect(generationInProgress) {
-        if (generationInProgress) {
+        if (!generationInProgress) {
             viewModel.loadGallery()
         }
     }

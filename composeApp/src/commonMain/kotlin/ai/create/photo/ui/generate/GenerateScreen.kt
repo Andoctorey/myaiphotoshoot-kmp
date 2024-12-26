@@ -24,7 +24,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
@@ -46,17 +45,13 @@ import photocreateai.composeapp.generated.resources.generate_prompt
 @Composable
 fun GenerateScreen(
     viewModel: GenerateViewModel = viewModel { GenerateViewModel() },
-    onGenerationsInProgressChanged: (Int) -> Unit,
+    onGenerate: (String) -> Unit,
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
         val state = viewModel.uiState
-
-        LaunchedEffect(state.generationsInProgress) {
-            onGenerationsInProgressChanged(state.generationsInProgress)
-        }
 
         if (state.isLoading) {
             Spacer(modifier = Modifier.height(20.dp))
@@ -80,9 +75,10 @@ fun GenerateScreen(
             )
 
             GenerateFab(
-                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
-                onClick = viewModel::generatePhoto,
-            )
+                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp)
+            ) {
+                onGenerate(state.prompt)
+            }
         }
 
         if (state.errorPopup != null) {

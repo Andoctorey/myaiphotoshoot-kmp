@@ -1,17 +1,11 @@
 package ai.create.photo.ui.generate
 
-import ai.create.photo.data.MemoryStore
 import ai.create.photo.data.supabase.SessionViewModel
-import ai.create.photo.data.supabase.SupabaseFunction
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.viewModelScope
-import co.touchlab.kermit.Logger
-import kotlinx.coroutines.launch
 
 class GenerateViewModel : SessionViewModel() {
-
 
     var uiState by mutableStateOf(GenerateUiState())
         private set
@@ -34,21 +28,6 @@ class GenerateViewModel : SessionViewModel() {
 
     fun onPromptChanged(prompt: String) {
         uiState = uiState.copy(prompt = prompt)
-    }
-
-    fun generatePhoto() = viewModelScope.launch {
-        val trainingId = MemoryStore.trainingId ?: return@launch
-        uiState = uiState.copy(generationsInProgress = uiState.generationsInProgress + 1)
-        try {
-            SupabaseFunction.generatePhoto(trainingId, uiState.prompt)
-            uiState = uiState.copy(generationsInProgress = uiState.generationsInProgress - 1)
-        } catch (e: Exception) {
-            Logger.e("Generate photo failed", e)
-            uiState = uiState.copy(
-                generationsInProgress = uiState.generationsInProgress - 1,
-                errorPopup = e
-            )
-        }
     }
 
     fun hideErrorPopup() {
