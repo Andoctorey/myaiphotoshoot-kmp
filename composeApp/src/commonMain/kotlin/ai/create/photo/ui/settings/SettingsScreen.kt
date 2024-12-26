@@ -14,9 +14,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Card
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
@@ -84,7 +91,9 @@ private fun Screen(items: List<SettingsUiState.Item>) {
         detailPane = {
             AnimatedPane {
                 navigator.currentDestination?.content?.let {
-                    SettingsDetails(it)
+                    SettingsDetails(it) {
+                        navigator.navigateBack()
+                    }
                 }
             }
         },
@@ -112,14 +121,41 @@ fun SettingsItems(
     }
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsDetails(item: SettingsUiState.Item) {
-    Card {
-        Column(Modifier.fillMaxSize().padding(16.dp)) {
-            Text(
-                text = "Details page for ${stringResource(item.nameRes)}",
-                fontSize = 24.sp,
+fun SettingsDetails(
+    item: SettingsUiState.Item,
+    onBackClick: () -> Unit
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(text = stringResource(item.nameRes))
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
             )
+        },
+        content = { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                Text(
+                    text = "Details page",
+                    fontSize = 24.sp,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
-    }
+    )
 }
