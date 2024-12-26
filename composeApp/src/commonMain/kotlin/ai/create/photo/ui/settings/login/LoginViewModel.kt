@@ -1,18 +1,21 @@
-package ai.create.photo.ui.settings.account
+package ai.create.photo.ui.settings.login
 
 import ai.create.photo.data.supabase.SessionViewModel
+import ai.create.photo.data.supabase.Supabase.supabase
 import ai.create.photo.data.supabase.SupabaseAuth
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
+import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.exception.AuthRestException
+import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.launch
 
-class AccountViewModel : SessionViewModel() {
+class LoginViewModel : SessionViewModel() {
 
-    var uiState by mutableStateOf(AccountUiState())
+    var uiState by mutableStateOf(LoginUiState())
         private set
 
     init {
@@ -25,10 +28,18 @@ class AccountViewModel : SessionViewModel() {
 
     override fun onAuthenticated() {
         uiState = uiState.copy(isLoading = false)
+        loadUser()
     }
 
     override fun onAuthError(error: Throwable) {
         uiState = uiState.copy(loadingError = error)
+    }
+
+    private fun loadUser() {
+        val sessionStatus = supabase.auth.sessionStatus.value
+        if (sessionStatus !is SessionStatus.Authenticated) return
+        val user = sessionStatus.session.user
+        uiState = uiState.copy(user = user)
     }
 
     fun hideErrorPopup() {
@@ -65,7 +76,8 @@ class AccountViewModel : SessionViewModel() {
 
         try {
             SupabaseAuth.verifyEmailOtp(uiState.email, uiState.otp)
-            uiState = uiState.copy(isVerifyingOtp = false, isVerified = true)
+            uiState = uiState.copy(isVerifyingOtp = false)
+            loadUser()
         } catch (e: Exception) {
             if (e is AuthRestException) {
                 uiState = uiState.copy(isIncorrectOtp = true, isVerifyingOtp = false)

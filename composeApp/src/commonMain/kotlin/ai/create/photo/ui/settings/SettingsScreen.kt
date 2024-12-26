@@ -4,7 +4,7 @@ import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.settings.SettingsUiState.Item
-import ai.create.photo.ui.settings.account.LoginScreen
+import ai.create.photo.ui.settings.login.LoginScreen
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -106,7 +106,6 @@ private fun Screen(
     }
     val expanded = navigator.scaffoldValue.primary == PaneAdaptedValue.Expanded
             && navigator.scaffoldValue.secondary == PaneAdaptedValue.Expanded
-    Logger.i("expanded: $expanded, navigator.scaffoldValue: ${navigator.scaffoldValue}")
     ListDetailPaneScaffold(
         directive = navigator.scaffoldDirective,
         value = navigator.scaffoldValue,
@@ -213,7 +212,7 @@ fun SettingsDetails(
                     .padding(24.dp)
             ) {
                 when (item) {
-                    is SettingsUiState.AccountItem -> LoginScreen()
+                    is SettingsUiState.LoginItem -> LoginScreen()
                     is SettingsUiState.PlaceholderItem -> {
                         Text(
                             text = "TODO: ${stringResource(item.nameRes)}",

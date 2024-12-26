@@ -17,7 +17,6 @@
     <string name="generate_photo">Generate Photo</string>
     <string name="creating_model_hint">This process usually takes about an hour, so feel free to close the app and check back later.</string>
     <string name="generate_prompt">Describe your look</string>
-    <string name="account">Account</string>
     <string name="login">Login</string>
     <string name="logout">Logout</string>
     <string name="top_up">Top Up</string>

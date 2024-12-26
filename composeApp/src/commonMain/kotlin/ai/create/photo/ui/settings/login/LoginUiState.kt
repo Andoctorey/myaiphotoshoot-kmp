@@ -1,12 +1,14 @@
-package ai.create.photo.ui.settings.account
+package ai.create.photo.ui.settings.login
 
 import androidx.compose.runtime.Immutable
+import io.github.jan.supabase.auth.user.UserInfo
 
 @Immutable
-data class AccountUiState(
+data class LoginUiState(
     val isLoading: Boolean = false,
     val loadingError: Throwable? = null,
     val errorPopup: Throwable? = null,
+    val user: UserInfo? = null,
 
     val email: String = "",
     val isInvalidEmail: Boolean = false,
@@ -18,5 +20,4 @@ data class AccountUiState(
     val isIncorrectOtp: Boolean = false,
 
     val isVerifyingOtp: Boolean = false,
-    val isVerified: Boolean = false
 )

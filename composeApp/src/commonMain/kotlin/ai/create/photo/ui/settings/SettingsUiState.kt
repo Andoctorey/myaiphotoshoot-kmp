@@ -3,7 +3,8 @@ package ai.create.photo.ui.settings
 import androidx.compose.runtime.Immutable
 import org.jetbrains.compose.resources.StringResource
 import photocreateai.composeapp.generated.resources.Res
-import photocreateai.composeapp.generated.resources.account
+import photocreateai.composeapp.generated.resources.delete_all_data
+import photocreateai.composeapp.generated.resources.login
 import photocreateai.composeapp.generated.resources.privacy_policy
 import photocreateai.composeapp.generated.resources.report_a_problem
 import photocreateai.composeapp.generated.resources.top_up
@@ -17,9 +18,10 @@ data class SettingsUiState(
     val currentDestination: Item? = null,
 
     val items: List<Item> = listOf(
-        AccountItem(),
+        LoginItem(),
         PlaceholderItem(Res.string.top_up),
         PlaceholderItem(Res.string.privacy_policy),
+        PlaceholderItem(Res.string.delete_all_data),
         PlaceholderItem(Res.string.report_a_problem),
     )
 ) {
@@ -29,7 +31,7 @@ data class SettingsUiState(
 
     sealed class DetailedItem(val nameRes: StringResource) : Item()
 
-    class AccountItem() : DetailedItem(Res.string.account)
+    class LoginItem() : DetailedItem(Res.string.login)
     class PlaceholderItem(nameRes: StringResource) : DetailedItem(nameRes)
     class SpacerItem : Item()
 }
