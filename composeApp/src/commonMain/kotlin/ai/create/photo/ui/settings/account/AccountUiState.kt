@@ -1,9 +1,9 @@
-package ai.create.photo.ui.settings.login
+package ai.create.photo.ui.settings.account
 
 import androidx.compose.runtime.Immutable
 
 @Immutable
-data class LoginUiState(
+data class AccountUiState(
     val isLoading: Boolean = false,
     val loadingError: Throwable? = null,
     val errorPopup: Throwable? = null,

@@ -1,4 +1,4 @@
-package ai.create.photo.ui.settings.login
+package ai.create.photo.ui.settings.account
 
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
@@ -48,7 +48,7 @@ import photocreateai.composeapp.generated.resources.wrong_code
 
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel = viewModel { LoginViewModel() },
+    viewModel: AccountViewModel = viewModel { AccountViewModel() },
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),

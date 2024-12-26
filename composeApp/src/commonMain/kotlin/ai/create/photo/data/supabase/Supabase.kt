@@ -15,7 +15,7 @@ import kotlin.time.Duration.Companion.minutes
 
 object Supabase {
 
-    val local = platform().platform == Platforms.DESKTOP && true
+    val local = platform().platform == Platforms.DESKTOP && false
     val supabase = createSupabaseClient(
         supabaseUrl = if (local) "http://127.0.0.1:54321" else "https://trzgfajvyjpvbqedyxug.supabase.co",
         supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRyemdmYWp2eWpwdmJxZWR5eHVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM1NTA5MzAsImV4cCI6MjA0OTEyNjkzMH0.39Qdq2nTCuoIpAfc7L725MZA2ls3NegFy6zCjOTzW9M"

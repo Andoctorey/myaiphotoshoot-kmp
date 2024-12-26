@@ -1,4 +1,4 @@
-package ai.create.photo.ui.settings.login
+package ai.create.photo.ui.settings.account
 
 import ai.create.photo.data.supabase.SessionViewModel
 import ai.create.photo.data.supabase.SupabaseAuth
@@ -10,9 +10,9 @@ import co.touchlab.kermit.Logger
 import io.github.jan.supabase.auth.exception.AuthRestException
 import kotlinx.coroutines.launch
 
-class LoginViewModel : SessionViewModel() {
+class AccountViewModel : SessionViewModel() {
 
-    var uiState by mutableStateOf(LoginUiState())
+    var uiState by mutableStateOf(AccountUiState())
         private set
 
     init {

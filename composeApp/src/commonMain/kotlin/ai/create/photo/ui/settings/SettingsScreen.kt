@@ -4,10 +4,11 @@ import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.settings.SettingsUiState.Item
-import ai.create.photo.ui.settings.login.LoginScreen
+import ai.create.photo.ui.settings.account.LoginScreen
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsTopHeight
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -102,12 +104,16 @@ private fun Screen(
             hasNavigated = true
         }
     }
+    val expanded = navigator.scaffoldValue.primary == PaneAdaptedValue.Expanded
+            && navigator.scaffoldValue.secondary == PaneAdaptedValue.Expanded
+    Logger.i("expanded: $expanded, navigator.scaffoldValue: ${navigator.scaffoldValue}")
     ListDetailPaneScaffold(
         directive = navigator.scaffoldDirective,
         value = navigator.scaffoldValue,
         listPane = {
-            AnimatedPane {
+            AnimatedPane(modifier = Modifier) {
                 SettingsItems(
+                    expanded = expanded,
                     items = items,
                     onItemClick = { item ->
                         Logger.i("Navigate to: $item")
@@ -140,15 +146,19 @@ private fun Screen(
 
 @Composable
 fun SettingsItems(
+    expanded: Boolean,
     items: List<Item>,
     onItemClick: (Item) -> Unit,
 ) {
-    LazyColumn {
+    LazyColumn(
+        modifier = if (expanded) Modifier else Modifier.wrapContentHeight(),
+        contentPadding = PaddingValues(bottom = 16.dp)
+    ) {
         items.forEach { item ->
             item {
                 when (item) {
                     is SettingsUiState.SpacerItem -> {
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(24.dp))
                     }
 
                     is SettingsUiState.DetailedItem -> {
@@ -203,7 +213,7 @@ fun SettingsDetails(
                     .padding(24.dp)
             ) {
                 when (item) {
-                    is SettingsUiState.LoginItem -> LoginScreen()
+                    is SettingsUiState.AccountItem -> LoginScreen()
                     is SettingsUiState.PlaceholderItem -> {
                         Text(
                             text = "TODO: ${stringResource(item.nameRes)}",

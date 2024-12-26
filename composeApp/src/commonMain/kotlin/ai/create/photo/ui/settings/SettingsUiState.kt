@@ -1,15 +1,12 @@
 package ai.create.photo.ui.settings
 
-import ai.create.photo.ui.settings.SettingsUiState.SpacerItem
 import androidx.compose.runtime.Immutable
 import org.jetbrains.compose.resources.StringResource
 import photocreateai.composeapp.generated.resources.Res
-import photocreateai.composeapp.generated.resources.settings_delete_all_data
-import photocreateai.composeapp.generated.resources.settings_login
-import photocreateai.composeapp.generated.resources.settings_logout
-import photocreateai.composeapp.generated.resources.settings_privacy_policy
-import photocreateai.composeapp.generated.resources.settings_report_a_problem
-import photocreateai.composeapp.generated.resources.settings_top_up
+import photocreateai.composeapp.generated.resources.account
+import photocreateai.composeapp.generated.resources.privacy_policy
+import photocreateai.composeapp.generated.resources.report_a_problem
+import photocreateai.composeapp.generated.resources.top_up
 
 
 @Immutable
@@ -20,14 +17,10 @@ data class SettingsUiState(
     val currentDestination: Item? = null,
 
     val items: List<Item> = listOf(
-        LoginItem(),
-        PlaceholderItem(Res.string.settings_top_up),
-        SpacerItem(),
-        PlaceholderItem(Res.string.settings_privacy_policy),
-        PlaceholderItem(Res.string.settings_report_a_problem),
-        SpacerItem(),
-        PlaceholderItem(Res.string.settings_delete_all_data),
-        PlaceholderItem(Res.string.settings_logout),
+        AccountItem(),
+        PlaceholderItem(Res.string.top_up),
+        PlaceholderItem(Res.string.privacy_policy),
+        PlaceholderItem(Res.string.report_a_problem),
     )
 ) {
 
@@ -36,7 +29,7 @@ data class SettingsUiState(
 
     sealed class DetailedItem(val nameRes: StringResource) : Item()
 
-    class LoginItem() : DetailedItem(Res.string.settings_login)
+    class AccountItem() : DetailedItem(Res.string.account)
     class PlaceholderItem(nameRes: StringResource) : DetailedItem(nameRes)
     class SpacerItem : Item()
 }
