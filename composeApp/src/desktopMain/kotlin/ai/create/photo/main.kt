@@ -15,7 +15,7 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "My AI Photo Shoot",
     ) {
-        SetMinimumWindowSize(width = 100.dp, height = 200.dp)
+        SetMinimumWindowSize(width = 200.dp, height = 200.dp)
         App()
     }
 }
