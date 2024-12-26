@@ -7,4 +7,9 @@ data class LoginUiState(
     val isLoading: Boolean = false,
     val loadingError: Throwable? = null,
     val errorPopup: Throwable? = null,
+
+    val email: String = "",
+    val isInvalidEmail: Boolean = false,
+    val isSendingOtp: Boolean = false,
+
 )

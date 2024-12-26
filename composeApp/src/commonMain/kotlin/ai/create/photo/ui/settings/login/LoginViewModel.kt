@@ -29,4 +29,21 @@ class LoginViewModel : SessionViewModel() {
     fun hideErrorPopup() {
         uiState = uiState.copy(errorPopup = null)
     }
+
+    fun onEmailChanged(email: String) {
+        uiState = uiState.copy(email = email, isInvalidEmail = false)
+    }
+
+    fun sendOtp() {
+        uiState = uiState.copy(isInvalidEmail = false, isSendingOtp = true)
+        if (!isValidEmail(uiState.email)) {
+            uiState = uiState.copy(isInvalidEmail = true, isSendingOtp = false)
+            return
+        }
+    }
+
+    private fun isValidEmail(email: String): Boolean {
+        val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()
+        return email.matches(emailRegex)
+    }
 }

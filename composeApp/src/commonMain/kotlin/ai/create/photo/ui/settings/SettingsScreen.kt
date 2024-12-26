@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import co.touchlab.kermit.Logger
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -85,6 +86,7 @@ private fun Screen(items: List<SettingsUiState.Item>) {
                 SettingsItems(
                     items = items,
                     onItemClick = { item ->
+                        Logger.i("Navigate to: $item")
                         navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, item)
                     },
                 )
