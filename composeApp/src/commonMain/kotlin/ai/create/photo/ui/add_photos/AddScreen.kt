@@ -87,6 +87,7 @@ import photocreateai.composeapp.generated.resources.delete_photo_set
 import photocreateai.composeapp.generated.resources.generate_photo
 import photocreateai.composeapp.generated.resources.photo_set
 import photocreateai.composeapp.generated.resources.upload_guidelines_message
+import photocreateai.composeapp.generated.resources.upload_more_photos
 
 
 @Preview
@@ -567,7 +568,7 @@ fun PhotoSets(
 private fun UploadMorePhotosPopup(onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        text = { Text(text = stringResource(Res.string.creating_model_hint)) },
+        text = { Text(text = stringResource(Res.string.upload_more_photos)) },
         confirmButton = {
             Button(onClick = onDismiss) {
                 Text("OK")

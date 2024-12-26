@@ -215,6 +215,7 @@ class AddViewModel : SessionViewModel() {
 
     fun selectPhotoSet(photoSet: Int) {
         uiState = uiState.copy(showMenu = false, photoSet = photoSet)
+        loadTraining()
     }
 
     fun createPhotoSet() {
