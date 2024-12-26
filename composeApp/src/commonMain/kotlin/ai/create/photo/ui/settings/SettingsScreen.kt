@@ -3,6 +3,7 @@ package ai.create.photo.ui.settings
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
+import ai.create.photo.ui.settings.login.LoginScreen
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -173,11 +174,16 @@ fun SettingsDetails(
                     .padding(paddingValues)
                     .padding(24.dp)
             ) {
-                Text(
-                    text = "Details page",
-                    fontSize = 24.sp,
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                when (item) {
+                    is SettingsUiState.LoginItem -> LoginScreen()
+                    is SettingsUiState.PlaceholderItem -> {
+                        Text(
+                            text = "TODO: ${stringResource(item.nameRes)}",
+                            fontSize = 24.sp,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
             }
         }
     )

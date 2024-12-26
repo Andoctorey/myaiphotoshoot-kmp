@@ -18,21 +18,23 @@ data class SettingsUiState(
     val errorPopup: Throwable? = null,
 
     val items: List<Item> = listOf(
-        DetailedItem(Res.string.settings_login),
-        DetailedItem(Res.string.settings_top_up),
+        LoginItem(),
+        PlaceholderItem(Res.string.settings_top_up),
         SpacerItem(),
-        DetailedItem(Res.string.settings_privacy_policy),
-        DetailedItem(Res.string.settings_report_a_problem),
+        PlaceholderItem(Res.string.settings_privacy_policy),
+        PlaceholderItem(Res.string.settings_report_a_problem),
         SpacerItem(),
-        DetailedItem(Res.string.settings_delete_all_data),
-        DetailedItem(Res.string.settings_logout),
+        PlaceholderItem(Res.string.settings_delete_all_data),
+        PlaceholderItem(Res.string.settings_logout),
     )
 ) {
 
     @Immutable
     sealed class Item()
 
-    data class DetailedItem(val nameRes: StringResource) : Item()
+    sealed class DetailedItem(val nameRes: StringResource) : Item()
 
+    class LoginItem() : DetailedItem(Res.string.settings_login)
+    class PlaceholderItem(nameRes: StringResource) : DetailedItem(nameRes)
     class SpacerItem : Item()
 }
