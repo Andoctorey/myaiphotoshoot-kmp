@@ -92,11 +92,16 @@ private fun Screen(items: List<SettingsUiState.Item>) {
         detailPane = {
             AnimatedPane {
                 navigator.currentDestination?.content?.let {
-                    SettingsDetails(
-                        expanded = navigator.scaffoldValue.secondary == PaneAdaptedValue.Expanded,
-                        item = it
-                    ) {
-                        navigator.navigateBack()
+                    when (it) {
+                        is SettingsUiState.SpacerItem -> {}
+                        is SettingsUiState.DetailedItem -> {
+                            SettingsDetails(
+                                expanded = navigator.scaffoldValue.secondary == PaneAdaptedValue.Expanded,
+                                item = it
+                            ) {
+                                navigator.navigateBack()
+                            }
+                        }
                     }
                 }
             }
@@ -112,14 +117,22 @@ fun SettingsItems(
     LazyColumn {
         items.forEach { item ->
             item {
-                ListItem(
-                    modifier = Modifier.clickable {
-                        onItemClick(item)
-                    },
-                    headlineContent = {
-                        Text(text = stringResource(item.nameRes))
-                    },
-                )
+                when (item) {
+                    is SettingsUiState.SpacerItem -> {
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+
+                    is SettingsUiState.DetailedItem -> {
+                        ListItem(
+                            modifier = Modifier.clickable {
+                                onItemClick(item)
+                            },
+                            headlineContent = {
+                                Text(text = stringResource(item.nameRes))
+                            },
+                        )
+                    }
+                }
             }
         }
     }
@@ -130,7 +143,7 @@ fun SettingsItems(
 @Composable
 fun SettingsDetails(
     expanded: Boolean,
-    item: SettingsUiState.Item,
+    item: SettingsUiState.DetailedItem,
     onBackClick: () -> Unit
 ) {
     Scaffold(
@@ -140,6 +153,7 @@ fun SettingsDetails(
                     title = {
                         Text(text = stringResource(item.nameRes))
                     },
+                    windowInsets = WindowInsets(0.dp),
                     navigationIcon = {
                         IconButton(onClick = onBackClick) {
                             Icon(
@@ -147,7 +161,8 @@ fun SettingsDetails(
                                 contentDescription = "Back"
                             )
                         }
-                    }
+                    },
+//                    scrollBehavior =  TODO
                 )
             }
         },

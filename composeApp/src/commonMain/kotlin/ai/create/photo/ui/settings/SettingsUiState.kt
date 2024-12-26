@@ -1,5 +1,6 @@
 package ai.create.photo.ui.settings
 
+import ai.create.photo.ui.settings.SettingsUiState.SpacerItem
 import androidx.compose.runtime.Immutable
 import org.jetbrains.compose.resources.StringResource
 import photocreateai.composeapp.generated.resources.Res
@@ -17,17 +18,21 @@ data class SettingsUiState(
     val errorPopup: Throwable? = null,
 
     val items: List<Item> = listOf(
-        Item(Res.string.settings_login),
-        Item(Res.string.settings_top_up),
-        Item(Res.string.settings_privacy_policy),
-        Item(Res.string.settings_report_a_problem),
-        Item(Res.string.settings_delete_all_data),
-        Item(Res.string.settings_logout),
+        DetailedItem(Res.string.settings_login),
+        DetailedItem(Res.string.settings_top_up),
+        SpacerItem(),
+        DetailedItem(Res.string.settings_privacy_policy),
+        DetailedItem(Res.string.settings_report_a_problem),
+        SpacerItem(),
+        DetailedItem(Res.string.settings_delete_all_data),
+        DetailedItem(Res.string.settings_logout),
     )
 ) {
 
     @Immutable
-    data class Item(
-        val nameRes: StringResource,
-    )
+    sealed class Item()
+
+    data class DetailedItem(val nameRes: StringResource) : Item()
+
+    class SpacerItem : Item()
 }
