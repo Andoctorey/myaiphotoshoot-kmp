@@ -11,11 +11,13 @@ import photocreateai.composeapp.generated.resources.settings_privacy_policy
 import photocreateai.composeapp.generated.resources.settings_report_a_problem
 import photocreateai.composeapp.generated.resources.settings_top_up
 
+
 @Immutable
 data class SettingsUiState(
     val isLoading: Boolean = false,
     val loadingError: Throwable? = null,
     val errorPopup: Throwable? = null,
+    val currentDestination: Item? = null,
 
     val items: List<Item> = listOf(
         LoginItem(),

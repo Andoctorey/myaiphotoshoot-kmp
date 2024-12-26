@@ -3,6 +3,7 @@ package ai.create.photo.ui.settings
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
+import ai.create.photo.ui.settings.SettingsUiState.Item
 import ai.create.photo.ui.settings.login.LoginScreen
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -32,6 +33,11 @@ import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -53,6 +59,7 @@ fun SettingsScreen(
     ) {
         val state = viewModel.uiState
 
+
         if (state.isLoading) {
             Spacer(modifier = Modifier.height(20.dp))
             LoadingPlaceholder()
@@ -61,7 +68,7 @@ fun SettingsScreen(
         } else {
             Column {
                 Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
-                Screen(state.items)
+                Screen(state.items, state.currentDestination, viewModel::saveDestination)
             }
         }
 
@@ -75,9 +82,26 @@ fun SettingsScreen(
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-private fun Screen(items: List<SettingsUiState.Item>) {
-    val navigator = rememberListDetailPaneScaffoldNavigator<SettingsUiState.Item>()
+private fun Screen(
+    items: List<Item>,
+    savedDestination: Item?,
+    onSaveDestination: (Item?) -> Unit,
+) {
+    val navigator = rememberListDetailPaneScaffoldNavigator<Item>()
+    var hasNavigated by remember { mutableStateOf(false) }
 
+    LaunchedEffect(savedDestination, hasNavigated) {
+        if (savedDestination != null && !hasNavigated) {
+            Logger.i("Navigate to savedDestination: $savedDestination")
+            when (savedDestination) {
+                is SettingsUiState.DetailedItem ->
+                    navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, savedDestination)
+
+                is SettingsUiState.SpacerItem -> {}
+            }
+            hasNavigated = true
+        }
+    }
     ListDetailPaneScaffold(
         directive = navigator.scaffoldDirective,
         value = navigator.scaffoldValue,
@@ -87,6 +111,7 @@ private fun Screen(items: List<SettingsUiState.Item>) {
                     items = items,
                     onItemClick = { item ->
                         Logger.i("Navigate to: $item")
+                        onSaveDestination(item)
                         navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, item)
                     },
                 )
@@ -102,6 +127,7 @@ private fun Screen(items: List<SettingsUiState.Item>) {
                                 expanded = navigator.scaffoldValue.secondary == PaneAdaptedValue.Expanded,
                                 item = it
                             ) {
+                                onSaveDestination(null)
                                 navigator.navigateBack()
                             }
                         }
@@ -114,8 +140,8 @@ private fun Screen(items: List<SettingsUiState.Item>) {
 
 @Composable
 fun SettingsItems(
-    items: List<SettingsUiState.Item>,
-    onItemClick: (SettingsUiState.Item) -> Unit,
+    items: List<Item>,
+    onItemClick: (Item) -> Unit,
 ) {
     LazyColumn {
         items.forEach { item ->
