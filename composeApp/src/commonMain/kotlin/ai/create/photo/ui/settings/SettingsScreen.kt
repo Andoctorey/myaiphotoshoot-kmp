@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
@@ -51,7 +51,7 @@ fun SettingsScreen(
         } else {
             Column {
                 Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
-                Screen()
+                Screen(state.items)
             }
         }
 
@@ -65,17 +65,17 @@ fun SettingsScreen(
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-private fun Screen() {
-    val navigator = rememberListDetailPaneScaffoldNavigator<MyItem>()
+private fun Screen(items: List<SettingsUiState.Item>) {
+    val navigator = rememberListDetailPaneScaffoldNavigator<SettingsUiState.Item>()
 
     ListDetailPaneScaffold(
         directive = navigator.scaffoldDirective,
         value = navigator.scaffoldValue,
         listPane = {
             AnimatedPane {
-                MyList(
+                SettingsItems(
+                    items = items,
                     onItemClick = { item ->
-                        // Navigate to the detail pane with the passed item
                         navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, item)
                     },
                 )
@@ -83,9 +83,8 @@ private fun Screen() {
         },
         detailPane = {
             AnimatedPane {
-                // Show the detail pane content if selected item is available
                 navigator.currentDestination?.content?.let {
-                    MyDetails(it)
+                    SettingsDetails(it)
                 }
             }
         },
@@ -93,68 +92,34 @@ private fun Screen() {
 }
 
 @Composable
-fun MyList(
-    onItemClick: (MyItem) -> Unit,
+fun SettingsItems(
+    items: List<SettingsUiState.Item>,
+    onItemClick: (SettingsUiState.Item) -> Unit,
 ) {
-    Card {
-        LazyColumn {
-            shortStrings.forEachIndexed { id, string ->
-                item {
-                    ListItem(
-                        modifier = Modifier
-                            .clickable {
-                                onItemClick(MyItem(id))
-                            },
-                        headlineContent = {
-                            Text(
-                                text = string,
-                            )
-                        },
-                    )
-                }
+    LazyColumn {
+        items.forEach { item ->
+            item {
+                ListItem(
+                    modifier = Modifier.clickable {
+                        onItemClick(item)
+                    },
+                    headlineContent = {
+                        Text(text = stringResource(item.nameRes))
+                    },
+                )
             }
         }
     }
 }
 
 @Composable
-fun MyDetails(item: MyItem) {
-    val text = shortStrings[item.id]
+fun SettingsDetails(item: SettingsUiState.Item) {
     Card {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
+        Column(Modifier.fillMaxSize().padding(16.dp)) {
             Text(
-                text = "Details page for $text",
+                text = "Details page for ${stringResource(item.nameRes)}",
                 fontSize = 24.sp,
-            )
-            Spacer(Modifier.size(16.dp))
-            Text(
-                text = "TODO: Add great details here"
             )
         }
     }
 }
-
-
-class MyItem(val id: Int)
-// [END android_compose_adaptivelayouts_sample_list_detail_pane_scaffold_myitem]
-
-val shortStrings = listOf(
-    "Cupcake",
-    "Donut",
-    "Eclair",
-    "Froyo",
-    "Gingerbread",
-    "Honeycomb",
-    "Ice cream sandwich",
-    "Jelly bean",
-    "Kitkat",
-    "Lollipop",
-    "Marshmallow",
-    "Nougat",
-    "Oreo",
-    "Pie",
-)

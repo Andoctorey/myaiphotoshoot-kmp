@@ -17,4 +17,10 @@
     <string name="generate_photo">Generate Photo</string>
     <string name="creating_model_hint">This process usually takes about an hour, so feel free to close the app and check back later.</string>
     <string name="generate_prompt">Describe your look</string>
+    <string name="settings_login">Login</string>
+    <string name="settings_logout">Logout</string>
+    <string name="settings_top_up">Top Up</string>
+    <string name="settings_privacy_policy">Privacy Policy</string>
+    <string name="settings_delete_all_data">Delete All Data</string>
+    <string name="settings_report_a_problem">Report a Problem</string>
 </resources>
