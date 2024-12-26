@@ -28,6 +28,7 @@ import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
+import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -91,7 +92,10 @@ private fun Screen(items: List<SettingsUiState.Item>) {
         detailPane = {
             AnimatedPane {
                 navigator.currentDestination?.content?.let {
-                    SettingsDetails(it) {
+                    SettingsDetails(
+                        expanded = navigator.scaffoldValue.secondary == PaneAdaptedValue.Expanded,
+                        item = it
+                    ) {
                         navigator.navigateBack()
                     }
                 }
@@ -125,30 +129,34 @@ fun SettingsItems(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsDetails(
+    expanded: Boolean,
     item: SettingsUiState.Item,
     onBackClick: () -> Unit
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = stringResource(item.nameRes))
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                            contentDescription = "Back"
-                        )
+            if (!expanded) {
+                TopAppBar(
+                    title = {
+                        Text(text = stringResource(item.nameRes))
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onBackClick) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                                contentDescription = "Back"
+                            )
+                        }
                     }
-                }
-            )
+                )
+            }
         },
         content = { paddingValues ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
+                    .padding(24.dp)
             ) {
                 Text(
                     text = "Details page",
