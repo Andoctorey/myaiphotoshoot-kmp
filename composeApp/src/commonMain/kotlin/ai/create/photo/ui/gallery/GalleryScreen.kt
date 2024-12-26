@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -68,6 +69,13 @@ fun GalleryScreen(
         } else if (state.loadingError != null) {
             ErrorMessagePlaceHolder(state.loadingError)
         } else if (state.photos != null) {
+            LaunchedEffect(state.scrollToTop) {
+                if (state.scrollToTop && state.listState.firstVisibleItemIndex > 1) {
+                    state.listState.animateScrollToItem(0)
+                }
+                viewModel.resetScrollToTop()
+            }
+
             Photos(state.photos, state.listState)
         }
     }

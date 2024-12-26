@@ -12,6 +12,7 @@ data class GalleryUiState(
     val photos: List<Photo>? = null,
 
     val listState: LazyStaggeredGridState = LazyStaggeredGridState(),
+    val scrollToTop: Boolean = false,
 ) {
     @Immutable
     data class Photo(

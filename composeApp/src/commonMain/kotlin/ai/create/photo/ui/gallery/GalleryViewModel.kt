@@ -37,11 +37,12 @@ class GalleryViewModel : SessionViewModel() {
             uiState = uiState.copy(
                 isLoading = false,
                 loadingError = null,
+                scrollToTop = generations.size > (uiState.photos?.size ?: 0),
                 photos = generations.map {
                     GalleryUiState.Photo(
                         id = it.id,
                         createdAt = it.createdAt,
-                        name = it.file!!.fileName,
+                        name = it.file.fileName,
                         photoSet = it.file.photoSet,
                         prompt = it.prompt,
                         url = it.file.signedUrl,
@@ -52,6 +53,10 @@ class GalleryViewModel : SessionViewModel() {
             Logger.e("Load gallery failed", e)
             uiState = uiState.copy(isLoading = false, loadingError = e)
         }
+    }
+
+    fun resetScrollToTop() {
+        uiState = uiState.copy(scrollToTop = false)
     }
 
 }
