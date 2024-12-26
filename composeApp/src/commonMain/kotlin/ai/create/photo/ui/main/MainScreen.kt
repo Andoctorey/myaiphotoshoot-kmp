@@ -4,6 +4,7 @@ import ai.create.photo.ui.add_photos.AddScreen
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.gallery.GalleryScreen
 import ai.create.photo.ui.generate.GenerateScreen
+import ai.create.photo.ui.settings.SettingsScreen
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -12,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -23,11 +25,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import co.touchlab.kermit.Logger
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainApp(
+fun MainScreen(
     viewModel: MainViewModel = viewModel { MainViewModel() },
     navController: NavHostController = rememberNavController(),
 ) {
@@ -38,6 +41,9 @@ fun MainApp(
 
     val state = viewModel.uiState
     var currentDestination by rememberSaveable { mutableStateOf(AppNavigationRoutes.TAB1) }
+    LaunchedEffect(currentDestination) {
+        Logger.i("change tab: ${currentDestination.name}")
+    }
     NavigationSuiteScaffold(
         modifier = Modifier.widthIn(min = 200.dp),
         navigationSuiteItems = {
@@ -87,11 +93,11 @@ fun MainApp(
                 viewModel.generatePhoto(prompt)
             }
 
-            AppNavigationRoutes.TAB3 -> {
-                GalleryScreen(generationInProgress = state.generationsInProgress != 0)
-            }
+            AppNavigationRoutes.TAB3 -> GalleryScreen(
+                generationInProgress = state.generationsInProgress != 0
+            )
 
-            AppNavigationRoutes.TAB4 -> {}
+            AppNavigationRoutes.TAB4 -> SettingsScreen()
         }
     }
 
