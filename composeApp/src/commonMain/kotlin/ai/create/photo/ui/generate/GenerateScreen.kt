@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -19,13 +18,13 @@ import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Brush
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
@@ -41,19 +40,23 @@ import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.create_ai_model
 import photocreateai.composeapp.generated.resources.generate_photo
 import photocreateai.composeapp.generated.resources.generate_prompt
-import photocreateai.composeapp.generated.resources.generating_photo
 
 
 @Preview
 @Composable
-fun CreateScreen(
+fun GenerateScreen(
     viewModel: GenerateViewModel = viewModel { GenerateViewModel() },
+    onGenerationsInProgressChanged: (Int) -> Unit,
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
         val state = viewModel.uiState
+
+        LaunchedEffect(state.generationsInProgress) {
+            onGenerationsInProgressChanged(state.generationsInProgress)
+        }
 
         if (state.isLoading) {
             Spacer(modifier = Modifier.height(20.dp))
@@ -78,7 +81,6 @@ fun CreateScreen(
 
             GenerateFab(
                 modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
-                isGenerating = state.isGenerating,
                 onClick = viewModel::generatePhoto,
             )
         }
@@ -92,38 +94,24 @@ fun CreateScreen(
 }
 
 @Composable
-private fun GenerateFab(modifier: Modifier, isGenerating: Boolean, onClick: () -> Unit) {
+private fun GenerateFab(modifier: Modifier, onClick: () -> Unit) {
     ExtendedFloatingActionButton(
         modifier = modifier,
         onClick = onClick,
     ) {
-        if (isGenerating) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = MaterialTheme.colorScheme.primary,
-                    strokeWidth = 2.dp,
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(
-                    text = stringResource(Res.string.generating_photo),
-                )
-            }
-        } else {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.Brush,
-                    contentDescription = stringResource(Res.string.create_ai_model),
-                    tint = MaterialTheme.colorScheme.onSurface,
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(
-                    text = stringResource(Res.string.generate_photo),
-                    textAlign = TextAlign.Center,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = Icons.Default.Brush,
+                contentDescription = stringResource(Res.string.create_ai_model),
+                tint = MaterialTheme.colorScheme.onSurface,
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(
+                text = stringResource(Res.string.generate_photo),
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }

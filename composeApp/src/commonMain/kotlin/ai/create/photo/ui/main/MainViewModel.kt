@@ -10,4 +10,8 @@ class MainViewModel : ViewModel() {
     var uiState by mutableStateOf(MainUiState())
         private set
 
+    fun onGenerationsInProgressChanged(generationsInProgress: Int) {
+        uiState = uiState.copy(generationsInProgress = generationsInProgress)
+    }
+
 }

@@ -4,5 +4,5 @@ import androidx.compose.runtime.Immutable
 
 @Immutable
 data class MainUiState(
-    val loading: Boolean = false,
+    val generationsInProgress: Int = 0,
 )

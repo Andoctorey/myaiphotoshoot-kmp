@@ -38,13 +38,16 @@ class GenerateViewModel : SessionViewModel() {
 
     fun generatePhoto() = viewModelScope.launch {
         val trainingId = MemoryStore.trainingId ?: return@launch
-        uiState = uiState.copy(isGenerating = true)
+        uiState = uiState.copy(generationsInProgress = uiState.generationsInProgress + 1)
         try {
             SupabaseFunction.generatePhoto(trainingId, uiState.prompt)
-            uiState = uiState.copy(isGenerating = false)
+            uiState = uiState.copy(generationsInProgress = uiState.generationsInProgress - 1)
         } catch (e: Exception) {
             Logger.e("Generate photo failed", e)
-            uiState = uiState.copy(isGenerating = false, errorPopup = e)
+            uiState = uiState.copy(
+                generationsInProgress = uiState.generationsInProgress - 1,
+                errorPopup = e
+            )
         }
     }
 

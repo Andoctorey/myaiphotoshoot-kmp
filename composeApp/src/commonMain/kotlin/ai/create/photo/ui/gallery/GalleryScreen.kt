@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,9 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import co.touchlab.kermit.Logger
 import coil3.compose.AsyncImage
@@ -43,22 +39,15 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun GalleryScreen(
     viewModel: GalleryViewModel = viewModel { GalleryViewModel() },
+    generationInProgress: Boolean,
 ) {
-    val state = viewModel.uiState
-
-    val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (!state.isLoading && event == Lifecycle.Event.ON_RESUME) {
-                viewModel.loadGallery()
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
+    LaunchedEffect(generationInProgress) {
+        if (generationInProgress) {
+            viewModel.loadGallery()
         }
     }
 
+    val state = viewModel.uiState
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
