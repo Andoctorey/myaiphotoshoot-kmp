@@ -62,8 +62,6 @@ fun LoginScreen(
         } else if (state.loadingError != null) {
             ErrorMessagePlaceHolder(state.loadingError)
         } else {
-            val keyboardController = LocalSoftwareKeyboardController.current
-            val focusManager = LocalFocusManager.current
             Column(
                 modifier = Modifier
                     .widthIn(max = 600.dp)
@@ -72,26 +70,26 @@ fun LoginScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                val sendOtp: () -> Unit = {
-                    keyboardController?.hide()
-                    focusManager.clearFocus()
-                    viewModel.sendOtp()
+                if (state.email != null) {
+                    Text(
+                        text = state.email,
+                        fontSize = 18.sp,
+                    )
+                } else {
+                    LoginWithOtp(
+                        email = state.emailToVerify,
+                        onEmailChanged = viewModel::onEmailChanged,
+                        isInvalidEmail = state.isInvalidEmail,
+                        enterOtp = state.enterOtp,
+                        otp = state.otp,
+                        sendOtp = viewModel::sendOtp,
+                        isSendingOtp = state.isSendingOtp,
+                        isIncorrectOtp = state.isIncorrectOtp,
+                        onOtpChanged = viewModel::onOtpChanged,
+                        isVerifyingOtp = state.isVerifyingOtp,
+                        verifyOtp = viewModel::verifyOtp
+                    )
                 }
-                EmailTextField(
-                    email = state.email,
-                    onEmailChanged = viewModel::onEmailChanged,
-                    sendOtp = sendOtp,
-                    isInvalidEmail = state.isInvalidEmail
-                )
-                SendOtpButton(state.isSendingOtp, sendOtp)
-                Spacer(modifier = Modifier.height(16.dp))
-                EnterCode(
-                    enterOtp = state.enterOtp,
-                    otp = state.otp,
-                    isIncorrectOtp = state.isIncorrectOtp,
-                    onOtpChanged = viewModel::onOtpChanged
-                )
-                ConfirmOtpButton(state.enterOtp, state.isVerifyingOtp, viewModel::verifyOtp)
             }
         }
 
@@ -100,6 +98,46 @@ fun LoginScreen(
                 viewModel.hideErrorPopup()
             }
         }
+    }
+}
+
+@Composable
+fun LoginWithOtp(
+    email: String,
+    onEmailChanged: (String) -> Unit,
+    isInvalidEmail: Boolean,
+    enterOtp: Boolean,
+    otp: String,
+    isSendingOtp: Boolean,
+    sendOtp: () -> Unit,
+    isIncorrectOtp: Boolean,
+    onOtpChanged: (String) -> Unit,
+    isVerifyingOtp: Boolean,
+    verifyOtp: () -> Unit
+) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+    Column {
+        val sendOtp: () -> Unit = {
+            keyboardController?.hide()
+            focusManager.clearFocus()
+            sendOtp()
+        }
+        EmailTextField(
+            email = email,
+            onEmailChanged = onEmailChanged,
+            sendOtp = sendOtp,
+            isInvalidEmail = isInvalidEmail,
+        )
+        SendOtpButton(isSendingOtp, sendOtp)
+        Spacer(modifier = Modifier.height(16.dp))
+        EnterCode(
+            enterOtp = enterOtp,
+            otp = otp,
+            isIncorrectOtp = isIncorrectOtp,
+            onOtpChanged = onOtpChanged
+        )
+        ConfirmOtpButton(enterOtp, isVerifyingOtp, verifyOtp)
     }
 }
 
@@ -155,7 +193,7 @@ fun EnterCode(
     enterOtp: Boolean,
     otp: String,
     isIncorrectOtp: Boolean,
-    onOtpChanged: (String) -> Unit
+    onOtpChanged: (String) -> Unit,
 ) {
     Crossfade(
         targetState = enterOtp,

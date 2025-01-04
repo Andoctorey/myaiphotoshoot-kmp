@@ -39,7 +39,8 @@ class LoginViewModel : SessionViewModel() {
         val sessionStatus = supabase.auth.sessionStatus.value
         if (sessionStatus !is SessionStatus.Authenticated) return
         val user = sessionStatus.session.user
-        uiState = uiState.copy(user = user)
+        val email = user?.email?.takeIf { user.confirmedAt != null }
+        uiState = uiState.copy(email = email)
     }
 
     fun hideErrorPopup() {
@@ -47,19 +48,19 @@ class LoginViewModel : SessionViewModel() {
     }
 
     fun onEmailChanged(email: String) {
-        uiState = uiState.copy(email = email, isInvalidEmail = false)
+        uiState = uiState.copy(emailToVerify = email, isInvalidEmail = false)
     }
 
     fun sendOtp() = viewModelScope.launch {
         uiState = uiState.copy(isInvalidEmail = false, isSendingOtp = true, enterOtp = false)
-        if (!isValidEmail(uiState.email)) {
+        if (!isValidEmail(uiState.emailToVerify)) {
             uiState = uiState.copy(isInvalidEmail = true, isSendingOtp = false)
             return@launch
         }
 
         try {
-            SupabaseAuth.convertAnonymousUserToEmail(uiState.email)
-            SupabaseAuth.signInWithEmailOtp(uiState.email)
+            SupabaseAuth.convertAnonymousUserToEmail(uiState.emailToVerify)
+            SupabaseAuth.signInWithEmailOtp(uiState.emailToVerify)
             uiState = uiState.copy(isSendingOtp = false, enterOtp = true)
         } catch (e: Exception) {
             Logger.e("sendOtp failed", e)
@@ -75,7 +76,7 @@ class LoginViewModel : SessionViewModel() {
         }
 
         try {
-            SupabaseAuth.verifyEmailOtp(uiState.email, uiState.otp)
+            SupabaseAuth.verifyEmailOtp(uiState.emailToVerify, uiState.otp)
             uiState = uiState.copy(isVerifyingOtp = false)
             loadUser()
         } catch (e: Exception) {
