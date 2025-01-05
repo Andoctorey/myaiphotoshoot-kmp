@@ -42,6 +42,7 @@ import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.enter_code
 import photocreateai.composeapp.generated.resources.enter_email
 import photocreateai.composeapp.generated.resources.invalid_email
+import photocreateai.composeapp.generated.resources.login
 import photocreateai.composeapp.generated.resources.logout
 import photocreateai.composeapp.generated.resources.send_otp
 import photocreateai.composeapp.generated.resources.verify
@@ -126,7 +127,15 @@ fun LoginWithOtp(
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
-    Column {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = stringResource(Res.string.login),
+            style = MaterialTheme.typography.headlineMedium,
+        )
+        Spacer(modifier = Modifier.height(8.dp))
         val sendOtp: () -> Unit = {
             keyboardController?.hide()
             focusManager.clearFocus()
