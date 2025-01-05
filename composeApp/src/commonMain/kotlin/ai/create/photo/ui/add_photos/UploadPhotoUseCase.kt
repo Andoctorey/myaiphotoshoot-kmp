@@ -2,6 +2,7 @@ package ai.create.photo.ui.add_photos
 
 import ai.create.photo.data.supabase.SupabaseStorage
 import ai.create.photo.data.supabase.database.UserFilesRepository
+import ai.create.photo.platform.resizeToWidth
 import io.github.jan.supabase.storage.UploadStatus
 import io.github.vinceglb.filekit.core.PlatformFile
 import kotlinx.coroutines.flow.Flow
@@ -14,8 +15,10 @@ class UploadPhotoUseCase(
 
     fun invoke(userId: String, photoSet: Int, file: PlatformFile): Flow<UploadStatus> =
         flow {
+            val resized = resizeToWidth(file.readBytes()).getOrThrow()
+
             var successfulResponse: UploadStatus? = null
-            storage.uploadPhoto(userId, photoSet, file)
+            storage.uploadPhoto(userId, photoSet, file.name, resized)
                 .collect { response ->
                     if (response is UploadStatus.Success) {
                         successfulResponse = response

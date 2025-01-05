@@ -4,7 +4,6 @@ import co.touchlab.kermit.Logger
 import io.github.jan.supabase.storage.UploadStatus
 import io.github.jan.supabase.storage.storage
 import io.github.jan.supabase.storage.uploadAsFlow
-import io.github.vinceglb.filekit.core.PlatformFile
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Duration.Companion.days
 
@@ -12,18 +11,19 @@ object SupabaseStorage {
 
     private const val BUCKET = "photos"
 
-    suspend fun uploadPhoto(
+    fun uploadPhoto(
         userId: String,
         photoSet: Int,
-        file: PlatformFile
+        fileName: String,
+        file: ByteArray
     ): Flow<UploadStatus> {
-        val filePath = "${userId}/$photoSet/${file.name}"
-        Logger.i("uploadPhoto $filePath, size: ${file.getSize()}")
+        val filePath = "${userId}/$photoSet/${fileName}"
+        Logger.i("uploadPhoto $filePath, size: ${file.size}")
         return Supabase.supabase.storage
             .from(BUCKET)
             .uploadAsFlow(
                 path = filePath,
-                data = file.readBytes()
+                data = file,
             ) {
                 upsert = true
             }
