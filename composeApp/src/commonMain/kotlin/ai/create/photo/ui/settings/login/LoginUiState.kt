@@ -20,5 +20,6 @@ data class LoginUiState(
 
     val isVerifyingOtp: Boolean = false,
 
+    val confirmDeletedPopup: Boolean = false,
     val dataDeletedPopup: Boolean = false,
 )

@@ -1,5 +1,6 @@
 package ai.create.photo.ui.settings.login
 
+import ai.create.photo.ui.compose.ConfirmationPopup
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.InfoPopup
@@ -19,6 +20,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -40,7 +43,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.jetbrains.compose.resources.stringResource
 import photocreateai.composeapp.generated.resources.Res
+import photocreateai.composeapp.generated.resources.confirm_data_delete
 import photocreateai.composeapp.generated.resources.data_deleted
+import photocreateai.composeapp.generated.resources.delete
 import photocreateai.composeapp.generated.resources.delete_all_data
 import photocreateai.composeapp.generated.resources.enter_code
 import photocreateai.composeapp.generated.resources.enter_email
@@ -106,7 +111,7 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(64.dp))
 
-                TextButton(onClick = viewModel::deleteAllData) {
+                TextButton(onClick = { viewModel.toggleConfirmDeletePopup(true) }) {
                     Text(
                         text = stringResource(Res.string.delete_all_data),
                         fontSize = 18.sp,
@@ -125,6 +130,18 @@ fun LoginScreen(
             InfoPopup(stringResource(Res.string.data_deleted)) {
                 viewModel.hideDataDeletedPopup()
             }
+        }
+        if (state.confirmDeletedPopup == true) {
+            ConfirmationPopup(
+                icon = Icons.Default.Delete,
+                message = stringResource(Res.string.confirm_data_delete),
+                confirmButton = stringResource(Res.string.delete),
+                onConfirm = {
+                    viewModel.toggleConfirmDeletePopup(false)
+                    viewModel.deleteAllData()
+                },
+                onDismiss = { viewModel.toggleConfirmDeletePopup(false) },
+            )
         }
     }
 }

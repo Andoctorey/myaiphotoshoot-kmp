@@ -137,4 +137,8 @@ class LoginViewModel : SessionViewModel() {
     fun hideDataDeletedPopup() {
         uiState = uiState.copy(dataDeletedPopup = false)
     }
+
+    fun toggleConfirmDeletePopup(show: Boolean) {
+        uiState = uiState.copy(confirmDeletedPopup = show)
+    }
 }

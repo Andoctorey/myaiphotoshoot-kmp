@@ -23,6 +23,9 @@
     <string name="top_up">Top Up</string>
     <string name="privacy_policy">Privacy Policy</string>
     <string name="delete_all_data">Delete All Data</string>
+    <string name="confirm_data_delete">Are you sure you want to delete your account? This action is permanent and will remove all your data. You can’t undo this.</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
     <string name="data_deleted">All your stored data has been deleted successfully.</string>
     <string name="report_a_problem">Report a Problem</string>
     <string name="enter_email">Enter email</string>
