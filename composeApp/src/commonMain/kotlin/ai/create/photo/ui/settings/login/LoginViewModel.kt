@@ -19,7 +19,6 @@ class LoginViewModel : SessionViewModel() {
 
     var uiState by mutableStateOf(LoginUiState())
         private set
-    var anonymousUserId: String? = null
 
     init {
         loadSession()
@@ -44,9 +43,6 @@ class LoginViewModel : SessionViewModel() {
         if (sessionStatus !is SessionStatus.Authenticated) return
         val user = sessionStatus.session.user
         val email = user?.email?.takeIf { user.confirmedAt != null }
-        if (email == null) {
-            anonymousUserId = user?.id
-        }
         uiState = uiState.copy(email = email)
     }
 
@@ -67,7 +63,12 @@ class LoginViewModel : SessionViewModel() {
         }
 
         try {
-            SupabaseAuth.convertAnonymousUserToEmail(uiState.emailToVerify)
+            try {
+                SupabaseAuth.convertAnonymousUserToEmail(uiState.emailToVerify)
+            } catch (e: AuthRestException) {
+                Logger.i("convertAnonymousUserToEmail", e)
+                SupabaseFunction.deleteUser()
+            }
             SupabaseAuth.signInWithEmailOtp(uiState.emailToVerify)
             uiState = uiState.copy(isSendingOtp = false, enterOtp = true)
         } catch (e: Exception) {
@@ -86,9 +87,6 @@ class LoginViewModel : SessionViewModel() {
 
         try {
             SupabaseAuth.verifyEmailOtp(uiState.emailToVerify, uiState.otp)
-            anonymousUserId?.let { it ->
-                anonymousUserId = null
-            }
             uiState = uiState.copy(isVerifyingOtp = false)
             loadUser()
         } catch (e: Exception) {

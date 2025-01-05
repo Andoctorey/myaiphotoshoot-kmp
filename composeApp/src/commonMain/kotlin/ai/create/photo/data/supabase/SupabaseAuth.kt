@@ -4,7 +4,6 @@ import ai.create.photo.data.supabase.Supabase.supabase
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.auth.OtpType
 import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.providers.builtin.OTP
 
 object SupabaseAuth {
@@ -35,12 +34,8 @@ object SupabaseAuth {
 
     suspend fun convertAnonymousUserToEmail(email: String) {
         Logger.i("convertAnonymousUserToEmail $email")
-        try {
-            supabase.auth.updateUser {
-                this.email = email
-            }
-        } catch (e: AuthRestException) {
-            Logger.i("convertAnonymousUserToEmail", e)
+        supabase.auth.updateUser {
+            this.email = email
         }
     }
 }
