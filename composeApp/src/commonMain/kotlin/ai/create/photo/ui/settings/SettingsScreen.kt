@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
@@ -42,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -162,11 +164,13 @@ fun SettingsItems(
 
                     is SettingsUiState.DetailedItem -> {
                         ListItem(
-                            modifier = Modifier.clickable {
-                                onItemClick(item)
-                            },
+                            modifier = Modifier.clickable { onItemClick(item) },
                             headlineContent = {
-                                Text(text = stringResource(item.nameRes))
+                                Text(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    text = stringResource(item.nameRes),
+                                    textAlign = TextAlign.Center
+                                )
                             },
                         )
                     }
@@ -209,7 +213,7 @@ fun SettingsDetails(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(24.dp)
+                    .padding(24.dp),
             ) {
                 when (item) {
                     is SettingsUiState.LoginItem -> LoginScreen()
