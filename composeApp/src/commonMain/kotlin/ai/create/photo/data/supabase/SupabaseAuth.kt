@@ -9,9 +9,14 @@ import io.github.jan.supabase.auth.providers.builtin.OTP
 
 object SupabaseAuth {
 
+    var signingIn: Boolean = false
+
     suspend fun signInAnonymously() {
+        if (signingIn) return
         Logger.i("signInAnonymously")
+        signingIn = true
         supabase.auth.signInAnonymously()
+        signingIn = false
     }
 
     suspend fun signInWithEmailOtp(email: String) {
