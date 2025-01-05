@@ -23,4 +23,9 @@ object SupabaseFunction {
             )
         )
     }
+
+    suspend fun deleteUser() {
+        Logger.i("deleteUser")
+        Supabase.supabase.functions.invoke(function = "delete-user")
+    }
 }
