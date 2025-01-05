@@ -42,6 +42,7 @@ import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.enter_code
 import photocreateai.composeapp.generated.resources.enter_email
 import photocreateai.composeapp.generated.resources.invalid_email
+import photocreateai.composeapp.generated.resources.logout
 import photocreateai.composeapp.generated.resources.send_otp
 import photocreateai.composeapp.generated.resources.verify
 import photocreateai.composeapp.generated.resources.wrong_code
@@ -75,6 +76,14 @@ fun LoginScreen(
                         text = state.email,
                         fontSize = 18.sp,
                     )
+                    TextButton(
+                        onClick = viewModel::logout,
+                    ) {
+                        Text(
+                            text = stringResource(Res.string.logout),
+                            fontSize = 18.sp,
+                        )
+                    }
                 } else {
                     LoginWithOtp(
                         email = state.emailToVerify,

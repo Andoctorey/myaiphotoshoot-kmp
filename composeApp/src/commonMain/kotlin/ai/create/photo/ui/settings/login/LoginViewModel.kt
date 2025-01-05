@@ -36,6 +36,7 @@ class LoginViewModel : SessionViewModel() {
     }
 
     private fun loadUser() {
+        Logger.i("loadUser")
         val sessionStatus = supabase.auth.sessionStatus.value
         if (sessionStatus !is SessionStatus.Authenticated) return
         val user = sessionStatus.session.user
@@ -52,6 +53,7 @@ class LoginViewModel : SessionViewModel() {
     }
 
     fun sendOtp() = viewModelScope.launch {
+        Logger.i("sendOtp")
         uiState = uiState.copy(isInvalidEmail = false, isSendingOtp = true, enterOtp = false)
         if (!isValidEmail(uiState.emailToVerify)) {
             uiState = uiState.copy(isInvalidEmail = true, isSendingOtp = false)
@@ -69,6 +71,7 @@ class LoginViewModel : SessionViewModel() {
     }
 
     fun verifyOtp() = viewModelScope.launch {
+        Logger.i("verifyOtp")
         uiState = uiState.copy(isIncorrectOtp = false, isVerifyingOtp = true)
         if (!isValidOtpCode(uiState.otp)) {
             uiState = uiState.copy(isIncorrectOtp = true, isVerifyingOtp = false)
@@ -101,5 +104,10 @@ class LoginViewModel : SessionViewModel() {
 
     fun onOtpChanged(otp: String) {
         uiState = uiState.copy(otp = otp, isIncorrectOtp = false)
+    }
+
+    fun logout() = viewModelScope.launch {
+        Logger.i("logout")
+        supabase.auth.signOut()
     }
 }
