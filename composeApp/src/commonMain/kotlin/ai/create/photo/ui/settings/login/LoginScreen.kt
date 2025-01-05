@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.jetbrains.compose.resources.stringResource
 import photocreateai.composeapp.generated.resources.Res
+import photocreateai.composeapp.generated.resources.attach_email
 import photocreateai.composeapp.generated.resources.confirm_data_delete
 import photocreateai.composeapp.generated.resources.data_deleted
 import photocreateai.composeapp.generated.resources.delete
@@ -50,7 +51,6 @@ import photocreateai.composeapp.generated.resources.delete_all_data
 import photocreateai.composeapp.generated.resources.enter_code
 import photocreateai.composeapp.generated.resources.enter_email
 import photocreateai.composeapp.generated.resources.invalid_email
-import photocreateai.composeapp.generated.resources.login
 import photocreateai.composeapp.generated.resources.logout
 import photocreateai.composeapp.generated.resources.send_otp
 import photocreateai.composeapp.generated.resources.verify
@@ -167,7 +167,7 @@ fun LoginWithOtp(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = stringResource(Res.string.login),
+            text = stringResource(Res.string.attach_email),
             fontSize = 18.sp,
         )
         Spacer(modifier = Modifier.height(8.dp))
