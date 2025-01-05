@@ -127,9 +127,14 @@ class LoginViewModel : SessionViewModel() {
             SupabaseStorage.deleteUserFiles(userId)
             SupabaseFunction.deleteUser()
             logout()
+            uiState = uiState.copy(dataDeletedPopup = true)
         } catch (e: Exception) {
             Logger.e("deleteAllData failed", e)
             uiState = uiState.copy(isLoading = false, errorPopup = e)
         }
+    }
+
+    fun hideDataDeletedPopup() {
+        uiState = uiState.copy(dataDeletedPopup = false)
     }
 }

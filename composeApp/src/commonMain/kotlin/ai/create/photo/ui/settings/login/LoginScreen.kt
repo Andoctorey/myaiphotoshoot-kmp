@@ -2,6 +2,7 @@ package ai.create.photo.ui.settings.login
 
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
+import ai.create.photo.ui.compose.InfoPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
@@ -32,7 +33,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.jetbrains.compose.resources.stringResource
 import photocreateai.composeapp.generated.resources.Res
+import photocreateai.composeapp.generated.resources.data_deleted
 import photocreateai.composeapp.generated.resources.delete_all_data
 import photocreateai.composeapp.generated.resources.enter_code
 import photocreateai.composeapp.generated.resources.enter_email
@@ -104,6 +105,7 @@ fun LoginScreen(
                 }
 
                 Spacer(modifier = Modifier.height(64.dp))
+
                 TextButton(onClick = viewModel::deleteAllData) {
                     Text(
                         text = stringResource(Res.string.delete_all_data),
@@ -117,6 +119,11 @@ fun LoginScreen(
         if (state.errorPopup != null) {
             ErrorPopup(state.errorPopup) {
                 viewModel.hideErrorPopup()
+            }
+        }
+        if (state.dataDeletedPopup == true) {
+            InfoPopup(stringResource(Res.string.data_deleted)) {
+                viewModel.hideDataDeletedPopup()
             }
         }
     }
@@ -145,7 +152,6 @@ fun LoginWithOtp(
         Text(
             text = stringResource(Res.string.login),
             fontSize = 18.sp,
-            fontWeight = FontWeight.Medium,
         )
         Spacer(modifier = Modifier.height(8.dp))
         val sendOtp: () -> Unit = {

@@ -23,6 +23,7 @@
     <string name="top_up">Top Up</string>
     <string name="privacy_policy">Privacy Policy</string>
     <string name="delete_all_data">Delete All Data</string>
+    <string name="data_deleted">All your stored data has been deleted successfully.</string>
     <string name="report_a_problem">Report a Problem</string>
     <string name="enter_email">Enter email</string>
     <string name="invalid_email">Please enter a valid email</string>

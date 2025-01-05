@@ -3,6 +3,7 @@ package ai.create.photo.ui.add_photos
 import ai.create.photo.data.supabase.model.TrainingStatus
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
+import ai.create.photo.ui.compose.InfoPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
@@ -38,8 +39,6 @@ import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Mood
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -175,13 +174,13 @@ fun AddScreen(
         }
 
         if (state.showUploadMorePhotosPopup) {
-            CreatingModelPopup {
+            InfoPopup(stringResource(Res.string.creating_model_hint)) {
                 viewModel.hideUploadMorePhotosPopup()
             }
         }
 
         if (state.showCreatingModelPopup) {
-            UploadMorePhotosPopup {
+            InfoPopup(stringResource(Res.string.upload_more_photos)) {
                 viewModel.hideCreatingModelClick()
             }
         }
@@ -561,32 +560,4 @@ fun PhotoSets(
             }
         }
     }
-}
-
-
-@Composable
-private fun UploadMorePhotosPopup(onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        text = { Text(text = stringResource(Res.string.upload_more_photos)) },
-        confirmButton = {
-            Button(onClick = onDismiss) {
-                Text("OK")
-            }
-        }
-    )
-}
-
-
-@Composable
-private fun CreatingModelPopup(onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        text = { Text(text = stringResource(Res.string.creating_model_hint)) },
-        confirmButton = {
-            Button(onClick = onDismiss) {
-                Text("OK")
-            }
-        }
-    )
 }

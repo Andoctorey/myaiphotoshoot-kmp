@@ -19,4 +19,6 @@ data class LoginUiState(
     val isIncorrectOtp: Boolean = false,
 
     val isVerifyingOtp: Boolean = false,
+
+    val dataDeletedPopup: Boolean = false,
 )
