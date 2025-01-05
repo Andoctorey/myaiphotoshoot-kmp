@@ -118,4 +118,8 @@ class LoginViewModel : SessionViewModel() {
         Logger.i("logout")
         supabase.auth.signOut()
     }
+
+    fun deleteAllData() = viewModelScope.launch {
+        Logger.i("deleteAllData")
+    }
 }

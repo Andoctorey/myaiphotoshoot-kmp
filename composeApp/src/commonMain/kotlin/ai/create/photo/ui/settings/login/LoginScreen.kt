@@ -32,6 +32,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -39,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.jetbrains.compose.resources.stringResource
 import photocreateai.composeapp.generated.resources.Res
+import photocreateai.composeapp.generated.resources.delete_all_data
 import photocreateai.composeapp.generated.resources.enter_code
 import photocreateai.composeapp.generated.resources.enter_email
 import photocreateai.composeapp.generated.resources.invalid_email
@@ -100,6 +102,15 @@ fun LoginScreen(
                         verifyOtp = viewModel::verifyOtp
                     )
                 }
+
+                Spacer(modifier = Modifier.height(64.dp))
+                TextButton(onClick = viewModel::deleteAllData) {
+                    Text(
+                        text = stringResource(Res.string.delete_all_data),
+                        fontSize = 18.sp,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
             }
         }
 
@@ -133,7 +144,8 @@ fun LoginWithOtp(
     ) {
         Text(
             text = stringResource(Res.string.login),
-            style = MaterialTheme.typography.headlineSmall,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Medium,
         )
         Spacer(modifier = Modifier.height(8.dp))
         val sendOtp: () -> Unit = {
