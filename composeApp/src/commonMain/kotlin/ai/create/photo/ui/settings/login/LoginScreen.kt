@@ -133,7 +133,7 @@ fun LoginWithOtp(
     ) {
         Text(
             text = stringResource(Res.string.login),
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.headlineSmall,
         )
         Spacer(modifier = Modifier.height(8.dp))
         val sendOtp: () -> Unit = {

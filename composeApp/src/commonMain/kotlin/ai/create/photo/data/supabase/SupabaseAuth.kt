@@ -43,4 +43,9 @@ object SupabaseAuth {
             Logger.i("convertAnonymousUserToEmail", e)
         }
     }
+
+    suspend fun deleteAnonymousUser(uid: String) {
+        Logger.i("deleteAnonymousUser $uid")
+        supabase.auth.admin.deleteUser(uid = uid)
+    }
 }
