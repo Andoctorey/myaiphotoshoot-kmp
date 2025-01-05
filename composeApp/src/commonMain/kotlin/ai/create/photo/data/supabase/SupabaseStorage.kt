@@ -46,4 +46,24 @@ object SupabaseStorage {
         Logger.i("delete files from storage ${paths.joinToString()}")
         Supabase.supabase.storage.from(BUCKET).delete(paths)
     }
+
+    suspend fun deleteUserFiles(uid: String) {
+        Logger.i("deleteUserFiles $uid")
+        val bucket = Supabase.supabase.storage.from(BUCKET)
+
+        val userFiles = bucket.list("$uid/")
+            .flatMap { folder ->
+                bucket.list("$uid/${folder.name}/")
+                    .map { file -> "$uid/${folder.name}/${file.name}" }
+            }
+
+        if (userFiles.isNotEmpty()) {
+            bucket.delete(userFiles)
+            Logger.i("Deleted files: ${userFiles.joinToString()}")
+        } else {
+            Logger.i("No files to delete for user $uid.")
+        }
+    }
+
+
 }

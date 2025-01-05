@@ -3,6 +3,7 @@ package ai.create.photo.ui.settings.login
 import ai.create.photo.data.supabase.SessionViewModel
 import ai.create.photo.data.supabase.Supabase.supabase
 import ai.create.photo.data.supabase.SupabaseAuth
+import ai.create.photo.data.supabase.SupabaseStorage
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -85,7 +86,7 @@ class LoginViewModel : SessionViewModel() {
         try {
             SupabaseAuth.verifyEmailOtp(uiState.emailToVerify, uiState.otp)
             anonymousUserId?.let { it ->
-                SupabaseAuth.deleteAnonymousUser(it)
+                SupabaseAuth.deleteUser(it)
                 anonymousUserId = null
             }
             uiState = uiState.copy(isVerifyingOtp = false)
@@ -121,5 +122,14 @@ class LoginViewModel : SessionViewModel() {
 
     fun deleteAllData() = viewModelScope.launch {
         Logger.i("deleteAllData")
+        try {
+            uiState = uiState.copy(isLoading = true)
+            SupabaseStorage.deleteUserFiles(userId)
+            SupabaseAuth.deleteUser(userId)
+//            uiState = uiState.copy(isLoading = false)
+        } catch (e: Exception) {
+            Logger.e("deleteAllData failed", e)
+            uiState = uiState.copy(isLoading = false, errorPopup = e)
+        }
     }
 }

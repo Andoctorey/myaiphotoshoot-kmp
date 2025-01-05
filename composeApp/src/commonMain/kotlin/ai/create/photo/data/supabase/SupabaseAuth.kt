@@ -44,8 +44,8 @@ object SupabaseAuth {
         }
     }
 
-    suspend fun deleteAnonymousUser(uid: String) {
-        Logger.i("deleteAnonymousUser $uid")
+    suspend fun deleteUser(uid: String) {
+        Logger.i("deleteUser $uid")
         supabase.auth.admin.deleteUser(uid = uid)
     }
 }
