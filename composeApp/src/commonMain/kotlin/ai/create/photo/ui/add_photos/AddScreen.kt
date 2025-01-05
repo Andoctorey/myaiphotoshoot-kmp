@@ -405,11 +405,12 @@ private fun Photo(
             onError = {
                 Logger.e("error loading image", it.result.throwable)
                 error = it.result.throwable
+                loading = false
             },
             contentDescription = "photo",
         )
 
-        if (!hideDeletePhotoButton && !loading && error == null) {
+        if (!hideDeletePhotoButton && !loading) {
             IconButton(
                 onClick = { onDelete(photo) },
                 modifier = Modifier
