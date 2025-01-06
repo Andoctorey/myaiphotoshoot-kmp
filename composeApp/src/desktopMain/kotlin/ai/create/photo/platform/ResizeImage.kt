@@ -16,7 +16,7 @@ actual suspend fun resizeToWidth(
         val originalImage = ImageIO.read(ByteArrayInputStream(input))
         val scaledHeight =
             (originalImage.height * targetWidth.toDouble() / originalImage.width).roundToInt()
-        val scaledImage = BufferedImage(targetWidth, scaledHeight, BufferedImage.TYPE_INT_ARGB)
+        val scaledImage = BufferedImage(targetWidth, scaledHeight, BufferedImage.TYPE_INT_RGB)
         val graphics = scaledImage.createGraphics()
         graphics.drawImage(originalImage, 0, 0, targetWidth, scaledHeight, null)
         graphics.dispose()
