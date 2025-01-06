@@ -143,7 +143,6 @@ fun AddScreen(
                     generatePhotos = openCreatePhotosScreen,
                 )
             } else {
-                Logger.i("AddPhotosFab, state:$state")
                 AddPhotosFab(
                     modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
                     extended = true,
