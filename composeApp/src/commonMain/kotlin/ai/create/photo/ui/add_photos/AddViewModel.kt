@@ -80,7 +80,9 @@ class AddViewModel : SessionViewModel() {
 
     private fun loadTraining(): Job = viewModelScope.launch {
         Logger.i("loadTraining")
-        uiState = uiState.copy(isLoadingTraining = true)
+        if (uiState.trainingStatus != TrainingStatus.PROCESSING) {
+            uiState = uiState.copy(isLoadingTraining = true)
+        }
         try {
             val userTraining =
                 UserTrainingsRepository.getTraining(userId, uiState.photoSet).getOrThrow()
