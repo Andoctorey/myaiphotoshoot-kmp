@@ -267,9 +267,9 @@ class AddViewModel : SessionViewModel() {
         val ids = badPhotos.map { it.id }
         val paths = badPhotos.map { "$userId/${it.photoSet}/${it.name}" }
         try {
+            uiState = uiState.copy(deleteUnsuitablePhotosPopup = false)
             UserFilesRepository.deleteFiles(ids)
             SupabaseStorage.deleteFiles(paths)
-            uiState = uiState.copy(deleteUnsuitablePhotosPopup = false)
             loadPhotos()
         } catch (e: Exception) {
             Logger.e("Delete unsuitable photos failed", e)
