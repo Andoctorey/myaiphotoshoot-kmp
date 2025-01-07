@@ -173,13 +173,13 @@ fun AddScreen(
         }
 
         if (state.showUploadMorePhotosPopup) {
-            InfoPopup(stringResource(Res.string.creating_model_hint)) {
+            InfoPopup(stringResource(Res.string.upload_more_photos)) {
                 viewModel.hideUploadMorePhotosPopup()
             }
         }
 
         if (state.showCreatingModelPopup) {
-            InfoPopup(stringResource(Res.string.upload_more_photos)) {
+            InfoPopup(stringResource(Res.string.creating_model_hint)) {
                 viewModel.hideCreatingModelClick()
             }
         }
