@@ -23,4 +23,18 @@ object UserTrainingsRepository {
                 Logger.i("getTraining: $it")
             }
     }
+
+    suspend fun getTraining(id: String): Result<UserTraining?> = runCatching {
+        Supabase.supabase
+            .from(USER_TRAININGS_TABLE)
+            .select {
+                filter {
+                    eq("id", id)
+                }
+            }
+            .decodeSingleOrNull<UserTraining>()
+            .also {
+                Logger.i("getTraining: $it")
+            }
+    }
 }
