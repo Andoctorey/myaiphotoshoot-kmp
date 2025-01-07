@@ -26,8 +26,12 @@ class GenerateViewModel : SessionViewModel() {
         uiState = uiState.copy(loadingError = error)
     }
 
-    fun onPromptChanged(prompt: String) {
-        uiState = uiState.copy(prompt = prompt)
+    fun onAiVisionPromptChanged(prompt: String) {
+        uiState = uiState.copy(aiVisionPrompt = prompt)
+    }
+
+    fun onUserPromptChanged(prompt: String) {
+        uiState = uiState.copy(userPrompt = prompt)
     }
 
     fun hideErrorPopup() {

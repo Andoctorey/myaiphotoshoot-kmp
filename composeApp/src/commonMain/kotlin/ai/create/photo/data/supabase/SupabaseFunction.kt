@@ -36,4 +36,12 @@ object SupabaseFunction {
             body = mapOf("file_id" to fileId)
         )
     }
+
+    suspend fun generatePersonDescription(trainingId: String) {
+        Logger.i("generatePersonDescription, trainingId: $trainingId")
+        Supabase.supabase.functions.invoke(
+            function = "generate-person-description",
+            body = mapOf("training_id" to trainingId)
+        )
+    }
 }

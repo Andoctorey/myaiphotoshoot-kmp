@@ -3,7 +3,9 @@ package ai.create.photo.ui.generate
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -15,7 +17,9 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsTopHeight
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -37,8 +41,9 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.create_ai_model
+import photocreateai.composeapp.generated.resources.enhance_photo_accuracy
 import photocreateai.composeapp.generated.resources.generate_photo
-import photocreateai.composeapp.generated.resources.generate_prompt
+import photocreateai.composeapp.generated.resources.photo_prompt
 
 
 @Preview
@@ -61,23 +66,25 @@ fun GenerateScreen(
         } else {
             Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
 
-            OutlinedTextField(
-                modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().padding(24.dp),
-                value = state.prompt,
-                onValueChange = { viewModel.onPromptChanged(it) },
-                label = { Text(text = stringResource(Res.string.generate_prompt)) },
-                keyboardOptions = KeyboardOptions(
-                    autoCorrectEnabled = true,
-                    imeAction = ImeAction.Done,
-                    capitalization = KeyboardCapitalization.Sentences,
-                    keyboardType = KeyboardType.Text,
-                )
-            )
+            Column(
+                modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
+                    .padding(bottom = 64.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceEvenly
+            ) {
+                AiVisionPrompt(prompt = state.aiVisionPrompt) {
+                    viewModel.onAiVisionPromptChanged(it)
+                }
+
+                PhotoPrompt(prompt = state.userPrompt) {
+                    viewModel.onUserPromptChanged(it)
+                }
+            }
 
             GenerateFab(
                 modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp)
             ) {
-                onGenerate(state.prompt)
+                onGenerate(state.userPrompt)
             }
         }
 
@@ -87,6 +94,38 @@ fun GenerateScreen(
             }
         }
     }
+}
+
+@Composable
+fun AiVisionPrompt(prompt: String, onPromptChanged: (String) -> Unit) {
+    OutlinedTextField(
+        modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().padding(24.dp),
+        value = prompt,
+        onValueChange = onPromptChanged,
+        label = { Text(text = stringResource(Res.string.enhance_photo_accuracy)) },
+        keyboardOptions = KeyboardOptions(
+            autoCorrectEnabled = true,
+            imeAction = ImeAction.Next,
+            capitalization = KeyboardCapitalization.Sentences,
+            keyboardType = KeyboardType.Text,
+        )
+    )
+}
+
+@Composable
+fun PhotoPrompt(prompt: String, onPromptChanged: (String) -> Unit) {
+    OutlinedTextField(
+        modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().padding(24.dp),
+        value = prompt,
+        onValueChange = onPromptChanged,
+        label = { Text(text = stringResource(Res.string.photo_prompt)) },
+        keyboardOptions = KeyboardOptions(
+            autoCorrectEnabled = true,
+            imeAction = ImeAction.Done,
+            capitalization = KeyboardCapitalization.Sentences,
+            keyboardType = KeyboardType.Text,
+        )
+    )
 }
 
 @Composable
