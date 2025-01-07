@@ -5,7 +5,7 @@
     <string name="tab_4">Settings</string>
     <string name="back_button">Back</string>
     <string name="add_your_photos">Add your photos</string>
-    <string name="upload_guidelines_message">Select and upload at least 10 high-quality, clear photos of yourself (ideally 15–20) from your gallery. Choose images with varied angles, different lighting conditions, and simple, solid-colored clothing. Make sure you are the only person in each photo, keep the background uncluttered, and include natural, relaxed expressions.</string>
+    <string name="upload_guidelines_message">Make and upload 10 high-quality selfies with varied angles.</string>
     <string name="connection_error">Problem connecting with server. Please check your connection.</string>
     <string name="photo_set">Photo Set</string>
     <string name="create_photo_set">Create Photo Set</string>
