@@ -191,14 +191,14 @@ class AddViewModel : SessionViewModel() {
             return@launch
         }
 
-//        uiState = uiState.copy(trainingStatus = TrainingStatus.PROCESSING)
-//        try {
-//            SupabaseFunction.createAiModel(uiState.photoSet)
-//            loadTraining()
-//        } catch (e: Exception) {
-//            Logger.e("Create model failed", e)
-//            uiState = uiState.copy(trainingStatus = null, errorPopup = e)
-//        }
+        uiState = uiState.copy(trainingStatus = TrainingStatus.PROCESSING)
+        try {
+            SupabaseFunction.createAiModel(uiState.photoSet)
+            loadTraining()
+        } catch (e: Exception) {
+            Logger.e("Create model failed", e)
+            uiState = uiState.copy(trainingStatus = null, errorPopup = e)
+        }
     }
 
     fun onCreatingModelClick() {
