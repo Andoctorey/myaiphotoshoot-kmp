@@ -43,8 +43,5 @@ data class AddUiState(
         val createdAt: Instant,
         val analysis: String?,
         val analysisStatus: AnalysisStatus?,
-    ) {
-        val isApproved: Boolean
-            get() = analysis != null && analysisStatus == AnalysisStatus.APPROVED
-    }
+    )
 }
