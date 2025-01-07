@@ -2,6 +2,7 @@ package ai.create.photo.ui.add_photos
 
 import ai.create.photo.data.MemoryStore
 import ai.create.photo.data.supabase.SessionViewModel
+import ai.create.photo.data.supabase.Supabase
 import ai.create.photo.data.supabase.SupabaseFunction
 import ai.create.photo.data.supabase.SupabaseStorage
 import ai.create.photo.data.supabase.database.UserFilesRepository
@@ -171,12 +172,18 @@ class AddViewModel : SessionViewModel() {
         if (notAnalyzedPhotos.isNotEmpty()) {
             uiState = uiState.copy(trainingStatus = TrainingStatus.ANALYZING_PHOTOS)
             try {
-                val analysisJobs = notAnalyzedPhotos.map { photo ->
-                    async {
+                if (Supabase.local) {
+                    notAnalyzedPhotos.forEach { photo ->
                         SupabaseFunction.analyzePhoto(photo.id)
                     }
+                } else {
+                    val analysisJobs = notAnalyzedPhotos.map { photo ->
+                        async {
+                            SupabaseFunction.analyzePhoto(photo.id)
+                        }
+                    }
+                    analysisJobs.awaitAll()
                 }
-                analysisJobs.awaitAll()
                 uiState = uiState.copy(trainingStatus = null)
                 loadPhotos()
             } catch (e: Exception) {
