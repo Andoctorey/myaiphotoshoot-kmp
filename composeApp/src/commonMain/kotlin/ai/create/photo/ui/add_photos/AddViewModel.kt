@@ -182,6 +182,8 @@ class AddViewModel : SessionViewModel() {
             uiState = uiState.copy(trainingStatus = null, errorPopup = e)
         }
 
+        loadPhotos()
+
 //        uiState = uiState.copy(trainingStatus = TrainingStatus.PROCESSING)
 //        try {
 //            SupabaseFunction.createAiModel(uiState.photoSet)

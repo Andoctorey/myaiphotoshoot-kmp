@@ -12,5 +12,16 @@ data class UserFile(
     @SerialName("file_name") val fileName: String,
     @SerialName("signed_url") val signedUrl: String,
     @SerialName("analysis") val analysis: String?,
-    @SerialName("analysis_status") val analysisStatus: Boolean?,
+    @SerialName("analysis_status") val analysisStatus: AnalysisStatus?,
 )
+
+enum class AnalysisStatus {
+    @SerialName("approved")
+    APPROVED,
+
+    @SerialName("declined")
+    DECLINED,
+
+    @SerialName("processing")
+    PROCESSING,
+}

@@ -1,5 +1,6 @@
 package ai.create.photo.ui.add_photos
 
+import ai.create.photo.data.supabase.model.AnalysisStatus
 import ai.create.photo.data.supabase.model.TrainingStatus
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.runtime.Immutable
@@ -40,9 +41,9 @@ data class AddUiState(
         val url: String,
         val createdAt: Instant,
         val analysis: String?,
-        val analysisStatus: Boolean?,
+        val analysisStatus: AnalysisStatus?,
     ) {
         val isApproved: Boolean
-            get() = analysis != null && analysisStatus == true
+            get() = analysis != null && analysisStatus == AnalysisStatus.APPROVED
     }
 }
