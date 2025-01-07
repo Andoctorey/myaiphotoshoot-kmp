@@ -487,14 +487,14 @@ private fun Photo(
             }
         }
 
-        if (!loading && showAnalysis) {
+        if (!loading && showAnalysis && !photo.analysis.isNullOrEmpty()) {
             Text(
                 modifier = Modifier.fillMaxWidth()
                     .padding(vertical = 8.dp, horizontal = 64.dp)
                     .background(Color.Black.copy(alpha = 0.5f), shape = RoundedCornerShape(8.dp))
                     .align(Alignment.TopCenter)
                     .padding(8.dp),
-                text = photo.analysis ?: "",
+                text = photo.analysis,
                 color = Color.White,
                 fontSize = 16.sp,
             )
