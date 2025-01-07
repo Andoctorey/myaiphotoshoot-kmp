@@ -39,5 +39,10 @@ data class AddUiState(
         val photoSet: Int,
         val url: String,
         val createdAt: Instant,
-    )
+        val analysis: String?,
+        val analysisStatus: Boolean?,
+    ) {
+        val isApproved: Boolean
+            get() = analysis != null && analysisStatus == true
+    }
 }

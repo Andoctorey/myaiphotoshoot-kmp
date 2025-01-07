@@ -15,6 +15,8 @@ import co.touchlab.kermit.Logger
 import io.github.jan.supabase.storage.UploadStatus
 import io.github.vinceglb.filekit.core.PlatformFiles
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.catch
@@ -61,6 +63,8 @@ class AddViewModel : SessionViewModel() {
                         name = file.fileName,
                         photoSet = file.photoSet,
                         url = file.signedUrl,
+                        analysis = file.analysis,
+                        analysisStatus = file.analysisStatus,
                     )
                 }.groupBy { it.photoSet },
                 photoSet = uiState.photoSet,
@@ -162,14 +166,30 @@ class AddViewModel : SessionViewModel() {
             return@launch
         }
 
-        uiState = uiState.copy(trainingStatus = TrainingStatus.PROCESSING)
+        val notAnalyzedPhotos = photos.filter { it.analysis == null }
+        if (notAnalyzedPhotos.isNotEmpty()) {
+            uiState = uiState.copy(trainingStatus = TrainingStatus.ANALYZING_PHOTOS)
+        }
         try {
-            SupabaseFunction.createAiModel(uiState.photoSet)
-            loadTraining()
+            val analysisJobs = notAnalyzedPhotos.map { photo ->
+                async {
+                    SupabaseFunction.analyzePhoto(photo.id)
+                }
+            }
+            analysisJobs.awaitAll()
         } catch (e: Exception) {
-            Logger.e("Create model failed", e)
+            Logger.e("Analyzing photos failed", e)
             uiState = uiState.copy(trainingStatus = null, errorPopup = e)
         }
+
+//        uiState = uiState.copy(trainingStatus = TrainingStatus.PROCESSING)
+//        try {
+//            SupabaseFunction.createAiModel(uiState.photoSet)
+//            loadTraining()
+//        } catch (e: Exception) {
+//            Logger.e("Create model failed", e)
+//            uiState = uiState.copy(trainingStatus = null, errorPopup = e)
+//        }
     }
 
     fun onCreatingModelClick() {

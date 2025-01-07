@@ -11,4 +11,6 @@ data class UserFile(
     @SerialName("photo_set") val photoSet: Int,
     @SerialName("file_name") val fileName: String,
     @SerialName("signed_url") val signedUrl: String,
+    @SerialName("analysis") val analysis: String?,
+    @SerialName("analysis_status") val analysisStatus: Boolean?,
 )

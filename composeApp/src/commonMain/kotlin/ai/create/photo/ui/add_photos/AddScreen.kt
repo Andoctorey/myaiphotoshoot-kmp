@@ -78,6 +78,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.add_your_photos
+import photocreateai.composeapp.generated.resources.analyzing_photos
 import photocreateai.composeapp.generated.resources.create_ai_model
 import photocreateai.composeapp.generated.resources.create_photo_set
 import photocreateai.composeapp.generated.resources.creating_ai_model
@@ -272,6 +273,7 @@ fun CreateModelFab(
         modifier = modifier,
         onClick = {
             when (trainingStatus) {
+                TrainingStatus.ANALYZING_PHOTOS -> {}
                 TrainingStatus.SUCCEEDED -> generatePhotos()
                 TrainingStatus.PROCESSING -> onCreatingModelClick()
                 null -> createModel()
@@ -279,6 +281,20 @@ fun CreateModelFab(
         },
     ) {
         when (trainingStatus) {
+            TrainingStatus.ANALYZING_PHOTOS -> {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.primary,
+                        strokeWidth = 2.dp,
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(
+                        text = stringResource(Res.string.analyzing_photos),
+                    )
+                }
+            }
+
             TrainingStatus.SUCCEEDED -> {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (extended) {
@@ -313,7 +329,7 @@ fun CreateModelFab(
                 }
             }
 
-            else -> {
+            null -> {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (extended) {
                         Icon(
