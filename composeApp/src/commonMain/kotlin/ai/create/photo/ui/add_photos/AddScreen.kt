@@ -487,7 +487,7 @@ private fun Photo(
             }
         }
 
-        if (showAnalysis) {
+        if (!loading && showAnalysis) {
             Text(
                 modifier = Modifier.fillMaxWidth()
                     .padding(vertical = 8.dp, horizontal = 64.dp)
