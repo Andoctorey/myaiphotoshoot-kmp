@@ -177,6 +177,7 @@ class AddViewModel : SessionViewModel() {
                     }
                 }
                 analysisJobs.awaitAll()
+                uiState = uiState.copy(trainingStatus = null)
                 loadPhotos()
             } catch (e: Exception) {
                 Logger.e("Analyzing photos failed", e)
