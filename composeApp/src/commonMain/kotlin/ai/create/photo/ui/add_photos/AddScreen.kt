@@ -137,7 +137,12 @@ fun AddScreen(
                 viewModel.resetScrollToTop()
             }
             val hideDeletePhotoButton = state.isLoadingTraining || state.trainingStatus != null
-            Photos(photos, state.listState, hideDeletePhotoButton) {
+            Photos(
+                photos = photos,
+                listState = state.listState,
+                hideDeletePhotoButton = hideDeletePhotoButton,
+                trainingStatus = state.trainingStatus
+            ) {
                 viewModel.deletePhoto(it)
             }
         }
@@ -377,9 +382,10 @@ private fun Photos(
     photos: List<AddUiState.Photo>,
     listState: LazyStaggeredGridState,
     hideDeletePhotoButton: Boolean,
+    trainingStatus: TrainingStatus?,
     onDelete: (AddUiState.Photo) -> Unit,
 ) {
-    var showAnalysis by remember { mutableStateOf(true) }
+    var showAnalysis by remember { mutableStateOf(trainingStatus == null || trainingStatus == TrainingStatus.ANALYZING_PHOTOS) }
 
     LazyVerticalStaggeredGrid(
         state = listState,
