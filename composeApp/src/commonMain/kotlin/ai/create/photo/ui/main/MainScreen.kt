@@ -86,11 +86,18 @@ fun MainScreen(
     ) {
         when (currentDestination) {
             AppNavigationRoutes.TAB1 -> AddScreen(
-                openCreatePhotosScreen = { currentDestination = AppNavigationRoutes.TAB2 }
+                openCreatePhotosScreen = {
+                    if (!state.generateScreenOpened) {
+                        currentDestination = AppNavigationRoutes.TAB2
+                    }
+                }
             )
 
-            AppNavigationRoutes.TAB2 -> GenerateScreen { prompt ->
-                viewModel.generatePhoto(prompt)
+            AppNavigationRoutes.TAB2 -> {
+                viewModel.setGenerateScreenOpened()
+                GenerateScreen { prompt ->
+                    viewModel.generatePhoto(prompt)
+                }
             }
 
             AppNavigationRoutes.TAB3 -> GalleryScreen(

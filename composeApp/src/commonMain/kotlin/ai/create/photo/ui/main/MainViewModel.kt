@@ -35,4 +35,8 @@ class MainViewModel : ViewModel() {
         uiState = uiState.copy(errorPopup = null)
     }
 
+    fun setGenerateScreenOpened() {
+        uiState = uiState.copy(generateScreenOpened = true)
+    }
+
 }

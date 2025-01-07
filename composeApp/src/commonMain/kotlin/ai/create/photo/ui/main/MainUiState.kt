@@ -7,4 +7,5 @@ data class MainUiState(
     val errorPopup: Throwable? = null,
 
     val generationsInProgress: Int = 0,
+    val generateScreenOpened: Boolean = false,
 )
