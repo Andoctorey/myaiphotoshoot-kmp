@@ -28,4 +28,12 @@ object SupabaseFunction {
         Logger.i("deleteUser")
         Supabase.supabase.functions.invoke(function = "delete-user")
     }
+
+    suspend fun analyzePhoto(fileId: String) {
+        Logger.i("analyzePhoto fileId: $fileId")
+        Supabase.supabase.functions.invoke(
+            function = "analyze-image",
+            body = mapOf("file_id" to fileId)
+        )
+    }
 }
