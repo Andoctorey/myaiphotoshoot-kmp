@@ -1,5 +1,6 @@
 package ai.create.photo.ui.add_photos
 
+import ai.create.photo.data.supabase.model.AnalysisStatus
 import ai.create.photo.data.supabase.model.TrainingStatus
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
@@ -30,6 +31,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
@@ -39,6 +41,9 @@ import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Mood
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.icons.filled.ThumbDown
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -360,6 +365,8 @@ private fun Photos(
     hideDeletePhotoButton: Boolean,
     onDelete: (AddUiState.Photo) -> Unit,
 ) {
+    var showAnalysis by remember { mutableStateOf(true) }
+
     LazyVerticalStaggeredGrid(
         state = listState,
         modifier = Modifier.fillMaxSize(),
@@ -376,7 +383,9 @@ private fun Photos(
                 modifier = Modifier.animateItem(),
                 photo = photos[item],
                 hideDeletePhotoButton = hideDeletePhotoButton,
-                onDelete = onDelete
+                onDelete = onDelete,
+                showAnalysis = showAnalysis,
+                onToggleShowAnalysis = { showAnalysis = !showAnalysis },
             )
         }
     }
@@ -387,7 +396,9 @@ private fun Photo(
     modifier: Modifier,
     photo: AddUiState.Photo,
     hideDeletePhotoButton: Boolean,
-    onDelete: (AddUiState.Photo) -> Unit
+    onDelete: (AddUiState.Photo) -> Unit,
+    showAnalysis: Boolean,
+    onToggleShowAnalysis: () -> Unit,
 ) {
     var loading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<Throwable?>(null) }
@@ -439,6 +450,40 @@ private fun Photo(
                     tint = Color.White,
                 )
             }
+        }
+
+        if (!loading && photo.analysisStatus != null) {
+            IconButton(
+                onClick = onToggleShowAnalysis,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(8.dp)
+                    .background(Color.Black.copy(alpha = 0.5f), shape = CircleShape)
+            ) {
+                val image = when (photo.analysisStatus) {
+                    AnalysisStatus.PROCESSING -> Icons.Default.Sync
+                    AnalysisStatus.APPROVED -> Icons.Default.ThumbUp
+                    AnalysisStatus.DECLINED -> Icons.Default.ThumbDown
+                }
+                Icon(
+                    imageVector = image,
+                    contentDescription = image.name,
+                    tint = Color.White,
+                )
+            }
+        }
+
+        if (showAnalysis) {
+            Text(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(vertical = 8.dp, horizontal = 64.dp)
+                    .background(Color.Black.copy(alpha = 0.5f), shape = RoundedCornerShape(8.dp))
+                    .align(Alignment.TopCenter)
+                    .padding(8.dp),
+                text = photo.analysis ?: "",
+                color = Color.White,
+                fontSize = 16.sp,
+            )
         }
     }
 }
