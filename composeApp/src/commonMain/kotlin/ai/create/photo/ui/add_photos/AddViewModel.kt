@@ -6,6 +6,7 @@ import ai.create.photo.data.supabase.SupabaseFunction
 import ai.create.photo.data.supabase.SupabaseStorage
 import ai.create.photo.data.supabase.database.UserFilesRepository
 import ai.create.photo.data.supabase.database.UserTrainingsRepository
+import ai.create.photo.data.supabase.model.AnalysisStatus
 import ai.create.photo.data.supabase.model.TrainingStatus
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -169,20 +170,26 @@ class AddViewModel : SessionViewModel() {
         val notAnalyzedPhotos = photos.filter { it.analysis == null }
         if (notAnalyzedPhotos.isNotEmpty()) {
             uiState = uiState.copy(trainingStatus = TrainingStatus.ANALYZING_PHOTOS)
-        }
-        try {
-            val analysisJobs = notAnalyzedPhotos.map { photo ->
-                async {
-                    SupabaseFunction.analyzePhoto(photo.id)
+            try {
+                val analysisJobs = notAnalyzedPhotos.map { photo ->
+                    async {
+                        SupabaseFunction.analyzePhoto(photo.id)
+                    }
                 }
+                analysisJobs.awaitAll()
+                loadPhotos()
+            } catch (e: Exception) {
+                Logger.e("Analyzing photos failed", e)
+                uiState = uiState.copy(trainingStatus = null, errorPopup = e)
             }
-            analysisJobs.awaitAll()
-        } catch (e: Exception) {
-            Logger.e("Analyzing photos failed", e)
-            uiState = uiState.copy(trainingStatus = null, errorPopup = e)
+            return@launch
         }
 
-        loadPhotos()
+        val badPhotos = photos.filter { it.analysisStatus != AnalysisStatus.APPROVED }
+        if (badPhotos.isNotEmpty()) {
+            uiState = uiState.copy(deleteUnsuitablePhotosPopup = true)
+            return@launch
+        }
 
 //        uiState = uiState.copy(trainingStatus = TrainingStatus.PROCESSING)
 //        try {
@@ -246,5 +253,26 @@ class AddViewModel : SessionViewModel() {
 
     fun openedCreatePhotosScreen() {
         uiState = uiState.copy(openedCreatePhotosScreen = true)
+    }
+
+    fun hideDeleteUnsuitablePhotosPopup() {
+        uiState = uiState.copy(deleteUnsuitablePhotosPopup = false)
+    }
+
+    fun deleteUnsuitablePhotos() = viewModelScope.launch {
+        val photos = uiState.displayingPhotos ?: return@launch
+        uiState = uiState.copy(isLoadingPhotos = true)
+        val badPhotos = photos.filter { it.analysisStatus != AnalysisStatus.APPROVED }
+        val ids = badPhotos.map { it.id }
+        val paths = badPhotos.map { "$userId/${it.photoSet}/${it.name}" }
+        try {
+            UserFilesRepository.deleteFiles(ids)
+            SupabaseStorage.deleteFiles(paths)
+            uiState = uiState.copy(deleteUnsuitablePhotosPopup = false)
+            loadPhotos()
+        } catch (e: Exception) {
+            Logger.e("Delete unsuitable photos failed", e)
+            uiState = uiState.copy(errorPopup = e)
+        }
     }
 }

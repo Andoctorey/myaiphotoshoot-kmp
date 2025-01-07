@@ -25,6 +25,7 @@ data class AddUiState(
     val showUploadMorePhotosPopup: Boolean = false,
     val showCreatingModelPopup: Boolean = false,
     val openedCreatePhotosScreen: Boolean = false,
+    val deleteUnsuitablePhotosPopup: Boolean = false,
 ) {
 
     val displayingPhotos: List<Photo>?

@@ -2,6 +2,7 @@ package ai.create.photo.ui.add_photos
 
 import ai.create.photo.data.supabase.model.AnalysisStatus
 import ai.create.photo.data.supabase.model.TrainingStatus
+import ai.create.photo.ui.compose.ConfirmationPopup
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.InfoPopup
@@ -39,6 +40,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Mood
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Sync
@@ -88,7 +90,9 @@ import photocreateai.composeapp.generated.resources.create_ai_model
 import photocreateai.composeapp.generated.resources.create_photo_set
 import photocreateai.composeapp.generated.resources.creating_ai_model
 import photocreateai.composeapp.generated.resources.creating_model_hint
+import photocreateai.composeapp.generated.resources.delete
 import photocreateai.composeapp.generated.resources.delete_photo_set
+import photocreateai.composeapp.generated.resources.delete_unsuitable_photos
 import photocreateai.composeapp.generated.resources.generate_photo
 import photocreateai.composeapp.generated.resources.photo_set
 import photocreateai.composeapp.generated.resources.upload_guidelines_message
@@ -194,6 +198,16 @@ fun AddScreen(
             ErrorPopup(state.errorPopup) {
                 viewModel.hideErrorPopup()
             }
+        }
+
+        if (state.deleteUnsuitablePhotosPopup) {
+            ConfirmationPopup(
+                icon = Icons.Default.Delete,
+                message = stringResource(Res.string.delete_unsuitable_photos),
+                confirmButton = stringResource(Res.string.delete),
+                onConfirm = viewModel::deleteUnsuitablePhotos,
+                onDismiss = viewModel::hideDeleteUnsuitablePhotosPopup,
+            )
         }
 
         if (!state.openedCreatePhotosScreen) {
