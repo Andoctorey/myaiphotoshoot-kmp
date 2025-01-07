@@ -258,6 +258,7 @@ private fun AddPhotosFab(
                     text = "${uploadProgress}%",
                     fontSize = 12.sp,
                 )
+                Spacer(modifier = Modifier.height(4.dp))
                 LinearProgressIndicator(progress = { uploadProgress / 100f })
             }
         } else {
