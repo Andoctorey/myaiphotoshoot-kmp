@@ -2,6 +2,7 @@ package ai.create.photo.ui.generate
 
 import ai.create.photo.data.MemoryStore
 import ai.create.photo.data.supabase.SessionViewModel
+import ai.create.photo.data.supabase.SupabaseFunction
 import ai.create.photo.data.supabase.database.UserTrainingsRepository
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,9 +41,14 @@ class GenerateViewModel : SessionViewModel() {
         uiState = uiState.copy(isLoading = true, loadingError = null)
 
         try {
-            val training = UserTrainingsRepository.getTraining(trainingId).getOrThrow()
+            var training = UserTrainingsRepository.getTraining(trainingId).getOrThrow()
+            if (training?.personDescription.isNullOrEmpty()) {
+                SupabaseFunction.generatePersonDescription(trainingId)
+                training = UserTrainingsRepository.getTraining(trainingId).getOrThrow()
+            }
             uiState =
                 uiState.copy(isLoading = false, aiVisionPrompt = training?.personDescription ?: "")
+
         } catch (e: Exception) {
             Logger.e("Load training failed", e)
             uiState = uiState.copy(isLoading = false, loadingError = e)

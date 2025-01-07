@@ -72,8 +72,10 @@ fun GenerateScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceEvenly
             ) {
-                AiVisionPrompt(prompt = state.aiVisionPrompt) {
-                    viewModel.onAiVisionPromptChanged(it)
+                if (state.aiVisionPrompt.isNotEmpty()) {
+                    AiVisionPrompt(prompt = state.aiVisionPrompt) {
+                        viewModel.onAiVisionPromptChanged(it)
+                    }
                 }
 
                 PhotoPrompt(prompt = state.userPrompt) {
