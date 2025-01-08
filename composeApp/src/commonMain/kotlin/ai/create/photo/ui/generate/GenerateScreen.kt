@@ -3,6 +3,8 @@ package ai.create.photo.ui.generate
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +24,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Brush
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -73,9 +77,12 @@ fun GenerateScreen(
                 verticalArrangement = Arrangement.SpaceEvenly
             ) {
                 if (state.aiVisionPrompt.isNotEmpty()) {
-                    AiVisionPrompt(prompt = state.aiVisionPrompt) {
-                        viewModel.onAiVisionPromptChanged(it)
-                    }
+                    AiVisionPrompt(
+                        prompt = state.aiVisionPrompt,
+                        onPromptChanged = viewModel::onAiVisionPromptChanged,
+                        expanded = state.expanded,
+                        onExpand = viewModel::onExpand,
+                    )
                 }
 
                 PhotoPrompt(prompt = state.userPrompt) {
@@ -99,11 +106,26 @@ fun GenerateScreen(
 }
 
 @Composable
-fun AiVisionPrompt(prompt: String, onPromptChanged: (String) -> Unit) {
+fun AiVisionPrompt(
+    prompt: String, onPromptChanged: (String) -> Unit,
+    expanded: Boolean = false, onExpand: () -> Unit
+) {
     OutlinedTextField(
-        modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().padding(24.dp),
+        modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().padding(24.dp)
+            .animateContentSize(),
         value = prompt,
+        trailingIcon = {
+            val icon =
+                if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown
+            Icon(
+                modifier = Modifier.clickable { onExpand() },
+                imageVector = icon,
+                contentDescription = icon.name,
+                tint = MaterialTheme.colorScheme.onSurface,
+            )
+        },
         onValueChange = onPromptChanged,
+        singleLine = !expanded,
         label = { Text(text = stringResource(Res.string.enhance_photo_accuracy)) },
         keyboardOptions = KeyboardOptions(
             autoCorrectEnabled = true,

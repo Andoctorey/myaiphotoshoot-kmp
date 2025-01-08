@@ -68,4 +68,8 @@ class GenerateViewModel : SessionViewModel() {
         uiState = uiState.copy(errorPopup = null)
     }
 
+    fun onExpand() {
+        uiState = uiState.copy(expanded = !uiState.expanded)
+    }
+
 }
