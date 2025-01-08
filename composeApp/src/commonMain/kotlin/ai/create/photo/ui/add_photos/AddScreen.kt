@@ -386,7 +386,7 @@ private fun Photos(
     trainingStatus: TrainingStatus?,
     onDelete: (AddUiState.Photo) -> Unit,
 ) {
-    var showAnalysis by remember { mutableStateOf(trainingStatus == null || trainingStatus == TrainingStatus.ANALYZING_PHOTOS) }
+    var showAnalysis by remember { mutableStateOf(trainingStatus == TrainingStatus.ANALYZING_PHOTOS) }
 
     LazyVerticalStaggeredGrid(
         state = listState,
@@ -582,7 +582,7 @@ fun FabMenu(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PhotoSets(
+private fun PhotoSets(
     photoSets: List<Int>,
     selectedPhotoSet: Int,
     selectPhotoSet: (Int) -> Unit,
