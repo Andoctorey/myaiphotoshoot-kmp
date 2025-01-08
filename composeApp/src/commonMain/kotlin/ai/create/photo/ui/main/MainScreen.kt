@@ -7,6 +7,7 @@ import ai.create.photo.ui.generate.GenerateScreen
 import ai.create.photo.ui.settings.SettingsScreen
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.*
@@ -20,7 +21,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -55,20 +59,21 @@ fun MainScreen(
                                 contentAlignment = Alignment.Center,
                                 modifier = Modifier.size(24.dp)
                             ) {
+                                Text(
+                                    modifier = Modifier.padding(0.dp).size(14.dp),
+                                    text = state.generationsInProgress.toString(),
+                                    textAlign = TextAlign.Center,
+                                    maxLines = 1,
+                                    fontSize = 11.sp,
+                                    style = TextStyle(
+                                        lineHeight = 11.sp,
+                                    ),
+                                )
                                 CircularProgressIndicator(
                                     color = MaterialTheme.colorScheme.onSurface,
                                     strokeWidth = 3.dp,
                                     modifier = Modifier.fillMaxSize()
                                 )
-                                // Text has weird padding, waiting for fix style = TextStyle( platformStyle = PlatformTextStyle( includeFontPadding = false, ), ),
-//                                Text(
-//                                    modifier = Modifier .padding(0.dp) .size(14.dp).background(Color.Red),
-//                                    style = TextStyle( platformStyle = PlatformTextStyle( includeFontPadding = false, ), ),
-//                                    text = state.generationsInProgress.toString(),
-//                                    textAlign = TextAlign.Center,
-//                                    maxLines = 1,
-//                                    fontSize = 8.sp,
-//                                )
                             }
                         } else {
                             Icon(
