@@ -77,7 +77,7 @@ fun GenerateScreen(
                 modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
                     .padding(bottom = 64.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceEvenly
+                verticalArrangement = Arrangement.Center
             ) {
                 if (state.aiVisionPrompt.isNotEmpty()) {
                     AiVisionPrompt(
@@ -89,6 +89,7 @@ fun GenerateScreen(
                         onRefreshAiVisionPrompt = viewModel::onRefreshAiVisionPrompt,
                     )
                 }
+
 
                 PhotoPrompt(prompt = state.userPrompt) {
                     viewModel.onUserPromptChanged(it)
@@ -146,6 +147,7 @@ fun AiVisionPrompt(
                     contentDescription = icon.name,
                     tint = MaterialTheme.colorScheme.onSurface,
                 )
+                Spacer(modifier = Modifier.width(4.dp))
             }
         },
         onValueChange = onPromptChanged,
