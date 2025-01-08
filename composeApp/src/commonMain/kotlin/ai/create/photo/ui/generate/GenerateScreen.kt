@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -26,6 +27,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -82,6 +85,8 @@ fun GenerateScreen(
                         onPromptChanged = viewModel::onAiVisionPromptChanged,
                         expanded = state.expanded,
                         onExpand = viewModel::onExpand,
+                        isLoadingAiVisionPrompt = state.isLoadingAiVisionPrompt,
+                        onRefreshAiVisionPrompt = viewModel::onRefreshAiVisionPrompt,
                     )
                 }
 
@@ -109,21 +114,39 @@ fun GenerateScreen(
 @Composable
 fun AiVisionPrompt(
     prompt: String, onPromptChanged: (String) -> Unit,
-    expanded: Boolean = false, onExpand: () -> Unit
+    expanded: Boolean = false, onExpand: () -> Unit,
+    isLoadingAiVisionPrompt: Boolean = false, onRefreshAiVisionPrompt: () -> Unit,
 ) {
     OutlinedTextField(
         modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().padding(24.dp)
             .animateContentSize(),
         value = prompt,
         trailingIcon = {
-            val icon =
-                if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown
-            Icon(
-                modifier = Modifier.clickable { onExpand() },
-                imageVector = icon,
-                contentDescription = icon.name,
-                tint = MaterialTheme.colorScheme.onSurface,
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (isLoadingAiVisionPrompt) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        strokeWidth = 2.dp,
+                    )
+                } else {
+                    Icon(
+                        modifier = Modifier.clickable { onRefreshAiVisionPrompt() },
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = Icons.Default.Refresh.name,
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+                Spacer(modifier = Modifier.width(4.dp))
+                val icon =
+                    if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown
+                Icon(
+                    modifier = Modifier.clickable { onExpand() },
+                    imageVector = icon,
+                    contentDescription = icon.name,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                )
+            }
         },
         onValueChange = onPromptChanged,
         singleLine = !expanded,

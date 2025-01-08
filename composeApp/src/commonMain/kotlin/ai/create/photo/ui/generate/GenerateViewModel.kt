@@ -1,7 +1,6 @@
 package ai.create.photo.ui.generate
 
 import ai.create.photo.data.MemoryStore
-import ai.create.photo.data.MemoryStore.trainingId
 import ai.create.photo.data.supabase.SessionViewModel
 import ai.create.photo.data.supabase.SupabaseFunction
 import ai.create.photo.data.supabase.database.UserTrainingsRepository
@@ -39,13 +38,13 @@ class GenerateViewModel : SessionViewModel() {
             uiState = uiState.copy(isLoading = false)
             return@launch
         }
+
         uiState = uiState.copy(isLoading = true, loadingError = null)
 
         try {
             var training = UserTrainingsRepository.getTraining(trainingId).getOrThrow()
             if (training?.personDescription.isNullOrEmpty()) {
-                SupabaseFunction.generatePersonDescription(trainingId)
-                training = UserTrainingsRepository.getTraining(trainingId).getOrThrow()
+                onRefreshAiVisionPrompt()
             }
             uiState =
                 uiState.copy(
@@ -53,7 +52,6 @@ class GenerateViewModel : SessionViewModel() {
                     originalAiVisionPrompt = training?.personDescription ?: "",
                     aiVisionPrompt = training?.personDescription ?: ""
                 )
-
         } catch (e: Exception) {
             Logger.e("Load training failed", e)
             uiState = uiState.copy(isLoading = false, loadingError = e)
@@ -86,13 +84,35 @@ class GenerateViewModel : SessionViewModel() {
         }
 
         try {
-            UserTrainingsRepository.updatePersonDescription(trainingId!!, newDescription)
+            UserTrainingsRepository.updatePersonDescription(
+                MemoryStore.trainingId!!,
+                newDescription
+            )
                 .getOrThrow()
             uiState = uiState.copy(originalAiVisionPrompt = newDescription)
             onGenerate(uiState.userPrompt)
         } catch (e: Exception) {
             Logger.e("Update description failed", e)
             uiState = uiState.copy(errorPopup = e)
+        }
+    }
+
+    fun onRefreshAiVisionPrompt() = viewModelScope.launch {
+        uiState = uiState.copy(isLoadingAiVisionPrompt = true, aiVisionPrompt = " ")
+        try {
+            val trainingId = MemoryStore.trainingId!!
+            SupabaseFunction.generatePersonDescription(trainingId)
+            val training = UserTrainingsRepository.getTraining(trainingId).getOrThrow()
+            uiState =
+                uiState.copy(
+                    isLoadingAiVisionPrompt = false,
+                    originalAiVisionPrompt = training?.personDescription ?: "",
+                    aiVisionPrompt = training?.personDescription ?: ""
+                )
+
+        } catch (e: Exception) {
+            Logger.e("onRefreshAiVisionPrompt failed", e)
+            uiState = uiState.copy(isLoadingAiVisionPrompt = false, errorPopup = e)
         }
     }
 
