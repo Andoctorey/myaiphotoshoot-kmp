@@ -45,6 +45,8 @@ class GenerateViewModel : SessionViewModel() {
                 isLoading = false,
                 trainings = trainings,
                 training = trainings.lastOrNull(),
+                aiVisionPrompt = "",
+                originalAiVisionPrompt = "",
             )
 
             uiState.training?.let { selectTraining(it) }
