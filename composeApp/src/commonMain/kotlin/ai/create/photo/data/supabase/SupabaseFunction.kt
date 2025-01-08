@@ -2,6 +2,7 @@ package ai.create.photo.data.supabase
 
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.functions.functions
+import io.ktor.client.call.body
 
 object SupabaseFunction {
 
@@ -43,5 +44,11 @@ object SupabaseFunction {
             function = "generate-person-description",
             body = mapOf("training_id" to trainingId)
         )
+    }
+
+    suspend fun surpriseMe(): String {
+        Logger.i("surpriseMe")
+        val response = Supabase.supabase.functions.invoke(function = "surprise-me")
+        return response.body<String>()
     }
 }

@@ -37,4 +37,5 @@
     <string name="wrong_code">Wrong code. Please try again.</string>
     <string name="verify">Verify</string>
     <string name="delete_unsuitable_photos">Would you like to delete all unsuitable photos?</string>
+    <string name="surprise_me">Surprise Me</string>
 </resources>

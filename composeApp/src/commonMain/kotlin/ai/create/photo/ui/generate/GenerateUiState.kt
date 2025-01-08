@@ -7,6 +7,8 @@ data class GenerateUiState(
     val isLoading: Boolean = false,
     val loadingError: Throwable? = null,
 
+    val errorPopup: Throwable? = null,
+
     val isLoadingAiVisionPrompt: Boolean = false,
     val originalAiVisionPrompt: String = "",
     val aiVisionPrompt: String = "",
@@ -14,5 +16,5 @@ data class GenerateUiState(
 
     val userPrompt: String = "",
 
-    val errorPopup: Throwable? = null,
+    val isLoadingSurpriseMe: Boolean = false,
 )

@@ -116,4 +116,15 @@ class GenerateViewModel : SessionViewModel() {
         }
     }
 
+    fun surpriseMe() = viewModelScope.launch() {
+        uiState = uiState.copy(isLoadingSurpriseMe = true)
+        try {
+            val prompt = SupabaseFunction.surpriseMe()
+            uiState = uiState.copy(userPrompt = prompt, isLoadingSurpriseMe = false)
+        } catch (e: Exception) {
+            Logger.e("surpriseMe failed", e)
+            uiState = uiState.copy(isLoadingSurpriseMe = false, errorPopup = e)
+        }
+    }
+
 }

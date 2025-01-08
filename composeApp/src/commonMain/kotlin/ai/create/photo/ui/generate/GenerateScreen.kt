@@ -34,6 +34,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,6 +52,7 @@ import photocreateai.composeapp.generated.resources.create_ai_model
 import photocreateai.composeapp.generated.resources.enhance_photo_accuracy
 import photocreateai.composeapp.generated.resources.generate_photo
 import photocreateai.composeapp.generated.resources.photo_prompt
+import photocreateai.composeapp.generated.resources.surprise_me
 
 
 @Preview
@@ -90,10 +92,13 @@ fun GenerateScreen(
                     )
                 }
 
+                Spacer(modifier = Modifier.height(25.dp))
 
                 PhotoPrompt(prompt = state.userPrompt) {
                     viewModel.onUserPromptChanged(it)
                 }
+
+                SurpriseMeButton(state.isLoadingSurpriseMe, viewModel::surpriseMe)
             }
 
             GenerateFab(
@@ -113,13 +118,13 @@ fun GenerateScreen(
 }
 
 @Composable
-fun AiVisionPrompt(
+private fun AiVisionPrompt(
     prompt: String, onPromptChanged: (String) -> Unit,
     expanded: Boolean = false, onExpand: () -> Unit,
     isLoadingAiVisionPrompt: Boolean = false, onRefreshAiVisionPrompt: () -> Unit,
 ) {
     OutlinedTextField(
-        modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().padding(24.dp)
+        modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().padding(horizontal = 24.dp)
             .animateContentSize(),
         value = prompt,
         trailingIcon = {
@@ -163,9 +168,9 @@ fun AiVisionPrompt(
 }
 
 @Composable
-fun PhotoPrompt(prompt: String, onPromptChanged: (String) -> Unit) {
+private fun PhotoPrompt(prompt: String, onPromptChanged: (String) -> Unit) {
     OutlinedTextField(
-        modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().padding(24.dp),
+        modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().padding(horizontal = 24.dp),
         value = prompt,
         onValueChange = onPromptChanged,
         label = { Text(text = stringResource(Res.string.photo_prompt)) },
@@ -197,6 +202,22 @@ private fun GenerateFab(modifier: Modifier, onClick: () -> Unit) {
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
+        }
+    }
+}
+
+
+@Composable
+private fun SurpriseMeButton(isLoading: Boolean, onClick: () -> Unit) {
+    if (isLoading) {
+        CircularProgressIndicator(
+            modifier = Modifier.padding(top = 8.dp, bottom = 16.dp).size(24.dp),
+            color = MaterialTheme.colorScheme.primary,
+            strokeWidth = 2.dp,
+        )
+    } else {
+        TextButton(onClick = onClick) {
+            Text(text = stringResource(Res.string.surprise_me))
         }
     }
 }
