@@ -60,7 +60,7 @@ fun MainScreen(
                                 modifier = Modifier.size(24.dp)
                             ) {
                                 Text(
-                                    modifier = Modifier.padding(0.dp).size(14.dp),
+                                    modifier = Modifier.padding(bottom = 1.dp),
                                     text = state.generationsInProgress.toString(),
                                     textAlign = TextAlign.Center,
                                     maxLines = 1,
@@ -71,7 +71,7 @@ fun MainScreen(
                                 )
                                 CircularProgressIndicator(
                                     color = MaterialTheme.colorScheme.onSurface,
-                                    strokeWidth = 3.dp,
+                                    strokeWidth = 2.dp,
                                     modifier = Modifier.fillMaxSize()
                                 )
                             }
