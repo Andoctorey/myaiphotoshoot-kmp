@@ -37,4 +37,17 @@ object UserTrainingsRepository {
                 Logger.i("getTraining: $it")
             }
     }
+
+    suspend fun updatePersonDescription(id: String, personDescription: String): Result<Unit> =
+        runCatching {
+            Supabase.supabase
+                .from(USER_TRAININGS_TABLE)
+                .update(
+                    mapOf("person_description" to personDescription)
+                ) {
+                    filter {
+                        eq("id", id)
+                    }
+                }
+        }
 }

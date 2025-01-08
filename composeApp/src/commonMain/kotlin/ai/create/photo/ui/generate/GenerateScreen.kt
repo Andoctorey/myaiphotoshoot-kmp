@@ -93,6 +93,7 @@ fun GenerateScreen(
             GenerateFab(
                 modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp)
             ) {
+                viewModel.prepareToGenerate(onGenerate)
                 onGenerate(state.userPrompt)
             }
         }

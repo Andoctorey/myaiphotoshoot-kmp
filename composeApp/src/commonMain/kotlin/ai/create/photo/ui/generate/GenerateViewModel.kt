@@ -1,6 +1,7 @@
 package ai.create.photo.ui.generate
 
 import ai.create.photo.data.MemoryStore
+import ai.create.photo.data.MemoryStore.trainingId
 import ai.create.photo.data.supabase.SessionViewModel
 import ai.create.photo.data.supabase.SupabaseFunction
 import ai.create.photo.data.supabase.database.UserTrainingsRepository
@@ -47,7 +48,11 @@ class GenerateViewModel : SessionViewModel() {
                 training = UserTrainingsRepository.getTraining(trainingId).getOrThrow()
             }
             uiState =
-                uiState.copy(isLoading = false, aiVisionPrompt = training?.personDescription ?: "")
+                uiState.copy(
+                    isLoading = false,
+                    originalAiVisionPrompt = training?.personDescription ?: "",
+                    aiVisionPrompt = training?.personDescription ?: ""
+                )
 
         } catch (e: Exception) {
             Logger.e("Load training failed", e)
@@ -70,6 +75,25 @@ class GenerateViewModel : SessionViewModel() {
 
     fun onExpand() {
         uiState = uiState.copy(expanded = !uiState.expanded)
+    }
+
+    fun prepareToGenerate(onGenerate: (String) -> Unit) = viewModelScope.launch {
+        val oldDescription = uiState.originalAiVisionPrompt
+        val newDescription = uiState.aiVisionPrompt
+        if (oldDescription == newDescription) {
+            onGenerate(uiState.userPrompt)
+            return@launch
+        }
+
+        try {
+            UserTrainingsRepository.updatePersonDescription(trainingId!!, newDescription)
+                .getOrThrow()
+            uiState = uiState.copy(originalAiVisionPrompt = newDescription)
+            onGenerate(uiState.userPrompt)
+        } catch (e: Exception) {
+            Logger.e("Update description failed", e)
+            uiState = uiState.copy(errorPopup = e)
+        }
     }
 
 }
