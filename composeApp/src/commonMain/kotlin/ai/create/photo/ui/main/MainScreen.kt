@@ -95,9 +95,13 @@ fun MainScreen(
 
             AppNavigationRoutes.TAB2 -> {
                 viewModel.setGenerateScreenOpened()
-                GenerateScreen { prompt ->
-                    viewModel.generatePhoto(prompt)
-                }
+                GenerateScreen(
+                    createTraining = {
+                        currentDestination = AppNavigationRoutes.TAB1
+                    },
+                    onGenerate = { trainingId, prompt ->
+                        viewModel.generatePhoto(trainingId, prompt)
+                    })
             }
 
             AppNavigationRoutes.TAB3 -> GalleryScreen(

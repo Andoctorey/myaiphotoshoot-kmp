@@ -12,8 +12,9 @@
     <string name="delete_photo_set">Delete Photo Set</string>
     <string name="upload_more_photos">Oops! It looks like you need to upload at least 10 photos before training your model. Try taking some selfies in portrait mode from different angles to get started.</string>
     <string name="unknown_error">Unknown error</string>
-    <string name="create_ai_model">Create AI model ($9.99)</string>
+    <string name="create_ai_model">Create AI model</string>
     <string name="creating_ai_model">Creating AI model</string>
+    <string name="ai_model">Model</string>
     <string name="analyzing_photos">Analyzing photos</string>">
     <string name="generate_photo">Generate Photo</string>
     <string name="creating_model_hint">This process usually takes about an hour, so feel free to close the app and check back later.</string>

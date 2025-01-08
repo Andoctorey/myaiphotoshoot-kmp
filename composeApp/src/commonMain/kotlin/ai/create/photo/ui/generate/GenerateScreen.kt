@@ -24,18 +24,28 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
@@ -44,10 +54,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
+import photocreateai.composeapp.generated.resources.ai_model
 import photocreateai.composeapp.generated.resources.create_ai_model
 import photocreateai.composeapp.generated.resources.enhance_photo_accuracy
 import photocreateai.composeapp.generated.resources.generate_photo
@@ -59,7 +71,8 @@ import photocreateai.composeapp.generated.resources.surprise_me
 @Composable
 fun GenerateScreen(
     viewModel: GenerateViewModel = viewModel { GenerateViewModel() },
-    onGenerate: (String) -> Unit,
+    createTraining: () -> Unit,
+    onGenerate: (String, String) -> Unit,
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -81,6 +94,18 @@ fun GenerateScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+
+                if (state.trainings != null) {
+                    Trainings(
+                        trainings = state.trainings,
+                        selectedTraining = state.training,
+                        selectTraining = viewModel::selectTraining,
+                        createTraining = createTraining,
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
                 if (state.aiVisionPrompt.isNotEmpty()) {
                     AiVisionPrompt(
                         prompt = state.aiVisionPrompt,
@@ -92,7 +117,7 @@ fun GenerateScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(25.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
                 PhotoPrompt(prompt = state.userPrompt) {
                     viewModel.onUserPromptChanged(it)
@@ -105,7 +130,6 @@ fun GenerateScreen(
                 modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp)
             ) {
                 viewModel.prepareToGenerate(onGenerate)
-                onGenerate(state.userPrompt)
             }
         }
 
@@ -218,6 +242,70 @@ private fun SurpriseMeButton(isLoading: Boolean, onClick: () -> Unit) {
     } else {
         TextButton(onClick = onClick) {
             Text(text = stringResource(Res.string.surprise_me))
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Trainings(
+    trainings: List<GenerateUiState.Training?>,
+    selectedTraining: GenerateUiState.Training?,
+    selectTraining: (GenerateUiState.Training) -> Unit,
+    createTraining: () -> Unit
+) {
+    val options = trainings.toMutableList()
+    options.add(null)
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOption by remember { mutableStateOf(selectedTraining) }
+    val aiModelString = stringResource(Res.string.ai_model)
+    val createAiModelString = stringResource(Res.string.create_ai_model)
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded }
+    ) {
+        ExtendedFloatingActionButton(
+            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable),
+            onClick = { },
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = if (selectedOption == null) createAiModelString
+                    else "$aiModelString ${options.size - options.indexOf(selectedOption) - 1}",
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    fontSize = 14.sp,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            Icon(
+                imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
+                contentDescription = "error",
+                tint = MaterialTheme.colorScheme.onSurface,
+            )
+        }
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            options.forEachIndexed { index, option ->
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = if (option == null) createAiModelString
+                            else "$aiModelString ${options.size - index - 1}",
+                        )
+                    },
+                    onClick = {
+                        selectedOption = option
+                        expanded = false
+                        if (selectedOption == null) createTraining()
+                        else selectTraining(selectedOption!!)
+                    }
+                )
+            }
         }
     }
 }

@@ -6,8 +6,9 @@ import androidx.compose.runtime.Immutable
 data class GenerateUiState(
     val isLoading: Boolean = false,
     val loadingError: Throwable? = null,
-
     val errorPopup: Throwable? = null,
+    val trainings: List<Training>? = null,
+    val training: Training? = null,
 
     val isLoadingAiVisionPrompt: Boolean = false,
     val originalAiVisionPrompt: String = "",
@@ -17,4 +18,11 @@ data class GenerateUiState(
     val userPrompt: String = "",
 
     val isLoadingSurpriseMe: Boolean = false,
-)
+) {
+    @Immutable
+    data class Training(
+        val id: String,
+        val personDescription: String?
+    )
+
+}

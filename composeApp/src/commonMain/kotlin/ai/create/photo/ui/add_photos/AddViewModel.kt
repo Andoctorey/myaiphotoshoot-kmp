@@ -1,6 +1,5 @@
 package ai.create.photo.ui.add_photos
 
-import ai.create.photo.data.MemoryStore
 import ai.create.photo.data.supabase.SessionViewModel
 import ai.create.photo.data.supabase.Supabase
 import ai.create.photo.data.supabase.SupabaseFunction
@@ -91,9 +90,6 @@ class AddViewModel : SessionViewModel() {
                 trainingStatus = userTraining?.status,
                 loadingError = null,
             )
-            if (userTraining?.status == TrainingStatus.SUCCEEDED) {
-                MemoryStore.trainingId = userTraining.id
-            }
         } catch (e: Exception) {
             Logger.e("Loading training failed", e)
             uiState = uiState.copy(isLoadingTraining = false, errorPopup = e)

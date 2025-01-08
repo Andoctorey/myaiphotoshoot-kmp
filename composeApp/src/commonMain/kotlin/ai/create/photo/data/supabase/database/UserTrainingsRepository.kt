@@ -4,6 +4,7 @@ import ai.create.photo.data.supabase.Supabase
 import ai.create.photo.data.supabase.model.UserTraining
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Order
 
 object UserTrainingsRepository {
 
@@ -21,6 +22,22 @@ object UserTrainingsRepository {
             .decodeSingleOrNull<UserTraining>()
             .also {
                 Logger.i("getTraining: $it")
+            }
+    }
+
+    suspend fun getTrainings(userId: String): Result<List<UserTraining>> = runCatching {
+        Supabase.supabase
+            .from(USER_TRAININGS_TABLE)
+            .select {
+                filter {
+                    eq("user_id", userId)
+                    eq("status", "succeeded")
+                }
+                order(column = "created_at", order = Order.DESCENDING)
+            }
+            .decodeList<UserTraining>()
+            .also {
+                Logger.i("getTrainings: ${it.size}")
             }
     }
 

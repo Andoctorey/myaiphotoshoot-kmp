@@ -1,6 +1,5 @@
 package ai.create.photo.ui.generate
 
-import ai.create.photo.data.MemoryStore
 import ai.create.photo.data.supabase.SessionViewModel
 import ai.create.photo.data.supabase.SupabaseFunction
 import ai.create.photo.data.supabase.database.UserTrainingsRepository
@@ -25,33 +24,30 @@ class GenerateViewModel : SessionViewModel() {
     }
 
     override fun onAuthenticated() {
-        loadTraining()
+        loadTrainings()
     }
 
     override fun onAuthError(error: Throwable) {
         uiState = uiState.copy(loadingError = error)
     }
 
-    fun loadTraining() = viewModelScope.launch {
-        val trainingId = MemoryStore.trainingId
-        if (trainingId == null) {
-            uiState = uiState.copy(isLoading = false)
-            return@launch
-        }
-
+    fun loadTrainings() = viewModelScope.launch {
         uiState = uiState.copy(isLoading = true, loadingError = null)
 
         try {
-            var training = UserTrainingsRepository.getTraining(trainingId).getOrThrow()
-            if (training?.personDescription.isNullOrEmpty()) {
-                onRefreshAiVisionPrompt()
-            }
-            uiState =
-                uiState.copy(
-                    isLoading = false,
-                    originalAiVisionPrompt = training?.personDescription ?: "",
-                    aiVisionPrompt = training?.personDescription ?: ""
+            var trainings = UserTrainingsRepository.getTrainings(userId).getOrThrow().map {
+                GenerateUiState.Training(
+                    id = it.id,
+                    personDescription = it.personDescription,
                 )
+            }
+            uiState = uiState.copy(
+                isLoading = false,
+                trainings = trainings,
+                training = trainings.lastOrNull(),
+            )
+
+            uiState.training?.let { selectTraining(it) }
         } catch (e: Exception) {
             Logger.e("Load training failed", e)
             uiState = uiState.copy(isLoading = false, loadingError = e)
@@ -75,22 +71,20 @@ class GenerateViewModel : SessionViewModel() {
         uiState = uiState.copy(expanded = !uiState.expanded)
     }
 
-    fun prepareToGenerate(onGenerate: (String) -> Unit) = viewModelScope.launch {
+    fun prepareToGenerate(onGenerate: (String, String) -> Unit) = viewModelScope.launch {
+        val trainingId = uiState.training?.id ?: return@launch
+
         val oldDescription = uiState.originalAiVisionPrompt
         val newDescription = uiState.aiVisionPrompt
         if (oldDescription == newDescription) {
-            onGenerate(uiState.userPrompt)
+            onGenerate(trainingId, uiState.userPrompt)
             return@launch
         }
 
         try {
-            UserTrainingsRepository.updatePersonDescription(
-                MemoryStore.trainingId!!,
-                newDescription
-            )
-                .getOrThrow()
+            UserTrainingsRepository.updatePersonDescription(trainingId, newDescription).getOrThrow()
             uiState = uiState.copy(originalAiVisionPrompt = newDescription)
-            onGenerate(uiState.userPrompt)
+            onGenerate(trainingId, uiState.userPrompt)
         } catch (e: Exception) {
             Logger.e("Update description failed", e)
             uiState = uiState.copy(errorPopup = e)
@@ -98,9 +92,9 @@ class GenerateViewModel : SessionViewModel() {
     }
 
     fun onRefreshAiVisionPrompt() = viewModelScope.launch {
+        val trainingId = uiState.training?.id ?: return@launch
         uiState = uiState.copy(isLoadingAiVisionPrompt = true, aiVisionPrompt = " ")
         try {
-            val trainingId = MemoryStore.trainingId!!
             SupabaseFunction.generatePersonDescription(trainingId)
             val training = UserTrainingsRepository.getTraining(trainingId).getOrThrow()
             uiState =
@@ -125,6 +119,17 @@ class GenerateViewModel : SessionViewModel() {
             Logger.e("surpriseMe failed", e)
             uiState = uiState.copy(isLoadingSurpriseMe = false, errorPopup = e)
         }
+    }
+
+    fun selectTraining(training: GenerateUiState.Training) = viewModelScope.launch {
+        if (training.personDescription.isNullOrEmpty()) {
+            onRefreshAiVisionPrompt()
+        }
+        uiState = uiState.copy(
+            training = training,
+            originalAiVisionPrompt = training.personDescription ?: "",
+            aiVisionPrompt = training.personDescription ?: ""
+        )
     }
 
 }

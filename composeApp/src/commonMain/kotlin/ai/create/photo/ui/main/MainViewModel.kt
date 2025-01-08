@@ -1,6 +1,5 @@
 package ai.create.photo.ui.main
 
-import ai.create.photo.data.MemoryStore
 import ai.create.photo.data.supabase.SupabaseFunction
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,8 +15,7 @@ class MainViewModel : ViewModel() {
         private set
 
 
-    fun generatePhoto(prompt: String) = viewModelScope.launch {
-        val trainingId = MemoryStore.trainingId ?: return@launch
+    fun generatePhoto(trainingId: String, prompt: String) = viewModelScope.launch {
         uiState = uiState.copy(generationsInProgress = uiState.generationsInProgress + 1)
         try {
             SupabaseFunction.generatePhoto(trainingId, prompt)
