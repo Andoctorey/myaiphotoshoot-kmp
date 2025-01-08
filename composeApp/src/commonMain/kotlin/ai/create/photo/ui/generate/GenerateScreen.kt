@@ -108,7 +108,7 @@ fun GenerateScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 if (state.aiVisionPrompt.isNotEmpty()) {
                     AiVisionPrompt(
@@ -123,17 +123,18 @@ fun GenerateScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                PhotosToGenerate(state.photosToGenerateX100) {
+                    viewModel.onPhotosToGenerateChanged(it)
+                }
+
+                Spacer(modifier = Modifier.height(72.dp))
+
                 PhotoPrompt(prompt = state.userPrompt) {
                     viewModel.onUserPromptChanged(it)
                 }
 
                 SurpriseMeButton(state.isLoadingSurpriseMe, viewModel::surpriseMe)
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                PhotosToGenerate(state.photosToGenerateX100) {
-                    viewModel.onPhotosToGenerateChanged(it)
-                }
             }
 
             GenerateFab(
@@ -279,7 +280,7 @@ private fun Trainings(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded }
     ) {
-        ExtendedFloatingActionButton(
+        TextButton(
             modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable),
             onClick = { },
         ) {
@@ -298,7 +299,7 @@ private fun Trainings(
             Icon(
                 imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
                 contentDescription = "error",
-                tint = MaterialTheme.colorScheme.onSurface,
+                tint = MaterialTheme.colorScheme.primary,
             )
         }
         ExposedDropdownMenu(
@@ -333,7 +334,8 @@ private fun PhotosToGenerate(photosToGenerate: Int, onPhotosToGenerateChanged: (
     ) {
         Text(
             modifier = Modifier.animateContentSize(),
-            text = stringResource(Res.string.photos_to_generate) + ": ${photosToGenerate / 100}"
+            text = stringResource(Res.string.photos_to_generate) + ": ${photosToGenerate / 100}",
+            fontSize = 14.sp,
         )
         Slider(
             value = photosToGenerate.toFloat(),
