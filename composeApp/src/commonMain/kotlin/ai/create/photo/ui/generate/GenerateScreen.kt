@@ -149,6 +149,7 @@ private fun AiVisionPrompt(
     expanded: Boolean = false, onExpand: () -> Unit,
     isLoadingAiVisionPrompt: Boolean = false, onRefreshAiVisionPrompt: () -> Unit,
 ) {
+    val isExpandedPrompt = prompt.length > 100
     OutlinedTextField(
         modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().padding(horizontal = 24.dp)
             .animateContentSize(),
@@ -169,20 +170,22 @@ private fun AiVisionPrompt(
                         tint = MaterialTheme.colorScheme.onSurface,
                     )
                 }
-                Spacer(modifier = Modifier.width(4.dp))
-                val icon =
-                    if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown
-                Icon(
-                    modifier = Modifier.clickable { onExpand() },
-                    imageVector = icon,
-                    contentDescription = icon.name,
-                    tint = MaterialTheme.colorScheme.onSurface,
-                )
-                Spacer(modifier = Modifier.width(4.dp))
+                if (isExpandedPrompt) {
+                    Spacer(modifier = Modifier.width(4.dp))
+                    val icon =
+                        if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown
+                    Icon(
+                        modifier = Modifier.clickable { onExpand() },
+                        imageVector = icon,
+                        contentDescription = icon.name,
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                }
             }
         },
         onValueChange = onPromptChanged,
-        singleLine = !expanded,
+        singleLine = isExpandedPrompt && !expanded,
         label = { Text(text = stringResource(Res.string.enhance_photo_accuracy)) },
         keyboardOptions = KeyboardOptions(
             autoCorrectEnabled = true,
