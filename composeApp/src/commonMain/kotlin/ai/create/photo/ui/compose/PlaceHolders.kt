@@ -2,15 +2,12 @@ package ai.create.photo.ui.compose
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -75,32 +72,6 @@ fun ErrorMessagePlaceHolder(errorMessage: Throwable) {
             text = errorMessage.getFriendlyError(),
             color = MaterialTheme.colorScheme.error,
             fontSize = 24.sp,
-            textAlign = TextAlign.Center,
-        )
-    }
-}
-
-@Preview
-@Composable
-fun ErrorMessage(errorMessage: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
-    ) {
-        Icon(
-            modifier = Modifier.size(24.dp),
-            imageVector = Icons.Outlined.ErrorOutline,
-            contentDescription = errorMessage,
-            tint = MaterialTheme.colorScheme.error,
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = errorMessage,
-            color = MaterialTheme.colorScheme.error,
-            fontSize = 14.sp,
             textAlign = TextAlign.Center,
         )
     }
