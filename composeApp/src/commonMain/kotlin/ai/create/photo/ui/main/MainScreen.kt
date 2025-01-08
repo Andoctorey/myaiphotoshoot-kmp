@@ -104,8 +104,8 @@ fun MainScreen(
                     createTraining = {
                         currentDestination = AppNavigationRoutes.TAB1
                     },
-                    onGenerate = { trainingId, prompt ->
-                        viewModel.generatePhoto(trainingId, prompt)
+                    onGenerate = { trainingId, prompt, photosToGenerate ->
+                        viewModel.generatePhoto(trainingId, prompt, photosToGenerate)
                     })
             }
 

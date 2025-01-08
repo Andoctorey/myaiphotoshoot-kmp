@@ -39,4 +39,6 @@
     <string name="verify">Verify</string>
     <string name="delete_unsuitable_photos">Would you like to delete all unsuitable photos?</string>
     <string name="surprise_me">Surprise Me</string>
+    <string name="photos_to_generate">Photos to Generate</string>
+
 </resources>

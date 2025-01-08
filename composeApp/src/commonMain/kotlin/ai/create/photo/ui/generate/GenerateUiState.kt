@@ -18,6 +18,8 @@ data class GenerateUiState(
     val userPrompt: String = "",
 
     val isLoadingSurpriseMe: Boolean = false,
+
+    val photosToGenerateX100: Int = 300,
 ) {
     @Immutable
     data class Training(

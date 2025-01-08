@@ -15,11 +15,24 @@ class MainViewModel : ViewModel() {
         private set
 
 
-    fun generatePhoto(trainingId: String, prompt: String) = viewModelScope.launch {
-        uiState = uiState.copy(generationsInProgress = uiState.generationsInProgress + 1)
+    fun generatePhoto(trainingId: String, prompt: String, photosToGenerate: Int) =
+        viewModelScope.launch {
+            uiState =
+                uiState.copy(generationsInProgress = uiState.generationsInProgress + photosToGenerate)
         try {
-            SupabaseFunction.generatePhoto(trainingId, prompt)
-            uiState = uiState.copy(generationsInProgress = uiState.generationsInProgress - 1)
+            repeat(photosToGenerate) {
+                launch {
+                    try {
+                        SupabaseFunction.generatePhoto(trainingId, prompt)
+                    } catch (e: Exception) {
+                        Logger.e("Generate photo failed", e)
+                        uiState = uiState.copy(errorPopup = e)
+                    } finally {
+                        uiState =
+                            uiState.copy(generationsInProgress = uiState.generationsInProgress - 1)
+                    }
+                }
+            }
         } catch (e: Exception) {
             Logger.e("Generate photo failed", e)
             uiState = uiState.copy(

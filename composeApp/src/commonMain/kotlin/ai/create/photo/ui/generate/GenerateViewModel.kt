@@ -73,20 +73,20 @@ class GenerateViewModel : SessionViewModel() {
         uiState = uiState.copy(expanded = !uiState.expanded)
     }
 
-    fun prepareToGenerate(onGenerate: (String, String) -> Unit) = viewModelScope.launch {
+    fun prepareToGenerate(onGenerate: (String, String, Int) -> Unit) = viewModelScope.launch {
         val trainingId = uiState.training?.id ?: return@launch
 
         val oldDescription = uiState.originalAiVisionPrompt
         val newDescription = uiState.aiVisionPrompt
         if (oldDescription == newDescription) {
-            onGenerate(trainingId, uiState.userPrompt)
+            onGenerate(trainingId, uiState.userPrompt, uiState.photosToGenerateX100 / 100)
             return@launch
         }
 
         try {
             UserTrainingsRepository.updatePersonDescription(trainingId, newDescription).getOrThrow()
             uiState = uiState.copy(originalAiVisionPrompt = newDescription)
-            onGenerate(trainingId, uiState.userPrompt)
+            onGenerate(trainingId, uiState.userPrompt, uiState.photosToGenerateX100 / 100)
         } catch (e: Exception) {
             Logger.e("Update description failed", e)
             uiState = uiState.copy(errorPopup = e)
@@ -132,6 +132,10 @@ class GenerateViewModel : SessionViewModel() {
             originalAiVisionPrompt = training.personDescription ?: "",
             aiVisionPrompt = training.personDescription ?: ""
         )
+    }
+
+    fun onPhotosToGenerateChanged(photosToGenerate: Int) {
+        uiState = uiState.copy(photosToGenerateX100 = photosToGenerate)
     }
 
 }

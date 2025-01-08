@@ -40,6 +40,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -66,6 +67,7 @@ import photocreateai.composeapp.generated.resources.create_ai_model
 import photocreateai.composeapp.generated.resources.enhance_photo_accuracy
 import photocreateai.composeapp.generated.resources.generate_photo
 import photocreateai.composeapp.generated.resources.photo_prompt
+import photocreateai.composeapp.generated.resources.photos_to_generate
 import photocreateai.composeapp.generated.resources.surprise_me
 
 
@@ -74,7 +76,7 @@ import photocreateai.composeapp.generated.resources.surprise_me
 fun GenerateScreen(
     viewModel: GenerateViewModel = viewModel { GenerateViewModel() },
     createTraining: () -> Unit,
-    onGenerate: (String, String) -> Unit,
+    onGenerate: (String, String, Int) -> Unit,
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -126,6 +128,12 @@ fun GenerateScreen(
                 }
 
                 SurpriseMeButton(state.isLoadingSurpriseMe, viewModel::surpriseMe)
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                PhotosToGenerate(state.photosToGenerateX100) {
+                    viewModel.onPhotosToGenerateChanged(it)
+                }
             }
 
             GenerateFab(
@@ -255,7 +263,7 @@ private fun SurpriseMeButton(isLoading: Boolean, onClick: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Trainings(
+private fun Trainings(
     trainings: List<GenerateUiState.Training?>,
     selectedTraining: GenerateUiState.Training?,
     selectTraining: (GenerateUiState.Training) -> Unit,
@@ -315,4 +323,23 @@ fun Trainings(
             }
         }
     }
+}
+
+@Composable
+private fun PhotosToGenerate(photosToGenerate: Int, onPhotosToGenerateChanged: (Int) -> Unit) {
+    Column(
+        modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().padding(horizontal = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            modifier = Modifier.animateContentSize(),
+            text = stringResource(Res.string.photos_to_generate) + ": ${photosToGenerate / 100}"
+        )
+        Slider(
+            value = photosToGenerate.toFloat(),
+            onValueChange = { onPhotosToGenerateChanged(it.toInt()) },
+            valueRange = 100f..1000f,
+        )
+    }
+
 }
