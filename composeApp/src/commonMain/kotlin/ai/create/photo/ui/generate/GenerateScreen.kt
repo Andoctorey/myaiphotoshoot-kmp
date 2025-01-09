@@ -4,6 +4,7 @@ import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,6 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -31,6 +33,8 @@ import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -50,6 +54,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -93,41 +98,57 @@ fun GenerateScreen(
             Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
 
             Column(
-                modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
-                    .padding(bottom = 64.dp),
+                modifier = Modifier.widthIn(max = 600.dp).fillMaxSize()
+                    .padding(horizontal = 24.dp).verticalScroll(rememberScrollState())
+                    .padding(bottom = 72.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
 
-                if (state.trainings != null) {
-                    Trainings(
-                        trainings = state.trainings,
-                        selectedTraining = state.training,
-                        selectTraining = viewModel::selectTraining,
-                        createTraining = createTraining,
-                    )
+                Card(
+                    border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.onSurface),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.Transparent
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        if (state.trainings != null) {
+                            Trainings(
+                                trainings = state.trainings,
+                                selectedTraining = state.training,
+                                selectTraining = viewModel::selectTraining,
+                                createTraining = createTraining,
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        if (state.aiVisionPrompt.isNotEmpty()) {
+                            AiVisionPrompt(
+                                prompt = state.aiVisionPrompt,
+                                onPromptChanged = viewModel::onAiVisionPromptChanged,
+                                expanded = state.expanded,
+                                onExpand = viewModel::onExpand,
+                                isLoadingAiVisionPrompt = state.isLoadingAiVisionPrompt,
+                                onRefreshAiVisionPrompt = viewModel::onRefreshAiVisionPrompt,
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        PhotosToGenerate(state.photosToGenerateX100) {
+                            viewModel.onPhotosToGenerateChanged(it)
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                if (state.aiVisionPrompt.isNotEmpty()) {
-                    AiVisionPrompt(
-                        prompt = state.aiVisionPrompt,
-                        onPromptChanged = viewModel::onAiVisionPromptChanged,
-                        expanded = state.expanded,
-                        onExpand = viewModel::onExpand,
-                        isLoadingAiVisionPrompt = state.isLoadingAiVisionPrompt,
-                        onRefreshAiVisionPrompt = viewModel::onRefreshAiVisionPrompt,
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                PhotosToGenerate(state.photosToGenerateX100) {
-                    viewModel.onPhotosToGenerateChanged(it)
-                }
-
-                Spacer(modifier = Modifier.height(72.dp))
+                Spacer(modifier = Modifier.height(64.dp))
 
                 PhotoPrompt(prompt = state.userPrompt) {
                     viewModel.onUserPromptChanged(it)
@@ -158,7 +179,7 @@ private fun AiVisionPrompt(
     expanded: Boolean = false, onExpand: () -> Unit,
     isLoadingAiVisionPrompt: Boolean = false, onRefreshAiVisionPrompt: () -> Unit,
 ) {
-    val isExpandedPrompt = prompt.length > 100
+    val isExpandedPrompt = prompt.length > 150
     OutlinedTextField(
         modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().padding(horizontal = 24.dp)
             .animateContentSize(),
@@ -209,7 +230,7 @@ private fun AiVisionPrompt(
 private fun PhotoPrompt(prompt: String, onPromptChanged: (String) -> Unit) {
     val focusManager = LocalFocusManager.current
     OutlinedTextField(
-        modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().padding(horizontal = 24.dp),
+        modifier = Modifier.fillMaxWidth(),
         value = prompt,
         onValueChange = onPromptChanged,
         label = { Text(text = stringResource(Res.string.photo_prompt)) },
@@ -329,7 +350,7 @@ private fun Trainings(
 @Composable
 private fun PhotosToGenerate(photosToGenerate: Int, onPhotosToGenerateChanged: (Int) -> Unit) {
     Column(
-        modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().padding(horizontal = 24.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
