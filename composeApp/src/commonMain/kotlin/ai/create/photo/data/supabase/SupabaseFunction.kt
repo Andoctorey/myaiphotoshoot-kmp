@@ -51,4 +51,13 @@ object SupabaseFunction {
         val response = Supabase.supabase.functions.invoke(function = "surprise-me")
         return response.body<String>()
     }
+
+    suspend fun enhancePrompt(prompt: String): String {
+        Logger.i("enhancePrompt, prompt: $prompt")
+        val response = Supabase.supabase.functions.invoke(
+            function = "enhance-prompt",
+            body = mapOf("prompt" to prompt)
+        )
+        return response.body<String>()
+    }
 }

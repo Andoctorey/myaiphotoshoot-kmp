@@ -150,9 +150,9 @@ class GenerateViewModel : SessionViewModel() {
         }
 
         try {
-//            val prompt = SupabaseFunction.surpriseMe()
+            val prompt = SupabaseFunction.enhancePrompt(uiState.promptBeforeEnhancing)
             uiState =
-                uiState.copy(userPrompt = uiState.promptBeforeEnhancing, isEnhancingPrompt = false)
+                uiState.copy(userPrompt = prompt, isEnhancingPrompt = false)
         } catch (e: Exception) {
             Logger.e("surpriseMe failed", e)
             uiState = uiState.copy(isEnhancingPrompt = false, errorPopup = e)
