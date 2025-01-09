@@ -129,7 +129,7 @@ private fun Photo(
             contentScale = ContentScale.FillWidth,
             onSuccess = { loading = false },
             onError = {
-                Logger.e("error loading image", it.result.throwable)
+                Logger.e("error loading image ${photo.url}", it.result.throwable)
                 error = it.result.throwable
             },
             contentDescription = "photo",
