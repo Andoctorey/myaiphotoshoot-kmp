@@ -9,6 +9,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -71,12 +73,14 @@ import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.ai_model
 import photocreateai.composeapp.generated.resources.create_ai_model
 import photocreateai.composeapp.generated.resources.enhance_photo_accuracy
+import photocreateai.composeapp.generated.resources.enhance_prompt
 import photocreateai.composeapp.generated.resources.generate_photo
 import photocreateai.composeapp.generated.resources.photo_prompt
 import photocreateai.composeapp.generated.resources.photos_to_generate
 import photocreateai.composeapp.generated.resources.surprise_me
 
 
+@OptIn(ExperimentalLayoutApi::class)
 @Preview
 @Composable
 fun GenerateScreen(
@@ -164,8 +168,15 @@ fun GenerateScreen(
                     viewModel.onUserPromptChanged(it)
                 }
 
-                SurpriseMeButton(state.isLoadingSurpriseMe, viewModel::surpriseMe)
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalArrangement = Arrangement.Center,
+                ) {
+                    EnhancePromptButton(state.isEnhancingPrompt, viewModel::enhancePrompt)
 
+                    SurpriseMeButton(state.isLoadingSurpriseMe, viewModel::surpriseMe)
+                }
             }
 
             GenerateFab(
@@ -277,6 +288,20 @@ private fun GenerateFab(modifier: Modifier, onClick: () -> Unit) {
     }
 }
 
+@Composable
+private fun EnhancePromptButton(isLoading: Boolean, onClick: () -> Unit) {
+    if (isLoading) {
+        CircularProgressIndicator(
+            modifier = Modifier.padding(top = 8.dp, bottom = 16.dp).size(24.dp),
+            color = MaterialTheme.colorScheme.primary,
+            strokeWidth = 2.dp,
+        )
+    } else {
+        TextButton(onClick = onClick) {
+            Text(text = stringResource(Res.string.enhance_prompt))
+        }
+    }
+}
 
 @Composable
 private fun SurpriseMeButton(isLoading: Boolean, onClick: () -> Unit) {

@@ -16,7 +16,9 @@ data class GenerateUiState(
     val expanded: Boolean = false,
 
     val userPrompt: String = "",
+    val promptBeforeEnhancing: String = "",
 
+    val isEnhancingPrompt: Boolean = false,
     val isLoadingSurpriseMe: Boolean = false,
 
     val photosToGenerateX100: Int = 300,

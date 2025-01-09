@@ -62,7 +62,7 @@ class GenerateViewModel : SessionViewModel() {
     }
 
     fun onUserPromptChanged(prompt: String) {
-        uiState = uiState.copy(userPrompt = prompt)
+        uiState = uiState.copy(userPrompt = prompt, promptBeforeEnhancing = "")
     }
 
     fun hideErrorPopup() {
@@ -116,7 +116,11 @@ class GenerateViewModel : SessionViewModel() {
         uiState = uiState.copy(isLoadingSurpriseMe = true)
         try {
             val prompt = SupabaseFunction.surpriseMe()
-            uiState = uiState.copy(userPrompt = prompt, isLoadingSurpriseMe = false)
+            uiState = uiState.copy(
+                userPrompt = prompt,
+                promptBeforeEnhancing = "",
+                isLoadingSurpriseMe = false
+            )
         } catch (e: Exception) {
             Logger.e("surpriseMe failed", e)
             uiState = uiState.copy(isLoadingSurpriseMe = false, errorPopup = e)
@@ -136,6 +140,23 @@ class GenerateViewModel : SessionViewModel() {
 
     fun onPhotosToGenerateChanged(photosToGenerate: Int) {
         uiState = uiState.copy(photosToGenerateX100 = photosToGenerate)
+    }
+
+    fun enhancePrompt() = viewModelScope.launch() {
+        if (uiState.userPrompt.isEmpty()) return@launch
+        uiState = uiState.copy(isEnhancingPrompt = true)
+        if (uiState.promptBeforeEnhancing.isEmpty()) {
+            uiState = uiState.copy(promptBeforeEnhancing = uiState.userPrompt)
+        }
+
+        try {
+//            val prompt = SupabaseFunction.surpriseMe()
+            uiState =
+                uiState.copy(userPrompt = uiState.promptBeforeEnhancing, isEnhancingPrompt = false)
+        } catch (e: Exception) {
+            Logger.e("surpriseMe failed", e)
+            uiState = uiState.copy(isEnhancingPrompt = false, errorPopup = e)
+        }
     }
 
 }
