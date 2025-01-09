@@ -32,6 +32,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Brush
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Refresh
@@ -262,6 +263,16 @@ private fun PhotoPrompt(prompt: String, onPromptChanged: (String) -> Unit) {
             keyboardType = KeyboardType.Text,
         ),
         keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+        trailingIcon = {
+            if (prompt.isNotEmpty()) {
+                Icon(
+                    modifier = Modifier.clickable { onPromptChanged("") },
+                    imageVector = Icons.Default.Close,
+                    contentDescription = Icons.Default.Close.name,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+        },
     )
 }
 
