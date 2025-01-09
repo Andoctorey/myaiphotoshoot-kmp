@@ -70,7 +70,7 @@ class GenerateViewModel : SessionViewModel() {
     }
 
     fun onExpand() {
-        uiState = uiState.copy(expanded = !uiState.expanded)
+        uiState = uiState.copy(aiVisionPromptExpanded = !uiState.aiVisionPromptExpanded)
     }
 
     fun prepareToGenerate(onGenerate: (String, String, Int) -> Unit) = viewModelScope.launch {
@@ -157,6 +157,10 @@ class GenerateViewModel : SessionViewModel() {
             Logger.e("surpriseMe failed", e)
             uiState = uiState.copy(isEnhancingPrompt = false, errorPopup = e)
         }
+    }
+
+    fun toggleSettings() {
+        uiState = uiState.copy(showSettings = !uiState.showSettings)
     }
 
 }

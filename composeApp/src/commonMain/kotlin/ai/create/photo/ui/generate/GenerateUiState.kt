@@ -7,13 +7,16 @@ data class GenerateUiState(
     val isLoading: Boolean = false,
     val loadingError: Throwable? = null,
     val errorPopup: Throwable? = null,
+
+    val showSettings: Boolean = false,
+
     val trainings: List<Training>? = null,
     val training: Training? = null,
 
     val isLoadingAiVisionPrompt: Boolean = false,
     val originalAiVisionPrompt: String = "",
     val aiVisionPrompt: String = "",
-    val expanded: Boolean = false,
+    val aiVisionPromptExpanded: Boolean = false,
 
     val userPrompt: String = "",
     val promptBeforeEnhancing: String = "",

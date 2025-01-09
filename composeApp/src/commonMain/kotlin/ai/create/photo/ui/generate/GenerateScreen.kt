@@ -3,6 +3,7 @@ package ai.create.photo.ui.generate
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -36,6 +37,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -44,6 +46,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
@@ -106,6 +109,7 @@ fun GenerateScreen(
             val scrollState = rememberScrollState()
             Column(
                 modifier = Modifier.widthIn(max = 600.dp).fillMaxSize()
+                    .animateContentSize()
                     .padding(horizontal = 24.dp).verticalScroll(scrollState)
                     .padding(bottom = 80.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -113,49 +117,75 @@ fun GenerateScreen(
             ) {
 
                 Card(
-                    border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.onSurface),
+                    border = if (state.showSettings) BorderStroke(
+                        0.5.dp,
+                        MaterialTheme.colorScheme.onSurface
+                    ) else null,
                     colors = CardDefaults.cardColors(
                         containerColor = Color.Transparent
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Column(
+                        modifier = Modifier.fillMaxWidth().animateContentSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
                         if (state.trainings != null) {
-                            Trainings(
-                                trainings = state.trainings,
-                                selectedTraining = state.training,
-                                selectTraining = viewModel::selectTraining,
-                                createTraining = createTraining,
-                            )
+                            Box(modifier = Modifier.fillMaxWidth()) {
+                                Trainings(
+                                    modifier = Modifier.align(Alignment.Center),
+                                    trainings = state.trainings,
+                                    selectedTraining = state.training,
+                                    selectTraining = viewModel::selectTraining,
+                                    createTraining = createTraining,
+                                )
+                                IconButton(
+                                    modifier = Modifier.align(Alignment.CenterEnd),
+                                    onClick = viewModel::toggleSettings,
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Settings,
+                                        contentDescription = Icons.Default.Settings.name,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                    )
+                                }
+                            }
                         }
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Crossfade(targetState = state.showSettings) { showSettings ->
+                            if (showSettings) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    Spacer(modifier = Modifier.height(8.dp))
 
-                        if (state.aiVisionPrompt.isNotEmpty()) {
-                            AiVisionPrompt(
-                                prompt = state.aiVisionPrompt,
-                                onPromptChanged = viewModel::onAiVisionPromptChanged,
-                                expanded = state.expanded,
-                                onExpand = viewModel::onExpand,
-                                isLoadingAiVisionPrompt = state.isLoadingAiVisionPrompt,
-                                onRefreshAiVisionPrompt = viewModel::onRefreshAiVisionPrompt,
-                            )
+                                    if (state.aiVisionPrompt.isNotEmpty()) {
+                                        AiVisionPrompt(
+                                            prompt = state.aiVisionPrompt,
+                                            onPromptChanged = viewModel::onAiVisionPromptChanged,
+                                            expanded = state.aiVisionPromptExpanded,
+                                            onExpand = viewModel::onExpand,
+                                            isLoadingAiVisionPrompt = state.isLoadingAiVisionPrompt,
+                                            onRefreshAiVisionPrompt = viewModel::onRefreshAiVisionPrompt,
+                                        )
+                                    }
+
+                                    Spacer(modifier = Modifier.height(16.dp))
+
+                                    PhotosToGenerate(state.photosToGenerateX100) {
+                                        viewModel.onPhotosToGenerateChanged(it)
+                                    }
+
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                }
+                            }
                         }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        PhotosToGenerate(state.photosToGenerateX100) {
-                            viewModel.onPhotosToGenerateChanged(it)
-                        }
-
-                        Spacer(modifier = Modifier.height(12.dp))
                     }
                 }
 
-                Spacer(modifier = Modifier.height(64.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 var previousText by remember { mutableStateOf("") }
                 LaunchedEffect(state.userPrompt) {
@@ -332,6 +362,7 @@ private fun SurpriseMeButton(isLoading: Boolean, onClick: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Trainings(
+    modifier: Modifier,
     trainings: List<GenerateUiState.Training?>,
     selectedTraining: GenerateUiState.Training?,
     selectTraining: (GenerateUiState.Training) -> Unit,
@@ -344,6 +375,7 @@ private fun Trainings(
     val aiModelString = stringResource(Res.string.ai_model)
     val createAiModelString = stringResource(Res.string.create_ai_model)
     ExposedDropdownMenuBox(
+        modifier = modifier,
         expanded = expanded,
         onExpandedChange = { expanded = !expanded }
     ) {
