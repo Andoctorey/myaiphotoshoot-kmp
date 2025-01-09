@@ -48,6 +48,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -97,10 +98,11 @@ fun GenerateScreen(
         } else {
             Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
 
+            val scrollState = rememberScrollState()
             Column(
                 modifier = Modifier.widthIn(max = 600.dp).fillMaxSize()
-                    .padding(horizontal = 24.dp).verticalScroll(rememberScrollState())
-                    .padding(bottom = 72.dp),
+                    .padding(horizontal = 24.dp).verticalScroll(scrollState)
+                    .padding(bottom = 80.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -149,6 +151,14 @@ fun GenerateScreen(
                 }
 
                 Spacer(modifier = Modifier.height(64.dp))
+
+                var previousText by remember { mutableStateOf("") }
+                LaunchedEffect(state.userPrompt) {
+                    if (state.userPrompt.count { it == '\n' } > previousText.count { it == '\n' }) {
+                        scrollState.animateScrollTo(scrollState.maxValue)
+                    }
+                    previousText = state.userPrompt
+                }
 
                 PhotoPrompt(prompt = state.userPrompt) {
                     viewModel.onUserPromptChanged(it)
