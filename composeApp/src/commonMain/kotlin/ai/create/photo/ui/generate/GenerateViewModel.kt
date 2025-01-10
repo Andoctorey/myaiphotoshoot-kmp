@@ -76,6 +76,8 @@ class GenerateViewModel : SessionViewModel() {
     fun prepareToGenerate(onGenerate: (String, String, Int) -> Unit) = viewModelScope.launch {
         val trainingId = uiState.training?.id ?: return@launch
 
+        uiState = uiState.copy(showSettings = false)
+
         val oldDescription = uiState.originalAiVisionPrompt
         val newDescription = uiState.aiVisionPrompt
         if (oldDescription == newDescription) {
