@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsTopHeight
@@ -30,9 +31,9 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
-import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -44,7 +45,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -61,6 +61,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
@@ -78,7 +79,6 @@ import photocreateai.composeapp.generated.resources.ai_model
 import photocreateai.composeapp.generated.resources.create_ai_model
 import photocreateai.composeapp.generated.resources.enhance_photo_accuracy
 import photocreateai.composeapp.generated.resources.enhance_prompt
-import photocreateai.composeapp.generated.resources.generate_photo
 import photocreateai.composeapp.generated.resources.photo_prompt
 import photocreateai.composeapp.generated.resources.photos_to_generate
 import photocreateai.composeapp.generated.resources.surprise_me
@@ -109,11 +109,9 @@ fun GenerateScreen(
             val scrollState = rememberScrollState()
             Column(
                 modifier = Modifier.widthIn(max = 600.dp).fillMaxSize()
-                    .animateContentSize()
-                    .padding(horizontal = 24.dp).verticalScroll(scrollState)
-                    .padding(bottom = 80.dp),
+                    .animateContentSize().verticalScroll(scrollState),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
 
                 Card(
@@ -132,7 +130,7 @@ fun GenerateScreen(
                         verticalArrangement = Arrangement.Center
                     ) {
                         if (state.trainings != null) {
-                            Box(modifier = Modifier.fillMaxWidth()) {
+                            Box(modifier = Modifier.fillMaxWidth().systemBarsPadding()) {
                                 Trainings(
                                     modifier = Modifier.align(Alignment.Center),
                                     trainings = state.trainings,
@@ -177,15 +175,23 @@ fun GenerateScreen(
                                     PhotosToGenerate(state.photosToGenerateX100) {
                                         viewModel.onPhotosToGenerateChanged(it)
                                     }
-
-                                    Spacer(modifier = Modifier.height(12.dp))
                                 }
                             }
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalArrangement = Arrangement.Center,
+                ) {
+                    EnhancePromptButton(state.isEnhancingPrompt, viewModel::enhancePrompt)
+
+                    SurpriseMeButton(state.isLoadingSurpriseMe, viewModel::surpriseMe)
+                }
+
 
                 var previousText by remember { mutableStateOf("") }
                 LaunchedEffect(state.userPrompt) {
@@ -195,25 +201,9 @@ fun GenerateScreen(
                     previousText = state.userPrompt
                 }
 
-                PhotoPrompt(prompt = state.userPrompt) {
-                    viewModel.onUserPromptChanged(it)
-                }
-
-                FlowRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalArrangement = Arrangement.Center,
-                ) {
-                    EnhancePromptButton(state.isEnhancingPrompt, viewModel::enhancePrompt)
-
-                    SurpriseMeButton(state.isLoadingSurpriseMe, viewModel::surpriseMe)
-                }
-            }
-
-            GenerateFab(
-                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp)
-            ) {
-                viewModel.prepareToGenerate(onGenerate)
+                PhotoPrompt(prompt = state.userPrompt,
+                    onPromptChanged = viewModel::onUserPromptChanged,
+                    onGenerate = { viewModel.prepareToGenerate(onGenerate) })
             }
         }
 
@@ -279,10 +269,18 @@ private fun AiVisionPrompt(
 }
 
 @Composable
-private fun PhotoPrompt(prompt: String, onPromptChanged: (String) -> Unit) {
+private fun PhotoPrompt(
+    prompt: String,
+    onPromptChanged: (String) -> Unit,
+    onGenerate: () -> Unit
+) {
     val focusManager = LocalFocusManager.current
+    val onDone = {
+        focusManager.clearFocus()
+        onGenerate()
+    }
     OutlinedTextField(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp, start = 8.dp, end = 8.dp),
         value = prompt,
         onValueChange = onPromptChanged,
         label = { Text(text = stringResource(Res.string.photo_prompt)) },
@@ -292,69 +290,78 @@ private fun PhotoPrompt(prompt: String, onPromptChanged: (String) -> Unit) {
             capitalization = KeyboardCapitalization.Sentences,
             keyboardType = KeyboardType.Text,
         ),
-        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+        keyboardActions = KeyboardActions(onDone = { onDone() }),
         trailingIcon = {
-            if (prompt.isNotEmpty()) {
-                Icon(
-                    modifier = Modifier.clickable { onPromptChanged("") },
-                    imageVector = Icons.Default.Close,
-                    contentDescription = Icons.Default.Close.name,
-                    tint = MaterialTheme.colorScheme.onSurface,
-                )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Crossfade(targetState = prompt.isNotEmpty()) {
+                    if (it) {
+                        IconButton(
+                            onClick = {
+                                focusManager.clearFocus()
+                                onPromptChanged("")
+                            },
+                        ) {
+                            Icon(
+                                modifier = Modifier.clickable { onPromptChanged("") },
+                                imageVector = Icons.Default.Close,
+                                contentDescription = Icons.Default.Close.name,
+                                tint = MaterialTheme.colorScheme.onSurface,
+                            )
+                        }
+                    }
+                }
+                IconButton(onClick = { onDone() }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Send,
+                        contentDescription = Icons.AutoMirrored.Filled.Send.name,
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                }
             }
         },
     )
 }
 
 @Composable
-private fun GenerateFab(modifier: Modifier, onClick: () -> Unit) {
-    ExtendedFloatingActionButton(
-        modifier = modifier,
-        onClick = onClick,
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector = Icons.Default.Brush,
-                contentDescription = stringResource(Res.string.create_ai_model),
-                tint = MaterialTheme.colorScheme.onSurface,
-            )
-            Spacer(modifier = Modifier.width(16.dp))
+private fun EnhancePromptButton(isLoading: Boolean, onClick: () -> Unit) {
+    Box(contentAlignment = Alignment.Center) {
+        TextButton(
+            modifier = Modifier.alpha(if (isLoading) 0f else 1f),
+            onClick = onClick
+        ) {
             Text(
-                text = stringResource(Res.string.generate_photo),
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+                text = stringResource(Res.string.enhance_prompt),
+                fontSize = 16.sp,
             )
         }
-    }
-}
-
-@Composable
-private fun EnhancePromptButton(isLoading: Boolean, onClick: () -> Unit) {
-    if (isLoading) {
-        CircularProgressIndicator(
-            modifier = Modifier.padding(top = 8.dp, bottom = 16.dp).size(24.dp),
-            color = MaterialTheme.colorScheme.primary,
-            strokeWidth = 2.dp,
-        )
-    } else {
-        TextButton(onClick = onClick) {
-            Text(text = stringResource(Res.string.enhance_prompt))
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.padding(horizontal = 8.dp).size(24.dp),
+                color = MaterialTheme.colorScheme.primary,
+                strokeWidth = 2.dp,
+            )
         }
     }
 }
 
 @Composable
 private fun SurpriseMeButton(isLoading: Boolean, onClick: () -> Unit) {
-    if (isLoading) {
-        CircularProgressIndicator(
-            modifier = Modifier.padding(top = 8.dp, bottom = 16.dp).size(24.dp),
-            color = MaterialTheme.colorScheme.primary,
-            strokeWidth = 2.dp,
-        )
-    } else {
-        TextButton(onClick = onClick) {
-            Text(text = stringResource(Res.string.surprise_me))
+    Box(contentAlignment = Alignment.Center) {
+        TextButton(
+            modifier = Modifier.alpha(if (isLoading) 0f else 1f),
+            onClick = onClick,
+        ) {
+            Text(
+                text = stringResource(Res.string.surprise_me),
+                fontSize = 16.sp,
+            )
+        }
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.padding(horizontal = 8.dp).size(24.dp),
+                color = MaterialTheme.colorScheme.primary,
+                strokeWidth = 2.dp,
+            )
         }
     }
 }
@@ -391,7 +398,7 @@ private fun Trainings(
                     else "$aiModelString ${options.size - options.indexOf(selectedOption) - 1}",
                     textAlign = TextAlign.Center,
                     maxLines = 1,
-                    fontSize = 14.sp,
+                    fontSize = 16.sp,
                     overflow = TextOverflow.Ellipsis,
                 )
             }
