@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.rememberScrollState
@@ -35,8 +34,6 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
@@ -165,8 +162,6 @@ fun GenerateScreen(
                                         AiVisionPrompt(
                                             prompt = state.aiVisionPrompt,
                                             onPromptChanged = viewModel::onAiVisionPromptChanged,
-                                            expanded = state.aiVisionPromptExpanded,
-                                            onExpand = viewModel::onExpand,
                                             isLoadingAiVisionPrompt = state.isLoadingAiVisionPrompt,
                                             onRefreshAiVisionPrompt = viewModel::onRefreshAiVisionPrompt,
                                         )
@@ -224,10 +219,8 @@ fun GenerateScreen(
 @Composable
 private fun AiVisionPrompt(
     prompt: String, onPromptChanged: (String) -> Unit,
-    expanded: Boolean = false, onExpand: () -> Unit,
     isLoadingAiVisionPrompt: Boolean = false, onRefreshAiVisionPrompt: () -> Unit,
 ) {
-    val isExpandedPrompt = prompt.length > 150
     OutlinedTextField(
         modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().padding(horizontal = 24.dp)
             .animateContentSize(),
@@ -248,22 +241,9 @@ private fun AiVisionPrompt(
                         tint = MaterialTheme.colorScheme.onSurface,
                     )
                 }
-                if (isExpandedPrompt) {
-                    Spacer(modifier = Modifier.width(4.dp))
-                    val icon =
-                        if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown
-                    Icon(
-                        modifier = Modifier.clickable { onExpand() },
-                        imageVector = icon,
-                        contentDescription = icon.name,
-                        tint = MaterialTheme.colorScheme.onSurface,
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                }
             }
         },
         onValueChange = onPromptChanged,
-        singleLine = isExpandedPrompt && !expanded,
         label = { Text(text = stringResource(Res.string.enhance_photo_accuracy)) },
         keyboardOptions = KeyboardOptions(
             autoCorrectEnabled = true,

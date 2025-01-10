@@ -16,7 +16,6 @@ data class GenerateUiState(
     val isLoadingAiVisionPrompt: Boolean = false,
     val originalAiVisionPrompt: String = "",
     val aiVisionPrompt: String = "",
-    val aiVisionPromptExpanded: Boolean = false,
 
     val userPrompt: String = "",
     val promptBeforeEnhancing: String = "",

@@ -69,10 +69,6 @@ class GenerateViewModel : SessionViewModel() {
         uiState = uiState.copy(errorPopup = null)
     }
 
-    fun onExpand() {
-        uiState = uiState.copy(aiVisionPromptExpanded = !uiState.aiVisionPromptExpanded)
-    }
-
     fun prepareToGenerate(onGenerate: (String, String, Int) -> Unit) = viewModelScope.launch {
         val trainingId = uiState.training?.id ?: return@launch
 
