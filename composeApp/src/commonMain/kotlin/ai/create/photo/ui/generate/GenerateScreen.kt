@@ -51,6 +51,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -114,7 +115,9 @@ fun GenerateScreen(
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
 
+                // top of the screen
                 Card(
+                    modifier = Modifier.systemBarsPadding().padding(8.dp),
                     border = if (state.showSettings) BorderStroke(
                         0.5.dp,
                         MaterialTheme.colorScheme.onSurface
@@ -130,7 +133,7 @@ fun GenerateScreen(
                         verticalArrangement = Arrangement.Center
                     ) {
                         if (state.trainings != null) {
-                            Box(modifier = Modifier.fillMaxWidth().systemBarsPadding()) {
+                            Box(modifier = Modifier.fillMaxWidth()) {
                                 Trainings(
                                     modifier = Modifier.align(Alignment.Center),
                                     trainings = state.trainings,
@@ -138,14 +141,13 @@ fun GenerateScreen(
                                     selectTraining = viewModel::selectTraining,
                                     createTraining = createTraining,
                                 )
-                                IconButton(
-                                    modifier = Modifier.align(Alignment.CenterEnd),
+                                SmallFloatingActionButton(
+                                    modifier = Modifier.align(Alignment.CenterEnd).padding(8.dp),
                                     onClick = viewModel::toggleSettings,
                                 ) {
                                     Icon(
-                                        imageVector = Icons.Default.Settings,
-                                        contentDescription = Icons.Default.Settings.name,
-                                        tint = MaterialTheme.colorScheme.primary,
+                                        imageVector = if (state.showSettings) Icons.Default.Close else Icons.Default.Settings,
+                                        contentDescription = "settings",
                                     )
                                 }
                             }
@@ -175,6 +177,8 @@ fun GenerateScreen(
                                     PhotosToGenerate(state.photosToGenerateX100) {
                                         viewModel.onPhotosToGenerateChanged(it)
                                     }
+
+                                    Spacer(modifier = Modifier.height(12.dp))
                                 }
                             }
                         }
@@ -182,6 +186,7 @@ fun GenerateScreen(
                 }
 
 
+                // middle of the screen
                 FlowRow(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
                     horizontalArrangement = Arrangement.Center,
@@ -193,6 +198,7 @@ fun GenerateScreen(
                 }
 
 
+                // bottom of the screen
                 var previousText by remember { mutableStateOf("") }
                 LaunchedEffect(state.userPrompt) {
                     if (state.userPrompt.count { it == '\n' } > previousText.count { it == '\n' }) {
