@@ -1,5 +1,7 @@
 package ai.create.photo.ui.generate
 
+import ai.create.photo.platform.Platforms
+import ai.create.photo.platform.platform
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
@@ -104,12 +106,17 @@ fun GenerateScreen(
         } else {
             Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
 
+            val hasSoftKeyboard = remember {
+                platform().platform in
+                        listOf(Platforms.ANDROID, Platforms.IOS, Platforms.WEB_MOBILE)
+            }
+
             val scrollState = rememberScrollState()
             Column(
                 modifier = Modifier.widthIn(max = 600.dp).fillMaxSize()
                     .animateContentSize().verticalScroll(scrollState),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceBetween
+                verticalArrangement = if (hasSoftKeyboard) Arrangement.SpaceBetween else Arrangement.Center
             ) {
 
                 // top of the screen
@@ -180,6 +187,9 @@ fun GenerateScreen(
                     }
                 }
 
+                if (!hasSoftKeyboard) {
+                    Spacer(modifier = Modifier.height(36.dp))
+                }
 
                 // middle of the screen
                 FlowRow(
@@ -191,7 +201,6 @@ fun GenerateScreen(
 
                     SurpriseMeButton(state.isLoadingSurpriseMe, viewModel::surpriseMe)
                 }
-
 
                 // bottom of the screen
                 var previousText by remember { mutableStateOf("") }

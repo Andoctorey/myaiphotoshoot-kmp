@@ -2,7 +2,7 @@ package ai.create.photo.platform
 
 
 enum class Platforms {
-    ANDROID, IOS, DESKTOP, WEB
+    ANDROID, IOS, DESKTOP, WEB_DESKTOP, WEB_MOBILE
 }
 
 interface Platform {
