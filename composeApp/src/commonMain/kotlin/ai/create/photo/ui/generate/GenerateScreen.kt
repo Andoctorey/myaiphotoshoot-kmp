@@ -146,7 +146,8 @@ fun GenerateScreen(
                                     createTraining = createTraining,
                                 )
                                 SmallFloatingActionButton(
-                                    modifier = Modifier.align(Alignment.CenterEnd).padding(8.dp),
+                                    modifier = Modifier.align(Alignment.CenterEnd)
+                                        .padding(top = 8.dp, start = 8.dp, end = 8.dp),
                                     onClick = viewModel::toggleSettings,
                                 ) {
                                     Icon(
@@ -185,10 +186,6 @@ fun GenerateScreen(
                             }
                         }
                     }
-                }
-
-                if (!hasSoftKeyboard) {
-                    Spacer(modifier = Modifier.height(36.dp))
                 }
 
                 // middle of the screen
