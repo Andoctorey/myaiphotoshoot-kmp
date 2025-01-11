@@ -116,7 +116,7 @@ fun GenerateScreen(
                 modifier = Modifier.widthIn(max = 600.dp).fillMaxSize()
                     .animateContentSize().verticalScroll(scrollState),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = if (hasSoftKeyboard) Arrangement.SpaceBetween else Arrangement.Center
+                verticalArrangement = if (hasSoftKeyboard) Arrangement.SpaceBetween else Arrangement.SpaceAround
             ) {
 
                 // top of the screen
