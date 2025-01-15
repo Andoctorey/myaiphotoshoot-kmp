@@ -163,4 +163,7 @@ class GenerateViewModel : SessionViewModel() {
         uiState = uiState.copy(showSettings = !uiState.showSettings)
     }
 
+    fun createAiModel() {
+    }
+
 }

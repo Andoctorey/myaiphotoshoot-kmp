@@ -35,9 +35,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -48,6 +52,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
@@ -193,11 +198,13 @@ fun GenerateScreen(
                 FlowRow(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
                     horizontalArrangement = Arrangement.Center,
-                    verticalArrangement = Arrangement.Center,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    EnhancePromptButton(state.isEnhancingPrompt, viewModel::enhancePrompt)
+                    CreateAiModelButton(viewModel::createAiModel)
 
                     SurpriseMeButton(state.isLoadingSurpriseMe, viewModel::surpriseMe)
+
+                    EnhancePromptButton(state.isEnhancingPrompt, viewModel::enhancePrompt)
                 }
 
                 // bottom of the screen
@@ -222,6 +229,7 @@ fun GenerateScreen(
         }
     }
 }
+
 
 @Composable
 private fun AiVisionPrompt(
@@ -316,12 +324,32 @@ private fun PhotoPrompt(
 }
 
 @Composable
+private fun CreateAiModelButton(onClick: () -> Unit) {
+    OutlinedButton(onClick = onClick) {
+        Icon(
+            imageVector = Icons.Default.Memory,
+            contentDescription = stringResource(Res.string.create_ai_model)
+        )
+        Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
+        Text(
+            text = stringResource(Res.string.create_ai_model),
+            fontSize = 16.sp,
+        )
+    }
+}
+
+@Composable
 private fun EnhancePromptButton(isLoading: Boolean, onClick: () -> Unit) {
     Box(contentAlignment = Alignment.Center) {
-        TextButton(
+        OutlinedButton(
             modifier = Modifier.alpha(if (isLoading) 0f else 1f),
             onClick = onClick
         ) {
+            Icon(
+                imageVector = Icons.Default.Build,
+                contentDescription = stringResource(Res.string.enhance_prompt)
+            )
+            Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
             Text(
                 text = stringResource(Res.string.enhance_prompt),
                 fontSize = 16.sp,
@@ -340,10 +368,15 @@ private fun EnhancePromptButton(isLoading: Boolean, onClick: () -> Unit) {
 @Composable
 private fun SurpriseMeButton(isLoading: Boolean, onClick: () -> Unit) {
     Box(contentAlignment = Alignment.Center) {
-        TextButton(
+        OutlinedButton(
             modifier = Modifier.alpha(if (isLoading) 0f else 1f),
             onClick = onClick,
         ) {
+            Icon(
+                imageVector = Icons.Default.Lightbulb,
+                contentDescription = stringResource(Res.string.surprise_me)
+            )
+            Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
             Text(
                 text = stringResource(Res.string.surprise_me),
                 fontSize = 16.sp,
