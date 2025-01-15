@@ -19,6 +19,7 @@ object UserGenerationsRepository {
                     eq("user_id", userId)
                     eq("status", "succeeded")
                 }
+                limit(10)
                 order(column = "created_at", order = Order.DESCENDING)
             }
             .decodeList<UserGeneration>()
