@@ -169,7 +169,8 @@ fun SettingsItems(
                                 Text(
                                     modifier = Modifier.fillMaxWidth(),
                                     text = stringResource(item.nameRes),
-                                    textAlign = TextAlign.Center
+                                    textAlign = TextAlign.Center,
+                                    color = MaterialTheme.colorScheme.primary,
                                 )
                             },
                         )
