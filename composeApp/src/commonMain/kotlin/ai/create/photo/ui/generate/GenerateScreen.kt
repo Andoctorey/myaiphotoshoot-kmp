@@ -50,7 +50,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
-import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -139,13 +138,14 @@ fun GenerateScreen(
                         if (state.trainings != null) {
                             Box(modifier = Modifier.fillMaxWidth()) {
                                 Trainings(
-                                    modifier = Modifier.align(Alignment.Center),
+                                    modifier = Modifier.align(Alignment.Center)
+                                        .padding(top = 12.dp),
                                     trainings = state.trainings,
                                     selectedTraining = state.training,
                                     selectTraining = viewModel::selectTraining,
                                     createTraining = createTraining,
                                 )
-                                SmallFloatingActionButton(
+                                IconButton(
                                     modifier = Modifier.align(Alignment.CenterEnd)
                                         .padding(top = 8.dp, start = 8.dp, end = 8.dp),
                                     onClick = viewModel::toggleSettings,
@@ -153,6 +153,7 @@ fun GenerateScreen(
                                     Icon(
                                         imageVector = if (state.showSettings) Icons.Default.Close else Icons.Default.Settings,
                                         contentDescription = "settings",
+                                        tint = MaterialTheme.colorScheme.primary,
                                     )
                                 }
                             }
