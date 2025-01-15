@@ -32,8 +32,10 @@ class GenerateViewModel : SessionViewModel() {
     }
 
     fun loadTrainings() = viewModelScope.launch {
-        uiState = uiState.copy(isLoading = true, loadingError = null)
+        Logger.i("loadTrainings")
+        val userId = userId ?: return@launch
 
+        uiState = uiState.copy(isLoading = true, loadingError = null)
         try {
             var trainings = UserTrainingsRepository.getTrainings(userId).getOrThrow().map {
                 GenerateUiState.Training(

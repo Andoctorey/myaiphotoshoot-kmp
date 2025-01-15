@@ -52,6 +52,8 @@ class AddViewModel : SessionViewModel() {
     }
 
     private fun loadPhotos() = viewModelScope.launch {
+        Logger.i("loadPhotos")
+        val userId = userId ?: return@launch
         uiState = uiState.copy(isLoadingPhotos = uiState.photosByPhotoSet == null)
         try {
             val files = UserFilesRepository.getInputPhotos(userId).getOrThrow()
@@ -78,7 +80,8 @@ class AddViewModel : SessionViewModel() {
     }
 
     private fun loadTraining(): Job = viewModelScope.launch {
-        Logger.i("loadTraining")
+        Logger.i("loadPhotos")
+        val userId = userId ?: return@launch
         if (uiState.trainingStatus != TrainingStatus.PROCESSING) {
             uiState = uiState.copy(isLoadingTraining = true)
         }
@@ -103,7 +106,8 @@ class AddViewModel : SessionViewModel() {
     }
 
     fun uploadPhotos(files: PlatformFiles) = viewModelScope.launch {
-        Logger.i { "Selected files: ${files.joinToString { it.name }}" }
+        Logger.i("uploadPhotos: ${files.joinToString { it.name }}")
+        val userId = userId ?: return@launch
         if (files.isEmpty()) return@launch
 
         uiState = uiState.copy(uploadProgress = 1, errorPopup = null, showMenu = false)

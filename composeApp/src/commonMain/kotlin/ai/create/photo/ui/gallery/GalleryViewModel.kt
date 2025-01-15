@@ -31,6 +31,8 @@ class GalleryViewModel : SessionViewModel() {
     }
 
     fun loadGallery() = viewModelScope.launch {
+        Logger.i("loadGallery")
+        val userId = userId ?: return@launch
         uiState = uiState.copy(isLoading = true)
         try {
             val generations = UserGenerationsRepository.getGenerations(userId).getOrThrow()

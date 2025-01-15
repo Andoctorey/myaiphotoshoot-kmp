@@ -119,6 +119,8 @@ class LoginViewModel : SessionViewModel() {
     }
 
     fun deleteAllData() = viewModelScope.launch {
+        val userId = userId ?: return@launch
+
         Logger.i("deleteAllData")
         try {
             uiState = uiState.copy(isLoading = true)

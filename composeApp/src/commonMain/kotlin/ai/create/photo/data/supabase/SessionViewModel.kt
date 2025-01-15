@@ -12,7 +12,7 @@ abstract class SessionViewModel : ViewModel() {
 
     val auth = Supabase.supabase.auth
 
-    lateinit var userId: String
+    var userId: String? = null
 
     fun loadSession() = viewModelScope.launch {
         Logger.i("loadSession from ${this@SessionViewModel}")
