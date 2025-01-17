@@ -200,11 +200,22 @@ fun GenerateScreen(
                     horizontalArrangement = Arrangement.Center,
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    CreateAiModelButton(viewModel::createAiModel)
+                    CreateAiModelButton(
+                        modifier = Modifier.padding(horizontal = 4.dp),
+                        onClick = viewModel::createAiModel
+                    )
 
-                    SurpriseMeButton(state.isLoadingSurpriseMe, viewModel::surpriseMe)
+                    SurpriseMeButton(
+                        modifier = Modifier.padding(horizontal = 4.dp),
+                        isLoading = state.isLoadingSurpriseMe,
+                        onClick = viewModel::surpriseMe
+                    )
 
-                    EnhancePromptButton(state.isEnhancingPrompt, viewModel::enhancePrompt)
+                    EnhancePromptButton(
+                        modifier = Modifier.padding(horizontal = 4.dp),
+                        isLoading = state.isEnhancingPrompt,
+                        onClick = viewModel::enhancePrompt
+                    )
                 }
 
                 // bottom of the screen
@@ -324,8 +335,8 @@ private fun PhotoPrompt(
 }
 
 @Composable
-private fun CreateAiModelButton(onClick: () -> Unit) {
-    OutlinedButton(onClick = onClick) {
+private fun CreateAiModelButton(modifier: Modifier, onClick: () -> Unit) {
+    OutlinedButton(modifier = modifier, onClick = onClick) {
         Icon(
             imageVector = Icons.Default.Memory,
             contentDescription = stringResource(Res.string.create_ai_model)
@@ -339,10 +350,10 @@ private fun CreateAiModelButton(onClick: () -> Unit) {
 }
 
 @Composable
-private fun EnhancePromptButton(isLoading: Boolean, onClick: () -> Unit) {
+private fun EnhancePromptButton(modifier: Modifier, isLoading: Boolean, onClick: () -> Unit) {
     Box(contentAlignment = Alignment.Center) {
         OutlinedButton(
-            modifier = Modifier.alpha(if (isLoading) 0f else 1f),
+            modifier = modifier.alpha(if (isLoading) 0f else 1f),
             onClick = onClick
         ) {
             Icon(
@@ -366,10 +377,10 @@ private fun EnhancePromptButton(isLoading: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-private fun SurpriseMeButton(isLoading: Boolean, onClick: () -> Unit) {
-    Box(contentAlignment = Alignment.Center) {
+private fun SurpriseMeButton(modifier: Modifier, isLoading: Boolean, onClick: () -> Unit) {
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
         OutlinedButton(
-            modifier = Modifier.alpha(if (isLoading) 0f else 1f),
+            modifier = Modifier.alpha(if (isLoading) 0f else 1f).padding(horizontal = 4.dp),
             onClick = onClick,
         ) {
             Icon(
