@@ -5,6 +5,7 @@ import ai.create.photo.platform.platform
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
+import ai.create.photo.ui.create_ai_model.CreateAiModelPopup
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
@@ -202,7 +203,7 @@ fun GenerateScreen(
                 ) {
                     CreateAiModelButton(
                         modifier = Modifier.padding(horizontal = 4.dp),
-                        onClick = viewModel::createAiModel
+                        onClick = { viewModel.toggleCreateAiModelPopup(true) }
                     )
 
                     SurpriseMeButton(
@@ -236,6 +237,12 @@ fun GenerateScreen(
         if (state.errorPopup != null) {
             ErrorPopup(state.errorPopup) {
                 viewModel.hideErrorPopup()
+            }
+        }
+
+        if (state.showCreateAiModelPopup) {
+            CreateAiModelPopup {
+                viewModel.toggleCreateAiModelPopup(false)
             }
         }
     }

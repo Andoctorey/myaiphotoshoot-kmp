@@ -163,7 +163,8 @@ class GenerateViewModel : SessionViewModel() {
         uiState = uiState.copy(showSettings = !uiState.showSettings)
     }
 
-    fun createAiModel() {
+    fun toggleCreateAiModelPopup(show: Boolean) {
+        uiState = uiState.copy(showCreateAiModelPopup = show)
     }
 
 }
