@@ -1,7 +1,5 @@
 package ai.create.photo.ui.compose
 
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Info
@@ -9,8 +7,8 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import org.jetbrains.compose.resources.stringResource
 import photocreateai.composeapp.generated.resources.Res
@@ -21,14 +19,9 @@ fun ErrorPopup(e: Throwable, onDismiss: () -> Unit) {
     AlertDialog(
         icon = { Icon(Icons.Default.Error, contentDescription = "error") },
         onDismissRequest = onDismiss,
-        text = {
-            Text(
-                modifier = Modifier.verticalScroll(rememberScrollState()),
-                text = e.getFriendlyError()
-            )
-        },
+        text = { Text(text = e.getFriendlyError()) },
         confirmButton = {
-            Button(onClick = onDismiss) {
+            TextButton(onClick = onDismiss) {
                 Text("OK")
             }
         }
@@ -40,14 +33,9 @@ fun InfoPopup(message: String, onDismiss: () -> Unit) {
     AlertDialog(
         icon = { Icon(Icons.Default.Info, contentDescription = message) },
         onDismissRequest = onDismiss,
-        text = {
-            Text(
-                modifier = Modifier.verticalScroll(rememberScrollState()),
-                text = message,
-            )
-        },
+        text = { Text(text = message) },
         confirmButton = {
-            Button(onClick = onDismiss) {
+            TextButton(onClick = onDismiss) {
                 Text("OK")
             }
         }
@@ -66,13 +54,10 @@ fun ConfirmationPopup(
         icon = { Icon(icon, contentDescription = message) },
         onDismissRequest = onDismiss,
         text = {
-            Text(
-                modifier = Modifier.verticalScroll(rememberScrollState()),
-                text = message,
-            )
+            Text(text = message)
         },
         dismissButton = {
-            Button(onClick = onDismiss) {
+            TextButton(onClick = onDismiss) {
                 Text(stringResource(Res.string.cancel))
             }
         },
