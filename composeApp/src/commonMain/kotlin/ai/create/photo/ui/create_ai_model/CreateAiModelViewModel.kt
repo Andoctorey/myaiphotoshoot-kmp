@@ -34,6 +34,7 @@ class CreateAiModelViewModel : SessionViewModel() {
         val userId = userId ?: return@launch
         uiState = uiState.copy(isLoading = true)
         try {
+            uiState = uiState.copy(isLoading = false)
         } catch (e: Exception) {
             Logger.e("Load state failed", e)
             uiState = uiState.copy(isLoading = false, loadingError = e)

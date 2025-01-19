@@ -42,5 +42,15 @@
     <string name="photos_to_generate">Photos to Generate</string>
     <string name="enhance_prompt">Enhance Prompt</string>
     <string name="ok">OK</string>
+    <string name="create_ai_model_title">Create an AI Model in 5 Easy Steps</string>
+    <string name="create_ai_model_step_1">1. Upload 10–20 high-quality selfies in portrait mode from various angles.</string>
+    <string name="create_ai_model_step_1_button">Upload Photos</string>
+    <string name="create_ai_model_step_2">2. Review your photos with AI to ensure they meet quality standards.</string>
+    <string name="create_ai_model_step_2_button">Analyze Photos</string>
+    <string name="create_ai_model_step_3">3. Select a model and the number of training steps.</string>
+    <string name="create_ai_model_step_4">4. Top up your balance to start training.</string>
+    <string name="create_ai_model_step_4_button">Top Up</string>
+    <string name="create_ai_model_step_5">5. Wait about one hour for the training to complete.</string>
+    <string name="create_ai_model_step_final">Generate an unlimited number of photos for just $0.03 each.</string>
 
 </resources>
