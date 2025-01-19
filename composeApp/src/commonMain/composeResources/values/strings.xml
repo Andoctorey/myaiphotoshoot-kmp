@@ -41,5 +41,6 @@
     <string name="surprise_me">Surprise Me</string>
     <string name="photos_to_generate">Photos to Generate</string>
     <string name="enhance_prompt">Enhance Prompt</string>
+    <string name="ok">OK</string>
 
 </resources>

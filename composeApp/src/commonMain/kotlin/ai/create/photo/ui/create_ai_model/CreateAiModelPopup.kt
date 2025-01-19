@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,7 +36,7 @@ fun CreateAiModelPopup(
             .fillMaxWidth(0.85f),
         properties = DialogProperties(usePlatformDefaultWidth = false),
         onDismissRequest = onDismiss,
-        title = { stringResource(Res.string.create_ai_model) },
+        title = { Text(text = stringResource(Res.string.create_ai_model)) },
         text = {
             Box(
                 modifier = Modifier.fillMaxWidth(),
@@ -48,7 +50,11 @@ fun CreateAiModelPopup(
                 }
             }
         },
-        confirmButton = {}
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("OK")
+            }
+        }
     )
 
 }
