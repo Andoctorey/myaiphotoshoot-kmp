@@ -72,7 +72,11 @@ class GenerateViewModel : SessionViewModel() {
     }
 
     fun prepareToGenerate(onGenerate: (String, String, Int) -> Unit) = viewModelScope.launch {
-        val trainingId = uiState.training?.id ?: return@launch
+        val trainingId = uiState.training?.id
+        if (trainingId.isNullOrEmpty()) {
+            toggleCreateAiModelPopup(true)
+            return@launch
+        }
 
         uiState = uiState.copy(showSettings = false)
 
