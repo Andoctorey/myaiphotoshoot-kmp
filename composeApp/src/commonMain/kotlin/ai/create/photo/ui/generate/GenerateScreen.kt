@@ -141,7 +141,7 @@ fun GenerateScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        if (state.trainings != null) {
+                        if (!state.trainings.isNullOrEmpty()) {
                             Box(modifier = Modifier.fillMaxWidth()) {
                                 Trainings(
                                     modifier = Modifier.align(Alignment.Center)
@@ -163,32 +163,32 @@ fun GenerateScreen(
                                     )
                                 }
                             }
-                        }
 
-                        Crossfade(targetState = state.showSettings) { showSettings ->
-                            if (showSettings) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center
-                                ) {
-                                    Spacer(modifier = Modifier.height(8.dp))
+                            Crossfade(targetState = state.showSettings) { showSettings ->
+                                if (showSettings) {
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Center
+                                    ) {
+                                        Spacer(modifier = Modifier.height(8.dp))
 
-                                    if (state.aiVisionPrompt.isNotEmpty()) {
-                                        AiVisionPrompt(
-                                            prompt = state.aiVisionPrompt,
-                                            onPromptChanged = viewModel::onAiVisionPromptChanged,
-                                            isLoadingAiVisionPrompt = state.isLoadingAiVisionPrompt,
-                                            onRefreshAiVisionPrompt = viewModel::onRefreshAiVisionPrompt,
-                                        )
+                                        if (state.aiVisionPrompt.isNotEmpty()) {
+                                            AiVisionPrompt(
+                                                prompt = state.aiVisionPrompt,
+                                                onPromptChanged = viewModel::onAiVisionPromptChanged,
+                                                isLoadingAiVisionPrompt = state.isLoadingAiVisionPrompt,
+                                                onRefreshAiVisionPrompt = viewModel::onRefreshAiVisionPrompt,
+                                            )
+                                        }
+
+                                        Spacer(modifier = Modifier.height(16.dp))
+
+                                        PhotosToGenerate(state.photosToGenerateX100) {
+                                            viewModel.onPhotosToGenerateChanged(it)
+                                        }
+
+                                        Spacer(modifier = Modifier.height(12.dp))
                                     }
-
-                                    Spacer(modifier = Modifier.height(16.dp))
-
-                                    PhotosToGenerate(state.photosToGenerateX100) {
-                                        viewModel.onPhotosToGenerateChanged(it)
-                                    }
-
-                                    Spacer(modifier = Modifier.height(12.dp))
                                 }
                             }
                         }
@@ -206,17 +206,19 @@ fun GenerateScreen(
                         onClick = { viewModel.toggleCreateAiModelPopup(true) }
                     )
 
-                    SurpriseMeButton(
-                        modifier = Modifier.padding(horizontal = 4.dp),
-                        isLoading = state.isLoadingSurpriseMe,
-                        onClick = viewModel::surpriseMe
-                    )
+                    if (!state.trainings.isNullOrEmpty()) {
+                        SurpriseMeButton(
+                            modifier = Modifier.padding(horizontal = 4.dp),
+                            isLoading = state.isLoadingSurpriseMe,
+                            onClick = viewModel::surpriseMe
+                        )
 
-                    EnhancePromptButton(
-                        modifier = Modifier.padding(horizontal = 4.dp),
-                        isLoading = state.isEnhancingPrompt,
-                        onClick = viewModel::enhancePrompt
-                    )
+                        EnhancePromptButton(
+                            modifier = Modifier.padding(horizontal = 4.dp),
+                            isLoading = state.isEnhancingPrompt,
+                            onClick = viewModel::enhancePrompt
+                        )
+                    }
                 }
 
                 // bottom of the screen
@@ -493,5 +495,4 @@ private fun PhotosToGenerate(photosToGenerate: Int, onPhotosToGenerateChanged: (
             valueRange = 100f..1000f,
         )
     }
-
 }
