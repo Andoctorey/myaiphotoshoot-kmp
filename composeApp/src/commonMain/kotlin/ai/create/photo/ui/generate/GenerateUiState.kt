@@ -23,7 +23,7 @@ data class GenerateUiState(
     val isEnhancingPrompt: Boolean = false,
     val isLoadingSurpriseMe: Boolean = false,
 
-    val photosToGenerateX100: Int = 300,
+    val photosToGenerateX100: Int = 100,
 
     val showCreateAiModelPopup: Boolean = false,
 ) {
