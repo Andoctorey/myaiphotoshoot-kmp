@@ -41,4 +41,8 @@ class CreateAiModelViewModel : SessionViewModel() {
         }
     }
 
+    fun updateTrainingSteps(trainingSteps: Int) {
+        uiState = uiState.copy(trainingSteps = trainingSteps)
+    }
+
 }

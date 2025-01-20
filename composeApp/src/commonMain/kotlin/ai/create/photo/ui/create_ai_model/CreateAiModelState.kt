@@ -6,4 +6,6 @@ import androidx.compose.runtime.Immutable
 data class CreateAiModelState(
     val isLoading: Boolean = true,
     val loadingError: Throwable? = null,
+
+    val trainingSteps: Int = 1000,
 )

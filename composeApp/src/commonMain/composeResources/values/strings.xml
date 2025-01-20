@@ -41,7 +41,11 @@
     <string name="surprise_me">Surprise Me</string>
     <string name="photos_to_generate">Photos to Generate</string>
     <string name="enhance_prompt">Enhance Prompt</string>
-    <string name="ok">OK</string>
+    <string name="cancel_popup">Cancel</string>
+    <string name="training_steps">Training steps</string>
+    <string name="minutes">Minutes</string>
+    <string name="cost">Cost: $%1$s, then $0.03 per photo.</string>
+
     <string name="create_ai_model_title">Create an AI Model in 5 Easy Steps</string>
     <string name="create_ai_model_step_1">1. Upload 10–20 high-quality selfies in portrait mode from various angles.</string>
     <string name="create_ai_model_step_1_button">Upload Photos</string>
