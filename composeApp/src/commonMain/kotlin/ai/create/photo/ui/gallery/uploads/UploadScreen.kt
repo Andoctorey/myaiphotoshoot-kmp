@@ -168,7 +168,7 @@ fun UploadScreen(
 
             if (!state.isLoadingTraining && state.trainingStatus != TrainingStatus.PROCESSING) {
                 FabMenu(
-                    modifier = Modifier.align(Alignment.BottomEnd).padding(bottom = 64.dp),
+                    modifier = Modifier.align(Alignment.BottomEnd).padding(bottom = 68.dp),
                     photos = state.displayingPhotos,
                     photoSets = state.photoSets,
                     uploadProgress = state.uploadProgress,
