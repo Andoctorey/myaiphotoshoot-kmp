@@ -10,12 +10,17 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -32,7 +37,12 @@ import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import photocreateai.composeapp.generated.resources.Res
+import photocreateai.composeapp.generated.resources.gallery_creations_tab
+import photocreateai.composeapp.generated.resources.gallery_public_tab
+import photocreateai.composeapp.generated.resources.gallery_uploads_tab
 
 
 @Preview
@@ -66,6 +76,32 @@ fun GalleryScreen(
             }
 
             Photos(state.photos, state.listState)
+
+            Tabs(modifier = Modifier.align(Alignment.BottomCenter).padding(24.dp))
+        }
+    }
+}
+
+@Composable
+private fun Tabs(modifier: Modifier) {
+    var selectedIndex by remember { mutableStateOf(0) }
+    val options = listOf(
+        stringResource(Res.string.gallery_public_tab),
+        stringResource(Res.string.gallery_creations_tab),
+        stringResource(Res.string.gallery_uploads_tab),
+    )
+    SingleChoiceSegmentedButtonRow(modifier = modifier) {
+        options.forEachIndexed { index, label ->
+            SegmentedButton(
+                shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
+                onClick = { selectedIndex = index },
+                selected = index == selectedIndex
+            ) {
+                Text(
+                    text = label,
+                    maxLines = 1
+                )
+            }
         }
     }
 }
