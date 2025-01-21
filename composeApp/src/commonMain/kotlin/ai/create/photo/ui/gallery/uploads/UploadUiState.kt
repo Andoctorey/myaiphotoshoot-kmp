@@ -24,7 +24,6 @@ data class UploadUiState(
     val showMenu: Boolean = false,
     val showUploadMorePhotosPopup: Boolean = false,
     val showCreatingModelPopup: Boolean = false,
-    val openedCreatePhotosScreen: Boolean = false,
     val deleteUnsuitablePhotosPopup: Boolean = false,
 ) {
 
