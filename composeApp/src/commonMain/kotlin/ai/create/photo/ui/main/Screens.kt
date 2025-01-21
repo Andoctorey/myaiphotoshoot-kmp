@@ -12,7 +12,7 @@ enum class AppNavigationRoutes(
     val label: StringResource,
     val icon: ImageVector,
 ) {
-    TAB_1_GALLERY(Res.string.tab_gallery, Icons.Default.Brush),
-    TAB_2_GENERATE(Res.string.tab_generate, Icons.Default.PersonSearch),
+    TAB_1_GALLERY(Res.string.tab_gallery, Icons.Default.PersonSearch),
+    TAB_2_GENERATE(Res.string.tab_generate, Icons.Default.Brush),
     TAB_3_SETTINGS(Res.string.tab_settings, Icons.Default.Settings),
 }
