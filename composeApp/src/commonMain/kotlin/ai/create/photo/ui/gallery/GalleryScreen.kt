@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -71,7 +72,8 @@ private fun Tabs(modifier: Modifier, selectedTab: Int, onClick: (Int) -> Unit) {
             ) {
                 Text(
                     text = label,
-                    maxLines = 1
+                    maxLines = 1,
+                    fontSize = 12.sp,
                 )
             }
         }
