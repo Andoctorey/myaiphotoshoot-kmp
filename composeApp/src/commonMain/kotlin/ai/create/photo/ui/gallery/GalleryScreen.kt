@@ -1,6 +1,7 @@
 package ai.create.photo.ui.gallery
 
 import ai.create.photo.ui.gallery.creations.CreationsScreen
+import ai.create.photo.ui.gallery.uploads.AddScreen
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -27,6 +28,7 @@ import photocreateai.composeapp.generated.resources.gallery_uploads_tab
 fun GalleryScreen(
     viewModel: GalleryViewModel = viewModel { GalleryViewModel() },
     generationInProgress: Boolean,
+    openGenerateTab: () -> Unit,
 ) {
     val state = viewModel.uiState
     Box(
@@ -41,10 +43,7 @@ fun GalleryScreen(
             )
 
             1 -> CreationsScreen(generationInProgress = generationInProgress)
-            2 -> Text(
-                text = "Uploads",
-                style = MaterialTheme.typography.bodySmall
-            )
+            2 -> AddScreen(openGenerateTab = openGenerateTab)
         }
 
         Tabs(

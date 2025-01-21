@@ -1,8 +1,7 @@
 <resources>
-    <string name="tab_1">Add</string>
-    <string name="tab_2">Generate</string>
-    <string name="tab_3">Gallery</string>
-    <string name="tab_4">Settings</string>
+    <string name="tab_gallery">Gallery</string>
+    <string name="tab_generate">Generate</string>
+    <string name="tab_settings">Settings</string>
     <string name="back_button">Back</string>
     <string name="add_your_photos">Add Selfies</string>
     <string name="upload_guidelines_message">Make and upload 10 high-quality selfies with varied angles. Don’t worry about getting every photo perfect - AI will review and exclude any unsupported images. </string>

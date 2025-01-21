@@ -1,6 +1,5 @@
 package ai.create.photo.ui.main
 
-import ai.create.photo.ui.add_photos.AddScreen
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.gallery.GalleryScreen
 import ai.create.photo.ui.generate.GenerateScreen
@@ -40,11 +39,11 @@ fun MainScreen(
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     AppNavigationRoutes.valueOf(
-        backStackEntry?.destination?.route ?: AppNavigationRoutes.TAB1.name
+        backStackEntry?.destination?.route ?: AppNavigationRoutes.TAB_1_GALLERY.name
     )
 
     val state = viewModel.uiState
-    var currentDestination by rememberSaveable { mutableStateOf(AppNavigationRoutes.TAB1) }
+    var currentDestination by rememberSaveable { mutableStateOf(AppNavigationRoutes.TAB_1_GALLERY) }
     LaunchedEffect(currentDestination) {
         Logger.i("change tab: ${currentDestination.name}")
     }
@@ -54,7 +53,7 @@ fun MainScreen(
             AppNavigationRoutes.entries.forEach {
                 item(
                     icon = {
-                        if (it == AppNavigationRoutes.TAB3 && state.generationsInProgress != 0) {
+                        if (it == AppNavigationRoutes.TAB_1_GALLERY && state.generationsInProgress != 0) {
                             Box(
                                 contentAlignment = Alignment.Center,
                                 modifier = Modifier.size(24.dp)
@@ -90,30 +89,28 @@ fun MainScreen(
         }
     ) {
         when (currentDestination) {
-            AppNavigationRoutes.TAB1 -> AddScreen(
-                openCreatePhotosScreen = {
+            AppNavigationRoutes.TAB_1_GALLERY -> GalleryScreen(
+                generationInProgress = state.generationsInProgress != 0,
+                openGenerateTab = {
                     if (!state.generateScreenOpened) {
-                        currentDestination = AppNavigationRoutes.TAB2
+                        currentDestination = AppNavigationRoutes.TAB_2_GENERATE
                     }
                 }
             )
 
-            AppNavigationRoutes.TAB2 -> {
+            AppNavigationRoutes.TAB_2_GENERATE -> {
                 viewModel.setGenerateScreenOpened()
                 GenerateScreen(
                     createTraining = {
-                        currentDestination = AppNavigationRoutes.TAB1
+                        currentDestination = AppNavigationRoutes.TAB_1_GALLERY
                     },
                     onGenerate = { trainingId, prompt, photosToGenerate ->
                         viewModel.generatePhoto(trainingId, prompt, photosToGenerate)
                     })
             }
 
-            AppNavigationRoutes.TAB3 -> GalleryScreen(
-                generationInProgress = state.generationsInProgress != 0
-            )
 
-            AppNavigationRoutes.TAB4 -> SettingsScreen()
+            AppNavigationRoutes.TAB_3_SETTINGS -> SettingsScreen()
         }
     }
 

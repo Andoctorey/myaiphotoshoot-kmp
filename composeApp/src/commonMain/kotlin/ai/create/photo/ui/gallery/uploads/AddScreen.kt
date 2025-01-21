@@ -1,4 +1,4 @@
-package ai.create.photo.ui.add_photos
+package ai.create.photo.ui.gallery.uploads
 
 import ai.create.photo.data.supabase.model.AnalysisStatus
 import ai.create.photo.data.supabase.model.TrainingStatus
@@ -103,7 +103,7 @@ import photocreateai.composeapp.generated.resources.upload_more_photos
 @Composable
 fun AddScreen(
     viewModel: AddViewModel = viewModel { AddViewModel() },
-    openCreatePhotosScreen: () -> Unit,
+    openGenerateTab: () -> Unit,
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -150,16 +150,16 @@ fun AddScreen(
         if (!state.isLoadingPhotos && photos != null) {
             if (!state.isLoadingTraining && photos.size >= 10) {
                 CreateModelFab(
-                    modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
+                    modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 88.dp),
                     extended = true,
                     trainingStatus = state.trainingStatus,
                     createModel = viewModel::createModel,
                     onCreatingModelClick = viewModel::onCreatingModelClick,
-                    generatePhotos = openCreatePhotosScreen,
+                    generatePhotos = openGenerateTab,
                 )
             } else {
                 AddPhotosFab(
-                    modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
+                    modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 88.dp),
                     extended = true,
                     uploadProgress = state.uploadProgress,
                     onClick = onAddPhotoClick,
@@ -168,7 +168,7 @@ fun AddScreen(
 
             if (!state.isLoadingTraining && state.trainingStatus != TrainingStatus.PROCESSING) {
                 FabMenu(
-                    modifier = Modifier.align(Alignment.BottomEnd),
+                    modifier = Modifier.align(Alignment.BottomEnd).padding(bottom = 64.dp),
                     photos = state.displayingPhotos,
                     photoSets = state.photoSets,
                     uploadProgress = state.uploadProgress,
@@ -178,7 +178,7 @@ fun AddScreen(
                     toggleMenu = viewModel::toggleMenu,
                     createModel = viewModel::createModel,
                     onCreatingModelClick = viewModel::onCreatingModelClick,
-                    generatePhotos = openCreatePhotosScreen,
+                    generatePhotos = openGenerateTab,
                     photoSet = state.photoSet,
                     selectPhotoSet = viewModel::selectPhotoSet,
                     createPhotoSet = viewModel::createPhotoSet,
@@ -213,15 +213,6 @@ fun AddScreen(
                 onConfirm = viewModel::deleteUnsuitablePhotos,
                 onDismiss = viewModel::hideDeleteUnsuitablePhotosPopup,
             )
-        }
-
-        if (!state.openedCreatePhotosScreen) {
-            LaunchedEffect(state.trainingStatus) {
-                if (state.trainingStatus == TrainingStatus.SUCCEEDED) {
-                    viewModel.openedCreatePhotosScreen()
-                    openCreatePhotosScreen()
-                }
-            }
         }
     }
 }
