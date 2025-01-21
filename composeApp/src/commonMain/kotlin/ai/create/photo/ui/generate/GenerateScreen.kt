@@ -5,7 +5,7 @@ import ai.create.photo.platform.platform
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
-import ai.create.photo.ui.create_ai_model.CreateAiModelPopup
+import ai.create.photo.ui.train_ai_model.TrainAiModelPopup
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
@@ -81,12 +81,12 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.ai_model
-import photocreateai.composeapp.generated.resources.create_ai_model
 import photocreateai.composeapp.generated.resources.enhance_photo_accuracy
 import photocreateai.composeapp.generated.resources.enhance_prompt
 import photocreateai.composeapp.generated.resources.photo_prompt
 import photocreateai.composeapp.generated.resources.photos_to_generate
 import photocreateai.composeapp.generated.resources.surprise_me
+import photocreateai.composeapp.generated.resources.train_ai_model
 
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -243,7 +243,7 @@ fun GenerateScreen(
         }
 
         if (state.showCreateAiModelPopup) {
-            CreateAiModelPopup {
+            TrainAiModelPopup {
                 viewModel.toggleCreateAiModelPopup(false)
             }
         }
@@ -348,11 +348,11 @@ private fun CreateAiModelButton(modifier: Modifier, onClick: () -> Unit) {
     OutlinedButton(modifier = modifier, onClick = onClick) {
         Icon(
             imageVector = Icons.Default.Memory,
-            contentDescription = stringResource(Res.string.create_ai_model)
+            contentDescription = stringResource(Res.string.train_ai_model)
         )
         Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
         Text(
-            text = stringResource(Res.string.create_ai_model),
+            text = stringResource(Res.string.train_ai_model),
             fontSize = 16.sp,
         )
     }
@@ -426,7 +426,7 @@ private fun Trainings(
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(selectedTraining) }
     val aiModelString = stringResource(Res.string.ai_model)
-    val createAiModelString = stringResource(Res.string.create_ai_model)
+    val createAiModelString = stringResource(Res.string.train_ai_model)
     ExposedDropdownMenuBox(
         modifier = modifier,
         expanded = expanded,

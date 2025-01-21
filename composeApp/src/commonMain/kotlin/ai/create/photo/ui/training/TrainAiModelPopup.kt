@@ -1,4 +1,4 @@
-package ai.create.photo.ui.create_ai_model
+package ai.create.photo.ui.train_ai_model
 
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.LoadingPlaceholder
@@ -29,16 +29,16 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.cancel
 import photocreateai.composeapp.generated.resources.cost
-import photocreateai.composeapp.generated.resources.create_ai_model
 import photocreateai.composeapp.generated.resources.minutes
+import photocreateai.composeapp.generated.resources.train_ai_model
 import photocreateai.composeapp.generated.resources.training_steps
 import kotlin.math.round
 
 
 @Preview
 @Composable
-fun CreateAiModelPopup(
-    viewModel: CreateAiModelViewModel = viewModel { CreateAiModelViewModel() },
+fun TrainAiModelPopup(
+    viewModel: TrainAiModelViewModel = viewModel { TrainAiModelViewModel() },
     onDismiss: () -> Unit,
 ) {
     val state = viewModel.uiState
@@ -63,12 +63,12 @@ fun CreateAiModelPopup(
                     Column(
                         modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
                     ) {
-//        Text(stringResource(Res.string.create_ai_model_step_1))
-//        Text(stringResource(Res.string.create_ai_model_step_2))
-//        Text(stringResource(Res.string.create_ai_model_step_3))
-//        Text(stringResource(Res.string.create_ai_model_step_4))
-//        Text(stringResource(Res.string.create_ai_model_step_5))
-//        Text(stringResource(Res.string.create_ai_model_step_final))
+//        Text(stringResource(Res.string.train_ai_model_step_1))
+//        Text(stringResource(Res.string.train_ai_model_step_2))
+//        Text(stringResource(Res.string.train_ai_model_step_3))
+//        Text(stringResource(Res.string.train_ai_model_step_4))
+//        Text(stringResource(Res.string.train_ai_model_step_5))
+//        Text(stringResource(Res.string.train_ai_model_step_final))
                         TrainingSteps(
                             steps = state.trainingSteps,
                             onStepsChanged = { viewModel.updateTrainingSteps(it) })
@@ -87,7 +87,7 @@ fun CreateAiModelPopup(
         confirmButton = {
             TextButton(onClick = onDismiss) {
                 Text(
-                    text = stringResource(Res.string.create_ai_model),
+                    text = stringResource(Res.string.train_ai_model),
                     fontSize = 16.sp
                 )
             }

@@ -1,4 +1,4 @@
-package ai.create.photo.ui.create_ai_model
+package ai.create.photo.ui.train_ai_model
 
 import ai.create.photo.data.supabase.SessionViewModel
 import androidx.compose.runtime.getValue
@@ -8,9 +8,9 @@ import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.launch
 
-class CreateAiModelViewModel : SessionViewModel() {
+class TrainAiModelViewModel : SessionViewModel() {
 
-    var uiState by mutableStateOf(CreateAiModelState())
+    var uiState by mutableStateOf(TrainAiModelState())
         private set
 
     init {

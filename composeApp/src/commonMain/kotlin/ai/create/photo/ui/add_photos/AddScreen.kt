@@ -86,15 +86,15 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.add_your_photos
 import photocreateai.composeapp.generated.resources.analyzing_photos
-import photocreateai.composeapp.generated.resources.create_ai_model
 import photocreateai.composeapp.generated.resources.create_photo_set
-import photocreateai.composeapp.generated.resources.creating_ai_model
 import photocreateai.composeapp.generated.resources.creating_model_hint
 import photocreateai.composeapp.generated.resources.delete
 import photocreateai.composeapp.generated.resources.delete_photo_set
 import photocreateai.composeapp.generated.resources.delete_unsuitable_photos
 import photocreateai.composeapp.generated.resources.generate_photo
 import photocreateai.composeapp.generated.resources.photo_set
+import photocreateai.composeapp.generated.resources.train_ai_model
+import photocreateai.composeapp.generated.resources.trainining_ai_model
 import photocreateai.composeapp.generated.resources.upload_guidelines_message
 import photocreateai.composeapp.generated.resources.upload_more_photos
 
@@ -325,7 +325,7 @@ fun CreateModelFab(
                     if (extended) {
                         Icon(
                             imageVector = Icons.Default.Brush,
-                            contentDescription = stringResource(Res.string.create_ai_model),
+                            contentDescription = stringResource(Res.string.train_ai_model),
                             tint = MaterialTheme.colorScheme.onSurface,
                         )
                         Spacer(modifier = Modifier.width(16.dp))
@@ -349,7 +349,7 @@ fun CreateModelFab(
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                     Text(
-                        text = stringResource(Res.string.creating_ai_model),
+                        text = stringResource(Res.string.trainining_ai_model),
                     )
                 }
             }
@@ -359,13 +359,13 @@ fun CreateModelFab(
                     if (extended) {
                         Icon(
                             imageVector = Icons.Default.Mood,
-                            contentDescription = stringResource(Res.string.create_ai_model),
+                            contentDescription = stringResource(Res.string.train_ai_model),
                             tint = MaterialTheme.colorScheme.onSurface,
                         )
                         Spacer(modifier = Modifier.width(16.dp))
                     }
                     Text(
-                        text = stringResource(Res.string.create_ai_model),
+                        text = stringResource(Res.string.train_ai_model),
                         textAlign = TextAlign.Center,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
