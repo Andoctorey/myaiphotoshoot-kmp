@@ -5,7 +5,7 @@ import ai.create.photo.platform.platform
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
-import ai.create.photo.ui.train_ai_model.TrainAiModelPopup
+import ai.create.photo.ui.training.TrainAiModelPopup
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke

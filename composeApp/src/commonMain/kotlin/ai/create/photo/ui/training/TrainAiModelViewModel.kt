@@ -1,4 +1,4 @@
-package ai.create.photo.ui.train_ai_model
+package ai.create.photo.ui.training
 
 import ai.create.photo.data.supabase.SessionViewModel
 import androidx.compose.runtime.getValue
