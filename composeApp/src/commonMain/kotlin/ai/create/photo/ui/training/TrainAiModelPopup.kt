@@ -30,6 +30,7 @@ import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.cancel
 import photocreateai.composeapp.generated.resources.cost
 import photocreateai.composeapp.generated.resources.minutes
+import photocreateai.composeapp.generated.resources.select_training_steps
 import photocreateai.composeapp.generated.resources.train_ai_model
 import photocreateai.composeapp.generated.resources.training_steps
 import kotlin.math.round
@@ -102,18 +103,23 @@ private fun TrainingSteps(steps: Int, onStepsChanged: (Int) -> Unit) {
         modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        val minutes = (steps / 1000f * 60).toInt()
         Text(
             modifier = Modifier.animateContentSize(),
-            text = stringResource(Res.string.training_steps) + ": $steps. " +
-                    stringResource(Res.string.minutes) + ": $minutes.",
-            fontSize = 16.sp,
+            text = stringResource(Res.string.select_training_steps),
+            fontSize = 14.sp,
         )
         Spacer(modifier = Modifier.height(8.dp))
         Slider(
             value = steps.toFloat(),
             onValueChange = { onStepsChanged(it.toInt()) },
             valueRange = 500f..2000f,
+        )
+        val minutes = (steps / 1000f * 60).toInt()
+        Text(
+            modifier = Modifier.animateContentSize(),
+            text = stringResource(Res.string.training_steps) + ": $steps. " +
+                    stringResource(Res.string.minutes) + ": $minutes.",
+            fontSize = 14.sp,
         )
         Spacer(modifier = Modifier.height(8.dp))
         val cost = round(steps / 500f * 4.99 * 100f) / 100f
