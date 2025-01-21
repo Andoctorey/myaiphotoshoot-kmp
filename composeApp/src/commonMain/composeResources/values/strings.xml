@@ -4,7 +4,7 @@
     <string name="tab_3">Gallery</string>
     <string name="tab_4">Settings</string>
     <string name="back_button">Back</string>
-    <string name="add_your_photos">Add your photos</string>
+    <string name="add_your_photos">Add Selfies</string>
     <string name="upload_guidelines_message">Make and upload 10 high-quality selfies with varied angles. Don’t worry about getting every photo perfect - AI will review and exclude any unsupported images. </string>
     <string name="connection_error">Problem connecting with server. Please check your connection.</string>
     <string name="photo_set">Photo Set</string>
