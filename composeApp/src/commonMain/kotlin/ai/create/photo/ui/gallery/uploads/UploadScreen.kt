@@ -101,8 +101,8 @@ import photocreateai.composeapp.generated.resources.upload_more_photos
 
 @Preview
 @Composable
-fun AddScreen(
-    viewModel: AddViewModel = viewModel { AddViewModel() },
+fun UploadScreen(
+    viewModel: UploadViewModel = viewModel { UploadViewModel() },
     openGenerateTab: () -> Unit,
 ) {
     Box(
@@ -371,11 +371,11 @@ fun CreateModelFab(
 
 @Composable
 private fun Photos(
-    photos: List<AddUiState.Photo>,
+    photos: List<UploadUiState.Photo>,
     listState: LazyStaggeredGridState,
     hideDeletePhotoButton: Boolean,
     trainingStatus: TrainingStatus?,
-    onDelete: (AddUiState.Photo) -> Unit,
+    onDelete: (UploadUiState.Photo) -> Unit,
 ) {
     var showAnalysis by remember { mutableStateOf(trainingStatus == TrainingStatus.ANALYZING_PHOTOS) }
 
@@ -406,9 +406,9 @@ private fun Photos(
 @Composable
 private fun Photo(
     modifier: Modifier,
-    photo: AddUiState.Photo,
+    photo: UploadUiState.Photo,
     hideDeletePhotoButton: Boolean,
-    onDelete: (AddUiState.Photo) -> Unit,
+    onDelete: (UploadUiState.Photo) -> Unit,
     showAnalysis: Boolean,
     onToggleShowAnalysis: () -> Unit,
 ) {
@@ -503,7 +503,7 @@ private fun Photo(
 @Composable
 fun FabMenu(
     modifier: Modifier,
-    photos: List<AddUiState.Photo>?,
+    photos: List<UploadUiState.Photo>?,
     uploadProgress: Int,
     trainingStatus: TrainingStatus?,
     showMenu: Boolean,

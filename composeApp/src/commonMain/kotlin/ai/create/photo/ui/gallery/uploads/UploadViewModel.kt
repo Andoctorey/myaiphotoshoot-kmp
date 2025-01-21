@@ -24,14 +24,14 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlin.math.max
 
-class AddViewModel : SessionViewModel() {
+class UploadViewModel : SessionViewModel() {
 
     private val uploadPhotoUseCase = UploadPhotoUseCase(
         storage = SupabaseStorage,
         database = UserFilesRepository,
     )
 
-    var uiState by mutableStateOf(AddUiState())
+    var uiState by mutableStateOf(UploadUiState())
         private set
 
     init {
@@ -60,7 +60,7 @@ class AddViewModel : SessionViewModel() {
             uiState = uiState.copy(
                 isLoadingPhotos = false,
                 photosByPhotoSet = files.map { file ->
-                    AddUiState.Photo(
+                    UploadUiState.Photo(
                         id = file.id,
                         createdAt = file.createdAt,
                         name = file.fileName,
@@ -144,7 +144,7 @@ class AddViewModel : SessionViewModel() {
         uiState = uiState.copy(showMenu = !uiState.showMenu)
     }
 
-    fun deletePhoto(photo: AddUiState.Photo) = viewModelScope.launch {
+    fun deletePhoto(photo: UploadUiState.Photo) = viewModelScope.launch {
         val photosByPhotoSet = uiState.photosByPhotoSet ?: return@launch
         val photosInPhotoSet = photosByPhotoSet[photo.photoSet] ?: return@launch
         val updatedPhotos = photosInPhotoSet.filter { it.id != photo.id }

@@ -7,7 +7,7 @@ import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
 
 @Immutable
-data class AddUiState(
+data class UploadUiState(
     val isLoadingPhotos: Boolean = false,
     val loadingError: Throwable? = null,
     val photoSet: Int = 1,
@@ -29,7 +29,7 @@ data class AddUiState(
 ) {
 
     val displayingPhotos: List<Photo>?
-        get() = photosByPhotoSet?.get(this@AddUiState.photoSet) ?: emptyList()
+        get() = photosByPhotoSet?.get(this@UploadUiState.photoSet) ?: emptyList()
 
     val photoSets: List<Int>?
         get() = photosByPhotoSet?.keys?.toList()

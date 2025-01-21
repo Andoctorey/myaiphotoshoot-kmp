@@ -1,7 +1,7 @@
 package ai.create.photo.ui.gallery
 
 import ai.create.photo.ui.gallery.creations.CreationsScreen
-import ai.create.photo.ui.gallery.uploads.AddScreen
+import ai.create.photo.ui.gallery.uploads.UploadScreen
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -43,7 +43,7 @@ fun GalleryScreen(
             )
 
             1 -> CreationsScreen(generationInProgress = generationInProgress)
-            2 -> AddScreen(openGenerateTab = openGenerateTab)
+            2 -> UploadScreen(openGenerateTab = openGenerateTab)
         }
 
         Tabs(
