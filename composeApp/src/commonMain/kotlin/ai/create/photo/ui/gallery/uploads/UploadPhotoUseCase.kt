@@ -13,12 +13,12 @@ class UploadPhotoUseCase(
     private val database: UserFilesRepository
 ) {
 
-    fun invoke(userId: String, photoSet: Int, file: PlatformFile): Flow<UploadStatus> =
+    fun invoke(userId: String, file: PlatformFile): Flow<UploadStatus> =
         flow {
             val resized = resizeToWidth(file.readBytes()).getOrThrow()
 
             var successfulResponse: UploadStatus? = null
-            storage.uploadPhoto(userId, photoSet, file.name, resized)
+            storage.uploadPhoto(userId, file.name, resized)
                 .collect { response ->
                     if (response is UploadStatus.Success) {
                         successfulResponse = response
@@ -29,7 +29,7 @@ class UploadPhotoUseCase(
 
             val fileName = (successfulResponse as? UploadStatus.Success)?.response?.path
                 ?: throw Exception("File path is null after upload")
-            database.saveFile(userId, photoSet, fileName).onFailure {
+            database.saveFile(userId, fileName).onFailure {
                 throw it
             }
 

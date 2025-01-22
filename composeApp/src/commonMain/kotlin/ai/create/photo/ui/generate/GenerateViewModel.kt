@@ -102,7 +102,7 @@ class GenerateViewModel : SessionViewModel() {
         uiState = uiState.copy(isLoadingAiVisionPrompt = true, aiVisionPrompt = " ")
         try {
             SupabaseFunction.generatePersonDescription(trainingId)
-            val training = UserTrainingsRepository.getTraining(trainingId).getOrThrow()
+            val training = UserTrainingsRepository.getLatestTraining(trainingId).getOrThrow()
             uiState =
                 uiState.copy(
                     isLoadingAiVisionPrompt = false,
