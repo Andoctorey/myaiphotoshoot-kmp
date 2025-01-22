@@ -194,11 +194,11 @@ class UploadViewModel : SessionViewModel() {
     }
 
     fun onCreatingModelClick() {
-        uiState = uiState.copy(showCreatingModelPopup = true)
+        uiState = uiState.copy(showTrainingAiModelPopup = true)
     }
 
     fun hideCreatingModelClick() {
-        uiState = uiState.copy(showCreatingModelPopup = false)
+        uiState = uiState.copy(showTrainingAiModelPopup = false)
     }
 
     fun hideUploadMorePhotosPopup() {
@@ -211,5 +211,9 @@ class UploadViewModel : SessionViewModel() {
 
     fun hideErrorPopup() {
         uiState = uiState.copy(errorPopup = null)
+    }
+
+    fun toggleTrainAiModelPopup(show: Boolean) {
+        uiState = uiState.copy(showTrainAiModelPopup = show)
     }
 }

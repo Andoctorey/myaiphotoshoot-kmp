@@ -71,10 +71,11 @@ class GenerateViewModel : SessionViewModel() {
         uiState = uiState.copy(errorPopup = null)
     }
 
-    fun prepareToGenerate(onGenerate: (String, String, Int) -> Unit) = viewModelScope.launch {
+    fun prepareToGenerate(onGenerate: (String, String, Int) -> Unit, trainAiModel: () -> Unit) =
+        viewModelScope.launch {
         val trainingId = uiState.training?.id
         if (trainingId.isNullOrEmpty()) {
-            toggleCreateAiModelPopup(true)
+            trainAiModel()
             return@launch
         }
 
@@ -166,9 +167,4 @@ class GenerateViewModel : SessionViewModel() {
     fun toggleSettings() {
         uiState = uiState.copy(showSettings = !uiState.showSettings)
     }
-
-    fun toggleCreateAiModelPopup(show: Boolean) {
-        uiState = uiState.copy(showCreateAiModelPopup = show)
-    }
-
 }

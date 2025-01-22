@@ -88,6 +88,7 @@ fun MainScreen(
             }
         }
     ) {
+
         when (currentDestination) {
             AppNavigationRoutes.TAB_1_GALLERY -> GalleryScreen(
                 generationInProgress = state.generationsInProgress != 0,
@@ -95,14 +96,16 @@ fun MainScreen(
                     if (!state.generateScreenOpened) {
                         currentDestination = AppNavigationRoutes.TAB_2_GENERATE
                     }
-                }
+                },
+                openUploads = state.openUploads,
             )
 
             AppNavigationRoutes.TAB_2_GENERATE -> {
                 viewModel.setGenerateScreenOpened()
                 GenerateScreen(
-                    createTraining = {
+                    trainAiModel = {
                         currentDestination = AppNavigationRoutes.TAB_1_GALLERY
+                        viewModel.toggleOpenUploads(true)
                     },
                     onGenerate = { trainingId, prompt, photosToGenerate ->
                         viewModel.generatePhoto(trainingId, prompt, photosToGenerate)
@@ -117,6 +120,12 @@ fun MainScreen(
     if (state.errorPopup != null) {
         ErrorPopup(state.errorPopup) {
             viewModel.hideErrorPopup()
+        }
+    }
+
+    LaunchedEffect(state.openUploads) {
+        if (state.openUploads) {
+            viewModel.toggleOpenUploads(false)
         }
     }
 
