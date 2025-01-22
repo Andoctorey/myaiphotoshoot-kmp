@@ -6,7 +6,6 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
@@ -30,12 +28,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
-import photocreateai.composeapp.generated.resources.add_your_photos
 import photocreateai.composeapp.generated.resources.cancel
 import photocreateai.composeapp.generated.resources.cost
 import photocreateai.composeapp.generated.resources.minutes
 import photocreateai.composeapp.generated.resources.select_training_steps
-import photocreateai.composeapp.generated.resources.top_up
 import photocreateai.composeapp.generated.resources.train_ai_model
 import photocreateai.composeapp.generated.resources.training_steps
 import kotlin.math.round
@@ -86,25 +82,11 @@ fun TrainAiModelPopup(
             }
         },
         confirmButton = {
-            FlowRow {
-                TextButton(onClick = onDismiss) {
-                    Text(
-                        text = stringResource(Res.string.add_your_photos),
-                        fontSize = 16.sp
-                    )
-                }
-                TextButton(onClick = onDismiss) {
-                    Text(
-                        text = stringResource(Res.string.top_up),
-                        fontSize = 16.sp
-                    )
-                }
-                TextButton(onClick = onDismiss) {
-                    Text(
-                        text = stringResource(Res.string.train_ai_model),
-                        fontSize = 16.sp
-                    )
-                }
+            TextButton(onClick = onDismiss) {
+                Text(
+                    text = stringResource(Res.string.train_ai_model),
+                    fontSize = 16.sp
+                )
             }
         }
     )
@@ -115,14 +97,13 @@ fun TrainAiModelPopup(
 private fun TrainingSteps(steps: Int, onStepsChanged: (Int) -> Unit) {
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             modifier = Modifier.animateContentSize(),
             text = stringResource(Res.string.select_training_steps),
             fontSize = 14.sp,
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(24.dp))
         Slider(
             value = steps.toFloat(),
             onValueChange = { onStepsChanged(it.toInt()) },
@@ -135,7 +116,6 @@ private fun TrainingSteps(steps: Int, onStepsChanged: (Int) -> Unit) {
             text = stringResource(Res.string.training_steps) + ": $steps. " +
                     stringResource(Res.string.minutes) + ": $minutes.",
             fontSize = 14.sp,
-            textAlign = TextAlign.Center,
         )
         Spacer(modifier = Modifier.height(8.dp))
         val cost = round(steps / 500f * 4.99 * 100f) / 100f
@@ -144,7 +124,6 @@ private fun TrainingSteps(steps: Int, onStepsChanged: (Int) -> Unit) {
             text = stringResource(Res.string.cost, cost),
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
-            textAlign = TextAlign.Center,
         )
     }
 }
