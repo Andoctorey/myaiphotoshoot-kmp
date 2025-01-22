@@ -2,30 +2,10 @@ package ai.create.photo.ui.gallery.uploads
 
 import ai.create.photo.data.supabase.model.AnalysisStatus
 import ai.create.photo.data.supabase.model.TrainingStatus
-import ai.create.photo.ui.compose.ConfirmationPopup
-import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
-import ai.create.photo.ui.compose.ErrorPopup
-import ai.create.photo.ui.compose.InfoPopup
-import ai.create.photo.ui.compose.LoadingPlaceholder
+import ai.create.photo.ui.compose.*
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.windowInsetsTopHeight
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
@@ -35,29 +15,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddAPhoto
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
-import androidx.compose.material.icons.filled.Brush
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Mood
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Sync
-import androidx.compose.material.icons.filled.ThumbDown
-import androidx.compose.material.icons.filled.ThumbUp
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
-import androidx.compose.material3.SmallFloatingActionButton
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -83,20 +42,7 @@ import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import photocreateai.composeapp.generated.resources.Res
-import photocreateai.composeapp.generated.resources.add_your_photos
-import photocreateai.composeapp.generated.resources.analyzing_photos
-import photocreateai.composeapp.generated.resources.create_photo_set
-import photocreateai.composeapp.generated.resources.creating_model_hint
-import photocreateai.composeapp.generated.resources.delete
-import photocreateai.composeapp.generated.resources.delete_photo_set
-import photocreateai.composeapp.generated.resources.delete_unsuitable_photos
-import photocreateai.composeapp.generated.resources.generate_photo
-import photocreateai.composeapp.generated.resources.photo_set
-import photocreateai.composeapp.generated.resources.train_ai_model
-import photocreateai.composeapp.generated.resources.trainining_ai_model
-import photocreateai.composeapp.generated.resources.upload_guidelines_message
-import photocreateai.composeapp.generated.resources.upload_more_photos
+import photocreateai.composeapp.generated.resources.*
 
 
 @Preview
@@ -449,19 +395,22 @@ private fun Photo(
         )
 
         if (!hideDeletePhotoButton && !loading) {
-            IconButton(
-                onClick = { onDelete(photo) },
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(8.dp)
-                    .background(Color.Black.copy(alpha = 0.5f), shape = CircleShape)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "delete",
-                    tint = Color.White,
-                )
-            }
+//            IconButton(
+//                onClick = { onDelete(photo) },
+//                modifier = Modifier
+//                    .align(Alignment.TopEnd)
+//                    .padding(8.dp)
+//                    .background(Color.Black.copy(alpha = 0.5f), shape = CircleShape)
+//            ) {
+//                Icon(
+//                    imageVector = Icons.Default.Close,
+//                    contentDescription = "delete",
+//                    tint = Color.White,
+//                )
+//            }
+            DropMenu(deletedItem = photo, onDeleteClicked = {
+                onDelete(photo)
+            })
         }
 
         if (!loading && photo.analysisStatus != null) {
