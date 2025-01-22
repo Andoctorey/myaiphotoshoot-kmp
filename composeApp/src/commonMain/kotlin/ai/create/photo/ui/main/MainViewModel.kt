@@ -50,4 +50,8 @@ class MainViewModel : ViewModel() {
         uiState = uiState.copy(generateScreenOpened = true)
     }
 
+    fun toggleOpenUploads(openUploads: Boolean) {
+        uiState = uiState.copy(openUploads = openUploads)
+    }
+
 }

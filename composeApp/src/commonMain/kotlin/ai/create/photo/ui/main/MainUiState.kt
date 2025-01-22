@@ -8,4 +8,5 @@ data class MainUiState(
 
     val generationsInProgress: Int = 0,
     val generateScreenOpened: Boolean = false,
+    val openUploads: Boolean = false,
 )

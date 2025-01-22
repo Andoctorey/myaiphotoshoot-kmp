@@ -6,6 +6,7 @@ import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.InfoPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
+import ai.create.photo.ui.training.TrainAiModelPopup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -137,14 +138,14 @@ fun UploadScreen(
                 CreateModelFab(
                     modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 88.dp),
                     trainingStatus = state.trainingStatus,
-                    createModel = viewModel::createModel,
+                    createModel = { viewModel.toggleTrainAiModelPopup(true) },
                     onCreatingModelClick = viewModel::onCreatingModelClick,
                     generatePhotos = openGenerateTab,
                 )
                 SmallFloatingActionButton(
                     modifier = Modifier.align(Alignment.BottomEnd)
                         .padding(bottom = 88.dp, end = 24.dp),
-                    onClick = viewModel::createModel,
+                    onClick = onAddPhotoClick,
                 ) {
                     Icon(
                         imageVector = Icons.Default.AddAPhoto,
@@ -160,7 +161,7 @@ fun UploadScreen(
                 SmallFloatingActionButton(
                     modifier = Modifier.align(Alignment.BottomEnd)
                         .padding(bottom = 88.dp, end = 24.dp),
-                    onClick = onAddPhotoClick,
+                    onClick = { viewModel.toggleTrainAiModelPopup(true) },
                 ) {
                     Icon(
                         imageVector = Icons.Default.Memory,
@@ -176,7 +177,7 @@ fun UploadScreen(
             }
         }
 
-        if (state.showCreatingModelPopup) {
+        if (state.showTrainingAiModelPopup) {
             InfoPopup(stringResource(Res.string.creating_model_hint)) {
                 viewModel.hideCreatingModelClick()
             }
@@ -185,6 +186,13 @@ fun UploadScreen(
         if (state.errorPopup != null) {
             ErrorPopup(state.errorPopup) {
                 viewModel.hideErrorPopup()
+            }
+        }
+
+
+        if (state.showTrainAiModelPopup) {
+            TrainAiModelPopup {
+                viewModel.toggleTrainAiModelPopup(false)
             }
         }
     }

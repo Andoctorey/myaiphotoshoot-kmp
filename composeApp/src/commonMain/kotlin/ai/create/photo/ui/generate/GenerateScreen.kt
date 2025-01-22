@@ -5,7 +5,6 @@ import ai.create.photo.platform.platform
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
-import ai.create.photo.ui.training.TrainAiModelPopup
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
@@ -94,7 +93,7 @@ import photocreateai.composeapp.generated.resources.train_ai_model
 @Composable
 fun GenerateScreen(
     viewModel: GenerateViewModel = viewModel { GenerateViewModel() },
-    createTraining: () -> Unit,
+    trainAiModel: () -> Unit,
     onGenerate: (String, String, Int) -> Unit,
 ) {
     Box(
@@ -149,7 +148,7 @@ fun GenerateScreen(
                                     trainings = state.trainings,
                                     selectedTraining = state.training,
                                     selectTraining = viewModel::selectTraining,
-                                    createTraining = createTraining,
+                                    trainAiModel = trainAiModel,
                                 )
                                 IconButton(
                                     modifier = Modifier.align(Alignment.CenterEnd)
@@ -203,7 +202,7 @@ fun GenerateScreen(
                 ) {
                     CreateAiModelButton(
                         modifier = Modifier.padding(horizontal = 4.dp),
-                        onClick = { viewModel.toggleCreateAiModelPopup(true) }
+                        onClick = trainAiModel,
                     )
 
                     if (!state.trainings.isNullOrEmpty()) {
@@ -232,19 +231,13 @@ fun GenerateScreen(
 
                 PhotoPrompt(prompt = state.userPrompt,
                     onPromptChanged = viewModel::onUserPromptChanged,
-                    onGenerate = { viewModel.prepareToGenerate(onGenerate) })
+                    onGenerate = { viewModel.prepareToGenerate(onGenerate, trainAiModel) })
             }
         }
 
         if (state.errorPopup != null) {
             ErrorPopup(state.errorPopup) {
                 viewModel.hideErrorPopup()
-            }
-        }
-
-        if (state.showCreateAiModelPopup) {
-            TrainAiModelPopup {
-                viewModel.toggleCreateAiModelPopup(false)
             }
         }
     }
@@ -419,7 +412,7 @@ private fun Trainings(
     trainings: List<GenerateUiState.Training?>,
     selectedTraining: GenerateUiState.Training?,
     selectTraining: (GenerateUiState.Training) -> Unit,
-    createTraining: () -> Unit
+    trainAiModel: () -> Unit
 ) {
     val options = trainings.toMutableList()
     options.add(null)
@@ -469,7 +462,7 @@ private fun Trainings(
                     onClick = {
                         selectedOption = option
                         expanded = false
-                        if (selectedOption == null) createTraining()
+                        if (selectedOption == null) trainAiModel()
                         else selectTraining(selectedOption!!)
                     }
                 )
