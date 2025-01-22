@@ -45,7 +45,6 @@ class CreationsViewModel : SessionViewModel() {
                         id = it.id,
                         createdAt = it.createdAt,
                         name = it.file.fileName,
-                        photoSet = it.file.photoSet,
                         prompt = it.prompt,
                         url = it.file.signedUrl,
                     )

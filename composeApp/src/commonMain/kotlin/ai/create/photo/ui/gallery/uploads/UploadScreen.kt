@@ -2,12 +2,10 @@ package ai.create.photo.ui.gallery.uploads
 
 import ai.create.photo.data.supabase.model.AnalysisStatus
 import ai.create.photo.data.supabase.model.TrainingStatus
-import ai.create.photo.ui.compose.ConfirmationPopup
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.InfoPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
-import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,26 +34,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.Mood
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.ThumbDown
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -86,15 +77,10 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.add_your_photos
 import photocreateai.composeapp.generated.resources.analyzing_photos
-import photocreateai.composeapp.generated.resources.create_photo_set
 import photocreateai.composeapp.generated.resources.creating_model_hint
-import photocreateai.composeapp.generated.resources.delete
-import photocreateai.composeapp.generated.resources.delete_photo_set
-import photocreateai.composeapp.generated.resources.delete_unsuitable_photos
 import photocreateai.composeapp.generated.resources.generate_photo
-import photocreateai.composeapp.generated.resources.photo_set
 import photocreateai.composeapp.generated.resources.train_ai_model
-import photocreateai.composeapp.generated.resources.trainining_ai_model
+import photocreateai.composeapp.generated.resources.training_ai_model
 import photocreateai.composeapp.generated.resources.upload_guidelines_message
 import photocreateai.composeapp.generated.resources.upload_more_photos
 
@@ -121,13 +107,12 @@ fun UploadScreen(
 
         val state = viewModel.uiState
 
-        val photos = state.displayingPhotos
         if (state.isLoadingPhotos) {
             Spacer(modifier = Modifier.height(20.dp))
             LoadingPlaceholder()
         } else if (state.loadingError != null) {
             ErrorMessagePlaceHolder(state.loadingError)
-        } else if (photos.isNullOrEmpty()) {
+        } else if (state.photos.isNullOrEmpty()) {
             Placeholder(modifier = Modifier.align(Alignment.Center))
         } else {
             LaunchedEffect(state.scrollToTop) {
@@ -138,7 +123,7 @@ fun UploadScreen(
             }
             val hideDeletePhotoButton = state.isLoadingTraining || state.trainingStatus != null
             Photos(
-                photos = photos,
+                photos = state.photos,
                 listState = state.listState,
                 hideDeletePhotoButton = hideDeletePhotoButton,
                 trainingStatus = state.trainingStatus
@@ -147,43 +132,41 @@ fun UploadScreen(
             }
         }
 
-        if (!state.isLoadingPhotos && photos != null) {
-            if (!state.isLoadingTraining && photos.size >= 10) {
+        if (!state.isLoadingPhotos && state.photos != null) {
+            if (!state.isLoadingTraining && state.photos.size >= 10) {
                 CreateModelFab(
                     modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 88.dp),
-                    extended = true,
                     trainingStatus = state.trainingStatus,
                     createModel = viewModel::createModel,
                     onCreatingModelClick = viewModel::onCreatingModelClick,
                     generatePhotos = openGenerateTab,
                 )
+                SmallFloatingActionButton(
+                    modifier = Modifier.align(Alignment.BottomEnd)
+                        .padding(bottom = 88.dp, end = 24.dp),
+                    onClick = viewModel::createModel,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AddAPhoto,
+                        contentDescription = Icons.Default.AddAPhoto.name,
+                    )
+                }
             } else {
                 AddPhotosFab(
                     modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 88.dp),
-                    extended = true,
                     uploadProgress = state.uploadProgress,
                     onClick = onAddPhotoClick,
                 )
-            }
-
-            if (!state.isLoadingTraining && state.trainingStatus != TrainingStatus.PROCESSING) {
-                FabMenu(
-                    modifier = Modifier.align(Alignment.BottomEnd).padding(bottom = 68.dp),
-                    photos = state.displayingPhotos,
-                    photoSets = state.photoSets,
-                    uploadProgress = state.uploadProgress,
-                    trainingStatus = state.trainingStatus,
-                    showMenu = state.showMenu,
-                    onAddPhotoClick = onAddPhotoClick,
-                    toggleMenu = viewModel::toggleMenu,
-                    createModel = viewModel::createModel,
-                    onCreatingModelClick = viewModel::onCreatingModelClick,
-                    generatePhotos = openGenerateTab,
-                    photoSet = state.photoSet,
-                    selectPhotoSet = viewModel::selectPhotoSet,
-                    createPhotoSet = viewModel::createPhotoSet,
-                    deletePhotoSet = viewModel::deletePhotoSet,
-                )
+                SmallFloatingActionButton(
+                    modifier = Modifier.align(Alignment.BottomEnd)
+                        .padding(bottom = 88.dp, end = 24.dp),
+                    onClick = onAddPhotoClick,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Memory,
+                        contentDescription = Icons.Default.Memory.name,
+                    )
+                }
             }
         }
 
@@ -203,16 +186,6 @@ fun UploadScreen(
             ErrorPopup(state.errorPopup) {
                 viewModel.hideErrorPopup()
             }
-        }
-
-        if (state.deleteUnsuitablePhotosPopup) {
-            ConfirmationPopup(
-                icon = Icons.Default.Delete,
-                message = stringResource(Res.string.delete_unsuitable_photos),
-                confirmButton = stringResource(Res.string.delete),
-                onConfirm = viewModel::deleteUnsuitablePhotos,
-                onDismiss = viewModel::hideDeleteUnsuitablePhotosPopup,
-            )
         }
     }
 }
@@ -234,7 +207,6 @@ private fun Placeholder(modifier: Modifier) {
 @Composable
 private fun AddPhotosFab(
     modifier: Modifier = Modifier,
-    extended: Boolean = false,
     uploadProgress: Int,
     onClick: () -> Unit
 ) {
@@ -256,20 +228,18 @@ private fun AddPhotosFab(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                if (extended) {
-                    Icon(
-                        imageVector = Icons.Default.AddAPhoto,
-                        contentDescription = stringResource(Res.string.add_your_photos),
-                        tint = MaterialTheme.colorScheme.onSurface,
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                }
+                Icon(
+                    imageVector = Icons.Default.AddAPhoto,
+                    contentDescription = stringResource(Res.string.add_your_photos),
+                    tint = MaterialTheme.colorScheme.onSurface,
+                )
+                Spacer(modifier = Modifier.width(16.dp))
                 Text(
                     text = stringResource(Res.string.add_your_photos),
                     textAlign = TextAlign.Center,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    fontSize = if (extended) 14.sp else 13.sp,
+                    fontSize = 14.sp,
                 )
             }
         }
@@ -279,7 +249,6 @@ private fun AddPhotosFab(
 @Composable
 fun CreateModelFab(
     modifier: Modifier = Modifier,
-    extended: Boolean = false,
     trainingStatus: TrainingStatus?,
     createModel: () -> Unit,
     onCreatingModelClick: () -> Unit,
@@ -313,20 +282,18 @@ fun CreateModelFab(
 
             TrainingStatus.SUCCEEDED -> {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (extended) {
-                        Icon(
-                            imageVector = Icons.Default.Brush,
-                            contentDescription = stringResource(Res.string.train_ai_model),
-                            tint = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Spacer(modifier = Modifier.width(16.dp))
-                    }
+                    Icon(
+                        imageVector = Icons.Default.Brush,
+                        contentDescription = stringResource(Res.string.train_ai_model),
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
                     Text(
                         text = stringResource(Res.string.generate_photo),
                         textAlign = TextAlign.Center,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        fontSize = if (extended) 14.sp else 13.sp,
+                        fontSize = 14.sp,
                     )
                 }
             }
@@ -340,27 +307,25 @@ fun CreateModelFab(
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                     Text(
-                        text = stringResource(Res.string.trainining_ai_model),
+                        text = stringResource(Res.string.training_ai_model),
                     )
                 }
             }
 
             null -> {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (extended) {
-                        Icon(
-                            imageVector = Icons.Default.Mood,
-                            contentDescription = stringResource(Res.string.train_ai_model),
-                            tint = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Spacer(modifier = Modifier.width(16.dp))
-                    }
+                    Icon(
+                        imageVector = Icons.Default.Mood,
+                        contentDescription = stringResource(Res.string.train_ai_model),
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
                     Text(
                         text = stringResource(Res.string.train_ai_model),
                         textAlign = TextAlign.Center,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        fontSize = if (extended) 14.sp else 13.sp,
+                        fontSize = 14.sp,
                     )
                 }
             }
@@ -496,141 +461,6 @@ private fun Photo(
                 color = Color.White,
                 fontSize = 16.sp,
             )
-        }
-    }
-}
-
-@Composable
-fun FabMenu(
-    modifier: Modifier,
-    photos: List<UploadUiState.Photo>?,
-    uploadProgress: Int,
-    trainingStatus: TrainingStatus?,
-    showMenu: Boolean,
-    onAddPhotoClick: () -> Unit,
-    toggleMenu: () -> Unit,
-    createModel: () -> Unit,
-    onCreatingModelClick: () -> Unit,
-    generatePhotos: () -> Unit,
-    photoSet: Int,
-    photoSets: List<Int>?,
-    selectPhotoSet: (Int) -> Unit,
-    createPhotoSet: () -> Unit,
-    deletePhotoSet: () -> Unit,
-) {
-    Column(modifier = modifier.padding(24.dp), horizontalAlignment = Alignment.End) {
-        Crossfade(targetState = showMenu) {
-            if (!it) return@Crossfade
-            Column(horizontalAlignment = Alignment.End) {
-                if (photoSets != null && (photoSets.isNotEmpty() || (photos?.size ?: 0) >= 1)) {
-                    PhotoSets(
-                        photoSets = photoSets,
-                        selectedPhotoSet = photoSet,
-                        selectPhotoSet = selectPhotoSet,
-                        createPhotoSet = createPhotoSet
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    ExtendedFloatingActionButton(onClick = deletePhotoSet) {
-                        Text(
-                            text = stringResource(Res.string.delete_photo_set),
-                            textAlign = TextAlign.Center,
-                            maxLines = 1,
-                            fontSize = 13.sp,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-
-                if (trainingStatus == null && (photos?.size ?: 0) <= 30) {
-                    if ((photos?.size ?: 0) >= 10) {
-                        AddPhotosFab(
-                            uploadProgress = uploadProgress,
-                            onClick = onAddPhotoClick
-                        )
-                    } else {
-                        CreateModelFab(
-                            trainingStatus = trainingStatus,
-                            createModel = createModel,
-                            onCreatingModelClick = onCreatingModelClick,
-                            generatePhotos = generatePhotos,
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-            }
-        }
-        SmallFloatingActionButton(
-            onClick = toggleMenu,
-        ) {
-            Icon(
-                imageVector = if (showMenu) Icons.Default.Close else Icons.Default.Settings,
-                contentDescription = "settings",
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun PhotoSets(
-    photoSets: List<Int>,
-    selectedPhotoSet: Int,
-    selectPhotoSet: (Int) -> Unit,
-    createPhotoSet: () -> Unit
-) {
-    val options = photoSets.toMutableList()
-    options.add(0)
-    var expanded by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf(selectedPhotoSet) }
-    val photoSetString = stringResource(Res.string.photo_set)
-    val createPhotoSetString = stringResource(Res.string.create_photo_set)
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded }
-    ) {
-        ExtendedFloatingActionButton(
-            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable),
-            onClick = { },
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = if (selectedOption == 0) createPhotoSetString
-                    else "$photoSetString $selectedOption",
-                    textAlign = TextAlign.Center,
-                    maxLines = 1,
-                    fontSize = 13.sp,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-            Icon(
-                imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
-                contentDescription = "error",
-                tint = MaterialTheme.colorScheme.onSurface,
-            )
-        }
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text = if (option == 0) createPhotoSetString
-                            else "$photoSetString $option",
-                        )
-                    },
-                    onClick = {
-                        selectedOption = option
-                        expanded = false
-                        if (selectedOption == 0) createPhotoSet()
-                        else selectPhotoSet(selectedOption)
-                    }
-                )
-            }
         }
     }
 }

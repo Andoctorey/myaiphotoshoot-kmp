@@ -6,11 +6,11 @@ import io.ktor.client.call.body
 
 object SupabaseFunction {
 
-    suspend fun createAiModel(photoSet: Int) {
-        Logger.i("createAiModel for $photoSet")
+    suspend fun createAiModel(photos: List<String>) {
+        Logger.i("createAiModel for ${photos.joinToString()}")
         Supabase.supabase.functions.invoke(
             function = "training",
-            body = mapOf("photo_set" to photoSet)
+            body = mapOf("photos" to photos.joinToString())
         )
     }
 

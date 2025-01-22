@@ -19,7 +19,6 @@ data class CreationsUiState(
         val id: String,
         val createdAt: Instant,
         val name: String,
-        val photoSet: Int,
         val url: String,
         val prompt: String,
     )

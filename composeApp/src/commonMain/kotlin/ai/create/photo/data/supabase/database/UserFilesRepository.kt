@@ -14,19 +14,17 @@ object UserFilesRepository {
 
     suspend fun saveFile(
         userId: String,
-        photoSet: Int,
         fileName: String
     ): Result<PostgrestResult> = runCatching {
         val photoData = mapOf(
             "user_id" to userId,
             "file_name" to fileName,
-            "photo_set" to photoSet.toString(),
             "type" to "input_image",
-            "signed_url" to SupabaseStorage.createSignedUrl(userId, photoSet, fileName),
+            "signed_url" to SupabaseStorage.createSignedUrl(userId, fileName),
         )
         Logger.i("save file to db $fileName")
         supabase.from(USER_FILES_TABLE).upsert(photoData) {
-            onConflict = "user_id, file_name, photo_set, type"
+            onConflict = "user_id, file_name, type"
         }
     }
 

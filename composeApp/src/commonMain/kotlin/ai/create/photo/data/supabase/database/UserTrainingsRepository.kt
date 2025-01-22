@@ -10,7 +10,8 @@ object UserTrainingsRepository {
 
     private const val USER_TRAININGS_TABLE = "user_trainings"
 
-    suspend fun getTraining(userId: String, photoSet: Int): Result<UserTraining?> = runCatching {
+    suspend fun getLatestTraining(userId: String, photoSet: Int): Result<UserTraining?> =
+        runCatching {
         Supabase.supabase
             .from(USER_TRAININGS_TABLE)
             .select {
@@ -41,13 +42,15 @@ object UserTrainingsRepository {
             }
     }
 
-    suspend fun getTraining(id: String): Result<UserTraining?> = runCatching {
+    suspend fun getLatestTraining(id: String): Result<UserTraining?> = runCatching {
         Supabase.supabase
             .from(USER_TRAININGS_TABLE)
             .select {
                 filter {
                     eq("id", id)
                 }
+                order(column = "created_at", order = Order.DESCENDING)
+                limit(1)
             }
             .decodeSingleOrNull<UserTraining>()
             .also {

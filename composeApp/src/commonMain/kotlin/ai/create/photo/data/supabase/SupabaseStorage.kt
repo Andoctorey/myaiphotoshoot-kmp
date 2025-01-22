@@ -10,14 +10,14 @@ import kotlin.time.Duration.Companion.days
 object SupabaseStorage {
 
     private const val BUCKET = "photos"
+    const val UPLOADS = "uploads"
 
     fun uploadPhoto(
         userId: String,
-        photoSet: Int,
         fileName: String,
         file: ByteArray
     ): Flow<UploadStatus> {
-        val filePath = "${userId}/$photoSet/${fileName}"
+        val filePath = "${userId}/$UPLOADS/${fileName}"
         Logger.i("uploadPhoto $filePath, size: ${file.size}")
         return Supabase.supabase.storage
             .from(BUCKET)
@@ -29,11 +29,11 @@ object SupabaseStorage {
             }
     }
 
-    suspend fun createSignedUrl(userId: String, photoSet: Int, filePath: String) =
+    suspend fun createSignedUrl(userId: String, filePath: String) =
         Supabase.supabase.storage
         .from(BUCKET)
         .createSignedUrl(
-            path = "${userId}/$photoSet/${filePath}",
+            path = "${userId}/$UPLOADS/${filePath}",
             expiresIn = 3650.days,
         )
 
