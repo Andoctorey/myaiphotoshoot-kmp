@@ -49,6 +49,10 @@
     <string name="gallery_creations_tab">Creations</string>
     <string name="gallery_uploads_tab">Uploads</string>
 
+    //drop menu values
+    <string name="options_description">Option</string>
+    <string name="search">Search</string>
+
     <string name="train_ai_model_title">Create an AI Model in 5 Easy Steps</string>
     <string name="train_ai_model_step_1">1. Upload 10–20 high-quality selfies in portrait mode from various angles.</string>
     <string name="train_ai_model_step_1_button">Upload Photos</string>
