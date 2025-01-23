@@ -139,15 +139,6 @@ class UploadViewModel : SessionViewModel() {
         }
     }
 
-    fun selectPhoto(photo: UploadUiState.Photo) {
-        val photos = uiState.photos ?: return
-        val newPhoto = photo.copy(selected = !photo.selected)
-        val updatedPhotos = photos.map {
-            if (it.id == photo.id) newPhoto else it
-        }
-        uiState = uiState.copy(photos = updatedPhotos)
-    }
-
     fun deletePhoto(photo: UploadUiState.Photo) = viewModelScope.launch {
         val photos = uiState.photos ?: return@launch
         val updatedPhotos = photos.filter { it.id != photo.id }
@@ -244,10 +235,6 @@ class UploadViewModel : SessionViewModel() {
 
     fun toggleTrainAiModelPopup(show: Boolean) {
         uiState = uiState.copy(showTrainAiModelPopup = show)
-    }
-
-    fun toggleSelectMode(selectMode: Boolean) {
-        uiState = uiState.copy(selectMode = selectMode)
     }
 
     fun toggleShowSelectPhotosPopup(show: Boolean) {

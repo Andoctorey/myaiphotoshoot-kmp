@@ -16,8 +16,6 @@ data class UploadUiState(
     val scrollToTop: Boolean = false,
     val uploadProgress: Int = 0,
 
-    val selectMode: Boolean = false,
-
     val analyzingPhotos: Boolean = false,
 
     val isLoadingTraining: Boolean = false,
@@ -40,6 +38,5 @@ data class UploadUiState(
         val createdAt: Instant,
         val analysis: String?,
         val analysisStatus: AnalysisStatus?,
-        val selected: Boolean = false,
     )
 }
