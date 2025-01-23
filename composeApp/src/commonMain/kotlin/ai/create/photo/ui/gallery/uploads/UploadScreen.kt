@@ -196,6 +196,7 @@ fun UploadScreen(
         if (state.showTrainAiModelPopup) {
             TrainAiModelPopup {
                 viewModel.toggleTrainAiModelPopup(false)
+                viewModel.createModel()
             }
         }
     }
@@ -270,6 +271,7 @@ fun CreateModelFab(
         onClick = {
             when (trainingStatus) {
                 TrainingStatus.ANALYZING_PHOTOS -> {}
+                TrainingStatus.SELECT_PHOTOS -> TODO()
                 TrainingStatus.SUCCEEDED -> generatePhotos()
                 TrainingStatus.PROCESSING -> onCreatingModelClick()
                 null -> createModel()
@@ -290,6 +292,8 @@ fun CreateModelFab(
                     )
                 }
             }
+
+            TrainingStatus.SELECT_PHOTOS -> {}
 
             TrainingStatus.SUCCEEDED -> {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -340,6 +344,7 @@ fun CreateModelFab(
                     )
                 }
             }
+
         }
     }
 }
@@ -353,7 +358,7 @@ private fun Photos(
     trainingStatus: TrainingStatus?,
     onDelete: (UploadUiState.Photo) -> Unit,
 ) {
-    var showAnalysis by remember { mutableStateOf(trainingStatus == TrainingStatus.ANALYZING_PHOTOS) }
+    var showAnalysis by remember { mutableStateOf(true) }
 
     LazyVerticalStaggeredGrid(
         state = listState,
