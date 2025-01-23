@@ -7,7 +7,10 @@ import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.InfoPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.training.TrainAiModelPopup
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,6 +39,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Brush
+import androidx.compose.material.icons.filled.CheckBox
+import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.Mood
@@ -44,6 +49,7 @@ import androidx.compose.material.icons.filled.ThumbDown
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -58,6 +64,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
@@ -80,6 +87,7 @@ import photocreateai.composeapp.generated.resources.add_your_photos
 import photocreateai.composeapp.generated.resources.analyzing_photos
 import photocreateai.composeapp.generated.resources.creating_model_hint
 import photocreateai.composeapp.generated.resources.generate_photo
+import photocreateai.composeapp.generated.resources.select_photos_popup_message
 import photocreateai.composeapp.generated.resources.train_ai_model
 import photocreateai.composeapp.generated.resources.training_ai_model
 import photocreateai.composeapp.generated.resources.upload_guidelines_message
@@ -126,11 +134,11 @@ fun UploadScreen(
             Photos(
                 photos = state.photos,
                 listState = state.listState,
+                selectMode = state.selectMode,
+                onSelect = viewModel::selectPhoto,
                 hideDeletePhotoButton = hideDeletePhotoButton,
-                trainingStatus = state.trainingStatus
-            ) {
-                viewModel.deletePhoto(it)
-            }
+                onDelete = viewModel::deletePhoto,
+            )
         }
 
         val buttonsBottomPadding = 94.dp
@@ -144,15 +152,38 @@ fun UploadScreen(
                     onCreatingModelClick = viewModel::onCreatingModelClick,
                     generatePhotos = openGenerateTab,
                 )
-                SmallFloatingActionButton(
-                    modifier = Modifier.align(Alignment.BottomEnd)
-                        .padding(bottom = buttonsBottomPadding, end = 24.dp),
-                    onClick = onAddPhotoClick,
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.AddAPhoto,
-                        contentDescription = Icons.Default.AddAPhoto.name,
-                    )
+                if (state.selectMode) {
+                    FloatingActionButton(
+                        modifier = Modifier.align(Alignment.BottomEnd)
+                            .padding(bottom = buttonsBottomPadding, end = 24.dp),
+                        onClick = { viewModel.toggleSelectMode(false) },
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = Icons.Default.Close.name,
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                modifier = Modifier.animateContentSize(),
+                                text = state.photos.count { it.selected }.toString(),
+                                fontSize = 16.sp,
+                            )
+                        }
+                    }
+                } else {
+                    SmallFloatingActionButton(
+                        modifier = Modifier.align(Alignment.BottomEnd)
+                            .padding(bottom = buttonsBottomPadding, end = 24.dp),
+                        onClick = onAddPhotoClick,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AddAPhoto,
+                            contentDescription = Icons.Default.AddAPhoto.name,
+                        )
+                    }
                 }
             } else {
                 AddPhotosFab(
@@ -197,6 +228,12 @@ fun UploadScreen(
             TrainAiModelPopup {
                 viewModel.toggleTrainAiModelPopup(false)
                 viewModel.createModel()
+            }
+        }
+
+        if (state.showSelectPhotosPopup) {
+            InfoPopup(stringResource(Res.string.select_photos_popup_message)) {
+                viewModel.toggleShowSelectPhotosPopup(false)
             }
         }
     }
@@ -271,7 +308,6 @@ fun CreateModelFab(
         onClick = {
             when (trainingStatus) {
                 TrainingStatus.ANALYZING_PHOTOS -> {}
-                TrainingStatus.SELECT_PHOTOS -> TODO()
                 TrainingStatus.SUCCEEDED -> generatePhotos()
                 TrainingStatus.PROCESSING -> onCreatingModelClick()
                 null -> createModel()
@@ -289,11 +325,12 @@ fun CreateModelFab(
                     Spacer(modifier = Modifier.width(16.dp))
                     Text(
                         text = stringResource(Res.string.analyzing_photos),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontSize = 14.sp,
                     )
                 }
             }
-
-            TrainingStatus.SELECT_PHOTOS -> {}
 
             TrainingStatus.SUCCEEDED -> {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -323,6 +360,9 @@ fun CreateModelFab(
                     Spacer(modifier = Modifier.width(16.dp))
                     Text(
                         text = stringResource(Res.string.training_ai_model),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontSize = 14.sp,
                     )
                 }
             }
@@ -354,8 +394,9 @@ fun CreateModelFab(
 private fun Photos(
     photos: List<UploadUiState.Photo>,
     listState: LazyStaggeredGridState,
+    selectMode: Boolean,
+    onSelect: (UploadUiState.Photo) -> Unit,
     hideDeletePhotoButton: Boolean,
-    trainingStatus: TrainingStatus?,
     onDelete: (UploadUiState.Photo) -> Unit,
 ) {
     var showAnalysis by remember { mutableStateOf(true) }
@@ -375,6 +416,8 @@ private fun Photos(
             Photo(
                 modifier = Modifier.animateItem(),
                 photo = photos[item],
+                selectMode = selectMode,
+                onSelect = onSelect,
                 hideDeletePhotoButton = hideDeletePhotoButton,
                 onDelete = onDelete,
                 showAnalysis = showAnalysis,
@@ -388,6 +431,8 @@ private fun Photos(
 private fun Photo(
     modifier: Modifier,
     photo: UploadUiState.Photo,
+    selectMode: Boolean,
+    onSelect: (UploadUiState.Photo) -> Unit,
     hideDeletePhotoButton: Boolean,
     onDelete: (UploadUiState.Photo) -> Unit,
     showAnalysis: Boolean,
@@ -412,9 +457,21 @@ private fun Photo(
         }
     }
 
-    Box(modifier = modifier.fillMaxWidth()) {
+    Box(
+        modifier = modifier.fillMaxWidth().then(
+            if (selectMode) {
+                Modifier.background(
+                    if (photo.analysisStatus == AnalysisStatus.APPROVED) Color.Green else Color.Red
+                )
+            } else {
+                Modifier
+            }
+        )
+    ) {
         AsyncImage(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().clickable {
+                if (selectMode) onSelect(photo)
+            }.alpha(if (selectMode && !photo.selected) 0.9f else 1f),
             model = ImageRequest.Builder(LocalPlatformContext.current)
                 .data(photo.url)
                 .crossfade(true)
@@ -429,7 +486,25 @@ private fun Photo(
             contentDescription = "photo",
         )
 
-        if (!hideDeletePhotoButton && !loading) {
+        if (selectMode) {
+            IconButton(
+                onClick = { onSelect(photo) },
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+                    .background(Color.Black.copy(alpha = 0.5f), shape = CircleShape)
+            ) {
+                Crossfade(targetState = photo.selected) { selected ->
+                    val icon =
+                        if (selected) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = icon.name,
+                        tint = Color.White,
+                    )
+                }
+            }
+        } else if (!hideDeletePhotoButton && !loading) {
             IconButton(
                 onClick = { onDelete(photo) },
                 modifier = Modifier
@@ -439,11 +514,12 @@ private fun Photo(
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = "delete",
+                    contentDescription = Icons.Default.Close.name,
                     tint = Color.White,
                 )
             }
         }
+
 
         if (!loading && photo.analysisStatus != null) {
             IconButton(

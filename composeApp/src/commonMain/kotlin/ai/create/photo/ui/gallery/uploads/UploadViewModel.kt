@@ -138,6 +138,15 @@ class UploadViewModel : SessionViewModel() {
         }
     }
 
+    fun selectPhoto(photo: UploadUiState.Photo) {
+        val photos = uiState.photos ?: return
+        val newPhoto = photo.copy(selected = !photo.selected)
+        val updatedPhotos = photos.map {
+            if (it.id == photo.id) newPhoto else it
+        }
+        uiState = uiState.copy(photos = updatedPhotos)
+    }
+
     fun deletePhoto(photo: UploadUiState.Photo) = viewModelScope.launch {
         val photos = uiState.photos ?: return@launch
         val updatedPhotos = photos.filter { it.id != photo.id }
@@ -174,7 +183,7 @@ class UploadViewModel : SessionViewModel() {
                     }
                     analysisJobs.awaitAll()
                 }
-                uiState = uiState.copy(trainingStatus = TrainingStatus.SELECT_PHOTOS)
+                uiState = uiState.copy(showSelectPhotosPopup = true, selectMode = true)
                 loadPhotos()
             } catch (e: Exception) {
                 Logger.e("Analyzing photos failed", e)
@@ -183,14 +192,20 @@ class UploadViewModel : SessionViewModel() {
             return@launch
         }
 
-        uiState = uiState.copy(trainingStatus = TrainingStatus.PROCESSING)
-        try {
-            SupabaseFunction.createAiModel(photos.map { it.id })
-            loadTraining()
-        } catch (e: Exception) {
-            Logger.e("Create model failed", e)
-            uiState = uiState.copy(trainingStatus = null, errorPopup = e)
+        val selectedPhotos = photos.count { it.selected }
+        if (selectedPhotos < 10) {
+            uiState = uiState.copy(showSelectPhotosPopup = true, selectMode = true)
+            return@launch
         }
+
+//        uiState = uiState.copy(trainingStatus = TrainingStatus.PROCESSING)
+//        try {
+//            SupabaseFunction.createAiModel(photos.map { it.id })
+//            loadTraining()
+//        } catch (e: Exception) {
+//            Logger.e("Create model failed", e)
+//            uiState = uiState.copy(trainingStatus = null, errorPopup = e)
+//        }
     }
 
     fun onCreatingModelClick() {
@@ -215,5 +230,13 @@ class UploadViewModel : SessionViewModel() {
 
     fun toggleTrainAiModelPopup(show: Boolean) {
         uiState = uiState.copy(showTrainAiModelPopup = show)
+    }
+
+    fun toggleSelectMode(selectMode: Boolean) {
+        uiState = uiState.copy(selectMode = selectMode)
+    }
+
+    fun toggleShowSelectPhotosPopup(show: Boolean) {
+        uiState = uiState.copy(showSelectPhotosPopup = show)
     }
 }
