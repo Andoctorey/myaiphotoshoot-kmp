@@ -133,10 +133,12 @@ fun UploadScreen(
             }
         }
 
+        val buttonsBottomPadding = 94.dp
         if (!state.isLoadingPhotos && state.photos != null) {
             if (!state.isLoadingTraining && state.photos.size >= 10) {
                 CreateModelFab(
-                    modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 88.dp),
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                        .padding(bottom = buttonsBottomPadding),
                     trainingStatus = state.trainingStatus,
                     createModel = { viewModel.toggleTrainAiModelPopup(true) },
                     onCreatingModelClick = viewModel::onCreatingModelClick,
@@ -144,7 +146,7 @@ fun UploadScreen(
                 )
                 SmallFloatingActionButton(
                     modifier = Modifier.align(Alignment.BottomEnd)
-                        .padding(bottom = 88.dp, end = 24.dp),
+                        .padding(bottom = buttonsBottomPadding, end = 24.dp),
                     onClick = onAddPhotoClick,
                 ) {
                     Icon(
@@ -154,13 +156,14 @@ fun UploadScreen(
                 }
             } else {
                 AddPhotosFab(
-                    modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 88.dp),
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                        .padding(bottom = buttonsBottomPadding),
                     uploadProgress = state.uploadProgress,
                     onClick = onAddPhotoClick,
                 )
                 SmallFloatingActionButton(
                     modifier = Modifier.align(Alignment.BottomEnd)
-                        .padding(bottom = 88.dp, end = 24.dp),
+                        .padding(bottom = buttonsBottomPadding, end = 24.dp),
                     onClick = { viewModel.toggleTrainAiModelPopup(true) },
                 ) {
                     Icon(
