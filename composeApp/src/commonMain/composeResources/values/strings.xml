@@ -11,6 +11,7 @@
     <string name="train_ai_model">Train AI model</string>
     <string name="training_ai_model">Training AI model</string>
     <string name="ai_model">Model</string>
+    <string name="analyze_photos">Analyze photos</string>">
     <string name="analyzing_photos">Analyzing photos</string>">
     <string name="generate_photo">Generate Photo</string>
     <string name="creating_model_hint">This process usually takes about an hour, so feel free to close the app and check back later.</string>

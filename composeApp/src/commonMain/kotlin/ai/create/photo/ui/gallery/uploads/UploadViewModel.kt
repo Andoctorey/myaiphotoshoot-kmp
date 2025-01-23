@@ -168,35 +168,6 @@ class UploadViewModel : SessionViewModel() {
             return@launch
         }
 
-        val notAnalyzedPhotos = photos.filter { it.analysis == null }
-        if (notAnalyzedPhotos.isNotEmpty()) {
-            uiState = uiState.copy(trainingStatus = TrainingStatus.ANALYZING_PHOTOS)
-            try {
-                if (Supabase.local) {
-                    notAnalyzedPhotos.forEach { photo ->
-                        SupabaseFunction.analyzePhoto(photo.id)
-                    }
-                } else {
-                    val analysisJobs = notAnalyzedPhotos.map { photo ->
-                        async {
-                            SupabaseFunction.analyzePhoto(photo.id)
-                        }
-                    }
-                    analysisJobs.awaitAll()
-                }
-                uiState = uiState.copy(
-                    trainingStatus = null,
-                    showSelectPhotosPopup = true,
-                    selectMode = true
-                )
-                loadPhotos()
-            } catch (e: Exception) {
-                Logger.e("Analyzing photos failed", e)
-                uiState = uiState.copy(trainingStatus = null, errorPopup = e)
-            }
-            return@launch
-        }
-
         val selectedPhotos = photos.count { it.selected }
         if (selectedPhotos < 10) {
             if (selectedPhotos == 0 && photos.size < 20) {
@@ -218,6 +189,34 @@ class UploadViewModel : SessionViewModel() {
 //            Logger.e("Create model failed", e)
 //            uiState = uiState.copy(trainingStatus = null, errorPopup = e)
 //        }
+    }
+
+
+    fun analyzePhotos() = viewModelScope.launch {
+        if (uiState.analyzingPhotos) return@launch
+        val notAnalyzedPhotos = uiState.photos?.filter { it.analysis == null }
+        if (notAnalyzedPhotos.isNullOrEmpty()) return@launch
+
+        uiState = uiState.copy(analyzingPhotos = true)
+        try {
+            if (Supabase.local) {
+                notAnalyzedPhotos.forEach { photo ->
+                    SupabaseFunction.analyzePhoto(photo.id)
+                }
+            } else {
+                val analysisJobs = notAnalyzedPhotos.map { photo ->
+                    async {
+                        SupabaseFunction.analyzePhoto(photo.id)
+                    }
+                }
+                analysisJobs.awaitAll()
+            }
+            uiState = uiState.copy(analyzingPhotos = false)
+            loadPhotos()
+        } catch (e: Exception) {
+            Logger.e("Analyzing photos failed", e)
+            uiState = uiState.copy(analyzingPhotos = false, errorPopup = e)
+        }
     }
 
     fun onCreatingModelClick() {

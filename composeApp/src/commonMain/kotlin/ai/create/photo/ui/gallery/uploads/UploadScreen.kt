@@ -42,6 +42,7 @@ import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ImageSearch
 import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.ThumbDown
@@ -83,6 +84,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.add_your_photos
+import photocreateai.composeapp.generated.resources.analyze_photos
 import photocreateai.composeapp.generated.resources.analyzing_photos
 import photocreateai.composeapp.generated.resources.creating_model_hint
 import photocreateai.composeapp.generated.resources.generate_photo
@@ -143,14 +145,24 @@ fun UploadScreen(
         val buttonsBottomPadding = 94.dp
         if (!state.isLoadingPhotos && state.photos != null) {
             if (!state.isLoadingTraining && state.photos.size >= 10) {
-                CreateModelFab(
-                    modifier = Modifier.align(Alignment.BottomCenter)
-                        .padding(bottom = buttonsBottomPadding),
-                    trainingStatus = state.trainingStatus,
-                    createModel = { viewModel.toggleTrainAiModelPopup(true) },
-                    onCreatingModelClick = viewModel::onCreatingModelClick,
-                    generatePhotos = openGenerateTab,
-                )
+                val shouldAnalyzePhotos = state.photos.any { it.analysisStatus == null }
+                if (shouldAnalyzePhotos) {
+                    AnalyzePhotosFab(
+                        modifier = Modifier.align(Alignment.BottomCenter)
+                            .padding(bottom = buttonsBottomPadding),
+                        analyzingPhotos = state.analyzingPhotos,
+                        onClick = viewModel::analyzePhotos,
+                    )
+                } else {
+                    CreateModelFab(
+                        modifier = Modifier.align(Alignment.BottomCenter)
+                            .padding(bottom = buttonsBottomPadding),
+                        trainingStatus = state.trainingStatus,
+                        createModel = { viewModel.toggleTrainAiModelPopup(true) },
+                        onCreatingModelClick = viewModel::onCreatingModelClick,
+                        generatePhotos = openGenerateTab,
+                    )
+                }
                 if (state.selectMode) {
                     FloatingActionButton(
                         modifier = Modifier.align(Alignment.BottomEnd)
@@ -295,6 +307,53 @@ private fun AddPhotosFab(
 }
 
 @Composable
+private fun AnalyzePhotosFab(
+    modifier: Modifier = Modifier,
+    analyzingPhotos: Boolean,
+    onClick: () -> Unit
+) {
+    ExtendedFloatingActionButton(
+        modifier = modifier,
+        onClick = onClick,
+    ) {
+        if (analyzingPhotos) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                    strokeWidth = 2.dp,
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = stringResource(Res.string.analyzing_photos),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 14.sp,
+                )
+            }
+        } else {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ImageSearch,
+                    contentDescription = Icons.Default.ImageSearch.name,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = stringResource(Res.string.analyze_photos),
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 14.sp,
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun CreateModelFab(
     modifier: Modifier = Modifier,
     trainingStatus: TrainingStatus?,
@@ -306,7 +365,6 @@ fun CreateModelFab(
         modifier = modifier,
         onClick = {
             when (trainingStatus) {
-                TrainingStatus.ANALYZING_PHOTOS -> {}
                 TrainingStatus.SUCCEEDED -> generatePhotos()
                 TrainingStatus.PROCESSING -> onCreatingModelClick()
                 null -> createModel()
@@ -314,22 +372,6 @@ fun CreateModelFab(
         },
     ) {
         when (trainingStatus) {
-            TrainingStatus.ANALYZING_PHOTOS -> {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = MaterialTheme.colorScheme.primary,
-                        strokeWidth = 2.dp,
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Text(
-                        text = stringResource(Res.string.analyzing_photos),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        fontSize = 14.sp,
-                    )
-                }
-            }
 
             TrainingStatus.SUCCEEDED -> {
                 Row(verticalAlignment = Alignment.CenterVertically) {
