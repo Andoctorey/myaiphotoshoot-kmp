@@ -150,7 +150,7 @@ fun UploadScreen(
                         onClick = viewModel::analyzePhotos,
                     )
                 } else {
-                    CreateModelFab(
+                    TrainModelFab(
                         modifier = Modifier.align(Alignment.BottomCenter)
                             .padding(bottom = buttonsBottomPadding),
                         trainingStatus = state.trainingStatus,
@@ -351,7 +351,7 @@ private fun AnalyzePhotosFab(
 }
 
 @Composable
-fun CreateModelFab(
+private fun TrainModelFab(
     modifier: Modifier = Modifier,
     trainingStatus: TrainingStatus?,
     createModel: () -> Unit,

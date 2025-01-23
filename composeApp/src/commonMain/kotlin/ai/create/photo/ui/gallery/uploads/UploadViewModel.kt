@@ -73,36 +73,11 @@ class UploadViewModel : SessionViewModel() {
                 scrollToTop = true,
             )
         } catch (e: Exception) {
-            Logger.e("Loading photos failed", e)
+            Logger.e("loadPhotos failed", e)
             uiState = uiState.copy(isLoadingPhotos = false, loadingError = e)
         }
     }
 
-    private fun loadTraining(): Job = viewModelScope.launch {
-        Logger.i("loadPhotos")
-        val userId = userId ?: return@launch
-        if (uiState.trainingStatus != TrainingStatus.PROCESSING) {
-            uiState = uiState.copy(isLoadingTraining = true)
-        }
-        try {
-            val userTraining =
-                UserTrainingsRepository.getLatestTraining(userId).getOrThrow()
-            uiState = uiState.copy(
-                isLoadingTraining = false,
-                trainingStatus = userTraining?.status,
-                loadingError = null,
-            )
-        } catch (e: Exception) {
-            Logger.e("Loading training failed", e)
-            uiState = uiState.copy(isLoadingTraining = false, errorPopup = e)
-        }
-        if (uiState.trainingStatus == TrainingStatus.PROCESSING) {
-            delay(100 * 1000)
-            ensureActive()
-            if (uiState.isLoadingPhotos) return@launch
-            loadTraining()
-        }
-    }
 
     fun uploadPhotos(files: PlatformFiles) = viewModelScope.launch {
         Logger.i("uploadPhotos: ${files.joinToString { it.name }}")
@@ -115,7 +90,7 @@ class UploadViewModel : SessionViewModel() {
         var completedFiles = 0
         for (file in files) {
             uploadPhotoUseCase.invoke(userId, file).catch {
-                Logger.e("upload failed", it)
+                Logger.e("uploadPhotos failed", it)
                 uiState = uiState.copy(uploadProgress = 0, errorPopup = it)
             }.collect { status ->
                 when (status) {
@@ -147,33 +122,17 @@ class UploadViewModel : SessionViewModel() {
             UserFilesRepository.deleteFile(photo.id)
             SupabaseStorage.deleteFile("$userId/$UPLOADS/${photo.name}")
         } catch (e: Exception) {
-            Logger.e("Delete photo failed, $photo", e)
+            Logger.e("deletePhoto failed, $photo", e)
             uiState = uiState.copy(photos = photos, errorPopup = e)
         }
     }
-
-    fun trainAiModel() = viewModelScope.launch {
-        val photos = uiState.photos
-        if (photos.isNullOrEmpty() || photos.size < 10) {
-            uiState = uiState.copy(showUploadMorePhotosPopup = true)
-            return@launch
-        }
-
-        uiState = uiState.copy(trainingStatus = TrainingStatus.PROCESSING)
-        try {
-            SupabaseFunction.trainAiModel()
-            loadTraining()
-        } catch (e: Exception) {
-            Logger.e("Create model failed", e)
-            uiState = uiState.copy(trainingStatus = null, errorPopup = e)
-        }
-    }
-
 
     fun analyzePhotos() = viewModelScope.launch {
         if (uiState.analyzingPhotos) return@launch
         val notAnalyzedPhotos = uiState.photos?.filter { it.analysis == null }
         if (notAnalyzedPhotos.isNullOrEmpty()) return@launch
+
+        Logger.i("analyzePhotos: ${notAnalyzedPhotos.size}")
 
         uiState = uiState.copy(analyzingPhotos = true)
         try {
@@ -192,13 +151,14 @@ class UploadViewModel : SessionViewModel() {
             uiState = uiState.copy(analyzingPhotos = false)
             loadPhotos()
         } catch (e: Exception) {
-            Logger.e("Analyzing photos failed", e)
+            Logger.e("analyzePhotos failed", e)
             uiState = uiState.copy(analyzingPhotos = false, errorPopup = e)
         }
     }
 
     fun deleteUnsuitablePhotos() = viewModelScope.launch {
         val photos = uiState.photos ?: return@launch
+        Logger.i("deleteUnsuitablePhotos: ${photos.size}")
         uiState = uiState.copy(
             deleteUnsuitablePhotosPopup = false,
             photos = photos.filter { it.analysisStatus != AnalysisStatus.DECLINED })
@@ -210,6 +170,53 @@ class UploadViewModel : SessionViewModel() {
         } catch (e: Exception) {
             Logger.e("Delete unsuitable photos failed", e)
             uiState = uiState.copy(errorPopup = e, photos = photos)
+        }
+    }
+
+    fun trainAiModel() = viewModelScope.launch {
+        val photos = uiState.photos
+        if (photos.isNullOrEmpty() || photos.size < 10) {
+            uiState = uiState.copy(showUploadMorePhotosPopup = true)
+            return@launch
+        }
+
+        Logger.i("trainAiModel: ${photos.size}")
+
+        uiState = uiState.copy(trainingStatus = TrainingStatus.PROCESSING)
+        try {
+            SupabaseFunction.trainAiModel()
+            loadTraining()
+        } catch (e: Exception) {
+            Logger.e("trainAiModel failed", e)
+            uiState = uiState.copy(trainingStatus = null, errorPopup = e)
+        }
+    }
+
+    private fun loadTraining(): Job = viewModelScope.launch {
+        Logger.i("loadTraining")
+        val userId = userId ?: return@launch
+        if (uiState.trainingStatus != TrainingStatus.PROCESSING) {
+            uiState = uiState.copy(isLoadingTraining = true)
+        }
+        
+        try {
+            val userTraining =
+                UserTrainingsRepository.getLatestTraining(userId).getOrThrow()
+            uiState = uiState.copy(
+                isLoadingTraining = false,
+                trainingStatus = userTraining?.status,
+                loadingError = null,
+            )
+        } catch (e: Exception) {
+            Logger.e("loadTraining failed", e)
+            uiState = uiState.copy(isLoadingTraining = false, errorPopup = e)
+        }
+
+        if (uiState.trainingStatus == TrainingStatus.PROCESSING) {
+            delay(100 * 1000)
+            ensureActive()
+            if (uiState.isLoadingPhotos) return@launch
+            loadTraining()
         }
     }
 
