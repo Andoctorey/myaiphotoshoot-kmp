@@ -41,23 +41,11 @@
     <string name="enhance_prompt">Enhance Prompt</string>
     <string name="cancel_popup">Cancel</string>
     <string name="select_training_steps">Use the slider to choose how many training steps you want. More steps typically produce better photos — 1,000 steps is a great place to start.</string>
-    <string name="training_steps">Training steps</string>
-    <string name="minutes">Minutes</string>
-    <string name="cost">Training cost: $%1$s, then $0.03 per photo.</string>
+    <string name="steps">steps</string>
+    <string name="minutes">minutes</string>
+    <string name="cost_per_photo">then $0.03 per photo</string>
     <string name="gallery_public_tab">Public</string>
     <string name="gallery_creations_tab">Creations</string>
     <string name="gallery_uploads_tab">Uploads</string>
     <string name="select_photos_popup_message">To ensure accurate training, please select at least 10 good photos to train your AI model.</string>
-
-    <string name="train_ai_model_title">Create an AI Model in 5 Easy Steps</string>
-    <string name="train_ai_model_step_1">1. Upload 10–20 high-quality selfies in portrait mode from various angles.</string>
-    <string name="train_ai_model_step_1_button">Upload Photos</string>
-    <string name="train_ai_model_step_2">2. Review your photos with AI to ensure they meet quality standards.</string>
-    <string name="train_ai_model_step_2_button">Analyze Photos</string>
-    <string name="train_ai_model_step_3">3. Select a model and the number of training steps.</string>
-    <string name="train_ai_model_step_4">4. Top up your balance to start training.</string>
-    <string name="train_ai_model_step_4_button">Top Up</string>
-    <string name="train_ai_model_step_5">5. Wait about one hour for the training to complete.</string>
-    <string name="train_ai_model_step_final">Generate an unlimited number of photos for just $0.03 each.</string>
-
 </resources>

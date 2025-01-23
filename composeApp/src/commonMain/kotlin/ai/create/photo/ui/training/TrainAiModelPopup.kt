@@ -29,11 +29,11 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.cancel
-import photocreateai.composeapp.generated.resources.cost
+import photocreateai.composeapp.generated.resources.cost_per_photo
 import photocreateai.composeapp.generated.resources.minutes
 import photocreateai.composeapp.generated.resources.select_training_steps
+import photocreateai.composeapp.generated.resources.steps
 import photocreateai.composeapp.generated.resources.train_ai_model
-import photocreateai.composeapp.generated.resources.training_steps
 import kotlin.math.round
 
 
@@ -43,6 +43,7 @@ import kotlin.math.round
 fun TrainAiModelPopup(
     viewModel: TrainAiModelViewModel = viewModel { TrainAiModelViewModel() },
     onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
 ) {
     val state = viewModel.uiState
 
@@ -82,7 +83,7 @@ fun TrainAiModelPopup(
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(onClick = onConfirm) {
                 Text(
                     text = stringResource(Res.string.train_ai_model),
                     fontSize = 16.sp
@@ -97,6 +98,7 @@ fun TrainAiModelPopup(
 private fun TrainingSteps(steps: Int, onStepsChanged: (Int) -> Unit) {
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             modifier = Modifier.animateContentSize(),
@@ -110,20 +112,30 @@ private fun TrainingSteps(steps: Int, onStepsChanged: (Int) -> Unit) {
             valueRange = 500f..2000f,
         )
         Spacer(modifier = Modifier.height(8.dp))
-        val minutes = (steps / 1000f * 60).toInt()
         Text(
             modifier = Modifier.animateContentSize(),
-            text = stringResource(Res.string.training_steps) + ": $steps. " +
-                    stringResource(Res.string.minutes) + ": $minutes.",
+            text = steps.toString() + " " + stringResource(Res.string.steps),
             fontSize = 14.sp,
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            modifier = Modifier.animateContentSize(),
+            text = (steps / 1000f * 60).toInt()
+                .toString() + " " + stringResource(Res.string.minutes),
+            fontSize = 14.sp,
+        )
+        Spacer(modifier = Modifier.height(16.dp))
         val cost = round(steps / 500f * 4.99 * 100f) / 100f
         Text(
             modifier = Modifier.animateContentSize(),
-            text = stringResource(Res.string.cost, cost),
-            fontSize = 16.sp,
+            text = "$$cost",
+            fontSize = 32.sp,
             fontWeight = FontWeight.Medium,
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            modifier = Modifier.animateContentSize(),
+            text = stringResource(Res.string.cost_per_photo),
+            fontSize = 14.sp,
         )
     }
 }
