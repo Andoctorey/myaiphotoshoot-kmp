@@ -161,34 +161,21 @@ class UploadViewModel : SessionViewModel() {
         }
     }
 
-    fun createModel() = viewModelScope.launch {
+    fun trainAiModel() = viewModelScope.launch {
         val photos = uiState.photos
         if (photos.isNullOrEmpty() || photos.size < 10) {
             uiState = uiState.copy(showUploadMorePhotosPopup = true)
             return@launch
         }
 
-        val selectedPhotos = photos.count { it.selected }
-        if (selectedPhotos < 10) {
-            if (selectedPhotos == 0 && photos.size < 20) {
-                // first use
-                val selectedPhotos = photos.map {
-                    if (it.analysisStatus == AnalysisStatus.APPROVED) it.copy(selected = true) else it
-                }
-                uiState = uiState.copy(photos = selectedPhotos)
-            }
-            uiState = uiState.copy(showSelectPhotosPopup = true, selectMode = true)
-            return@launch
+        uiState = uiState.copy(trainingStatus = TrainingStatus.PROCESSING)
+        try {
+            SupabaseFunction.trainAiModel()
+            loadTraining()
+        } catch (e: Exception) {
+            Logger.e("Create model failed", e)
+            uiState = uiState.copy(trainingStatus = null, errorPopup = e)
         }
-
-//        uiState = uiState.copy(trainingStatus = TrainingStatus.PROCESSING)
-//        try {
-//            SupabaseFunction.createAiModel(photos.map { it.id })
-//            loadTraining()
-//        } catch (e: Exception) {
-//            Logger.e("Create model failed", e)
-//            uiState = uiState.copy(trainingStatus = null, errorPopup = e)
-//        }
     }
 
 
