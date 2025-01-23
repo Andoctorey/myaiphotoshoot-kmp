@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.cancel
@@ -28,12 +29,13 @@ fun ErrorPopup(e: Throwable, onDismiss: () -> Unit) {
     )
 }
 
+// don't add title, it looks ugly
 @Composable
 fun InfoPopup(message: String, onDismiss: () -> Unit) {
     AlertDialog(
         icon = { Icon(Icons.Default.Info, contentDescription = message) },
         onDismissRequest = onDismiss,
-        text = { Text(text = message) },
+        text = { Text(text = message, fontSize = 16.sp) },
         confirmButton = {
             TextButton(onClick = onDismiss) {
                 Text("OK")
