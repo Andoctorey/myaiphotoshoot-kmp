@@ -8,10 +8,7 @@ import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.InfoPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.training.TrainAiModelPopup
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,8 +37,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Brush
-import androidx.compose.material.icons.filled.CheckBox
-import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.CleaningServices
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
@@ -52,7 +47,6 @@ import androidx.compose.material.icons.filled.ThumbDown
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -67,7 +61,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
@@ -140,8 +133,6 @@ fun UploadScreen(
             Photos(
                 photos = state.photos,
                 listState = state.listState,
-                selectMode = state.selectMode,
-                onSelect = viewModel::selectPhoto,
                 hideDeletePhotoButton = hideDeletePhotoButton,
                 onDelete = viewModel::deletePhoto,
             )
@@ -168,38 +159,15 @@ fun UploadScreen(
                         generatePhotos = openGenerateTab,
                     )
                 }
-                if (state.selectMode) {
-                    FloatingActionButton(
-                        modifier = Modifier.align(Alignment.BottomEnd)
-                            .padding(bottom = buttonsBottomPadding, end = 24.dp),
-                        onClick = { viewModel.toggleSelectMode(false) },
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = Icons.Default.Close.name,
-                            )
-                            Text(
-                                modifier = Modifier.animateContentSize(),
-                                text = state.photos.count { it.selected }.toString(),
-                                fontSize = 16.sp,
-                            )
-                        }
-                    }
-                } else {
-                    SmallFloatingActionButton(
-                        modifier = Modifier.align(Alignment.BottomEnd)
-                            .padding(bottom = buttonsBottomPadding, end = 24.dp),
-                        onClick = onAddPhotoClick,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.AddAPhoto,
-                            contentDescription = Icons.Default.AddAPhoto.name,
-                        )
-                    }
+                SmallFloatingActionButton(
+                    modifier = Modifier.align(Alignment.BottomEnd)
+                        .padding(bottom = buttonsBottomPadding, end = 24.dp),
+                    onClick = onAddPhotoClick,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AddAPhoto,
+                        contentDescription = Icons.Default.AddAPhoto.name,
+                    )
                 }
 
                 val hasBadPhotos = state.photos.any { it.analysisStatus == AnalysisStatus.DECLINED }
@@ -464,8 +432,6 @@ fun CreateModelFab(
 private fun Photos(
     photos: List<UploadUiState.Photo>,
     listState: LazyStaggeredGridState,
-    selectMode: Boolean,
-    onSelect: (UploadUiState.Photo) -> Unit,
     hideDeletePhotoButton: Boolean,
     onDelete: (UploadUiState.Photo) -> Unit,
 ) {
@@ -486,8 +452,6 @@ private fun Photos(
             Photo(
                 modifier = Modifier.animateItem(),
                 photo = photos[item],
-                selectMode = selectMode,
-                onSelect = onSelect,
                 hideDeletePhotoButton = hideDeletePhotoButton,
                 onDelete = onDelete,
                 showAnalysis = showAnalysis,
@@ -501,8 +465,6 @@ private fun Photos(
 private fun Photo(
     modifier: Modifier,
     photo: UploadUiState.Photo,
-    selectMode: Boolean,
-    onSelect: (UploadUiState.Photo) -> Unit,
     hideDeletePhotoButton: Boolean,
     onDelete: (UploadUiState.Photo) -> Unit,
     showAnalysis: Boolean,
@@ -528,18 +490,10 @@ private fun Photo(
     }
 
     Box(
-        modifier = modifier.fillMaxWidth().then(
-            if (selectMode) {
-                Modifier.background(Color.Black)
-            } else {
-                Modifier
-            }
-        )
+        modifier = modifier.fillMaxWidth()
     ) {
         AsyncImage(
-            modifier = Modifier.fillMaxWidth().clickable {
-                if (selectMode) onSelect(photo)
-            }.alpha(if (selectMode && !photo.selected) 0.5f else 1f),
+            modifier = Modifier.fillMaxWidth(),
             model = ImageRequest.Builder(LocalPlatformContext.current)
                 .data(photo.url)
                 .crossfade(true)
@@ -554,25 +508,7 @@ private fun Photo(
             contentDescription = "photo",
         )
 
-        if (selectMode) {
-            IconButton(
-                onClick = { onSelect(photo) },
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(8.dp)
-                    .background(Color.Black.copy(alpha = 0.5f), shape = CircleShape)
-            ) {
-                Crossfade(targetState = photo.selected) { selected ->
-                    val icon =
-                        if (selected) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = icon.name,
-                        tint = Color.White,
-                    )
-                }
-            }
-        } else if (!hideDeletePhotoButton && !loading) {
+        if (!hideDeletePhotoButton && !loading) {
             IconButton(
                 onClick = { onDelete(photo) },
                 modifier = Modifier
