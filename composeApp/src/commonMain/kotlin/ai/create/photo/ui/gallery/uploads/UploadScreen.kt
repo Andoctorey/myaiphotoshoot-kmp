@@ -257,7 +257,7 @@ fun UploadScreen(
         if (state.showTrainAiModelPopup) {
             TrainAiModelPopup {
                 viewModel.toggleTrainAiModelPopup(false)
-                viewModel.createModel()
+                viewModel.trainAiModel()
             }
         }
 
