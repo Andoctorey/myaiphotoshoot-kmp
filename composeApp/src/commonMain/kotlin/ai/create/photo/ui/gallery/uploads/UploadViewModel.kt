@@ -219,6 +219,22 @@ class UploadViewModel : SessionViewModel() {
         }
     }
 
+    fun deleteUnsuitablePhotos() = viewModelScope.launch {
+        val photos = uiState.photos ?: return@launch
+        uiState = uiState.copy(
+            deleteUnsuitablePhotosPopup = false,
+            photos = photos.filter { it.analysisStatus != AnalysisStatus.DECLINED })
+        val badPhotos = photos.filter { it.analysisStatus == AnalysisStatus.DECLINED }
+        try {
+            UserFilesRepository.deleteFiles(badPhotos.map { it.id })
+            SupabaseStorage.deleteFiles(badPhotos.map { "$userId/$UPLOADS/${it.name}" })
+            loadPhotos()
+        } catch (e: Exception) {
+            Logger.e("Delete unsuitable photos failed", e)
+            uiState = uiState.copy(errorPopup = e, photos = photos)
+        }
+    }
+
     fun onCreatingModelClick() {
         uiState = uiState.copy(showTrainingAiModelPopup = true)
     }
@@ -249,5 +265,9 @@ class UploadViewModel : SessionViewModel() {
 
     fun toggleShowSelectPhotosPopup(show: Boolean) {
         uiState = uiState.copy(showSelectPhotosPopup = show)
+    }
+
+    fun toggleDeleteUnsuitablePhotosPopup(show: Boolean) {
+        uiState = uiState.copy(deleteUnsuitablePhotosPopup = show)
     }
 }

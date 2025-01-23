@@ -29,6 +29,7 @@ data class UploadUiState(
     val showSelectPhotosPopup: Boolean = false,
     val showTrainAiModelPopup: Boolean = false,
     val showTrainingAiModelPopup: Boolean = false,
+    val deleteUnsuitablePhotosPopup: Boolean = false,
 ) {
 
     @Immutable

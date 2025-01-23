@@ -2,6 +2,7 @@ package ai.create.photo.ui.gallery.uploads
 
 import ai.create.photo.data.supabase.model.AnalysisStatus
 import ai.create.photo.data.supabase.model.TrainingStatus
+import ai.create.photo.ui.compose.ConfirmationPopup
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.InfoPopup
@@ -41,7 +42,9 @@ import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
+import androidx.compose.material.icons.filled.CleaningServices
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ImageSearch
 import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.Sync
@@ -87,6 +90,8 @@ import photocreateai.composeapp.generated.resources.add_your_photos
 import photocreateai.composeapp.generated.resources.analyze_photos
 import photocreateai.composeapp.generated.resources.analyzing_photos
 import photocreateai.composeapp.generated.resources.creating_model_hint
+import photocreateai.composeapp.generated.resources.delete
+import photocreateai.composeapp.generated.resources.delete_unsuitable_photos
 import photocreateai.composeapp.generated.resources.generate_photo
 import photocreateai.composeapp.generated.resources.select_photos_popup_message
 import photocreateai.composeapp.generated.resources.train_ai_model
@@ -196,6 +201,20 @@ fun UploadScreen(
                         )
                     }
                 }
+
+                val hasBadPhotos = state.photos.any { it.analysisStatus == AnalysisStatus.DECLINED }
+                if (hasBadPhotos) {
+                    SmallFloatingActionButton(
+                        modifier = Modifier.align(Alignment.BottomStart)
+                            .padding(bottom = buttonsBottomPadding, start = 24.dp),
+                        onClick = { viewModel.toggleDeleteUnsuitablePhotosPopup(true) },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CleaningServices,
+                            contentDescription = Icons.Default.CleaningServices.name,
+                        )
+                    }
+                }
             } else {
                 AddPhotosFab(
                     modifier = Modifier.align(Alignment.BottomCenter)
@@ -246,6 +265,16 @@ fun UploadScreen(
             InfoPopup(stringResource(Res.string.select_photos_popup_message)) {
                 viewModel.toggleShowSelectPhotosPopup(false)
             }
+        }
+
+        if (state.deleteUnsuitablePhotosPopup) {
+            ConfirmationPopup(
+                icon = Icons.Default.Delete,
+                message = stringResource(Res.string.delete_unsuitable_photos),
+                confirmButton = stringResource(Res.string.delete),
+                onConfirm = viewModel::deleteUnsuitablePhotos,
+                onDismiss = { viewModel.toggleDeleteUnsuitablePhotosPopup(false) },
+            )
         }
     }
 }
