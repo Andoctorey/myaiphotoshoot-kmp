@@ -43,7 +43,6 @@ import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Memory
-import androidx.compose.material.icons.filled.Mood
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.ThumbDown
 import androidx.compose.material.icons.filled.ThumbUp
@@ -159,13 +158,13 @@ fun UploadScreen(
                         onClick = { viewModel.toggleSelectMode(false) },
                     ) {
                         Row(
+                            modifier = Modifier.padding(horizontal = 8.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = Icons.Default.Close.name,
                             )
-                            Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 modifier = Modifier.animateContentSize(),
                                 text = state.photos.count { it.selected }.toString(),
@@ -370,7 +369,7 @@ fun CreateModelFab(
             null -> {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        imageVector = Icons.Default.Mood,
+                        imageVector = Icons.Default.Memory,
                         contentDescription = stringResource(Res.string.train_ai_model),
                         tint = MaterialTheme.colorScheme.onSurface,
                     )
@@ -460,9 +459,7 @@ private fun Photo(
     Box(
         modifier = modifier.fillMaxWidth().then(
             if (selectMode) {
-                Modifier.background(
-                    if (photo.analysisStatus == AnalysisStatus.APPROVED) Color.Green else Color.Red
-                )
+                Modifier.background(Color.Black)
             } else {
                 Modifier
             }
@@ -471,7 +468,7 @@ private fun Photo(
         AsyncImage(
             modifier = Modifier.fillMaxWidth().clickable {
                 if (selectMode) onSelect(photo)
-            }.alpha(if (selectMode && !photo.selected) 0.9f else 1f),
+            }.alpha(if (selectMode && !photo.selected) 0.5f else 1f),
             model = ImageRequest.Builder(LocalPlatformContext.current)
                 .data(photo.url)
                 .crossfade(true)

@@ -7,6 +7,7 @@ import ai.create.photo.data.supabase.SupabaseStorage
 import ai.create.photo.data.supabase.SupabaseStorage.UPLOADS
 import ai.create.photo.data.supabase.database.UserFilesRepository
 import ai.create.photo.data.supabase.database.UserTrainingsRepository
+import ai.create.photo.data.supabase.model.AnalysisStatus
 import ai.create.photo.data.supabase.model.TrainingStatus
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -183,7 +184,11 @@ class UploadViewModel : SessionViewModel() {
                     }
                     analysisJobs.awaitAll()
                 }
-                uiState = uiState.copy(showSelectPhotosPopup = true, selectMode = true)
+                uiState = uiState.copy(
+                    trainingStatus = null,
+                    showSelectPhotosPopup = true,
+                    selectMode = true
+                )
                 loadPhotos()
             } catch (e: Exception) {
                 Logger.e("Analyzing photos failed", e)
@@ -194,6 +199,13 @@ class UploadViewModel : SessionViewModel() {
 
         val selectedPhotos = photos.count { it.selected }
         if (selectedPhotos < 10) {
+            if (selectedPhotos == 0 && photos.size < 20) {
+                // first use
+                val selectedPhotos = photos.map {
+                    if (it.analysisStatus == AnalysisStatus.APPROVED) it.copy(selected = true) else it
+                }
+                uiState = uiState.copy(photos = selectedPhotos)
+            }
             uiState = uiState.copy(showSelectPhotosPopup = true, selectMode = true)
             return@launch
         }
