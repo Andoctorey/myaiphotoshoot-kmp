@@ -9,7 +9,10 @@ data class CreationsUiState(
     val isLoading: Boolean = true,
     val loadingError: Throwable? = null,
 
-    val photos: List<Photo>? = null,
+    val photos: List<Photo> = emptyList(),
+    val page: Int = 1,
+    val isLoadingNextPage: Boolean = false,
+    val pagingLimitReach: Boolean = false,
 
     val listState: LazyStaggeredGridState = LazyStaggeredGridState(),
     val scrollToTop: Boolean = false,

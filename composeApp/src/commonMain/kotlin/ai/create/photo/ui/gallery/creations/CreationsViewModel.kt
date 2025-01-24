@@ -23,6 +23,7 @@ class CreationsViewModel : SessionViewModel() {
     }
 
     override fun onAuthenticated() {
+        uiState = uiState.copy(isLoading = false)
         loadCreations()
     }
 
@@ -33,26 +34,30 @@ class CreationsViewModel : SessionViewModel() {
     fun loadCreations() = viewModelScope.launch {
         Logger.i("loadCreations")
         val userId = userId ?: return@launch
-        uiState = uiState.copy(isLoading = true)
+        uiState = uiState.copy(isLoadingNextPage = true)
         try {
-            val generations = UserGenerationsRepository.getGenerations(userId).getOrThrow()
+            val generations =
+                UserGenerationsRepository.getGenerations(userId, uiState.page, 15).getOrThrow()
+            val newPhotos = generations.map {
+                CreationsUiState.Photo(
+                    id = it.id,
+                    createdAt = it.createdAt,
+                    name = it.file.fileName,
+                    prompt = it.prompt,
+                    url = it.file.signedUrl,
+                )
+            }
             uiState = uiState.copy(
-                isLoading = false,
                 loadingError = null,
-                scrollToTop = generations.size > (uiState.photos?.size ?: 0),
-                photos = generations.map {
-                    CreationsUiState.Photo(
-                        id = it.id,
-                        createdAt = it.createdAt,
-                        name = it.file.fileName,
-                        prompt = it.prompt,
-                        url = it.file.signedUrl,
-                    )
-                }
+                scrollToTop = generations.size > (uiState.photos.size),
+                photos = uiState.photos + newPhotos,
+                isLoadingNextPage = false,
+                page = uiState.page + 1,
+                pagingLimitReach = newPhotos.isEmpty(),
             )
         } catch (e: Exception) {
             Logger.e("loadCreations failed", e)
-            uiState = uiState.copy(isLoading = false, loadingError = e)
+            uiState = uiState.copy(isLoadingNextPage = false, loadingError = e) //TODO
         }
     }
 
