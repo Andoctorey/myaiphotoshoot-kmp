@@ -1,6 +1,7 @@
 package ai.create.photo.ui.gallery.creations
 
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
+import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.compose.PhotoDropMenu
 import androidx.compose.foundation.layout.Arrangement
@@ -67,6 +68,12 @@ fun CreationsScreen(
             }
 
             Photos(state.photos, state.listState, onDelete = viewModel::deleteGeneratedPhoto)
+        }
+    }
+
+    if (state.errorPopup != null) {
+        ErrorPopup(state.errorPopup) {
+            viewModel.hideErrorPopup()
         }
     }
 }

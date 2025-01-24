@@ -28,7 +28,7 @@ object UserGenerationsRepository {
             }
     }
 
-    suspend fun deleteGenetaredPhoto(photoId: String) {
+    suspend fun deleteGeneratedPhoto(photoId: String) {
         Supabase.supabase
             .from(USER_GENERATIONS_TABLE)
             .delete {
