@@ -31,6 +31,7 @@ import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.cancel
 import photocreateai.composeapp.generated.resources.cost_per_photo
 import photocreateai.composeapp.generated.resources.minutes
+import photocreateai.composeapp.generated.resources.photos_required
 import photocreateai.composeapp.generated.resources.select_training_steps
 import photocreateai.composeapp.generated.resources.steps
 import photocreateai.composeapp.generated.resources.train_ai_model
@@ -106,6 +107,17 @@ private fun TrainingSteps(steps: Int, onStepsChanged: (Int) -> Unit) {
             fontSize = 14.sp,
         )
         Spacer(modifier = Modifier.height(24.dp))
+        Text(
+            modifier = Modifier.animateContentSize(),
+            text = "$${round(steps / 500f * 2.49 * 100f) / 100f}",
+            fontSize = 32.sp,
+            fontWeight = FontWeight.Medium,
+        )
+        Text(
+            modifier = Modifier.animateContentSize(),
+            text = stringResource(Res.string.cost_per_photo),
+            fontSize = 14.sp,
+        )
         Slider(
             value = steps.toFloat(),
             onValueChange = { onStepsChanged(it.toInt()) },
@@ -119,22 +131,13 @@ private fun TrainingSteps(steps: Int, onStepsChanged: (Int) -> Unit) {
         )
         Text(
             modifier = Modifier.animateContentSize(),
-            text = (steps / 1000f * 60).toInt()
+            text = (steps / 2000f * 60).toInt()
                 .toString() + " " + stringResource(Res.string.minutes),
             fontSize = 14.sp,
         )
-        Spacer(modifier = Modifier.height(16.dp))
-        val cost = round(steps / 500f * 4.99 * 100f) / 100f
         Text(
             modifier = Modifier.animateContentSize(),
-            text = "$$cost",
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Medium,
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            modifier = Modifier.animateContentSize(),
-            text = stringResource(Res.string.cost_per_photo),
+            text = stringResource(Res.string.photos_required, steps / 100),
             fontSize = 14.sp,
         )
     }
