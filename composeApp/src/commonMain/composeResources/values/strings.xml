@@ -14,7 +14,6 @@
     <string name="analyze_photos">Analyze photos</string>
     <string name="analyzing_photos">Analyzing photos</string>
     <string name="delete_unsuitable_photos">For best results, delete all unsuitable photos. Continue?</string>
-
     <string name="generate_photo">Generate Photos</string>
     <string name="creating_model_hint">This process usually takes about an hour, so feel free to close the app and check back later.</string>
     <string name="enhance_photo_accuracy">Enhance Photo Accuracy</string>
@@ -26,7 +25,10 @@
     <string name="privacy_policy">Privacy Policy</string>
     <string name="delete_all_data">Delete All Data</string>
     <string name="confirm_data_delete">Are you sure you want to delete your account? This action is permanent and will remove all your data. You can’t undo this.</string>
+    <string name="delete_photo_confirmation">Would you like to delete this photo?</string>
     <string name="delete">Delete</string>
+    <string name="share">Share</string>
+    <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="data_deleted">All your stored data has been deleted successfully.</string>
     <string name="report_a_problem">Report a Problem</string>
