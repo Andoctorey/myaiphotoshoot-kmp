@@ -63,7 +63,7 @@ class CreationsViewModel : SessionViewModel() {
     }
 
     fun deleteGeneratedPhoto(photo: CreationsUiState.Photo) = viewModelScope.launch {
-        val photos = uiState.photos ?: return@launch
+        val photos = uiState.photos
         val updatedPhotos = photos.filter { it.id != photo.id }
         uiState = uiState.copy(photos = updatedPhotos)
         try {
