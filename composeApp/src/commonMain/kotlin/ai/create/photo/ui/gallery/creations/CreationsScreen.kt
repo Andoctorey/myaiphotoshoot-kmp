@@ -1,7 +1,9 @@
 package ai.create.photo.ui.gallery.creations
 
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
+import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
+import ai.create.photo.ui.compose.PhotoDropMenu
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -65,7 +67,13 @@ fun CreationsScreen(
                 viewModel.resetScrollToTop()
             }
 
-            Photos(state.photos, state.listState)
+            Photos(state.photos, state.listState, onDelete = viewModel::deleteGeneratedPhoto)
+        }
+    }
+
+    if (state.errorPopup != null) {
+        ErrorPopup(state.errorPopup) {
+            viewModel.hideErrorPopup()
         }
     }
 }
@@ -74,6 +82,7 @@ fun CreationsScreen(
 private fun Photos(
     photos: List<CreationsUiState.Photo>,
     listState: LazyStaggeredGridState,
+    onDelete: (CreationsUiState.Photo) -> Unit
 ) {
     LazyVerticalStaggeredGrid(
         state = listState,
@@ -90,6 +99,7 @@ private fun Photos(
             Photo(
                 modifier = Modifier.animateItem(),
                 photo = photos[item],
+                onDelete = { onDelete(photos[item]) }
             )
         }
     }
@@ -99,6 +109,7 @@ private fun Photos(
 private fun Photo(
     modifier: Modifier,
     photo: CreationsUiState.Photo,
+    onDelete: (CreationsUiState.Photo) -> Unit
 ) {
     var loading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<Throwable?>(null) }
@@ -133,6 +144,15 @@ private fun Photo(
                 error = it.result.throwable
             },
             contentDescription = "photo",
+        )
+
+        PhotoDropMenu(
+            modifier = modifier.align(Alignment.TopEnd),
+            item = photo,
+            onDelete = {
+                onDelete(photo)
+            },
+            onShare = { }
         )
     }
 }

@@ -13,6 +13,8 @@ data class CreationsUiState(
 
     val listState: LazyStaggeredGridState = LazyStaggeredGridState(),
     val scrollToTop: Boolean = false,
+
+    val errorPopup: Throwable? = null,
 ) {
     @Immutable
     data class Photo(
