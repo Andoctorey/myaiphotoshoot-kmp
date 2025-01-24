@@ -1,6 +1,8 @@
 package ai.create.photo.ui.gallery.creations
 
 import ai.create.photo.data.supabase.SessionViewModel
+import ai.create.photo.data.supabase.SupabaseStorage
+import ai.create.photo.data.supabase.database.UserFilesRepository
 import ai.create.photo.data.supabase.database.UserGenerationsRepository
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,6 +55,18 @@ class CreationsViewModel : SessionViewModel() {
         } catch (e: Exception) {
             Logger.e("loadCreations failed", e)
             uiState = uiState.copy(isLoading = false, loadingError = e)
+        }
+    }
+
+    fun deleteGeneratedPhoto(photo: CreationsUiState.Photo) = viewModelScope.launch {
+        val photos = uiState.photos ?: return@launch
+        val updatedPhotos = photos.filter { it.id != photo.id }
+        uiState = uiState.copy(photos = updatedPhotos)
+        try {
+            UserGenerationsRepository.deleteGenetaredPhoto(photo.id)
+        } catch (e: Exception) {
+            Logger.e("deletePhoto failed, $photo", e)
+            uiState = uiState.copy(photos = photos)
         }
     }
 
