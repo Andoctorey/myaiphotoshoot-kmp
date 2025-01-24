@@ -11,7 +11,14 @@ object UserGenerationsRepository {
 
     private const val USER_GENERATIONS_TABLE = "user_generations"
 
-    suspend fun getGenerations(userId: String): Result<List<UserGeneration>> = runCatching {
+    suspend fun getGenerations(
+        userId: String,
+        page: Int,
+        pageSize: Int
+    ): Result<List<UserGeneration>> = runCatching {
+        Logger.i("getGenerations, page: $page, pageSize: $pageSize")
+        val from = ((page - 1) * pageSize).toLong()
+        val to = (from + pageSize - 1).toLong()
         Supabase.supabase
             .from(USER_GENERATIONS_TABLE)
             .select(Columns.raw("*, user_files(*)")) {
@@ -19,12 +26,9 @@ object UserGenerationsRepository {
                     eq("user_id", userId)
                     eq("status", "succeeded")
                 }
-                limit(10)
                 order(column = "created_at", order = Order.DESCENDING)
+                range(from, to)
             }
             .decodeList<UserGeneration>()
-            .also {
-                Logger.i("getGenerations: ${it.size}, ")
-            }
     }
 }

@@ -22,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -32,6 +33,7 @@ import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import kotlinx.coroutines.flow.distinctUntilChanged
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
@@ -57,7 +59,7 @@ fun CreationsScreen(
             LoadingPlaceholder()
         } else if (state.loadingError != null) {
             ErrorMessagePlaceHolder(state.loadingError)
-        } else if (state.photos != null) {
+        } else {
             LaunchedEffect(state.scrollToTop) {
                 if (state.scrollToTop && state.listState.firstVisibleItemIndex > 1) {
                     state.listState.animateScrollToItem(0)
@@ -65,7 +67,13 @@ fun CreationsScreen(
                 viewModel.resetScrollToTop()
             }
 
-            Photos(state.photos, state.listState)
+            Photos(
+                photos = state.photos,
+                listState = state.listState,
+                isLoadingNextPage = state.isLoadingNextPage,
+                loadNextPage = { viewModel.loadCreations() },
+                pagingLimitReach = state.pagingLimitReach,
+            )
         }
     }
 }
@@ -74,6 +82,9 @@ fun CreationsScreen(
 private fun Photos(
     photos: List<CreationsUiState.Photo>,
     listState: LazyStaggeredGridState,
+    isLoadingNextPage: Boolean,
+    pagingLimitReach: Boolean,
+    loadNextPage: () -> Unit = {},
 ) {
     LazyVerticalStaggeredGrid(
         state = listState,
@@ -91,6 +102,31 @@ private fun Photos(
                 modifier = Modifier.animateItem(),
                 photo = photos[item],
             )
+        }
+
+        if (isLoadingNextPage && !pagingLimitReach) {
+            item {
+                Box(
+                    modifier = Modifier.fillMaxWidth().aspectRatio(1f),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    LoadingPlaceholder()
+                }
+            }
+        }
+    }
+
+    val photosCount = photos.size
+    if (!isLoadingNextPage && !pagingLimitReach) {
+        LaunchedEffect(listState, photosCount) {
+            snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
+                .distinctUntilChanged()
+                .collect {
+                    val lastVisibleItemIndex = it ?: return@collect
+                    if (lastVisibleItemIndex >= (photosCount - 3) && !isLoadingNextPage) {
+                        loadNextPage()
+                    }
+                }
         }
     }
 }
