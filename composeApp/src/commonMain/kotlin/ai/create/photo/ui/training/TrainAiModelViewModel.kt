@@ -45,4 +45,16 @@ class TrainAiModelViewModel : SessionViewModel() {
         uiState = uiState.copy(trainingSteps = trainingSteps)
     }
 
+    fun showPhotosRequiredPopup(photosRequired: Int, photosTaken: Int) {
+        uiState = uiState.copy(
+            photosRequired = photosRequired,
+            photosTaken = photosTaken,
+            showPhotosRequiredPopup = true
+        )
+    }
+
+    fun hidePhotosRequiredPopup() {
+        uiState = uiState.copy(showPhotosRequiredPopup = false)
+    }
+
 }

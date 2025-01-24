@@ -140,7 +140,7 @@ fun UploadScreen(
 
         val buttonsBottomPadding = 94.dp
         if (!state.isLoadingPhotos && state.photos != null) {
-            if (!state.isLoadingTraining && state.photos.size >= 10) {
+            if (!state.isLoadingTraining && state.photos.size >= 5) {
                 val shouldAnalyzePhotos = state.photos.any { it.analysisStatus == null }
                 if (shouldAnalyzePhotos) {
                     AnalyzePhotosFab(
@@ -224,6 +224,7 @@ fun UploadScreen(
 
         if (state.showTrainAiModelPopup) {
             TrainAiModelPopup(
+                photosCount = state.photos?.size ?: 0,
                 onDismiss = { viewModel.toggleTrainAiModelPopup(false) },
                 onConfirm = {
                     viewModel.toggleTrainAiModelPopup(false)
