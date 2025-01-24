@@ -175,7 +175,7 @@ class UploadViewModel : SessionViewModel() {
 
     fun trainAiModel() = viewModelScope.launch {
         val photos = uiState.photos
-        if (photos.isNullOrEmpty() || photos.size < 10) {
+        if (photos.isNullOrEmpty() || photos.size < 5) {
             uiState = uiState.copy(showUploadMorePhotosPopup = true)
             return@launch
         }
@@ -198,7 +198,7 @@ class UploadViewModel : SessionViewModel() {
         if (uiState.trainingStatus != TrainingStatus.PROCESSING) {
             uiState = uiState.copy(isLoadingTraining = true)
         }
-        
+
         try {
             val userTraining =
                 UserTrainingsRepository.getLatestTraining(userId).getOrThrow()

@@ -43,7 +43,8 @@
     <string name="select_training_steps">Use the slider to choose how many training steps you want. More steps typically produce better photos — 1,000 steps is a great place to start.</string>
     <string name="steps">steps</string>
     <string name="minutes">minutes</string>
-    <string name="photos_required">Minimum %1$s photos required</string>
+    <string name="minimum_photos_required">Minimum %1$s photos required</string>
+    <string name="photos_required"> You have uploaded %1$s photos. Please add %2$s more to meet the requirement.</string>
     <string name="cost_per_photo">then $0.03 per photo</string>
     <string name="gallery_public_tab">Public</string>
     <string name="gallery_creations_tab">Creations</string>

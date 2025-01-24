@@ -1,6 +1,7 @@
 package ai.create.photo.ui.training
 
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
+import ai.create.photo.ui.compose.InfoPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Box
@@ -30,6 +31,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.cancel
 import photocreateai.composeapp.generated.resources.cost_per_photo
+import photocreateai.composeapp.generated.resources.minimum_photos_required
 import photocreateai.composeapp.generated.resources.minutes
 import photocreateai.composeapp.generated.resources.photos_required
 import photocreateai.composeapp.generated.resources.select_training_steps
@@ -43,6 +45,7 @@ import kotlin.math.round
 @Composable
 fun TrainAiModelPopup(
     viewModel: TrainAiModelViewModel = viewModel { TrainAiModelViewModel() },
+    photosCount: Int,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
 ) {
@@ -84,7 +87,14 @@ fun TrainAiModelPopup(
             }
         },
         confirmButton = {
-            TextButton(onClick = onConfirm) {
+            TextButton(onClick = {
+                val photosRequired = state.trainingSteps / 100
+                if (photosCount < photosRequired) {
+                    viewModel.showPhotosRequiredPopup(photosRequired, photosCount)
+                } else {
+                    onConfirm()
+                }
+            }) {
                 Text(
                     text = stringResource(Res.string.train_ai_model),
                     fontSize = 16.sp
@@ -92,7 +102,17 @@ fun TrainAiModelPopup(
             }
         }
     )
-
+    if (state.showPhotosRequiredPopup) {
+        InfoPopup(
+            stringResource(
+                Res.string.photos_required,
+                state.photosTaken,
+                (state.photosRequired - state.photosTaken)
+            )
+        ) {
+            viewModel.hidePhotosRequiredPopup()
+        }
+    }
 }
 
 @Composable
@@ -137,7 +157,7 @@ private fun TrainingSteps(steps: Int, onStepsChanged: (Int) -> Unit) {
         )
         Text(
             modifier = Modifier.animateContentSize(),
-            text = stringResource(Res.string.photos_required, steps / 100),
+            text = stringResource(Res.string.minimum_photos_required, steps / 100),
             fontSize = 14.sp,
         )
     }
