@@ -119,8 +119,8 @@ class UploadViewModel : SessionViewModel() {
         val updatedPhotos = photos.filter { it.id != photo.id }
         uiState = uiState.copy(photos = updatedPhotos)
         try {
-            UserFilesRepository.deleteFile(photo.id)
             SupabaseStorage.deleteFile("$userId/$UPLOADS/${photo.name}")
+            UserFilesRepository.deleteFile(photo.id)
         } catch (e: Exception) {
             Logger.e("deletePhoto failed, $photo", e)
             uiState = uiState.copy(photos = photos, errorPopup = e)

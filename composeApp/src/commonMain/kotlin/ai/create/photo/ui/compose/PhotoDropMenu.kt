@@ -15,14 +15,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.delete
+import photocreateai.composeapp.generated.resources.delete_photo_confirmation
+import photocreateai.composeapp.generated.resources.save
+import photocreateai.composeapp.generated.resources.share
 
 @Composable
-fun <Item>PhotoDropMenu(
+fun <Item> PhotoDropMenu(
     modifier: Modifier = Modifier,
     item: Item,
     onDelete: (Item) -> Unit,
@@ -30,14 +32,14 @@ fun <Item>PhotoDropMenu(
     onSave: (Item) -> Unit = {}
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var isShowDialog by remember { mutableStateOf(false) }
+    var showConfirmDeletePopup by remember { mutableStateOf(false) }
 
     Box(
         modifier = modifier
             .fillMaxSize()
             .wrapContentSize(Alignment.TopEnd)
             .padding(8.dp)
-            .background(Color.Black.copy(alpha = 0.5f), shape = CircleShape)
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f), shape = CircleShape)
     ) {
         IconButton(onClick = { expanded = !expanded }) {
             Icon(Icons.Default.MoreVert, contentDescription = Icons.Default.MoreVert.name)
@@ -45,46 +47,56 @@ fun <Item>PhotoDropMenu(
 
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false}
+            onDismissRequest = { expanded = false }
         ) {
             DropdownMenuItem(
-                text = { Text(text = "Save") },
-                leadingIcon = { Icon(Icons.Default.Save, contentDescription = Icons.Default.Save.name) },
+                text = { Text(text = stringResource(Res.string.save)) },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Save,
+                        contentDescription = Icons.Default.Save.name
+                    )
+                },
                 onClick = { onSave(item) }
             )
 
             DropdownMenuItem(
-                text = { Text(text = "Share") },
-                leadingIcon = { Icon(Icons.Default.Share, contentDescription = Icons.Default.Share.name) },
+                text = { Text(text = stringResource(Res.string.share)) },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Share,
+                        contentDescription = Icons.Default.Share.name
+                    )
+                },
                 onClick = { onShare.invoke(item) }
             )
 
             DropdownMenuItem(
-                text = { Text(text = "Delete", color = Color.Red) },
-                leadingIcon = { Icon(Icons.Default.Delete, contentDescription = Icons.Default.Delete.name, tint = Color.Red) },
-                onClick = { isShowDialog = true}
+                text = {
+                    Text(
+                        text = stringResource(Res.string.delete),
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = Icons.Default.Delete.name,
+                        tint = MaterialTheme.colorScheme.error,
+                    )
+                },
+                onClick = { showConfirmDeletePopup = true }
             )
 
-            if (isShowDialog) {
+            if (showConfirmDeletePopup) {
                 ConfirmationPopup(
                     icon = Icons.Default.Delete,
-                    message = "Do you want delete this photo?",
+                    message = stringResource(Res.string.delete_photo_confirmation),
                     confirmButton = stringResource(Res.string.delete),
-                    onConfirm = {
-                        onDelete(item)
-                    },
-                    onDismiss = { isShowDialog = false }
+                    onConfirm = { onDelete(item) },
+                    onDismiss = { showConfirmDeletePopup = false }
                 )
             }
         }
     }
 }
-
-// PhotoDropMenu(
-//                modifier = modifier.align(Alignment.TopEnd),
-//                item = photo,
-//                onDelete = {
-//                    onDelete(photo)
-//                },
-//                onShare = { }
-//            )
