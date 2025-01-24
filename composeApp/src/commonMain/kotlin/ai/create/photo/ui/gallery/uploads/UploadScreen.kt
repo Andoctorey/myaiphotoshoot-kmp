@@ -225,7 +225,10 @@ fun UploadScreen(
         if (state.showTrainAiModelPopup) {
             TrainAiModelPopup(
                 onDismiss = { viewModel.toggleTrainAiModelPopup(false) },
-                onConfirm = { viewModel.trainAiModel() },
+                onConfirm = {
+                    viewModel.toggleTrainAiModelPopup(false)
+                    viewModel.trainAiModel()
+                },
             )
         }
 
