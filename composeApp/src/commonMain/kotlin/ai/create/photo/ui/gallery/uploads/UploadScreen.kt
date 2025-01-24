@@ -61,7 +61,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -518,12 +517,14 @@ private fun Photo(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(8.dp)
-                    .background(Color.Black.copy(alpha = 0.5f), shape = CircleShape)
+                    .background(
+                        MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+                        shape = CircleShape
+                    )
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = Icons.Default.Close.name,
-                    tint = Color.White,
                 )
             }
         }
@@ -535,7 +536,10 @@ private fun Photo(
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .padding(8.dp)
-                    .background(Color.Black.copy(alpha = 0.5f), shape = CircleShape)
+                    .background(
+                        MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+                        shape = CircleShape
+                    )
             ) {
                 val image = when (photo.analysisStatus) {
                     AnalysisStatus.PROCESSING -> Icons.Default.Sync
@@ -545,7 +549,6 @@ private fun Photo(
                 Icon(
                     imageVector = image,
                     contentDescription = image.name,
-                    tint = Color.White,
                 )
             }
         }
@@ -554,11 +557,13 @@ private fun Photo(
             Text(
                 modifier = Modifier.fillMaxWidth()
                     .padding(vertical = 8.dp, horizontal = 64.dp)
-                    .background(Color.Black.copy(alpha = 0.5f), shape = RoundedCornerShape(8.dp))
+                    .background(
+                        MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+                        shape = RoundedCornerShape(8.dp)
+                    )
                     .align(Alignment.TopCenter)
                     .padding(8.dp),
                 text = photo.analysis,
-                color = Color.White,
                 fontSize = 16.sp,
             )
         }

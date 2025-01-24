@@ -27,4 +27,15 @@ object UserGenerationsRepository {
                 Logger.i("getGenerations: ${it.size}, ")
             }
     }
+
+    suspend fun deleteGeneratedPhoto(photoId: String) {
+        Supabase.supabase
+            .from(USER_GENERATIONS_TABLE)
+            .delete {
+                filter {
+                    eq("id", photoId)
+                }
+            }
+            .also { Logger.i("deleteGeneratedPhotoId: $photoId") }
+    }
 }
