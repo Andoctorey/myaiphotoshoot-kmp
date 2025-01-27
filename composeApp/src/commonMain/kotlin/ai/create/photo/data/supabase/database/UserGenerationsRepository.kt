@@ -6,11 +6,14 @@ import co.touchlab.kermit.Logger
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Order
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.descriptors.elementNames
 
 object UserGenerationsRepository {
 
     private const val USER_GENERATIONS_TABLE = "user_generations"
 
+    @OptIn(ExperimentalSerializationApi::class)
     suspend fun getGenerations(
         userId: String,
         page: Int,
@@ -21,7 +24,7 @@ object UserGenerationsRepository {
         val to = (from + pageSize - 1).toLong()
         Supabase.supabase
             .from(USER_GENERATIONS_TABLE)
-            .select(Columns.raw("*, user_files(*)")) {
+            .select(columns = Columns.list(UserGeneration.serializer().descriptor.elementNames.toList())) {
                 filter {
                     eq("user_id", userId)
                     eq("status", "succeeded")

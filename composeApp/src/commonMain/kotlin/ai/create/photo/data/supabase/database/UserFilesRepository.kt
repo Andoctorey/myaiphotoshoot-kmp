@@ -28,6 +28,20 @@ object UserFilesRepository {
         }
     }
 
+
+    suspend fun getFile(id: String) = supabase
+        .from(USER_FILES_TABLE)
+        .select {
+            filter {
+                eq("id", id)
+            }
+            limit(1)
+        }
+        .decodeSingleOrNull<UserFile>()
+        .also {
+            Logger.i("getFile: $it")
+        }
+
     suspend fun getInputPhotos(userId: String): Result<List<UserFile>> = runCatching {
         supabase
             .from(USER_FILES_TABLE)
