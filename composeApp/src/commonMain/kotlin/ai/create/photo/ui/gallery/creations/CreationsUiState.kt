@@ -23,8 +23,8 @@ data class CreationsUiState(
     data class Photo(
         val id: String,
         val createdAt: Instant,
-        val name: String,
         val url: String,
         val prompt: String,
+        val fileId: String?,
     )
 }

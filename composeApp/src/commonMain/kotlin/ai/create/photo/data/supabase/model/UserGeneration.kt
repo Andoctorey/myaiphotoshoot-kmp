@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 data class UserGeneration(
     @SerialName("id") val id: String,
     @SerialName("created_at") val createdAt: Instant,
-    @SerialName("user_files") val file: UserFile,
     @SerialName("prompt") val prompt: String,
+    @SerialName("public_url") val imageUrl: String,
+    @SerialName("file_id") val fileId: String?,
 )

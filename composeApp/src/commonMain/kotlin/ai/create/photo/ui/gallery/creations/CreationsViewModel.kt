@@ -2,6 +2,7 @@ package ai.create.photo.ui.gallery.creations
 
 import ai.create.photo.data.supabase.SessionViewModel
 import ai.create.photo.data.supabase.SupabaseStorage
+import ai.create.photo.data.supabase.database.UserFilesRepository
 import ai.create.photo.data.supabase.database.UserGenerationsRepository
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,9 +44,9 @@ class CreationsViewModel : SessionViewModel() {
                 CreationsUiState.Photo(
                     id = it.id,
                     createdAt = it.createdAt,
-                    name = it.file.fileName,
                     prompt = it.prompt,
-                    url = it.file.signedUrl,
+                    url = it.imageUrl,
+                    fileId = it.fileId,
                 )
             }
             uiState = uiState.copy(
@@ -67,8 +68,14 @@ class CreationsViewModel : SessionViewModel() {
         val updatedPhotos = photos.filter { it.id != photo.id }
         uiState = uiState.copy(photos = updatedPhotos)
         try {
-            SupabaseStorage.deleteFile(photo.name)
-            UserGenerationsRepository.deleteGeneratedPhoto(photo.id)
+            if (photo.fileId != null) {
+                val file = UserFilesRepository.getFile(photo.fileId)!!
+                SupabaseStorage.deleteFile(file.fileName)
+                UserGenerationsRepository.deleteGeneratedPhoto(photo.id)
+                UserFilesRepository.deleteFile(photo.fileId)
+            } else {
+                UserGenerationsRepository.deleteGeneratedPhoto(photo.id)
+            }
         } catch (e: Exception) {
             Logger.e("deleteGeneratedPhoto failed, $photo", e)
             uiState = uiState.copy(photos = photos, errorPopup = e)

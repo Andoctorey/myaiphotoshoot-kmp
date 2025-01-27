@@ -49,7 +49,6 @@ object UserTrainingsRepository {
                 filter {
                     eq("id", id)
                 }
-                order(column = "created_at", order = Order.DESCENDING)
                 limit(1)
             }
             .decodeSingleOrNull<UserTraining>()
