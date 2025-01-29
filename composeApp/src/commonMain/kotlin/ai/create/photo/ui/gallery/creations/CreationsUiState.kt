@@ -20,6 +20,7 @@ data class CreationsUiState(
     val scrollToTop: Boolean = false,
 
     val errorPopup: Throwable? = null,
+
 ) {
     @Immutable
     data class Photo(
