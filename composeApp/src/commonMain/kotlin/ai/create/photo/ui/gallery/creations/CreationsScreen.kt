@@ -14,10 +14,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsTopHeight
-import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -94,7 +94,7 @@ fun CreationsScreen(
 @Composable
 private fun Photos(
     photos: List<CreationsUiState.Photo>,
-    listState: LazyStaggeredGridState,
+    listState: LazyGridState,
     isLoadingNextPage: Boolean,
     pagingLimitReach: Boolean,
     loadNextPage: () -> Unit = {},
@@ -107,14 +107,14 @@ private fun Photos(
         isRefreshing = isRefreshing,
         onRefresh = onRefresh
     ) {
-        LazyVerticalStaggeredGrid(
+        LazyVerticalGrid(
             state = listState,
             modifier = Modifier.fillMaxSize(),
-            columns = StaggeredGridCells.Adaptive(minSize = 540.dp),
-            verticalItemSpacing = 4.dp,
+            columns = GridCells.Adaptive(minSize = 540.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            item(span = StaggeredGridItemSpan.FullLine) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
                 Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
             }
 

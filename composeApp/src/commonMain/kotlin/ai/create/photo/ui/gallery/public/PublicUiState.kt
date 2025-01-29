@@ -1,6 +1,6 @@
 package ai.create.photo.ui.gallery.public
 
-import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Immutable
 
 @Immutable
@@ -13,7 +13,7 @@ data class PublicUiState(
     val isLoadingNextPage: Boolean = false,
     val pagingLimitReach: Boolean = false,
 
-    val listState: LazyStaggeredGridState = LazyStaggeredGridState(),
+    val listState: LazyGridState = LazyGridState(),
 
     val errorPopup: Throwable? = null,
 ) {

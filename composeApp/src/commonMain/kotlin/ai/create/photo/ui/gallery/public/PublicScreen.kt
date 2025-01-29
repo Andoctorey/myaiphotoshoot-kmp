@@ -15,10 +15,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsTopHeight
-import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -79,7 +79,7 @@ fun PublicScreen(
 @Composable
 private fun Photos(
     photos: List<PublicUiState.Photo>,
-    listState: LazyStaggeredGridState,
+    listState: LazyGridState,
     isLoadingNextPage: Boolean,
     pagingLimitReach: Boolean,
     loadNextPage: () -> Unit = {},
@@ -88,14 +88,14 @@ private fun Photos(
     val density = LocalDensity.current
     val width = 320
     val minSize = remember { with(density) { (width - 20).toDp() } } // paddings
-    LazyVerticalStaggeredGrid(
+    LazyVerticalGrid(
         state = listState,
         modifier = Modifier.fillMaxSize(),
-        columns = StaggeredGridCells.Adaptive(minSize = minSize),
-        verticalItemSpacing = 1.dp,
+        columns = GridCells.Adaptive(minSize = minSize),
+        verticalArrangement = Arrangement.spacedBy(1.dp),
         horizontalArrangement = Arrangement.spacedBy(1.dp),
     ) {
-        item(span = StaggeredGridItemSpan.FullLine) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
             Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
         }
 
