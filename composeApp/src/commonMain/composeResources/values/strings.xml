@@ -28,7 +28,7 @@
     <string name="delete_photo_confirmation">Would you like to delete this photo?</string>
     <string name="delete">Delete</string>
     <string name="share">Share</string>
-    <string name="save">Save</string>
+    <string name="download">Download</string>
     <string name="cancel">Cancel</string>
     <string name="data_deleted">All your stored data has been deleted successfully.</string>
     <string name="report_a_problem">Report a Problem</string>
