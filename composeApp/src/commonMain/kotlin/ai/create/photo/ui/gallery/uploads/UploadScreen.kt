@@ -225,9 +225,9 @@ fun UploadScreen(
             TrainAiModelPopup(
                 photosCount = state.photos?.size ?: 0,
                 onDismiss = { viewModel.toggleTrainAiModelPopup(false) },
-                onConfirm = {
+                onConfirm = { steps ->
                     viewModel.toggleTrainAiModelPopup(false)
-                    viewModel.trainAiModel()
+                    viewModel.trainAiModel(steps)
                 },
             )
         }

@@ -173,18 +173,18 @@ class UploadViewModel : SessionViewModel() {
         }
     }
 
-    fun trainAiModel() = viewModelScope.launch {
+    fun trainAiModel(steps: Int) = viewModelScope.launch {
         val photos = uiState.photos
         if (photos.isNullOrEmpty() || photos.size < 5) {
             uiState = uiState.copy(showUploadMorePhotosPopup = true)
             return@launch
         }
 
-        Logger.i("trainAiModel: ${photos.size}")
+        Logger.i("trainAiModel steps: $steps, photos: ${photos.size}")
 
         uiState = uiState.copy(trainingStatus = TrainingStatus.PROCESSING)
         try {
-            SupabaseFunction.trainAiModel()
+            SupabaseFunction.trainAiModel(steps)
             loadTraining()
         } catch (e: Exception) {
             Logger.e("trainAiModel failed", e)

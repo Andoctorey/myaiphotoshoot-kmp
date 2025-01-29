@@ -47,7 +47,7 @@ fun TrainAiModelPopup(
     viewModel: TrainAiModelViewModel = viewModel { TrainAiModelViewModel() },
     photosCount: Int,
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit,
+    onConfirm: (Int) -> Unit,
 ) {
     val state = viewModel.uiState
 
@@ -92,7 +92,7 @@ fun TrainAiModelPopup(
                 if (photosCount < photosRequired) {
                     viewModel.showPhotosRequiredPopup(photosRequired, photosCount)
                 } else {
-                    onConfirm()
+                    onConfirm(state.trainingSteps)
                 }
             }) {
                 Text(
