@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.io.IOException
@@ -46,6 +47,7 @@ fun Throwable.getFriendlyError() = when (this) {
     is HttpRequestException -> stringResource(Res.string.connection_error)
     is IOException -> stringResource(Res.string.connection_error)
     is UnresolvedAddressException -> stringResource(Res.string.connection_error)
+    is BadRequestRestException -> this.error.toString()
     else -> this.message.toString()
 }
 
