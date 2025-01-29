@@ -53,10 +53,9 @@ class CreationsViewModel : SessionViewModel() {
             )
         } catch (e: Exception) {
             Logger.e("refreshCreations failed", e)
-            uiState = uiState.copy(isLoadingNextPage = false, errorPopup = e)
+            uiState = uiState.copy(isRefreshing = false, errorPopup = e)
         }
     }
-
 
     fun loadCreations() = viewModelScope.launch {
         val userId = userId ?: return@launch
@@ -102,7 +101,7 @@ class CreationsViewModel : SessionViewModel() {
         }
     }
 
-    fun togglePublic(photo: CreationsUiState.Photo) = viewModelScope.launch {
+    fun togglePublic(photo: CreationsUiState.Photo, onSuccess: () -> Unit) = viewModelScope.launch {
         Logger.i("togglePublic: $photo")
         val photos = uiState.photos
         val public = !photo.isPublic
@@ -116,6 +115,7 @@ class CreationsViewModel : SessionViewModel() {
         uiState = uiState.copy(photos = updatedPhotos)
         try {
             UserGenerationsRepository.setPublic(photo.id, public)
+            onSuccess()
         } catch (e: Exception) {
             Logger.e("makePublic failed, $photo", e)
             uiState = uiState.copy(photos = photos, errorPopup = e)

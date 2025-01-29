@@ -2,6 +2,7 @@ package ai.create.photo.ui.gallery.public
 
 import ai.create.photo.data.supabase.SessionViewModel
 import ai.create.photo.data.supabase.database.UserGenerationsRepository
+import ai.create.photo.data.supabase.model.UserGeneration
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -30,6 +31,29 @@ class PublicViewModel : SessionViewModel() {
         uiState = uiState.copy(loadingError = error)
     }
 
+    fun refreshPublicGallery() = viewModelScope.launch {
+        if (uiState.isRefreshing) return@launch
+        val latestCreatedAt = uiState.photos.firstOrNull()?.createdAt ?: return@launch
+        Logger.i("refreshPublicGallery")
+        uiState = uiState.copy(isRefreshing = true)
+
+        try {
+            val generations = UserGenerationsRepository
+                .getPublicGalleryAfter(latestCreatedAt)
+                .getOrThrow()
+
+            val newPhotos = generations.map { PublicUiState.Photo(it) }
+            uiState = uiState.copy(
+                photos = (newPhotos + uiState.photos).distinctBy { photo -> photo.id },
+                isRefreshing = false,
+                loadingError = null,
+            )
+        } catch (e: Exception) {
+            Logger.e("refreshPublicGallery failed", e)
+            uiState = uiState.copy(isRefreshing = false, errorPopup = e)
+        }
+    }
+
     fun loadPublicGallery() = viewModelScope.launch {
         Logger.i("loadPublicGallery")
         if (uiState.isLoadingNextPage) return@launch
@@ -37,14 +61,7 @@ class PublicViewModel : SessionViewModel() {
         try {
             val generations =
                 UserGenerationsRepository.getPublicGallery(uiState.page, 100).getOrThrow()
-            val newPhotos = generations.map {
-                PublicUiState.Photo(
-                    id = it.id,
-                    prompt = it.prompt,
-                    url = it.imageUrl,
-                    fileId = it.fileId,
-                )
-            }
+            val newPhotos = generations.map { PublicUiState.Photo(it) }
             uiState = uiState.copy(
                 loadingError = null,
                 photos = uiState.photos + newPhotos,
@@ -61,6 +78,23 @@ class PublicViewModel : SessionViewModel() {
 
     fun hideErrorPopup() {
         uiState = uiState.copy(errorPopup = null)
+    }
+
+    fun addPhotoToPublicGallery(generations: List<UserGeneration>) {
+        if (generations.isEmpty()) return
+        val newPhotos = generations.map { generation ->
+            PublicUiState.Photo(generation)
+        }
+        val combinedPhotos = uiState.photos + newPhotos
+        val sortedPhotos = combinedPhotos.sortedByDescending { it.createdAt }
+        uiState = uiState.copy(photos = sortedPhotos)
+    }
+
+
+    fun removePhotoFromPublicGallery(ids: List<String>) {
+        val photos = uiState.photos.toMutableList()
+        photos.removeAll { ids.contains(it.id) }
+        uiState = uiState.copy(photos = photos)
     }
 
 }

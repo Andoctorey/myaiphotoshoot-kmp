@@ -40,7 +40,7 @@ object UserGenerationsRepository {
         userId: String,
         latestCreatedAt: Instant,
     ): Result<List<UserGeneration>> = runCatching {
-        Logger.i("getCreationsAfter, afterId: $latestCreatedAt")
+        Logger.i("getCreationsAfter $latestCreatedAt")
         Supabase.supabase
             .from(USER_GENERATIONS_TABLE)
             .select(columns = Columns.list(UserGeneration.columns)) {
@@ -76,6 +76,26 @@ object UserGenerationsRepository {
             }
             .decodeList<UserGeneration>()
     }
+
+    @OptIn(ExperimentalSerializationApi::class)
+    suspend fun getPublicGalleryAfter(latestCreatedAt: Instant): Result<List<UserGeneration>> =
+        runCatching {
+            Logger.i("getPublicGalleryAfter $latestCreatedAt")
+            Supabase.supabase
+                .from(USER_GENERATIONS_TABLE)
+                .select(columns = Columns.list(UserGeneration.columns)) {
+                    filter {
+                        eq("status", "succeeded")
+                        eq("is_public", true)
+                        gt("created_at", latestCreatedAt)
+                    }
+                    limit(100)
+                    order(column = "created_at", order = Order.DESCENDING)
+                }
+                .decodeList<UserGeneration>().also {
+                    Logger.i("getCreationsAfter, count: ${it.size}")
+                }
+        }
 
     suspend fun deleteGeneratedPhoto(photoId: String) {
         Supabase.supabase
