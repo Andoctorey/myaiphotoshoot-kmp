@@ -6,6 +6,7 @@ import co.touchlab.kermit.Logger
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Order
+import kotlinx.datetime.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.descriptors.elementNames
 
@@ -33,6 +34,27 @@ object UserGenerationsRepository {
                 range(from, to)
             }
             .decodeList<UserGeneration>()
+    }
+
+    @OptIn(ExperimentalSerializationApi::class)
+    suspend fun getCreationsAfter(
+        userId: String,
+        latestCreatedAt: Instant,
+    ): Result<List<UserGeneration>> = runCatching {
+        Logger.i("getCreationsAfter, afterId: $latestCreatedAt")
+        Supabase.supabase
+            .from(USER_GENERATIONS_TABLE)
+            .select(columns = Columns.list(UserGeneration.serializer().descriptor.elementNames.toList())) {
+                filter {
+                    eq("user_id", userId)
+                    eq("status", "succeeded")
+                    gt("created_at", latestCreatedAt)
+                }
+                order(column = "created_at", order = Order.DESCENDING)
+            }
+            .decodeList<UserGeneration>().also {
+                Logger.i("getCreationsAfter, count: ${it.size}")
+            }
     }
 
     @OptIn(ExperimentalSerializationApi::class)

@@ -18,6 +18,8 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -47,7 +49,7 @@ fun CreationsScreen(
 ) {
     LaunchedEffect(generationInProgress) {
         if (!generationInProgress) {
-            viewModel.loadCreations()
+            viewModel.refreshCreations()
         }
     }
 
@@ -73,8 +75,10 @@ fun CreationsScreen(
                 photos = state.photos,
                 listState = state.listState,
                 isLoadingNextPage = state.isLoadingNextPage,
-                loadNextPage = viewModel::loadCreations,
                 pagingLimitReach = state.pagingLimitReach,
+                loadNextPage = viewModel::loadCreations,
+                isRefreshing = state.isRefreshing,
+                onRefresh = viewModel::refreshCreations,
                 onDelete = viewModel::delete,
                 onTogglePublic = viewModel::togglePublic,
             )
@@ -88,6 +92,7 @@ fun CreationsScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Photos(
     photos: List<CreationsUiState.Photo>,
@@ -95,36 +100,43 @@ private fun Photos(
     isLoadingNextPage: Boolean,
     pagingLimitReach: Boolean,
     loadNextPage: () -> Unit = {},
+    isRefreshing: Boolean = false,
+    onRefresh: () -> Unit,
     onDelete: (CreationsUiState.Photo) -> Unit,
     onTogglePublic: (CreationsUiState.Photo) -> Unit,
 ) {
-    LazyVerticalStaggeredGrid(
-        state = listState,
-        modifier = Modifier.fillMaxSize(),
-        columns = StaggeredGridCells.Adaptive(minSize = 540.dp),
-        verticalItemSpacing = 4.dp,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh
     ) {
-        item(span = StaggeredGridItemSpan.FullLine) {
-            Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
-        }
+        LazyVerticalStaggeredGrid(
+            state = listState,
+            modifier = Modifier.fillMaxSize(),
+            columns = StaggeredGridCells.Adaptive(minSize = 540.dp),
+            verticalItemSpacing = 4.dp,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            item(span = StaggeredGridItemSpan.FullLine) {
+                Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
+            }
 
-        items(photos.size, key = { photos[it].id }) { item ->
-            Photo(
-                modifier = Modifier.animateItem(),
-                photo = photos[item],
-                onDelete = { onDelete(photos[item]) },
-                onTogglePublic = onTogglePublic,
-            )
-        }
+            items(photos.size, key = { photos[it].id }) { item ->
+                Photo(
+                    modifier = Modifier.animateItem(),
+                    photo = photos[item],
+                    onDelete = { onDelete(photos[item]) },
+                    onTogglePublic = onTogglePublic,
+                )
+            }
 
-        if (isLoadingNextPage && !pagingLimitReach) {
-            item {
-                Box(
-                    modifier = Modifier.fillMaxWidth().aspectRatio(1f),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    LoadingPlaceholder()
+            if (isLoadingNextPage && !pagingLimitReach) {
+                item {
+                    Box(
+                        modifier = Modifier.fillMaxWidth().aspectRatio(1f),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        LoadingPlaceholder()
+                    }
                 }
             }
         }
