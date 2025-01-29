@@ -159,7 +159,7 @@ private fun Photo(
         AsyncImage(
             modifier = Modifier.fillMaxWidth(),
             model = ImageRequest.Builder(LocalPlatformContext.current)
-                .data(photo.url + "?width=$width")
+                .data(photo.url + if (photo.url.contains("b-cdn.net")) "?width=$width" else "")
                 .crossfade(true)
                 .build(),
             contentScale = ContentScale.FillWidth,
