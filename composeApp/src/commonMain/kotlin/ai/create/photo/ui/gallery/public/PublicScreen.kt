@@ -27,6 +27,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import co.touchlab.kermit.Logger
@@ -79,10 +80,13 @@ private fun Photos(
     pagingLimitReach: Boolean,
     loadNextPage: () -> Unit = {},
 ) {
+    val density = LocalDensity.current
+    val width = 320
+    val minSize = remember { with(density) { (width - 20).toDp() } } // paddings
     LazyVerticalStaggeredGrid(
         state = listState,
         modifier = Modifier.fillMaxSize(),
-        columns = StaggeredGridCells.Adaptive(minSize = 540.dp),
+        columns = StaggeredGridCells.Adaptive(minSize = minSize),
         verticalItemSpacing = 4.dp,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
@@ -94,6 +98,7 @@ private fun Photos(
             Photo(
                 modifier = Modifier.animateItem(),
                 photo = photos[item],
+                width = width,
             )
         }
 
@@ -128,6 +133,7 @@ private fun Photos(
 private fun Photo(
     modifier: Modifier,
     photo: PublicUiState.Photo,
+    width: Int,
 ) {
     var loading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<Throwable?>(null) }
@@ -152,7 +158,7 @@ private fun Photo(
         AsyncImage(
             modifier = Modifier.fillMaxWidth(),
             model = ImageRequest.Builder(LocalPlatformContext.current)
-                .data(photo.url)
+                .data(photo.url + "?width=$width")
                 .crossfade(true)
                 .build(),
             contentScale = ContentScale.FillWidth,
