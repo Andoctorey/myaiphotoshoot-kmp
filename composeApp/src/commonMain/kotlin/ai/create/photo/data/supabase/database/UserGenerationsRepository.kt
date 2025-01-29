@@ -45,4 +45,15 @@ object UserGenerationsRepository {
             }
             .also { Logger.i("deleteGeneratedPhotoId: $photoId") }
     }
+
+    suspend fun setPublic(photoId: String, public: Boolean) {
+        Supabase.supabase
+            .from(USER_GENERATIONS_TABLE)
+            .update(mapOf("is_public" to public)) {
+                filter {
+                    eq("id", photoId)
+                }
+            }
+            .also { Logger.i("makePublic: $photoId") }
+    }
 }

@@ -11,4 +11,5 @@ data class UserGeneration(
     @SerialName("prompt") val prompt: String,
     @SerialName("public_url") val imageUrl: String,
     @SerialName("file_id") val fileId: String?,
+    @SerialName("is_public") val isPublic: Boolean,
 )

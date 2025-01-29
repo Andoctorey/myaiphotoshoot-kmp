@@ -1,5 +1,6 @@
 package ai.create.photo.ui.compose
 
+import ai.create.photo.ui.gallery.creations.CreationsUiState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +12,8 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,6 +23,8 @@ import org.jetbrains.compose.resources.stringResource
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.delete
 import photocreateai.composeapp.generated.resources.delete_photo_confirmation
+import photocreateai.composeapp.generated.resources.make_private
+import photocreateai.composeapp.generated.resources.make_public
 import photocreateai.composeapp.generated.resources.save
 import photocreateai.composeapp.generated.resources.share
 
@@ -29,7 +34,8 @@ fun <Item> PhotoDropMenu(
     item: Item,
     onDelete: (Item) -> Unit,
     onShare: (Item) -> Unit,
-    onSave: (Item) -> Unit = {}
+    onSave: (Item) -> Unit = {},
+    onTogglePublic: (Item) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
     var showConfirmDeletePopup by remember { mutableStateOf(false) }
@@ -57,7 +63,10 @@ fun <Item> PhotoDropMenu(
                         contentDescription = Icons.Default.Save.name
                     )
                 },
-                onClick = { onSave(item) }
+                onClick = {
+                    expanded = false
+                    onSave(item)
+                }
             )
 
             DropdownMenuItem(
@@ -68,7 +77,34 @@ fun <Item> PhotoDropMenu(
                         contentDescription = Icons.Default.Share.name
                     )
                 },
-                onClick = { onShare.invoke(item) }
+                onClick = {
+                    expanded = false
+                    onShare.invoke(item)
+                }
+            )
+
+            val isPublic = (item as? CreationsUiState.Photo)?.isPublic == true
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = stringResource(
+                            if (isPublic) Res.string.make_private
+                            else Res.string.make_public
+                        )
+                    )
+                },
+                leadingIcon = {
+                    val icon =
+                        if (isPublic) Icons.Default.VisibilityOff else Icons.Default.Visibility
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = icon.name,
+                    )
+                },
+                onClick = {
+                    expanded = false
+                    onTogglePublic(item)
+                }
             )
 
             DropdownMenuItem(
@@ -85,7 +121,10 @@ fun <Item> PhotoDropMenu(
                         tint = MaterialTheme.colorScheme.error,
                     )
                 },
-                onClick = { showConfirmDeletePopup = true }
+                onClick = {
+                    expanded = false
+                    showConfirmDeletePopup = true
+                }
             )
 
             if (showConfirmDeletePopup) {

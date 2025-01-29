@@ -52,4 +52,6 @@
     <string name="gallery_creations_tab">Creations</string>
     <string name="gallery_uploads_tab">Uploads</string>
     <string name="select_photos_popup_message">To ensure accurate training, please select at least 10 good photos to train your AI model.</string>
+    <string name="make_public">Make Public</string>
+    <string name="make_private">Make Private</string>
 </resources>
