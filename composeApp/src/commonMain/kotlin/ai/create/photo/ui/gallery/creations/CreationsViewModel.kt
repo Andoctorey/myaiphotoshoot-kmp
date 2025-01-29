@@ -25,7 +25,9 @@ class CreationsViewModel : SessionViewModel() {
     }
 
     override fun onAuthenticated() {
-        uiState = uiState.copy(isLoading = false)
+        if (uiState.photos.isNotEmpty()) {
+            uiState = uiState.copy(isLoading = false)
+        }
         loadCreations()
     }
 
@@ -72,6 +74,7 @@ class CreationsViewModel : SessionViewModel() {
                 scrollToTop = newPhotos.size > (uiState.photos.size),
                 photos = (uiState.photos + newPhotos).distinctBy { photo -> photo.id },
                 isLoadingNextPage = false,
+                isLoading = false,
                 page = uiState.page + 1,
                 pagingLimitReach = newPhotos.isEmpty(),
             )

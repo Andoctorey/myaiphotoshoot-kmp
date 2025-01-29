@@ -24,6 +24,9 @@ class PublicViewModel : SessionViewModel() {
     }
 
     override fun onAuthenticated() {
+        if (uiState.photos.isNotEmpty()) {
+            uiState = uiState.copy(isLoading = false)
+        }
         loadPublicGallery()
     }
 
