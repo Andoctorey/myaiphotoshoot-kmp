@@ -41,3 +41,12 @@ data class CreationsUiState(
         )
     }
 }
+
+fun CreationsUiState.Photo.toUserGeneration() = UserGeneration(
+    id = id,
+    createdAt = createdAt,
+    prompt = prompt,
+    imageUrl = url,
+    fileId = fileId,
+    isPublic = isPublic
+)

@@ -1,5 +1,6 @@
 package ai.create.photo.ui.gallery.creations
 
+import ai.create.photo.data.supabase.model.UserGeneration
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
@@ -46,6 +47,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun CreationsScreen(
     viewModel: CreationsViewModel = viewModel { CreationsViewModel() },
     generationsInProgress: Int,
+    addPhotoToPublicGallery: (UserGeneration) -> Unit,
+    removePhotoFromPublicGallery: (String) -> Unit,
 ) {
     LaunchedEffect(generationsInProgress) {
         viewModel.refreshCreations()
@@ -78,7 +81,15 @@ fun CreationsScreen(
                 isRefreshing = state.isRefreshing,
                 onRefresh = viewModel::refreshCreations,
                 onDelete = viewModel::delete,
-                onTogglePublic = viewModel::togglePublic,
+                onTogglePublic = {
+                    viewModel.togglePublic(it) {
+                        if (it.isPublic) {
+                            removePhotoFromPublicGallery(it.id)
+                        } else {
+                            addPhotoToPublicGallery(it.toUserGeneration())
+                        }
+                    }
+                },
             )
         }
     }

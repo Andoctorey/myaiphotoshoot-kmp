@@ -40,8 +40,20 @@ fun GalleryScreen(
     ) {
 
         when (state.selectedTab) {
-            0 -> PublicScreen(generate = { openGenerateTab(it) })
-            1 -> CreationsScreen(generationsInProgress = generationsInProgress)
+            0 -> PublicScreen(
+                generate = { openGenerateTab(it) },
+                addPhotosToPublicGallery = state.addPhotosToPublicGallery,
+                onAddedPhotosToPublicGallery = viewModel::onAddedPhotoToPublicGallery,
+                removePhotosFromPublicGallery = state.removePhotoFromPublicGallery,
+                onRemovedPhotosFromPublicGallery = viewModel::onRemovedPhotoFromPublicGallery,
+            )
+
+            1 -> CreationsScreen(
+                generationsInProgress = generationsInProgress,
+                addPhotoToPublicGallery = { viewModel.addPhotoToPublicGallery(it) },
+                removePhotoFromPublicGallery = { viewModel.removePhotoFromPublicGallery(it) },
+            )
+
             2 -> UploadScreen(openGenerateTab = { openGenerateTab("") })
         }
 

@@ -1,5 +1,6 @@
 package ai.create.photo.ui.gallery.public
 
+import ai.create.photo.data.supabase.model.UserGeneration
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolderSmall
 import ai.create.photo.ui.compose.ErrorPopup
@@ -19,6 +20,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -46,7 +49,25 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun PublicScreen(
     viewModel: PublicViewModel = viewModel { PublicViewModel() },
     generate: (String) -> Unit,
+    addPhotosToPublicGallery: List<UserGeneration>,
+    onAddedPhotosToPublicGallery: () -> Unit,
+    removePhotosFromPublicGallery: List<String>,
+    onRemovedPhotosFromPublicGallery: () -> Unit,
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.refreshPublicGallery()
+    }
+
+    if (addPhotosToPublicGallery.isNotEmpty()) {
+        viewModel.addPhotoToPublicGallery(addPhotosToPublicGallery)
+        onAddedPhotosToPublicGallery()
+    }
+
+    if (removePhotosFromPublicGallery.isNotEmpty()) {
+        viewModel.removePhotoFromPublicGallery(removePhotosFromPublicGallery)
+        onRemovedPhotosFromPublicGallery()
+    }
+
     val state = viewModel.uiState
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -63,6 +84,8 @@ fun PublicScreen(
                 listState = state.listState,
                 isLoadingNextPage = state.isLoadingNextPage,
                 loadNextPage = viewModel::loadPublicGallery,
+                isRefreshing = state.isRefreshing,
+                onRefresh = viewModel::refreshPublicGallery,
                 pagingLimitReach = state.pagingLimitReach,
                 onClick = { generate(it.prompt) }
             )
@@ -76,45 +99,53 @@ fun PublicScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Photos(
     photos: List<PublicUiState.Photo>,
     listState: LazyGridState,
     isLoadingNextPage: Boolean,
+    isRefreshing: Boolean = false,
+    onRefresh: () -> Unit,
     pagingLimitReach: Boolean,
     loadNextPage: () -> Unit = {},
     onClick: (PublicUiState.Photo) -> Unit,
 ) {
-    val density = LocalDensity.current
-    val width = 320
-    val minSize = remember { with(density) { (width - 20).toDp() } } // paddings
-    LazyVerticalGrid(
-        state = listState,
-        modifier = Modifier.fillMaxSize(),
-        columns = GridCells.Adaptive(minSize = minSize),
-        verticalArrangement = Arrangement.spacedBy(1.dp),
-        horizontalArrangement = Arrangement.spacedBy(1.dp),
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh
     ) {
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
-        }
+        val density = LocalDensity.current
+        val width = 320
+        val minSize = remember { with(density) { (width - 20).toDp() } } // paddings
+        LazyVerticalGrid(
+            state = listState,
+            modifier = Modifier.fillMaxSize(),
+            columns = GridCells.Adaptive(minSize = minSize),
+            verticalArrangement = Arrangement.spacedBy(1.dp),
+            horizontalArrangement = Arrangement.spacedBy(1.dp),
+        ) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
+            }
 
-        items(photos.size, key = { photos[it].id }) { item ->
-            Photo(
-                modifier = Modifier.animateItem(),
-                photo = photos[item],
-                width = width,
-                onClick = onClick,
-            )
-        }
+            items(photos.size, key = { photos[it].id }) { item ->
+                Photo(
+                    modifier = Modifier.animateItem(),
+                    photo = photos[item],
+                    width = width,
+                    onClick = onClick,
+                )
+            }
 
-        if (isLoadingNextPage && !pagingLimitReach) {
-            item {
-                Box(
-                    modifier = Modifier.fillMaxWidth().aspectRatio(1f),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    LoadingPlaceholder()
+            if (isLoadingNextPage && !pagingLimitReach) {
+                item {
+                    Box(
+                        modifier = Modifier.fillMaxWidth().aspectRatio(1f),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        LoadingPlaceholder()
+                    }
                 }
             }
         }
