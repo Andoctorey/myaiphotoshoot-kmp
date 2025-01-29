@@ -76,3 +76,30 @@ fun ErrorMessagePlaceHolder(errorMessage: Throwable) {
         )
     }
 }
+
+@Composable
+fun ErrorMessagePlaceHolderSmall(errorMessage: Throwable) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 4.dp)
+            .safeDrawingPadding(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            modifier = Modifier.size(14.dp),
+            imageVector = Icons.Outlined.ErrorOutline,
+            contentDescription = errorMessage.message,
+            tint = MaterialTheme.colorScheme.error,
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = errorMessage.getFriendlyError(),
+            color = MaterialTheme.colorScheme.error,
+            fontSize = 10.sp,
+            textAlign = TextAlign.Center,
+        )
+    }
+}
