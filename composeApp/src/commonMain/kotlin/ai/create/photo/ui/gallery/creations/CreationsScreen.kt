@@ -75,7 +75,8 @@ fun CreationsScreen(
                 isLoadingNextPage = state.isLoadingNextPage,
                 loadNextPage = { viewModel.loadCreations() },
                 pagingLimitReach = state.pagingLimitReach,
-                onDelete = { viewModel.deleteGeneratedPhoto(it) }
+                onDelete = viewModel::delete,
+                onTogglePublic = viewModel::togglePublic,
             )
         }
     }
@@ -94,7 +95,8 @@ private fun Photos(
     isLoadingNextPage: Boolean,
     pagingLimitReach: Boolean,
     loadNextPage: () -> Unit = {},
-    onDelete: (CreationsUiState.Photo) -> Unit
+    onDelete: (CreationsUiState.Photo) -> Unit,
+    onTogglePublic: (CreationsUiState.Photo) -> Unit,
 ) {
     LazyVerticalStaggeredGrid(
         state = listState,
@@ -111,7 +113,8 @@ private fun Photos(
             Photo(
                 modifier = Modifier.animateItem(),
                 photo = photos[item],
-                onDelete = { onDelete(photos[item]) }
+                onDelete = { onDelete(photos[item]) },
+                onTogglePublic = onTogglePublic,
             )
         }
 
@@ -146,7 +149,8 @@ private fun Photos(
 private fun Photo(
     modifier: Modifier,
     photo: CreationsUiState.Photo,
-    onDelete: (CreationsUiState.Photo) -> Unit
+    onDelete: (CreationsUiState.Photo) -> Unit,
+    onTogglePublic: (CreationsUiState.Photo) -> Unit,
 ) {
     var loading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<Throwable?>(null) }
@@ -189,7 +193,8 @@ private fun Photo(
             onDelete = {
                 onDelete(photo)
             },
-            onShare = { }
+            onShare = { },
+            onTogglePublic = onTogglePublic,
         )
     }
 }

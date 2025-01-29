@@ -47,6 +47,7 @@ class CreationsViewModel : SessionViewModel() {
                     prompt = it.prompt,
                     url = it.imageUrl,
                     fileId = it.fileId,
+                    isPublic = it.isPublic,
                 )
             }
             uiState = uiState.copy(
@@ -63,7 +64,8 @@ class CreationsViewModel : SessionViewModel() {
         }
     }
 
-    fun deleteGeneratedPhoto(photo: CreationsUiState.Photo) = viewModelScope.launch {
+    fun delete(photo: CreationsUiState.Photo) = viewModelScope.launch {
+        Logger.i("deleteGeneratedPhoto: $photo")
         val photos = uiState.photos
         val updatedPhotos = photos.filter { it.id != photo.id }
         uiState = uiState.copy(photos = updatedPhotos)
@@ -80,6 +82,27 @@ class CreationsViewModel : SessionViewModel() {
             Logger.e("deleteGeneratedPhoto failed, $photo", e)
             uiState = uiState.copy(photos = photos, errorPopup = e)
         }
+    }
+
+    fun togglePublic(photo: CreationsUiState.Photo) = viewModelScope.launch {
+        Logger.i("togglePublic: $photo")
+        val photos = uiState.photos
+        val public = !photo.isPublic
+        val updatedPhotos = photos.map {
+            if (it.id == photo.id) {
+                it.copy(isPublic = public)
+            } else {
+                it
+            }
+        }
+        uiState = uiState.copy(photos = updatedPhotos)
+        try {
+            UserGenerationsRepository.setPublic(photo.id, public)
+        } catch (e: Exception) {
+            Logger.e("makePublic failed, $photo", e)
+            uiState = uiState.copy(photos = photos, errorPopup = e)
+        }
+
     }
 
     fun resetScrollToTop() {

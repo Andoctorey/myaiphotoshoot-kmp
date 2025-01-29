@@ -26,5 +26,6 @@ data class CreationsUiState(
         val url: String,
         val prompt: String,
         val fileId: String?,
+        val isPublic: Boolean,
     )
 }

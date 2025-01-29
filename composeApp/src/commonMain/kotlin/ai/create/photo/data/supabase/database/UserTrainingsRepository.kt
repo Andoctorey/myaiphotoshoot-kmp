@@ -61,9 +61,7 @@ object UserTrainingsRepository {
         runCatching {
             Supabase.supabase
                 .from(USER_TRAININGS_TABLE)
-                .update(
-                    mapOf("person_description" to personDescription)
-                ) {
+                .update(mapOf("person_description" to personDescription)) {
                     filter {
                         eq("id", id)
                     }
