@@ -1,6 +1,7 @@
 package ai.create.photo.ui.gallery.public
 
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
+import ai.create.photo.ui.compose.ErrorMessagePlaceHolderSmall
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import androidx.compose.foundation.layout.Arrangement
@@ -143,7 +144,7 @@ private fun Photo(
             modifier = modifier.fillMaxWidth().aspectRatio(1f),
             contentAlignment = Alignment.Center,
         ) {
-            ErrorMessagePlaceHolder(error!!)
+            ErrorMessagePlaceHolderSmall(error!!)
         }
     } else if (loading) {
         Box(
