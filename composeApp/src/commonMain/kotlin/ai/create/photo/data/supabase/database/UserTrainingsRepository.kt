@@ -11,22 +11,6 @@ object UserTrainingsRepository {
 
     private const val USER_TRAININGS_TABLE = "user_trainings"
 
-    suspend fun getLatestTraining(userId: String, photoSet: Int): Result<UserTraining?> =
-        runCatching {
-        Supabase.supabase
-            .from(USER_TRAININGS_TABLE)
-            .select(columns = Columns.list(UserTraining.columns)) {
-                filter {
-                    eq("user_id", userId)
-                    eq("photo_set", photoSet)
-                }
-            }
-            .decodeSingleOrNull<UserTraining>()
-            .also {
-                Logger.i("getTraining: $it")
-            }
-    }
-
     suspend fun getTrainings(userId: String): Result<List<UserTraining>> = runCatching {
         Supabase.supabase
             .from(USER_TRAININGS_TABLE)
