@@ -59,7 +59,6 @@ object UserGenerationsRepository {
 
     @OptIn(ExperimentalSerializationApi::class)
     suspend fun getPublicGallery(
-        userId: String,
         page: Int,
         pageSize: Int
     ): Result<List<UserGeneration>> = runCatching {
@@ -70,7 +69,6 @@ object UserGenerationsRepository {
             .from(USER_GENERATIONS_TABLE)
             .select(columns = Columns.list(UserGeneration.serializer().descriptor.elementNames.toList())) {
                 filter {
-                    eq("user_id", userId)
                     eq("status", "succeeded")
                     eq("is_public", true)
                 }
