@@ -39,11 +39,10 @@ class CreationsViewModel : SessionViewModel() {
         uiState = uiState.copy(isLoadingNextPage = true)
         try {
             val generations =
-                UserGenerationsRepository.getGenerations(userId, uiState.page, 15).getOrThrow()
+                UserGenerationsRepository.getCreations(userId, uiState.page, 15).getOrThrow()
             val newPhotos = generations.map {
                 CreationsUiState.Photo(
                     id = it.id,
-                    createdAt = it.createdAt,
                     prompt = it.prompt,
                     url = it.imageUrl,
                     fileId = it.fileId,

@@ -4,5 +4,5 @@ import androidx.compose.runtime.Immutable
 
 @Immutable
 data class GalleryUiState(
-    val selectedTab: Int = 1,
+    val selectedTab: Int = 0,
 )

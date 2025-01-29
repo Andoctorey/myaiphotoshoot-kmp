@@ -14,12 +14,12 @@ object UserGenerationsRepository {
     private const val USER_GENERATIONS_TABLE = "user_generations"
 
     @OptIn(ExperimentalSerializationApi::class)
-    suspend fun getGenerations(
+    suspend fun getCreations(
         userId: String,
         page: Int,
         pageSize: Int
     ): Result<List<UserGeneration>> = runCatching {
-        Logger.i("getGenerations, page: $page, pageSize: $pageSize")
+        Logger.i("getCreations, page: $page, pageSize: $pageSize")
         val from = ((page - 1) * pageSize).toLong()
         val to = (from + pageSize - 1).toLong()
         Supabase.supabase
@@ -28,6 +28,29 @@ object UserGenerationsRepository {
                 filter {
                     eq("user_id", userId)
                     eq("status", "succeeded")
+                }
+                order(column = "created_at", order = Order.DESCENDING)
+                range(from, to)
+            }
+            .decodeList<UserGeneration>()
+    }
+
+    @OptIn(ExperimentalSerializationApi::class)
+    suspend fun getPublicGallery(
+        userId: String,
+        page: Int,
+        pageSize: Int
+    ): Result<List<UserGeneration>> = runCatching {
+        Logger.i("getPublicGallery, page: $page, pageSize: $pageSize")
+        val from = ((page - 1) * pageSize).toLong()
+        val to = (from + pageSize - 1).toLong()
+        Supabase.supabase
+            .from(USER_GENERATIONS_TABLE)
+            .select(columns = Columns.list(UserGeneration.serializer().descriptor.elementNames.toList())) {
+                filter {
+                    eq("user_id", userId)
+                    eq("status", "succeeded")
+                    eq("is_public", true)
                 }
                 order(column = "created_at", order = Order.DESCENDING)
                 range(from, to)
