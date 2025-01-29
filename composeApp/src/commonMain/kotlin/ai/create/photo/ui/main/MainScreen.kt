@@ -91,7 +91,7 @@ fun MainScreen(
 
         when (currentDestination) {
             AppNavigationRoutes.TAB_1_GALLERY -> GalleryScreen(
-                generationInProgress = state.generationsInProgress != 0,
+                generationsInProgress = state.generationsInProgress,
                 openGenerateTab = { prompt ->
                     currentDestination = AppNavigationRoutes.TAB_2_GENERATE
                     if (prompt.isNotEmpty()) {

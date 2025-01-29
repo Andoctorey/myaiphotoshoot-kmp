@@ -45,12 +45,10 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun CreationsScreen(
     viewModel: CreationsViewModel = viewModel { CreationsViewModel() },
-    generationInProgress: Boolean,
+    generationsInProgress: Int,
 ) {
-    LaunchedEffect(generationInProgress) {
-        if (!generationInProgress) {
-            viewModel.refreshCreations()
-        }
+    LaunchedEffect(generationsInProgress) {
+        viewModel.refreshCreations()
     }
 
     val state = viewModel.uiState
