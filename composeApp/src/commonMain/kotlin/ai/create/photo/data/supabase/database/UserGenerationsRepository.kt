@@ -8,7 +8,6 @@ import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Order
 import kotlinx.datetime.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.descriptors.elementNames
 
 object UserGenerationsRepository {
 
@@ -25,7 +24,7 @@ object UserGenerationsRepository {
         val to = (from + pageSize - 1).toLong()
         Supabase.supabase
             .from(USER_GENERATIONS_TABLE)
-            .select(columns = Columns.list(UserGeneration.serializer().descriptor.elementNames.toList())) {
+            .select(columns = Columns.list(UserGeneration.columns)) {
                 filter {
                     eq("user_id", userId)
                     eq("status", "succeeded")
@@ -44,7 +43,7 @@ object UserGenerationsRepository {
         Logger.i("getCreationsAfter, afterId: $latestCreatedAt")
         Supabase.supabase
             .from(USER_GENERATIONS_TABLE)
-            .select(columns = Columns.list(UserGeneration.serializer().descriptor.elementNames.toList())) {
+            .select(columns = Columns.list(UserGeneration.columns)) {
                 filter {
                     eq("user_id", userId)
                     eq("status", "succeeded")
@@ -67,7 +66,7 @@ object UserGenerationsRepository {
         val to = (from + pageSize - 1).toLong()
         Supabase.supabase
             .from(USER_GENERATIONS_TABLE)
-            .select(columns = Columns.list(UserGeneration.serializer().descriptor.elementNames.toList())) {
+            .select(columns = Columns.list(UserGeneration.columns)) {
                 filter {
                     eq("status", "succeeded")
                     eq("is_public", true)
