@@ -88,8 +88,8 @@ private fun Photos(
         state = listState,
         modifier = Modifier.fillMaxSize(),
         columns = StaggeredGridCells.Adaptive(minSize = minSize),
-        verticalItemSpacing = 4.dp,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalItemSpacing = 1.dp,
+        horizontalArrangement = Arrangement.spacedBy(1.dp),
     ) {
         item(span = StaggeredGridItemSpan.FullLine) {
             Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
