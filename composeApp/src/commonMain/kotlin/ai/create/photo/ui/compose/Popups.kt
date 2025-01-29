@@ -1,5 +1,8 @@
 package ai.create.photo.ui.compose
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Info
@@ -9,6 +12,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
@@ -20,7 +24,11 @@ fun ErrorPopup(e: Throwable, onDismiss: () -> Unit) {
     AlertDialog(
         icon = { Icon(Icons.Default.Error, contentDescription = "error") },
         onDismissRequest = onDismiss,
-        text = { Text(text = e.getFriendlyError()) },
+        text = {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                Text(text = e.getFriendlyError())
+            }
+        },
         confirmButton = {
             TextButton(onClick = onDismiss) {
                 Text("OK")
