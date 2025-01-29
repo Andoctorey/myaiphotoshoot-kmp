@@ -1,9 +1,8 @@
-package ai.create.photo.ui.gallery.creations
+package ai.create.photo.ui.gallery.public
 
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
-import ai.create.photo.ui.compose.PhotoDropMenu
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -41,16 +40,9 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Preview
 @Composable
-fun CreationsScreen(
-    viewModel: CreationsViewModel = viewModel { CreationsViewModel() },
-    generationInProgress: Boolean,
+fun PublicScreen(
+    viewModel: PublicViewModel = viewModel { PublicViewModel() },
 ) {
-    LaunchedEffect(generationInProgress) {
-        if (!generationInProgress) {
-            viewModel.loadCreations()
-        }
-    }
-
     val state = viewModel.uiState
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -62,21 +54,12 @@ fun CreationsScreen(
         } else if (state.loadingError != null) {
             ErrorMessagePlaceHolder(state.loadingError)
         } else {
-            LaunchedEffect(state.scrollToTop) {
-                if (state.scrollToTop && state.listState.firstVisibleItemIndex > 1) {
-                    state.listState.animateScrollToItem(0)
-                }
-                viewModel.resetScrollToTop()
-            }
-
             Photos(
                 photos = state.photos,
                 listState = state.listState,
                 isLoadingNextPage = state.isLoadingNextPage,
-                loadNextPage = viewModel::loadCreations,
+                loadNextPage = viewModel::loadPublicGallery,
                 pagingLimitReach = state.pagingLimitReach,
-                onDelete = viewModel::delete,
-                onTogglePublic = viewModel::togglePublic,
             )
         }
     }
@@ -90,13 +73,11 @@ fun CreationsScreen(
 
 @Composable
 private fun Photos(
-    photos: List<CreationsUiState.Photo>,
+    photos: List<PublicUiState.Photo>,
     listState: LazyStaggeredGridState,
     isLoadingNextPage: Boolean,
     pagingLimitReach: Boolean,
     loadNextPage: () -> Unit = {},
-    onDelete: (CreationsUiState.Photo) -> Unit,
-    onTogglePublic: (CreationsUiState.Photo) -> Unit,
 ) {
     LazyVerticalStaggeredGrid(
         state = listState,
@@ -113,8 +94,6 @@ private fun Photos(
             Photo(
                 modifier = Modifier.animateItem(),
                 photo = photos[item],
-                onDelete = { onDelete(photos[item]) },
-                onTogglePublic = onTogglePublic,
             )
         }
 
@@ -148,9 +127,7 @@ private fun Photos(
 @Composable
 private fun Photo(
     modifier: Modifier,
-    photo: CreationsUiState.Photo,
-    onDelete: (CreationsUiState.Photo) -> Unit,
-    onTogglePublic: (CreationsUiState.Photo) -> Unit,
+    photo: PublicUiState.Photo,
 ) {
     var loading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<Throwable?>(null) }
@@ -185,16 +162,6 @@ private fun Photo(
                 error = it.result.throwable
             },
             contentDescription = "photo",
-        )
-
-        PhotoDropMenu(
-            modifier = modifier.align(Alignment.TopEnd),
-            item = photo,
-            onDelete = {
-                onDelete(photo)
-            },
-            onShare = { },
-            onTogglePublic = onTogglePublic,
         )
     }
 }

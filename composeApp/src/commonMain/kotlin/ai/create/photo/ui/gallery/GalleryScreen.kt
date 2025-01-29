@@ -1,11 +1,11 @@
 package ai.create.photo.ui.gallery
 
 import ai.create.photo.ui.gallery.creations.CreationsScreen
+import ai.create.photo.ui.gallery.public.PublicScreen
 import ai.create.photo.ui.gallery.uploads.UploadScreen
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -40,11 +40,7 @@ fun GalleryScreen(
     ) {
 
         when (state.selectedTab) {
-            0 -> Text(
-                text = "Public",
-                style = MaterialTheme.typography.bodySmall
-            )
-
+            0 -> PublicScreen()
             1 -> CreationsScreen(generationInProgress = generationInProgress)
             2 -> UploadScreen(openGenerateTab = openGenerateTab)
         }

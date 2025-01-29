@@ -1,10 +1,10 @@
-package ai.create.photo.ui.gallery.creations
+package ai.create.photo.ui.gallery.public
 
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.runtime.Immutable
 
 @Immutable
-data class CreationsUiState(
+data class PublicUiState(
     val isLoading: Boolean = true,
     val loadingError: Throwable? = null,
 
@@ -14,7 +14,6 @@ data class CreationsUiState(
     val pagingLimitReach: Boolean = false,
 
     val listState: LazyStaggeredGridState = LazyStaggeredGridState(),
-    val scrollToTop: Boolean = false,
 
     val errorPopup: Throwable? = null,
 ) {
@@ -24,6 +23,5 @@ data class CreationsUiState(
         val url: String,
         val prompt: String,
         val fileId: String?,
-        val isPublic: Boolean,
     )
 }
