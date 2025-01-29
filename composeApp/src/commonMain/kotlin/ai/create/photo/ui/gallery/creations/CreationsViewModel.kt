@@ -47,13 +47,13 @@ class CreationsViewModel : SessionViewModel() {
 
             val newPhotos = generations.map { CreationsUiState.Photo(it) }
             uiState = uiState.copy(
-                photos = newPhotos + uiState.photos,
+                photos = (newPhotos + uiState.photos).distinctBy { photo -> photo.id },
                 isRefreshing = false,
                 loadingError = null,
             )
         } catch (e: Exception) {
             Logger.e("refreshCreations failed", e)
-            uiState = uiState.copy(isLoadingNextPage = false, loadingError = e)
+            uiState = uiState.copy(isLoadingNextPage = false, errorPopup = e)
         }
     }
 
@@ -67,17 +67,18 @@ class CreationsViewModel : SessionViewModel() {
             val generations =
                 UserGenerationsRepository.getCreations(userId, uiState.page, 15).getOrThrow()
             val newPhotos = generations.map { CreationsUiState.Photo(it) }
+
             uiState = uiState.copy(
                 loadingError = null,
-                scrollToTop = generations.size > (uiState.photos.size),
-                photos = uiState.photos + newPhotos,
+                scrollToTop = newPhotos.size > (uiState.photos.size),
+                photos = (uiState.photos + newPhotos).distinctBy { photo -> photo.id },
                 isLoadingNextPage = false,
                 page = uiState.page + 1,
                 pagingLimitReach = newPhotos.isEmpty(),
             )
         } catch (e: Exception) {
             Logger.e("loadCreations failed", e)
-            uiState = uiState.copy(isLoadingNextPage = false, loadingError = e) //TODO
+            uiState = uiState.copy(isLoadingNextPage = false, loadingError = e)
         }
     }
 
