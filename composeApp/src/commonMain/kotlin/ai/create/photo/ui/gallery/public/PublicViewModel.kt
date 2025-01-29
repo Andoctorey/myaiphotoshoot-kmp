@@ -38,7 +38,7 @@ class PublicViewModel : SessionViewModel() {
         uiState = uiState.copy(isLoadingNextPage = true)
         try {
             val generations =
-                UserGenerationsRepository.getPublicGallery(userId, uiState.page, 40).getOrThrow()
+                UserGenerationsRepository.getPublicGallery(userId, uiState.page, 100).getOrThrow()
             val newPhotos = generations.map {
                 PublicUiState.Photo(
                     id = it.id,
@@ -56,7 +56,7 @@ class PublicViewModel : SessionViewModel() {
             )
         } catch (e: Exception) {
             Logger.e("loadPublicGallery failed", e)
-            uiState = uiState.copy(isLoadingNextPage = false, loadingError = e) //TODO
+            uiState = uiState.copy(isLoadingNextPage = false, loadingError = e)
         }
     }
 

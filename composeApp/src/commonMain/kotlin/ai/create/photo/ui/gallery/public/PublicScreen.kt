@@ -122,7 +122,7 @@ private fun Photos(
                 .distinctUntilChanged()
                 .collect {
                     val lastVisibleItemIndex = it ?: return@collect
-                    if (lastVisibleItemIndex >= (photosCount - 3) && !isLoadingNextPage) {
+                    if (lastVisibleItemIndex >= (photosCount - 30) && !isLoadingNextPage) {
                         loadNextPage()
                     }
                 }
