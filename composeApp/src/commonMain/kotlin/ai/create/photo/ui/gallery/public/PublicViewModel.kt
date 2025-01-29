@@ -34,6 +34,7 @@ class PublicViewModel : SessionViewModel() {
     fun loadPublicGallery() = viewModelScope.launch {
         Logger.i("loadPublicGallery")
         val userId = userId ?: return@launch
+        if (uiState.isLoadingNextPage) return@launch
         uiState = uiState.copy(isLoadingNextPage = true)
         try {
             val generations =
