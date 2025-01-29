@@ -5,6 +5,7 @@ import ai.create.photo.data.supabase.SupabaseStorage
 import ai.create.photo.data.supabase.model.UserFile
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 
@@ -31,7 +32,7 @@ object UserFilesRepository {
 
     suspend fun getFile(id: String) = supabase
         .from(USER_FILES_TABLE)
-        .select {
+        .select(columns = Columns.list(UserFile.columns)) {
             filter {
                 eq("id", id)
             }
@@ -45,7 +46,7 @@ object UserFilesRepository {
     suspend fun getInputPhotos(userId: String): Result<List<UserFile>> = runCatching {
         supabase
             .from(USER_FILES_TABLE)
-            .select {
+            .select(columns = Columns.list(UserFile.columns)) {
                 filter {
                     eq("user_id", userId)
                     eq("type", "input_image")

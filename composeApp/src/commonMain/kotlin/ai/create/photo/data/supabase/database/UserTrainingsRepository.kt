@@ -4,6 +4,7 @@ import ai.create.photo.data.supabase.Supabase
 import ai.create.photo.data.supabase.model.UserTraining
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Order
 
 object UserTrainingsRepository {
@@ -14,7 +15,7 @@ object UserTrainingsRepository {
         runCatching {
         Supabase.supabase
             .from(USER_TRAININGS_TABLE)
-            .select {
+            .select(columns = Columns.list(UserTraining.columns)) {
                 filter {
                     eq("user_id", userId)
                     eq("photo_set", photoSet)
@@ -29,7 +30,7 @@ object UserTrainingsRepository {
     suspend fun getTrainings(userId: String): Result<List<UserTraining>> = runCatching {
         Supabase.supabase
             .from(USER_TRAININGS_TABLE)
-            .select {
+            .select(columns = Columns.list(UserTraining.columns)) {
                 filter {
                     eq("user_id", userId)
                     eq("status", "succeeded")
@@ -45,7 +46,7 @@ object UserTrainingsRepository {
     suspend fun getLatestTraining(id: String): Result<UserTraining?> = runCatching {
         Supabase.supabase
             .from(USER_TRAININGS_TABLE)
-            .select {
+            .select(columns = Columns.list(UserTraining.columns)) {
                 filter {
                     eq("id", id)
                 }
