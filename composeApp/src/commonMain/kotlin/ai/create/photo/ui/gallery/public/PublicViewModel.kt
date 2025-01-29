@@ -23,7 +23,6 @@ class PublicViewModel : SessionViewModel() {
     }
 
     override fun onAuthenticated() {
-        uiState = uiState.copy(isLoading = false)
         loadPublicGallery()
     }
 
@@ -50,6 +49,7 @@ class PublicViewModel : SessionViewModel() {
                 loadingError = null,
                 photos = uiState.photos + newPhotos,
                 isLoadingNextPage = false,
+                isLoading = false,
                 page = uiState.page + 1,
                 pagingLimitReach = newPhotos.isEmpty(),
             )
