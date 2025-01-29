@@ -95,6 +95,7 @@ fun GenerateScreen(
     viewModel: GenerateViewModel = viewModel { GenerateViewModel() },
     trainAiModel: () -> Unit,
     onGenerate: (String, String, Int) -> Unit,
+    prompt: String,
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -238,6 +239,12 @@ fun GenerateScreen(
         if (state.errorPopup != null) {
             ErrorPopup(state.errorPopup) {
                 viewModel.hideErrorPopup()
+            }
+        }
+
+        LaunchedEffect(prompt) {
+            if (prompt.isNotEmpty()) {
+                viewModel.putPrompt(prompt)
             }
         }
     }

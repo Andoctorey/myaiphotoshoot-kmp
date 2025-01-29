@@ -30,7 +30,7 @@ import photocreateai.composeapp.generated.resources.gallery_uploads_tab
 fun GalleryScreen(
     viewModel: GalleryViewModel = viewModel { GalleryViewModel() },
     generationInProgress: Boolean,
-    openGenerateTab: () -> Unit,
+    openGenerateTab: (String) -> Unit,
     openUploads: Boolean = false,
 ) {
     val state = viewModel.uiState
@@ -40,9 +40,9 @@ fun GalleryScreen(
     ) {
 
         when (state.selectedTab) {
-            0 -> PublicScreen()
+            0 -> PublicScreen(generate = { openGenerateTab(it) })
             1 -> CreationsScreen(generationInProgress = generationInProgress)
-            2 -> UploadScreen(openGenerateTab = openGenerateTab)
+            2 -> UploadScreen(openGenerateTab = { openGenerateTab("") })
         }
 
         Tabs(

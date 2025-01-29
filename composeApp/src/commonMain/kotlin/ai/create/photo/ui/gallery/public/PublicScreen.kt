@@ -4,6 +4,7 @@ import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolderSmall
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -44,6 +45,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun PublicScreen(
     viewModel: PublicViewModel = viewModel { PublicViewModel() },
+    generate: (String) -> Unit,
 ) {
     val state = viewModel.uiState
     Box(
@@ -62,6 +64,7 @@ fun PublicScreen(
                 isLoadingNextPage = state.isLoadingNextPage,
                 loadNextPage = viewModel::loadPublicGallery,
                 pagingLimitReach = state.pagingLimitReach,
+                onClick = { generate(it.prompt) }
             )
         }
     }
@@ -80,6 +83,7 @@ private fun Photos(
     isLoadingNextPage: Boolean,
     pagingLimitReach: Boolean,
     loadNextPage: () -> Unit = {},
+    onClick: (PublicUiState.Photo) -> Unit,
 ) {
     val density = LocalDensity.current
     val width = 320
@@ -100,6 +104,7 @@ private fun Photos(
                 modifier = Modifier.animateItem(),
                 photo = photos[item],
                 width = width,
+                onClick = onClick,
             )
         }
 
@@ -135,6 +140,7 @@ private fun Photo(
     modifier: Modifier,
     photo: PublicUiState.Photo,
     width: Int,
+    onClick: (PublicUiState.Photo) -> Unit,
 ) {
     var loading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<Throwable?>(null) }
@@ -157,7 +163,7 @@ private fun Photo(
 
     Box(modifier = modifier.fillMaxWidth()) {
         AsyncImage(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().clickable { onClick(photo) },
             model = ImageRequest.Builder(LocalPlatformContext.current)
                 .data(photo.url + if (photo.url.contains("b-cdn.net")) "?width=$width" else "")
                 .crossfade(true)
