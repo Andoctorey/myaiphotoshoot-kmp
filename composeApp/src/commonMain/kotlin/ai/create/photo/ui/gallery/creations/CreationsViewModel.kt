@@ -33,23 +33,40 @@ class CreationsViewModel : SessionViewModel() {
         uiState = uiState.copy(loadingError = error)
     }
 
+    fun refreshCreations() = viewModelScope.launch {
+        val userId = userId ?: return@launch
+        if (uiState.isRefreshing) return@launch
+        val latestCreatedAt = uiState.photos.firstOrNull()?.createdAt ?: return@launch
+        Logger.i("refreshCreations")
+        uiState = uiState.copy(isRefreshing = true)
+
+        try {
+            val generations = UserGenerationsRepository
+                .getCreationsAfter(userId, latestCreatedAt)
+                .getOrThrow()
+
+            val newPhotos = generations.map { CreationsUiState.Photo(it) }
+            uiState = uiState.copy(
+                photos = newPhotos + uiState.photos,
+                isRefreshing = false,
+                loadingError = null,
+            )
+        } catch (e: Exception) {
+            Logger.e("refreshCreations failed", e)
+            uiState = uiState.copy(isLoadingNextPage = false, loadingError = e)
+        }
+    }
+
+
     fun loadCreations() = viewModelScope.launch {
-        Logger.i("loadCreations")
         val userId = userId ?: return@launch
         if (uiState.isLoadingNextPage) return@launch
+        Logger.i("loadCreations")
         uiState = uiState.copy(isLoadingNextPage = true)
         try {
             val generations =
                 UserGenerationsRepository.getCreations(userId, uiState.page, 15).getOrThrow()
-            val newPhotos = generations.map {
-                CreationsUiState.Photo(
-                    id = it.id,
-                    prompt = it.prompt,
-                    url = it.imageUrl,
-                    fileId = it.fileId,
-                    isPublic = it.isPublic,
-                )
-            }
+            val newPhotos = generations.map { CreationsUiState.Photo(it) }
             uiState = uiState.copy(
                 loadingError = null,
                 scrollToTop = generations.size > (uiState.photos.size),
