@@ -1,16 +1,16 @@
 [versions]
 adaptive = "1.0.1"
-agp = "8.7.3"
+agp = "8.8.0"
 android-minSdk = "26"
 android-targetSdk = "35"
-androidx-activityCompose = "1.9.3"
+androidx-activityCompose = "1.10.0"
 androidx-lifecycle = "2.8.4"
-androidx-navigation = "2.8.0-alpha11"
+androidx-navigation = "2.8.0-alpha12"
 coilNetworkKtor = "3.0.4"
 compose-multiplatform = "1.7.3"
 filekitCompose = "0.8.8"
 kermit = "2.0.5"
-kotlin = "2.1.0"
+kotlin = "2.1.10"
 kotlinx-coroutines = "1.10.1"
 ktorClientCio = "3.0.3"
 materialNavigation = "1.7.0-beta02"
@@ -49,4 +49,4 @@ composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "k
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 # ./gradlew dependencyUpdates -Drevision=release
-versions = { id = "com.github.ben-manes.versions", version = "0.51.0" }
+versions = { id = "com.github.ben-manes.versions", version = "0.52.0" }
