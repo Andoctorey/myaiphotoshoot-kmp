@@ -1,7 +1,7 @@
 package ai.create.photo.ui.gallery.creations
 
 import ai.create.photo.data.supabase.model.UserGeneration
-import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
 
@@ -16,7 +16,7 @@ data class CreationsUiState(
     val page: Int = 1,
     val pagingLimitReach: Boolean = false,
 
-    val listState: LazyStaggeredGridState = LazyStaggeredGridState(),
+    val listState: LazyGridState = LazyGridState(),
     val scrollToTop: Boolean = false,
 
     val errorPopup: Throwable? = null,
