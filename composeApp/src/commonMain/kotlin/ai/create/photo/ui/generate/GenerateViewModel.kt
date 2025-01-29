@@ -46,7 +46,7 @@ class GenerateViewModel : SessionViewModel() {
             uiState = uiState.copy(
                 isLoading = false,
                 trainings = trainings,
-                training = trainings.lastOrNull(),
+                training = trainings.firstOrNull(),
                 aiVisionPrompt = "",
                 originalAiVisionPrompt = "",
             )
