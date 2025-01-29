@@ -46,12 +46,12 @@ class MainViewModel : ViewModel() {
         uiState = uiState.copy(errorPopup = null)
     }
 
-    fun setGenerateScreenOpened() {
-        uiState = uiState.copy(generateScreenOpened = true)
-    }
-
     fun toggleOpenUploads(openUploads: Boolean) {
         uiState = uiState.copy(openUploads = openUploads)
+    }
+
+    fun putPrompt(prompt: String) {
+        uiState = uiState.copy(putPrompt = prompt)
     }
 
 }

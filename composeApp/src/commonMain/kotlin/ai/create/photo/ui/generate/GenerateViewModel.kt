@@ -167,4 +167,8 @@ class GenerateViewModel : SessionViewModel() {
     fun toggleSettings() {
         uiState = uiState.copy(showSettings = !uiState.showSettings)
     }
+
+    fun putPrompt(prompt: String) {
+        uiState = uiState.copy(userPrompt = prompt)
+    }
 }
