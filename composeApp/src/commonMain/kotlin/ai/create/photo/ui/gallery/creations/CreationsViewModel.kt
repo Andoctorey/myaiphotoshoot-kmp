@@ -36,6 +36,7 @@ class CreationsViewModel : SessionViewModel() {
     fun loadCreations() = viewModelScope.launch {
         Logger.i("loadCreations")
         val userId = userId ?: return@launch
+        if (uiState.isLoadingNextPage) return@launch
         uiState = uiState.copy(isLoadingNextPage = true)
         try {
             val generations =
