@@ -201,10 +201,12 @@ fun GenerateScreen(
                     horizontalArrangement = Arrangement.Center,
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    CreateAiModelButton(
-                        modifier = Modifier.padding(horizontal = 4.dp),
-                        onClick = trainAiModel,
-                    )
+                    if (state.trainings.isNullOrEmpty()) {
+                        CreateAiModelButton(
+                            modifier = Modifier.padding(horizontal = 4.dp),
+                            onClick = trainAiModel,
+                        )
+                    }
 
                     if (!state.trainings.isNullOrEmpty()) {
                         SurpriseMeButton(
