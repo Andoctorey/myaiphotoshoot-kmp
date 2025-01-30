@@ -34,11 +34,11 @@ class PublicViewModel : SessionViewModel() {
         uiState = uiState.copy(loadingError = error)
     }
 
-    fun refreshPublicGallery() = viewModelScope.launch {
+    fun refreshPublicGallery(silent: Boolean = false) = viewModelScope.launch {
         if (uiState.isRefreshing) return@launch
         val latestCreatedAt = uiState.photos.firstOrNull()?.createdAt ?: return@launch
-        Logger.i("refreshPublicGallery")
-        uiState = uiState.copy(isRefreshing = true)
+        Logger.i("refreshPublicGallery, silent=$silent")
+        if (!silent) uiState = uiState.copy(isRefreshing = true)
 
         try {
             val generations = UserGenerationsRepository

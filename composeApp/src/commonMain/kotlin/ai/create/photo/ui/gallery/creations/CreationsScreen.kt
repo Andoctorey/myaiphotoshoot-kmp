@@ -50,8 +50,14 @@ fun CreationsScreen(
     addPhotoToPublicGallery: (UserGeneration) -> Unit,
     removePhotoFromPublicGallery: (String) -> Unit,
 ) {
+    var previousGenerationsInProgress by remember { mutableStateOf(0) }
     LaunchedEffect(generationsInProgress) {
-        viewModel.refreshCreations()
+        if (generationsInProgress != previousGenerationsInProgress) {
+            viewModel.refreshCreations()
+            previousGenerationsInProgress = generationsInProgress
+        } else {
+            viewModel.refreshCreations(silent = true)
+        }
     }
 
     val state = viewModel.uiState
