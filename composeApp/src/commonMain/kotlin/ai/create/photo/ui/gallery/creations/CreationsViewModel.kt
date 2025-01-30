@@ -35,12 +35,12 @@ class CreationsViewModel : SessionViewModel() {
         uiState = uiState.copy(loadingError = error)
     }
 
-    fun refreshCreations() = viewModelScope.launch {
+    fun refreshCreations(silent: Boolean = false) = viewModelScope.launch {
         val userId = userId ?: return@launch
         if (uiState.isRefreshing) return@launch
         val latestCreatedAt = uiState.photos.firstOrNull()?.createdAt ?: return@launch
-        Logger.i("refreshCreations")
-        uiState = uiState.copy(isRefreshing = true)
+        Logger.i("refreshCreations, silent=$silent")
+        if (!silent) uiState = uiState.copy(isRefreshing = true)
 
         try {
             val generations = UserGenerationsRepository

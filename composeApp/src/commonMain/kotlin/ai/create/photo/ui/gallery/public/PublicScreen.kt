@@ -55,7 +55,7 @@ fun PublicScreen(
     onRemovedPhotosFromPublicGallery: () -> Unit,
 ) {
     LaunchedEffect(Unit) {
-        viewModel.refreshPublicGallery()
+        viewModel.refreshPublicGallery(silent = true)
     }
 
     if (addPhotosToPublicGallery.isNotEmpty()) {
