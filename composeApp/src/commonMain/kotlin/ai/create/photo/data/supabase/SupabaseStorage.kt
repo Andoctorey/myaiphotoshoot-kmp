@@ -64,6 +64,4 @@ object SupabaseStorage {
             Logger.i("No files to delete for user $uid.")
         }
     }
-
-
 }
