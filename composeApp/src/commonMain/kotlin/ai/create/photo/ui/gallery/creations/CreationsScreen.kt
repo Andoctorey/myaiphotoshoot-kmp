@@ -1,6 +1,5 @@
 package ai.create.photo.ui.gallery.creations
 
-import ai.create.photo.data.supabase.model.UserGeneration
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
@@ -90,6 +89,8 @@ fun CreationsScreen(
                         }
                     }
                 },
+                onTogglePublic = viewModel::togglePublic,
+                onDownload = viewModel::downloadGeneratedPhoto,
             )
         }
     }
@@ -112,6 +113,7 @@ private fun Photos(
     isRefreshing: Boolean = false,
     onRefresh: () -> Unit,
     onDelete: (CreationsUiState.Photo) -> Unit,
+    onDownload: (CreationsUiState.Photo) -> Unit,
     onTogglePublic: (CreationsUiState.Photo) -> Unit,
 ) {
     PullToRefreshBox(
@@ -135,6 +137,7 @@ private fun Photos(
                     photo = photos[item],
                     onDelete = { onDelete(photos[item]) },
                     onTogglePublic = onTogglePublic,
+                    onDownload = { onDownload(photos[item]) },
                 )
             }
 
@@ -170,6 +173,7 @@ private fun Photos(
 private fun Photo(
     modifier: Modifier,
     photo: CreationsUiState.Photo,
+    onDownload: (CreationsUiState.Photo) -> Unit,
     onDelete: (CreationsUiState.Photo) -> Unit,
     onTogglePublic: (CreationsUiState.Photo) -> Unit,
 ) {
@@ -216,6 +220,7 @@ private fun Photo(
             },
             onShare = { },
             onTogglePublic = onTogglePublic,
+            onDownload = onDownload
         )
     }
 }
