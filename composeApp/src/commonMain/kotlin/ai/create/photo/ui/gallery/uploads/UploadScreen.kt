@@ -501,6 +501,7 @@ private fun Photo(
                 .data(photo.url)
                 .crossfade(true)
                 .build(),
+            contentDescription = photo.analysis,
             contentScale = ContentScale.FillWidth,
             onSuccess = { loading = false },
             onError = {
@@ -508,7 +509,6 @@ private fun Photo(
                 error = it.result.throwable
                 loading = false
             },
-            contentDescription = "photo",
         )
 
         if (!hideDeletePhotoButton && !loading) {

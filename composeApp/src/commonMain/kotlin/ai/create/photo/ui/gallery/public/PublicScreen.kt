@@ -199,13 +199,13 @@ private fun Photo(
                 .data(photo.url + if (photo.url.contains("b-cdn.net")) "?width=$width" else "")
                 .crossfade(true)
                 .build(),
+            contentDescription = photo.prompt,
             contentScale = ContentScale.FillWidth,
             onSuccess = { loading = false },
             onError = {
                 Logger.e("error loading image ${photo.url}", it.result.throwable)
                 error = it.result.throwable
             },
-            contentDescription = "photo",
         )
     }
 }
