@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -20,21 +20,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import photocreateai.composeapp.generated.resources.*
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.delete
 import photocreateai.composeapp.generated.resources.delete_photo_confirmation
 import photocreateai.composeapp.generated.resources.make_private
 import photocreateai.composeapp.generated.resources.make_public
-import photocreateai.composeapp.generated.resources.save
 import photocreateai.composeapp.generated.resources.share
 
 @Composable
 fun <Item> PhotoDropMenu(
     modifier: Modifier = Modifier,
     item: Item,
+    onDownload: (Item) -> Unit,
     onDelete: (Item) -> Unit,
     onShare: (Item) -> Unit,
-    onSave: (Item) -> Unit = {},
     onTogglePublic: (Item) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -56,16 +56,16 @@ fun <Item> PhotoDropMenu(
             onDismissRequest = { expanded = false }
         ) {
             DropdownMenuItem(
-                text = { Text(text = stringResource(Res.string.save)) },
+                text = { Text(text = stringResource(Res.string.download)) },
                 leadingIcon = {
                     Icon(
-                        Icons.Default.Save,
-                        contentDescription = Icons.Default.Save.name
+                        Icons.Default.Download,
+                        contentDescription = Icons.Default.Download.name
                     )
                 },
                 onClick = {
                     expanded = false
-                    onSave(item)
+                    onDownload(item)
                 }
             )
 
@@ -122,7 +122,6 @@ fun <Item> PhotoDropMenu(
                     )
                 },
                 onClick = {
-                    expanded = false
                     showConfirmDeletePopup = true
                 }
             )
