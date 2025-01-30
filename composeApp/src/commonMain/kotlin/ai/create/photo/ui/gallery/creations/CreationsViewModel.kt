@@ -4,7 +4,6 @@ import ai.create.photo.data.supabase.SessionViewModel
 import ai.create.photo.data.supabase.SupabaseStorage
 import ai.create.photo.data.supabase.database.UserFilesRepository
 import ai.create.photo.data.supabase.database.UserGenerationsRepository
-import ai.create.photo.ui.compose.MakeToast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -61,7 +60,6 @@ class CreationsViewModel : SessionViewModel() {
     }
 
     fun loadCreations() = viewModelScope.launch {
-        Logger.i("loadCreations")
         val userId = userId ?: return@launch
         if (uiState.isLoadingNextPage) return@launch
         Logger.i("loadCreations")
@@ -77,7 +75,6 @@ class CreationsViewModel : SessionViewModel() {
                 scrollToTop = newPhotos.size > (uiState.photos.size),
                 photos = (uiState.photos + newPhotos).distinctBy { photo -> photo.id },
                 isLoadingNextPage = false,
-                isLoading = false,
                 page = uiState.page + 1,
                 pagingLimitReach = newPhotos.isEmpty(),
             )
@@ -131,9 +128,9 @@ class CreationsViewModel : SessionViewModel() {
 
     fun downloadGeneratedPhoto(photo: CreationsUiState.Photo) = viewModelScope.launch {
         try {
-            UserGenerationsRepository.downloadGeneratedPhoto(photo.url)
+            UserGenerationsRepository.downloadGeneratedPhoto(photo.id, photo.url)
         } catch (e: Exception) {
-            Logger.i("Faild downloading - $e")
+            Logger.e("downloadGeneratedPhoto failed", e)
         }
     }
 

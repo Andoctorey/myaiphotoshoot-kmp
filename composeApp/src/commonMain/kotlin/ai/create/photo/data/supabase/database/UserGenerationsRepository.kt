@@ -6,9 +6,6 @@ import co.touchlab.kermit.Logger
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Order
-import io.github.jan.supabase.storage.DownloadStatus
-import io.github.jan.supabase.storage.downloadAuthenticatedAsFlow
-import io.github.jan.supabase.storage.storage
 import io.github.vinceglb.filekit.core.FileKit
 import io.ktor.client.*
 import io.ktor.client.request.*
@@ -115,24 +112,13 @@ object UserGenerationsRepository {
             .also { Logger.i("deleteGeneratedPhotoId: $photoId") }
     }
 
-    suspend fun downloadGeneratedPhoto(photoUrl: String) {
-        Logger.i("Download photo url - $photoUrl")
-        val client = HttpClient()
+    suspend fun downloadGeneratedPhoto(id: String, photoUrl: String) {
+        Logger.i("downloadGeneratedPhoto - $photoUrl")
         try {
-            val getPhoto = client.get(photoUrl)
-            val photoBytes = getPhoto.readRawBytes()
-
-            val saveFile = FileKit.saveFile(
-                bytes = photoBytes,
-                baseName = "image",
-                extension = "jpg"
-            )
-            if (saveFile != null) {
-                Logger.i("Downloading successfull")
-            }
-
+            val bytes = HttpClient().get(photoUrl).readRawBytes()
+            FileKit.saveFile(bytes = bytes, baseName = id, extension = "jpg")
         } catch (e: Exception) {
-            Logger.i("Downloading failed with exeption - $e")
+            Logger.e("downloadGeneratedPhoto failed", e)
         }
     }
 
