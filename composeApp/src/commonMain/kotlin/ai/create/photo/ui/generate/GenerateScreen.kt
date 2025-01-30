@@ -37,6 +37,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.Refresh
@@ -84,6 +85,7 @@ import photocreateai.composeapp.generated.resources.enhance_photo_accuracy
 import photocreateai.composeapp.generated.resources.enhance_prompt
 import photocreateai.composeapp.generated.resources.photo_prompt
 import photocreateai.composeapp.generated.resources.photos_to_generate
+import photocreateai.composeapp.generated.resources.picture_to_prompt
 import photocreateai.composeapp.generated.resources.surprise_me
 import photocreateai.composeapp.generated.resources.train_ai_model
 
@@ -219,6 +221,12 @@ fun GenerateScreen(
                             modifier = Modifier.padding(horizontal = 4.dp),
                             isLoading = state.isEnhancingPrompt,
                             onClick = viewModel::enhancePrompt
+                        )
+
+                        PictureToPromptButton(
+                            modifier = Modifier.padding(horizontal = 4.dp),
+                            isLoading = state.isLoadingPictureToPrompt,
+                            onClick = viewModel::pictureToPrompt
                         )
                     }
                 }
@@ -374,6 +382,33 @@ private fun EnhancePromptButton(modifier: Modifier, isLoading: Boolean, onClick:
             Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
             Text(
                 text = stringResource(Res.string.enhance_prompt),
+                fontSize = 16.sp,
+            )
+        }
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.padding(horizontal = 8.dp).size(24.dp),
+                color = MaterialTheme.colorScheme.primary,
+                strokeWidth = 2.dp,
+            )
+        }
+    }
+}
+
+@Composable
+private fun PictureToPromptButton(modifier: Modifier, isLoading: Boolean, onClick: () -> Unit) {
+    Box(contentAlignment = Alignment.Center) {
+        OutlinedButton(
+            modifier = modifier.alpha(if (isLoading) 0f else 1f),
+            onClick = onClick
+        ) {
+            Icon(
+                imageVector = Icons.Default.Image,
+                contentDescription = stringResource(Res.string.picture_to_prompt)
+            )
+            Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
+            Text(
+                text = stringResource(Res.string.picture_to_prompt),
                 fontSize = 16.sp,
             )
         }

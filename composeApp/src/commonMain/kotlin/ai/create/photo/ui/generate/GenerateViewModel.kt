@@ -164,6 +164,10 @@ class GenerateViewModel : SessionViewModel() {
         }
     }
 
+    fun pictureToPrompt() {
+        uiState = uiState.copy(isLoadingPictureToPrompt = true)
+    }
+
     fun toggleSettings() {
         uiState = uiState.copy(showSettings = !uiState.showSettings)
     }
