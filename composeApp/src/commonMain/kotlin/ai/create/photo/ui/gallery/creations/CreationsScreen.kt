@@ -1,5 +1,6 @@
 package ai.create.photo.ui.gallery.creations
 
+import ai.create.photo.data.supabase.model.UserGeneration
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
@@ -89,7 +90,6 @@ fun CreationsScreen(
                         }
                     }
                 },
-                onTogglePublic = viewModel::togglePublic,
                 onDownload = viewModel::downloadGeneratedPhoto,
             )
         }
