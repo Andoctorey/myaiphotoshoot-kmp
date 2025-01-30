@@ -9,7 +9,7 @@ import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 
-object UserFilesRepository {
+object  UserFilesRepository {
 
     private const val USER_FILES_TABLE = "user_files"
 
