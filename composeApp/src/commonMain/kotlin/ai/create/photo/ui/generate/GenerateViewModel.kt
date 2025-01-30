@@ -2,12 +2,15 @@ package ai.create.photo.ui.generate
 
 import ai.create.photo.data.supabase.SessionViewModel
 import ai.create.photo.data.supabase.SupabaseFunction
+import ai.create.photo.data.supabase.SupabaseStorage
 import ai.create.photo.data.supabase.database.UserTrainingsRepository
+import ai.create.photo.platform.resizeToWidth
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
+import io.github.vinceglb.filekit.core.PlatformFile
 import kotlinx.coroutines.launch
 
 class GenerateViewModel : SessionViewModel() {
@@ -73,30 +76,31 @@ class GenerateViewModel : SessionViewModel() {
 
     fun prepareToGenerate(onGenerate: (String, String, Int) -> Unit, trainAiModel: () -> Unit) =
         viewModelScope.launch {
-        val trainingId = uiState.training?.id
-        if (trainingId.isNullOrEmpty()) {
-            trainAiModel()
-            return@launch
-        }
+            val trainingId = uiState.training?.id
+            if (trainingId.isNullOrEmpty()) {
+                trainAiModel()
+                return@launch
+            }
 
-        uiState = uiState.copy(showSettings = false)
+            uiState = uiState.copy(showSettings = false)
 
-        val oldDescription = uiState.originalAiVisionPrompt
-        val newDescription = uiState.aiVisionPrompt
-        if (oldDescription == newDescription) {
-            onGenerate(trainingId, uiState.userPrompt, uiState.photosToGenerateX100 / 100)
-            return@launch
-        }
+            val oldDescription = uiState.originalAiVisionPrompt
+            val newDescription = uiState.aiVisionPrompt
+            if (oldDescription == newDescription) {
+                onGenerate(trainingId, uiState.userPrompt, uiState.photosToGenerateX100 / 100)
+                return@launch
+            }
 
-        try {
-            UserTrainingsRepository.updatePersonDescription(trainingId, newDescription).getOrThrow()
-            uiState = uiState.copy(originalAiVisionPrompt = newDescription)
-            onGenerate(trainingId, uiState.userPrompt, uiState.photosToGenerateX100 / 100)
-        } catch (e: Exception) {
-            Logger.e("Update description failed", e)
-            uiState = uiState.copy(errorPopup = e)
+            try {
+                UserTrainingsRepository.updatePersonDescription(trainingId, newDescription)
+                    .getOrThrow()
+                uiState = uiState.copy(originalAiVisionPrompt = newDescription)
+                onGenerate(trainingId, uiState.userPrompt, uiState.photosToGenerateX100 / 100)
+            } catch (e: Exception) {
+                Logger.e("Update description failed", e)
+                uiState = uiState.copy(errorPopup = e)
+            }
         }
-    }
 
     fun onRefreshAiVisionPrompt() = viewModelScope.launch {
         val trainingId = uiState.training?.id ?: return@launch
@@ -164,8 +168,24 @@ class GenerateViewModel : SessionViewModel() {
         }
     }
 
-    fun pictureToPrompt() {
+    fun pictureToPrompt(file: PlatformFile) = viewModelScope.launch {
+        val userId = userId ?: return@launch
+        Logger.i("pictureToPrompt: ${file.name}")
         uiState = uiState.copy(isLoadingPictureToPrompt = true)
+        try {
+            val resizedImage = resizeToWidth(
+                file.readBytes(),
+                targetWidth = 768, // openai model input size
+            ).getOrThrow()
+
+            val result = SupabaseStorage.uploadPictureToPrompt(userId, resizedImage)
+            val url = SupabaseStorage.createTempSignedUrl(userId, result.path)
+            val prompt = SupabaseFunction.pictureToPrompt(url)
+            uiState = uiState.copy(userPrompt = prompt, isLoadingPictureToPrompt = false)
+        } catch (e: Exception) {
+            Logger.e("pictureToPrompt failed", e)
+            uiState = uiState.copy(isLoadingPictureToPrompt = false, errorPopup = e)
+        }
     }
 
     fun toggleSettings() {

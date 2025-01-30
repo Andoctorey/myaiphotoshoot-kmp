@@ -1,16 +1,19 @@
 package ai.create.photo.data.supabase
 
 import co.touchlab.kermit.Logger
+import io.github.jan.supabase.storage.FileUploadResponse
 import io.github.jan.supabase.storage.UploadStatus
 import io.github.jan.supabase.storage.storage
 import io.github.jan.supabase.storage.uploadAsFlow
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
 
 object SupabaseStorage {
 
     private const val BUCKET = "photos"
     const val UPLOADS = "uploads"
+    const val TEMP = "temp"
 
     fun uploadPhoto(
         userId: String,
@@ -29,6 +32,22 @@ object SupabaseStorage {
             }
     }
 
+    suspend fun uploadPictureToPrompt(
+        userId: String,
+        file: ByteArray
+    ): FileUploadResponse {
+        val filePath = "${userId}/$TEMP/to_prompt.jpg"
+        Logger.i("uploadPictureToPrompt $filePath, size: ${file.size}")
+        return Supabase.supabase.storage
+            .from(BUCKET)
+            .upload(
+                path = filePath,
+                data = file,
+            ) {
+                upsert = true
+            }
+    }
+
     suspend fun createSignedUrl(userId: String, filePath: String) =
         Supabase.supabase.storage
         .from(BUCKET)
@@ -36,6 +55,14 @@ object SupabaseStorage {
             path = "${userId}/$UPLOADS/${filePath}",
             expiresIn = 3650.days,
         )
+
+    suspend fun createTempSignedUrl(userId: String, filePath: String) =
+        Supabase.supabase.storage
+            .from(BUCKET)
+            .createSignedUrl(
+                path = "${userId}/$TEMP/${filePath}",
+                expiresIn = 5.minutes,
+            )
 
     suspend fun deleteFile(path: String) {
         Logger.i("delete file from storage $path")

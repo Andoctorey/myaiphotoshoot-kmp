@@ -60,4 +60,13 @@ object SupabaseFunction {
         )
         return response.body<String>()
     }
+
+    suspend fun pictureToPrompt(url: String): String {
+        Logger.i("pictureToPrompt url: $url")
+        val response = Supabase.supabase.functions.invoke(
+            function = "picture-to-prompt",
+            body = mapOf("url" to url)
+        )
+        return response.body<String>()
+    }
 }

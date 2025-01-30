@@ -77,6 +77,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.core.PickerMode
+import io.github.vinceglb.filekit.core.PickerType
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
@@ -223,10 +226,18 @@ fun GenerateScreen(
                             onClick = viewModel::enhancePrompt
                         )
 
+                        val launcher = rememberFilePickerLauncher(
+                            title = stringResource(Res.string.picture_to_prompt),
+                            type = PickerType.Image,
+                            mode = PickerMode.Single
+                        ) { file ->
+                            if (file == null) return@rememberFilePickerLauncher
+                            viewModel.pictureToPrompt(file)
+                        }
                         PictureToPromptButton(
                             modifier = Modifier.padding(horizontal = 4.dp),
                             isLoading = state.isLoadingPictureToPrompt,
-                            onClick = viewModel::pictureToPrompt
+                            onClick = { launcher.launch() }
                         )
                     }
                 }
