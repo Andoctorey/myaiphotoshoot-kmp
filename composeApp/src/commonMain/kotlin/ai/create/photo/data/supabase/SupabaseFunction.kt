@@ -33,7 +33,7 @@ object SupabaseFunction {
     suspend fun analyzePhoto(fileId: String) {
         Logger.i("analyzePhoto fileId: $fileId")
         Supabase.supabase.functions.invoke(
-            function = "analyze-image",
+            function = "analyze-person",
             body = mapOf("file_id" to fileId)
         )
     }
