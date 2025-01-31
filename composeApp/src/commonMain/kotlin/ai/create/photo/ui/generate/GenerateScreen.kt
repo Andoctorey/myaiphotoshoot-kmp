@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -328,11 +327,10 @@ private fun PhotoPrompt(
         label = { Text(text = stringResource(Res.string.photo_prompt)) },
         keyboardOptions = KeyboardOptions(
             autoCorrectEnabled = true,
-            imeAction = ImeAction.Done,
             capitalization = KeyboardCapitalization.Sentences,
             keyboardType = KeyboardType.Text,
         ),
-        keyboardActions = KeyboardActions(onDone = { onDone() }),
+        maxLines = 10,
         trailingIcon = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Crossfade(targetState = prompt.isNotEmpty()) {
