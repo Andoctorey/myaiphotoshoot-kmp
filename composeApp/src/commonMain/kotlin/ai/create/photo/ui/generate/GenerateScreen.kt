@@ -177,12 +177,12 @@ fun GenerateScreen(
                                     ) {
                                         Spacer(modifier = Modifier.height(8.dp))
 
-                                        if (state.aiVisionPrompt.isNotEmpty()) {
-                                            AiVisionPrompt(
-                                                prompt = state.aiVisionPrompt,
-                                                onPromptChanged = viewModel::onAiVisionPromptChanged,
-                                                isLoadingAiVisionPrompt = state.isLoadingAiVisionPrompt,
-                                                onRefreshAiVisionPrompt = viewModel::onRefreshAiVisionPrompt,
+                                        if (state.personDescription.isNotEmpty()) {
+                                            EnhancePhotoAccuracy(
+                                                personDescription = state.personDescription,
+                                                onPersonDescriptionChanged = viewModel::onPersonDescriptionChanged,
+                                                isLoadingPersonDescription = state.isLoadingPersonDescription,
+                                                onRefreshPersonDescription = viewModel::onRefreshPersonDescription,
                                             )
                                         }
 
@@ -273,17 +273,17 @@ fun GenerateScreen(
 
 
 @Composable
-private fun AiVisionPrompt(
-    prompt: String, onPromptChanged: (String) -> Unit,
-    isLoadingAiVisionPrompt: Boolean = false, onRefreshAiVisionPrompt: () -> Unit,
+private fun EnhancePhotoAccuracy(
+    personDescription: String, onPersonDescriptionChanged: (String) -> Unit,
+    isLoadingPersonDescription: Boolean = false, onRefreshPersonDescription: () -> Unit,
 ) {
     OutlinedTextField(
         modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().padding(horizontal = 24.dp)
             .animateContentSize(),
-        value = prompt,
+        value = personDescription,
         trailingIcon = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                if (isLoadingAiVisionPrompt) {
+                if (isLoadingPersonDescription) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(16.dp),
                         color = MaterialTheme.colorScheme.onSurface,
@@ -291,7 +291,7 @@ private fun AiVisionPrompt(
                     )
                 } else {
                     Icon(
-                        modifier = Modifier.clickable { onRefreshAiVisionPrompt() },
+                        modifier = Modifier.clickable { onRefreshPersonDescription() },
                         imageVector = Icons.Default.Refresh,
                         contentDescription = Icons.Default.Refresh.name,
                         tint = MaterialTheme.colorScheme.onSurface,
@@ -299,7 +299,7 @@ private fun AiVisionPrompt(
                 }
             }
         },
-        onValueChange = onPromptChanged,
+        onValueChange = onPersonDescriptionChanged,
         label = { Text(text = stringResource(Res.string.enhance_photo_accuracy)) },
         keyboardOptions = KeyboardOptions(
             autoCorrectEnabled = true,

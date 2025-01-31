@@ -13,9 +13,9 @@ data class GenerateUiState(
     val trainings: List<Training>? = null,
     val training: Training? = null,
 
-    val isLoadingAiVisionPrompt: Boolean = false,
-    val originalAiVisionPrompt: String = "",
-    val aiVisionPrompt: String = "",
+    val isLoadingPersonDescription: Boolean = false,
+    val originalPersonDescription: String = "",
+    val personDescription: String = "",
 
     val userPrompt: String = "",
     val promptBeforeEnhancing: String = "",

@@ -49,9 +49,9 @@ class GenerateViewModel : SessionViewModel() {
             uiState = uiState.copy(
                 isLoading = false,
                 trainings = trainings,
-                training = trainings.firstOrNull(),
-                aiVisionPrompt = "",
-                originalAiVisionPrompt = "",
+                training = uiState.training ?: trainings.firstOrNull(),
+                personDescription = "",
+                originalPersonDescription = "",
             )
 
             uiState.training?.let { selectTraining(it) }
@@ -62,8 +62,8 @@ class GenerateViewModel : SessionViewModel() {
     }
 
 
-    fun onAiVisionPromptChanged(prompt: String) {
-        uiState = uiState.copy(aiVisionPrompt = prompt)
+    fun onPersonDescriptionChanged(prompt: String) {
+        uiState = uiState.copy(personDescription = prompt)
     }
 
     fun onUserPromptChanged(prompt: String) {
@@ -84,8 +84,8 @@ class GenerateViewModel : SessionViewModel() {
 
             uiState = uiState.copy(showSettings = false)
 
-            val oldDescription = uiState.originalAiVisionPrompt
-            val newDescription = uiState.aiVisionPrompt
+            val oldDescription = uiState.originalPersonDescription
+            val newDescription = uiState.personDescription
             if (oldDescription == newDescription) {
                 onGenerate(trainingId, uiState.userPrompt, uiState.photosToGenerateX100 / 100)
                 return@launch
@@ -94,7 +94,7 @@ class GenerateViewModel : SessionViewModel() {
             try {
                 UserTrainingsRepository.updatePersonDescription(trainingId, newDescription)
                     .getOrThrow()
-                uiState = uiState.copy(originalAiVisionPrompt = newDescription)
+                uiState = uiState.copy(originalPersonDescription = newDescription)
                 onGenerate(trainingId, uiState.userPrompt, uiState.photosToGenerateX100 / 100)
             } catch (e: Exception) {
                 Logger.e("Update description failed", e)
@@ -102,22 +102,23 @@ class GenerateViewModel : SessionViewModel() {
             }
         }
 
-    fun onRefreshAiVisionPrompt() = viewModelScope.launch {
+    fun onRefreshPersonDescription() = viewModelScope.launch {
         val trainingId = uiState.training?.id ?: return@launch
-        uiState = uiState.copy(isLoadingAiVisionPrompt = true, aiVisionPrompt = " ")
+        Logger.i("onRefreshAiVisionPrompt: $trainingId")
+        uiState = uiState.copy(isLoadingPersonDescription = true, personDescription = " ")
         try {
             SupabaseFunction.generatePersonDescription(trainingId)
             val training = UserTrainingsRepository.getLatestTraining(trainingId).getOrThrow()
             uiState =
                 uiState.copy(
-                    isLoadingAiVisionPrompt = false,
-                    originalAiVisionPrompt = training?.personDescription ?: "",
-                    aiVisionPrompt = training?.personDescription ?: ""
+                    isLoadingPersonDescription = false,
+                    originalPersonDescription = training?.personDescription ?: "",
+                    personDescription = training?.personDescription ?: ""
                 )
 
         } catch (e: Exception) {
             Logger.e("onRefreshAiVisionPrompt failed", e)
-            uiState = uiState.copy(isLoadingAiVisionPrompt = false, errorPopup = e)
+            uiState = uiState.copy(isLoadingPersonDescription = false, errorPopup = e)
         }
     }
 
@@ -138,12 +139,12 @@ class GenerateViewModel : SessionViewModel() {
 
     fun selectTraining(training: GenerateUiState.Training) = viewModelScope.launch {
         if (training.personDescription.isNullOrEmpty()) {
-            onRefreshAiVisionPrompt()
+            onRefreshPersonDescription()
         }
         uiState = uiState.copy(
             training = training,
-            originalAiVisionPrompt = training.personDescription ?: "",
-            aiVisionPrompt = training.personDescription ?: ""
+            originalPersonDescription = training.personDescription ?: "",
+            personDescription = training.personDescription ?: ""
         )
     }
 
