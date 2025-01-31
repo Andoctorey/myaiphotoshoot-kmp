@@ -28,7 +28,7 @@ class LoginViewModel : SessionViewModel() {
         uiState = uiState.copy(isLoading = true)
     }
 
-    override fun onAuthenticated() {
+    override fun onAuthenticated(userChanged: Boolean) {
         uiState = uiState.copy(isLoading = false)
         loadUser()
     }

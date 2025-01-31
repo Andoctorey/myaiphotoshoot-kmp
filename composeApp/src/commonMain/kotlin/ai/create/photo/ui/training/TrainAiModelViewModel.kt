@@ -21,7 +21,7 @@ class TrainAiModelViewModel : SessionViewModel() {
         uiState = uiState.copy(isLoading = true)
     }
 
-    override fun onAuthenticated() {
+    override fun onAuthenticated(userChanged: Boolean) {
         loadState()
     }
 

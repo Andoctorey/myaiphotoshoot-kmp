@@ -24,8 +24,8 @@ abstract class SessionViewModel : ViewModel() {
                         val userId =
                             it.session.user?.id ?: throw IllegalStateException("User id is null")
                         Logger.i("userId: $userId")
+                        onAuthenticated(this@SessionViewModel.userId != userId)
                         this@SessionViewModel.userId = userId
-                        onAuthenticated()
                     }
 
                     is SessionStatus.NotAuthenticated -> SupabaseAuth.signInAnonymously()
@@ -48,7 +48,7 @@ abstract class SessionViewModel : ViewModel() {
 
     abstract fun onAuthInitializing()
 
-    abstract fun onAuthenticated()
+    abstract fun onAuthenticated(userChanged: Boolean)
 
     abstract fun onAuthError(error: Throwable)
 }

@@ -43,7 +43,7 @@ class UploadViewModel : SessionViewModel() {
         uiState = uiState.copy(isLoadingPhotos = true)
     }
 
-    override fun onAuthenticated() {
+    override fun onAuthenticated(userChanged: Boolean) {
         loadPhotos()
         loadTraining()
     }

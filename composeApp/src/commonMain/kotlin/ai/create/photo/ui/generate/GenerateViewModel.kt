@@ -26,7 +26,7 @@ class GenerateViewModel : SessionViewModel() {
         uiState = uiState.copy(isLoading = true)
     }
 
-    override fun onAuthenticated() {
+    override fun onAuthenticated(userChanged: Boolean) {
         loadTrainings()
     }
 
@@ -121,7 +121,7 @@ class GenerateViewModel : SessionViewModel() {
         }
     }
 
-    fun surpriseMe() = viewModelScope.launch() {
+    fun surpriseMe() = viewModelScope.launch {
         uiState = uiState.copy(isLoadingSurpriseMe = true)
         try {
             val prompt = SupabaseFunction.surpriseMe()
@@ -151,7 +151,7 @@ class GenerateViewModel : SessionViewModel() {
         uiState = uiState.copy(photosToGenerateX100 = photosToGenerate)
     }
 
-    fun enhancePrompt() = viewModelScope.launch() {
+    fun enhancePrompt() = viewModelScope.launch {
         if (uiState.userPrompt.isEmpty()) return@launch
         uiState = uiState.copy(isEnhancingPrompt = true)
         if (uiState.promptBeforeEnhancing.isEmpty()) {

@@ -23,11 +23,13 @@ class PublicViewModel : SessionViewModel() {
         uiState = uiState.copy(isLoading = true)
     }
 
-    override fun onAuthenticated() {
+    override fun onAuthenticated(userChanged: Boolean) {
         if (uiState.photos.isNotEmpty()) {
             uiState = uiState.copy(isLoading = false)
         }
-        loadPublicGallery()
+        if (userChanged || uiState.photos.isEmpty()) {
+            loadPublicGallery()
+        }
     }
 
     override fun onAuthError(error: Throwable) {

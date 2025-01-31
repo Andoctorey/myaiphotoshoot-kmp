@@ -24,11 +24,13 @@ class CreationsViewModel : SessionViewModel() {
         uiState = uiState.copy(isLoading = true)
     }
 
-    override fun onAuthenticated() {
+    override fun onAuthenticated(userChanged: Boolean) {
         if (uiState.photos.isNotEmpty()) {
             uiState = uiState.copy(isLoading = false)
         }
-        loadCreations()
+        if (userChanged || uiState.photos.isEmpty()) {
+            loadCreations()
+        }
     }
 
     override fun onAuthError(error: Throwable) {
