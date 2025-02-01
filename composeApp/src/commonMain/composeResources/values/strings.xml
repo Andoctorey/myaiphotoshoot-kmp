@@ -47,6 +47,7 @@
     <string name="cancel_popup">Cancel</string>
     <string name="steps">steps</string>
     <string name="minutes">minutes</string>
+    <string name="stay_tuned_to_get_more_models">The app uses Flux.1 for training—the latest and most advanced model for fine-tuning. New models will be added as soon as they hit the market. Stay tuned for updates!</string>
     <string name="photos_required"> You have uploaded %1$s photos. Please add %2$s more to meet the requirement.</string>
     <string name="cost_per_photo">then $0.03 per photo</string>
     <string name="gallery_public_tab">Public</string>

@@ -33,6 +33,7 @@ import photocreateai.composeapp.generated.resources.cancel
 import photocreateai.composeapp.generated.resources.cost_per_photo
 import photocreateai.composeapp.generated.resources.minutes
 import photocreateai.composeapp.generated.resources.photos_required
+import photocreateai.composeapp.generated.resources.stay_tuned_to_get_more_models
 import photocreateai.composeapp.generated.resources.steps
 import photocreateai.composeapp.generated.resources.train_ai_model
 
@@ -109,6 +110,10 @@ private fun StepsSelector(onStepsSelected: (Int) -> Unit) {
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        Text(
+            text = stringResource(Res.string.stay_tuned_to_get_more_models),
+            fontSize = 14.sp,
+        )
         Spacer(modifier = Modifier.height(24.dp))
         Model(
             steps = 1000,
