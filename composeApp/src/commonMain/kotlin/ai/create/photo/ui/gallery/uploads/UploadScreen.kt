@@ -83,9 +83,9 @@ import photocreateai.composeapp.generated.resources.analyze_photos
 import photocreateai.composeapp.generated.resources.analyzing_photos
 import photocreateai.composeapp.generated.resources.creating_model_hint
 import photocreateai.composeapp.generated.resources.delete
+import photocreateai.composeapp.generated.resources.delete_some_photos
 import photocreateai.composeapp.generated.resources.delete_unsuitable_photos
 import photocreateai.composeapp.generated.resources.generate_photo
-import photocreateai.composeapp.generated.resources.select_photos_popup_message
 import photocreateai.composeapp.generated.resources.train_ai_model
 import photocreateai.composeapp.generated.resources.training_ai_model
 import photocreateai.composeapp.generated.resources.upload_guidelines_message
@@ -139,7 +139,7 @@ fun UploadScreen(
 
         val buttonsBottomPadding = 94.dp
         if (!state.isLoadingPhotos && state.photos != null) {
-            if (!state.isLoadingTraining && state.photos.size >= 5) {
+            if (!state.isLoadingTraining && state.photos.size >= 10) {
                 val shouldAnalyzePhotos = state.photos.any { it.analysisStatus == null }
                 if (shouldAnalyzePhotos) {
                     AnalyzePhotosFab(
@@ -158,6 +158,7 @@ fun UploadScreen(
                         generatePhotos = openGenerateTab,
                     )
                 }
+                if (state.photos.size < 20) {
                 SmallFloatingActionButton(
                     modifier = Modifier.align(Alignment.BottomEnd)
                         .padding(bottom = buttonsBottomPadding, end = 24.dp),
@@ -167,6 +168,7 @@ fun UploadScreen(
                         imageVector = Icons.Default.AddAPhoto,
                         contentDescription = Icons.Default.AddAPhoto.name,
                     )
+                }
                 }
 
                 val hasBadPhotos = state.photos.any { it.analysisStatus == AnalysisStatus.DECLINED }
@@ -208,6 +210,12 @@ fun UploadScreen(
             }
         }
 
+        if (state.showDeleteSomePhotosPopup) {
+            InfoPopup(stringResource(Res.string.delete_some_photos)) {
+                viewModel.hideDeleteSomePhotosPopup()
+            }
+        }
+
         if (state.showTrainingAiModelPopup) {
             InfoPopup(stringResource(Res.string.creating_model_hint)) {
                 viewModel.hideCreatingModelClick()
@@ -230,12 +238,6 @@ fun UploadScreen(
                     viewModel.trainAiModel(steps)
                 },
             )
-        }
-
-        if (state.showSelectPhotosPopup) {
-            InfoPopup(stringResource(Res.string.select_photos_popup_message)) {
-                viewModel.toggleShowSelectPhotosPopup(false)
-            }
         }
 
         if (state.deleteUnsuitablePhotosPopup) {

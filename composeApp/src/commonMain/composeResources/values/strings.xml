@@ -7,6 +7,7 @@
     <string name="upload_guidelines_message">Make and upload 10-20 high-quality selfies with varied angles. Don’t worry about getting every photo perfect - AI will review and exclude any unsupported images. </string>
     <string name="connection_error">Problem connecting with server. Please check your connection.</string>
     <string name="upload_more_photos">Oops! It looks like you need to upload at least 10 photos before training your model. Try taking some selfies in portrait mode from different angles to get started.</string>
+    <string name="delete_some_photos">Please delete some photos. For optimal training, please keep no more than 20 photos for training.</string>
     <string name="unknown_error">Unknown error</string>
     <string name="train_ai_model">Train AI model</string>
     <string name="training_ai_model">Training AI model</string>
@@ -51,7 +52,6 @@
     <string name="gallery_public_tab">Public</string>
     <string name="gallery_creations_tab">Creations</string>
     <string name="gallery_uploads_tab">Uploads</string>
-    <string name="select_photos_popup_message">To ensure accurate training, please select at least 10 good photos to train your AI model.</string>
     <string name="make_public">Make Public</string>
     <string name="make_private">Make Private</string>
 </resources>

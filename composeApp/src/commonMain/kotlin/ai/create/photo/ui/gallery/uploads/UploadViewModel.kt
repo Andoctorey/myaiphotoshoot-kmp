@@ -175,8 +175,13 @@ class UploadViewModel : SessionViewModel() {
 
     fun trainAiModel(steps: Int) = viewModelScope.launch {
         val photos = uiState.photos
-        if (photos.isNullOrEmpty() || photos.size < 5) {
+        if (photos.isNullOrEmpty() || photos.size < 10) {
             uiState = uiState.copy(showUploadMorePhotosPopup = true)
+            return@launch
+        }
+
+        if (photos.size > 20) {
+            uiState = uiState.copy(showDeleteSomePhotosPopup = true)
             return@launch
         }
 
@@ -232,6 +237,10 @@ class UploadViewModel : SessionViewModel() {
         uiState = uiState.copy(showUploadMorePhotosPopup = false)
     }
 
+    fun hideDeleteSomePhotosPopup() {
+        uiState = uiState.copy(showDeleteSomePhotosPopup = false)
+    }
+
     fun resetScrollToTop() {
         uiState = uiState.copy(scrollToTop = false)
     }
@@ -242,10 +251,6 @@ class UploadViewModel : SessionViewModel() {
 
     fun toggleTrainAiModelPopup(show: Boolean) {
         uiState = uiState.copy(showTrainAiModelPopup = show)
-    }
-
-    fun toggleShowSelectPhotosPopup(show: Boolean) {
-        uiState = uiState.copy(showSelectPhotosPopup = show)
     }
 
     fun toggleDeleteUnsuitablePhotosPopup(show: Boolean) {
