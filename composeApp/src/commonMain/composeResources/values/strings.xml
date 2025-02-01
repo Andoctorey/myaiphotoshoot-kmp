@@ -23,6 +23,7 @@
     <string name="logout">Log Out</string>
     <string name="top_up">Top Up</string>
     <string name="privacy_policy">Privacy Policy</string>
+    <string name="about">About</string>
     <string name="delete_all_data">Delete All Data</string>
     <string name="confirm_data_delete">Are you sure you want to delete your account? This action is permanent and will remove all your data. You can’t undo this.</string>
     <string name="delete_photo_confirmation">Would you like to delete this photo?</string>
