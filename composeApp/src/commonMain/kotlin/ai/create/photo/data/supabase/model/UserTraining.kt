@@ -11,7 +11,6 @@ data class UserTraining(
     @SerialName("id") val id: String,
     @SerialName("created_at") val createdAt: Instant,
     @SerialName("status") val status: TrainingStatus,
-    @SerialName("trigger_word") val triggerWord: String,
     @SerialName("person_description") val personDescription: String?,
 ) {
     companion object {
