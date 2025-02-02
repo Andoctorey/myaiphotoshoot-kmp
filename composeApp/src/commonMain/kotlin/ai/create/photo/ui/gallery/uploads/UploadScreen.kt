@@ -140,7 +140,8 @@ fun UploadScreen(
 
         val buttonsBottomPadding = 94.dp
         if (!state.isLoadingPhotos && state.photos != null) {
-            if (!state.isLoadingTraining && state.photos.size >= 10) {
+            val isUploading = state.uploadProgress in 1 until 100
+            if (!state.isLoadingTraining && state.photos.size >= 10 && !isUploading) {
                 val shouldAnalyzePhotos = state.photos.any { it.analysisStatus == null }
                 if (shouldAnalyzePhotos) {
                     AnalyzePhotosFab(
