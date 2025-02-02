@@ -27,12 +27,12 @@ object UserTrainingsRepository {
             }
     }
 
-    suspend fun getLatestTraining(id: String): Result<UserTraining?> = runCatching {
+    suspend fun getLatestTraining(userId: String): Result<UserTraining?> = runCatching {
         Supabase.supabase
             .from(USER_TRAININGS_TABLE)
             .select(columns = Columns.list(UserTraining.columns)) {
                 filter {
-                    eq("id", id)
+                    eq("user_id", userId)
                 }
                 limit(1)
             }

@@ -198,7 +198,7 @@ class UploadViewModel : SessionViewModel() {
     }
 
     private fun loadTraining(): Job = viewModelScope.launch {
-        Logger.i("loadTraining")
+        Logger.i("loadTraining, trainingStatus: ${uiState.trainingStatus}")
         val userId = userId ?: return@launch
         if (uiState.trainingStatus != TrainingStatus.PROCESSING) {
             uiState = uiState.copy(isLoadingTraining = true)
@@ -207,6 +207,7 @@ class UploadViewModel : SessionViewModel() {
         try {
             val userTraining =
                 UserTrainingsRepository.getLatestTraining(userId).getOrThrow()
+            Logger.i("latest training: ${userTraining?.status}")
             uiState = uiState.copy(
                 isLoadingTraining = false,
                 trainingStatus = userTraining?.status,
