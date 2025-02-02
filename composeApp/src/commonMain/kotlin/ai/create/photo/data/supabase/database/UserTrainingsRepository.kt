@@ -27,6 +27,21 @@ object UserTrainingsRepository {
             }
     }
 
+    suspend fun getTraining(id: String): Result<UserTraining?> = runCatching {
+        Supabase.supabase
+            .from(USER_TRAININGS_TABLE)
+            .select(columns = Columns.list(UserTraining.columns)) {
+                filter {
+                    eq("id", id)
+                }
+                limit(1)
+            }
+            .decodeSingleOrNull<UserTraining>()
+            .also {
+                Logger.i("getTraining: $it")
+            }
+    }
+
     suspend fun getLatestTraining(userId: String): Result<UserTraining?> = runCatching {
         Supabase.supabase
             .from(USER_TRAININGS_TABLE)
@@ -34,11 +49,12 @@ object UserTrainingsRepository {
                 filter {
                     eq("user_id", userId)
                 }
+                order(column = "created_at", order = Order.DESCENDING)
                 limit(1)
             }
             .decodeSingleOrNull<UserTraining>()
             .also {
-                Logger.i("getTraining: $it")
+                Logger.i("getLatestTraining: $it")
             }
     }
 

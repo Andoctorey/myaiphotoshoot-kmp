@@ -128,7 +128,8 @@ fun UploadScreen(
                 }
                 viewModel.resetScrollToTop()
             }
-            val hideDeletePhotoButton = state.isLoadingTraining || state.trainingStatus != null
+            val hideDeletePhotoButton = state.isLoadingTraining ||
+                    state.trainingStatus == TrainingStatus.PROCESSING
             Photos(
                 photos = state.photos,
                 listState = state.listState,
@@ -440,7 +441,7 @@ private fun Photos(
     hideDeletePhotoButton: Boolean,
     onDelete: (UploadUiState.Photo) -> Unit,
 ) {
-    var showAnalysis by remember { mutableStateOf(true) }
+    var showAnalysis by remember { mutableStateOf(false) }
 
     LazyVerticalStaggeredGrid(
         state = listState,

@@ -108,7 +108,7 @@ class GenerateViewModel : SessionViewModel() {
         uiState = uiState.copy(isLoadingPersonDescription = true, personDescription = " ")
         try {
             SupabaseFunction.generatePersonDescription(trainingId)
-            val training = UserTrainingsRepository.getLatestTraining(trainingId).getOrThrow()
+            val training = UserTrainingsRepository.getTraining(trainingId).getOrThrow()
             uiState =
                 uiState.copy(
                     isLoadingPersonDescription = false,

@@ -23,6 +23,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
 import kotlin.math.max
 
 class UploadViewModel : SessionViewModel() {
@@ -45,7 +46,6 @@ class UploadViewModel : SessionViewModel() {
 
     override fun onAuthenticated(userChanged: Boolean) {
         loadPhotos()
-        loadTraining()
     }
 
     override fun onAuthError(error: Throwable) {
@@ -72,6 +72,7 @@ class UploadViewModel : SessionViewModel() {
                 },
                 scrollToTop = true,
             )
+            loadTraining()
         } catch (e: Exception) {
             Logger.e("loadPhotos failed", e)
             uiState = uiState.copy(isLoadingPhotos = false, loadingError = e)
@@ -207,10 +208,21 @@ class UploadViewModel : SessionViewModel() {
         try {
             val userTraining =
                 UserTrainingsRepository.getLatestTraining(userId).getOrThrow()
-            Logger.i("latest training: ${userTraining?.status}")
+            var trainingStatus = userTraining?.status
+            if (userTraining != null) {
+                val lastPhotoUploadDate =
+                    uiState.photos?.first()?.createdAt ?: Instant.DISTANT_FUTURE
+                Logger.i("last photo upload date: $lastPhotoUploadDate")
+                val newPhotoSet = userTraining.createdAt
+                if (lastPhotoUploadDate > newPhotoSet) {
+                    Logger.i("New photos uploaded after the last training")
+                    trainingStatus = null
+                }
+            }
+            Logger.i("latest training: $trainingStatus")
             uiState = uiState.copy(
                 isLoadingTraining = false,
-                trainingStatus = userTraining?.status,
+                trainingStatus = trainingStatus,
                 loadingError = null,
             )
         } catch (e: Exception) {
