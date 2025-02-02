@@ -161,16 +161,16 @@ fun UploadScreen(
                     )
                 }
                 if (state.photos.size < 20) {
-                SmallFloatingActionButton(
-                    modifier = Modifier.align(Alignment.BottomEnd)
-                        .padding(bottom = buttonsBottomPadding, end = 24.dp),
-                    onClick = onAddPhotoClick,
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.AddAPhoto,
-                        contentDescription = Icons.Default.AddAPhoto.name,
-                    )
-                }
+                    SmallFloatingActionButton(
+                        modifier = Modifier.align(Alignment.BottomEnd)
+                            .padding(bottom = buttonsBottomPadding, end = 24.dp),
+                        onClick = onAddPhotoClick,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AddAPhoto,
+                            contentDescription = Icons.Default.AddAPhoto.name,
+                        )
+                    }
                 }
 
                 val hasBadPhotos = state.photos.any { it.analysisStatus == AnalysisStatus.DECLINED }
