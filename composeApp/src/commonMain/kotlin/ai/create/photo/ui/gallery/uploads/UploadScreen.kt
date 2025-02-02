@@ -128,8 +128,7 @@ fun UploadScreen(
                 }
                 viewModel.resetScrollToTop()
             }
-            val hideDeletePhotoButton = state.isLoadingTraining ||
-                    state.trainingStatus == TrainingStatus.PROCESSING
+            val hideDeletePhotoButton = state.trainingStatus == TrainingStatus.PROCESSING
             Photos(
                 photos = state.photos,
                 listState = state.listState,
@@ -141,7 +140,7 @@ fun UploadScreen(
         val buttonsBottomPadding = 94.dp
         if (!state.isLoadingPhotos && state.photos != null) {
             val isUploading = state.uploadProgress in 1 until 100
-            if (!state.isLoadingTraining && state.photos.size >= 10 && !isUploading) {
+            if (state.photos.size >= 10 && !isUploading) {
                 val shouldAnalyzePhotos = state.photos.any { it.analysisStatus == null }
                 if (shouldAnalyzePhotos) {
                     AnalyzePhotosFab(
