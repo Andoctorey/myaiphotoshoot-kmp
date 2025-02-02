@@ -164,7 +164,7 @@ private fun Model(steps: Int, minutes: Int, cost: Float, onClick: () -> Unit = {
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "$$cost",
-                fontSize = 40.sp
+                fontSize = 32.sp
             )
         }
     }
