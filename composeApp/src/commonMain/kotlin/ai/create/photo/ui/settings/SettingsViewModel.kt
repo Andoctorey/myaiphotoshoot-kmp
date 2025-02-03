@@ -20,7 +20,11 @@ class SettingsViewModel : SessionViewModel() {
     }
 
     override fun onAuthenticated(userChanged: Boolean) {
-        uiState = uiState.copy(isLoading = false, email = user?.email)
+        uiState = uiState.copy(
+            isLoading = false,
+            email = user?.email,
+            balance = user?.formattedBalance ?: "0",
+        )
     }
 
     override fun onAuthError(error: Throwable) {

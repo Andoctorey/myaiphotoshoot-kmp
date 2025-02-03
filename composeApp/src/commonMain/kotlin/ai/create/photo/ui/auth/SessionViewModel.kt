@@ -28,6 +28,7 @@ abstract class SessionViewModel : ViewModel() {
                         val user = User(
                             id = supabaseUser?.id ?: throw IllegalStateException("User id is null"),
                             email = supabaseUser.email,
+                            balance = 10f,
                         )
                         Logger.i("user: $user")
                         this@SessionViewModel.user = user

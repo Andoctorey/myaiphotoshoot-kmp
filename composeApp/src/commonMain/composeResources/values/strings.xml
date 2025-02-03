@@ -22,7 +22,7 @@
     <string name="account">Account</string>
     <string name="attach_email">You’re currently signed in as a guest. Adding an email will secure your data and let you sign in on any device, anytime.</string>
     <string name="logout">Log Out</string>
-    <string name="top_up">Top Up</string>
+    <string name="balance">Balance: $%1$s</string>
     <string name="privacy_policy">Privacy Policy</string>
     <string name="about">About</string>
     <string name="delete_all_data">Delete All Data</string>

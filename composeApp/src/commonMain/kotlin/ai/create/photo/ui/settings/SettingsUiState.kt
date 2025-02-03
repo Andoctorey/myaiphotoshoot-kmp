@@ -10,7 +10,6 @@ import org.jetbrains.compose.resources.StringResource
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.about
 import photocreateai.composeapp.generated.resources.account
-import photocreateai.composeapp.generated.resources.top_up
 
 
 @Immutable
@@ -20,13 +19,15 @@ data class SettingsUiState(
     val errorPopup: Throwable? = null,
     val currentDestination: Item? = null,
 
+    val email: String? = null,
+    val balance: String = "0",
+
     val items: List<Item> = listOf(
         LoginItem(),
-        PlaceholderItem(Res.string.top_up, Icons.Default.Paid),
+        BalanceItem(),
         PlaceholderItem(Res.string.about, Icons.AutoMirrored.Default.Help),
     ),
 
-    val email: String? = null,
 ) {
 
     @Immutable
@@ -38,6 +39,7 @@ data class SettingsUiState(
     ) : Item()
 
     class LoginItem() : DetailedItem(Res.string.account, Icons.Default.AccountCircle)
+    class BalanceItem() : DetailedItem(Res.string.account, Icons.Default.Paid)
     class PlaceholderItem(nameRes: StringResource, icon: ImageVector) :
         DetailedItem(nameRes, icon)
     class SpacerItem : Item()

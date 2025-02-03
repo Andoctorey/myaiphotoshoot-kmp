@@ -49,6 +49,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import co.touchlab.kermit.Logger
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import photocreateai.composeapp.generated.resources.Res
+import photocreateai.composeapp.generated.resources.balance
 
 
 @Preview
@@ -73,6 +75,7 @@ fun SettingsScreen(
                 Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
                 Screen(
                     email = state.email,
+                    balance = state.balance,
                     items = state.items,
                     savedDestination = state.currentDestination,
                     onSaveDestination = viewModel::saveDestination
@@ -92,6 +95,7 @@ fun SettingsScreen(
 @Composable
 private fun Screen(
     email: String?,
+    balance: String,
     items: List<Item>,
     savedDestination: Item?,
     onSaveDestination: (Item?) -> Unit,
@@ -120,6 +124,7 @@ private fun Screen(
             AnimatedPane(modifier = Modifier) {
                 SettingsItems(
                     email = email,
+                    balance = balance,
                     expanded = expanded,
                     items = items,
                     onItemClick = { item ->
@@ -154,6 +159,7 @@ private fun Screen(
 @Composable
 fun SettingsItems(
     email: String?,
+    balance: String,
     expanded: Boolean,
     items: List<Item>,
     onItemClick: (Item) -> Unit,
@@ -185,6 +191,10 @@ fun SettingsItems(
                                     is SettingsUiState.LoginItem -> email
                                         ?: stringResource(item.nameRes)
 
+                                    is SettingsUiState.BalanceItem -> stringResource(
+                                        Res.string.balance,
+                                        balance
+                                    )
                                     is SettingsUiState.PlaceholderItem -> stringResource(item.nameRes)
                                 },
                                 fontSize = 16.sp,
@@ -234,6 +244,7 @@ fun SettingsDetails(
             ) {
                 when (item) {
                     is SettingsUiState.LoginItem -> LoginScreen()
+                    is SettingsUiState.BalanceItem -> TODO()
                     is SettingsUiState.PlaceholderItem -> {
                         Text(
                             text = "TODO: ${stringResource(item.nameRes)}",
@@ -241,6 +252,7 @@ fun SettingsDetails(
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
+
                 }
             }
         }
