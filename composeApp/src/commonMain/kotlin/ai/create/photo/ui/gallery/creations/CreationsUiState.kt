@@ -21,6 +21,7 @@ data class CreationsUiState(
 
     val errorPopup: Throwable? = null,
 
+
 ) {
     @Immutable
     data class Photo(
@@ -38,7 +39,7 @@ data class CreationsUiState(
             url = it.imageUrl,
             prompt = it.prompt,
             fileId = it.fileId,
-            isPublic = it.isPublic
+            isPublic = it.isPublic,
         )
     }
 }
@@ -49,5 +50,5 @@ fun CreationsUiState.Photo.toUserGeneration() = UserGeneration(
     prompt = prompt,
     imageUrl = url,
     fileId = fileId,
-    isPublic = isPublic
+    isPublic = isPublic,
 )
