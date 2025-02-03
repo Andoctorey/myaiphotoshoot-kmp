@@ -1,8 +1,8 @@
 package ai.create.photo.ui.gallery.public
 
-import ai.create.photo.data.supabase.SessionViewModel
 import ai.create.photo.data.supabase.database.UserGenerationsRepository
 import ai.create.photo.data.supabase.model.UserGeneration
+import ai.create.photo.ui.auth.SessionViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue

@@ -1,6 +1,6 @@
 package ai.create.photo.ui.settings
 
-import ai.create.photo.data.supabase.SessionViewModel
+import ai.create.photo.ui.auth.SessionViewModel
 import ai.create.photo.ui.settings.SettingsUiState.Item
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,7 +20,7 @@ class SettingsViewModel : SessionViewModel() {
     }
 
     override fun onAuthenticated(userChanged: Boolean) {
-        uiState = uiState.copy(isLoading = false)
+        uiState = uiState.copy(isLoading = false, email = user?.email)
     }
 
     override fun onAuthError(error: Throwable) {

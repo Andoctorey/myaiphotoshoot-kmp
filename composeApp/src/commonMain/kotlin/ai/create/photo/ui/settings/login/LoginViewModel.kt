@@ -1,10 +1,10 @@
 package ai.create.photo.ui.settings.login
 
-import ai.create.photo.data.supabase.SessionViewModel
 import ai.create.photo.data.supabase.Supabase.supabase
 import ai.create.photo.data.supabase.SupabaseAuth
 import ai.create.photo.data.supabase.SupabaseFunction
 import ai.create.photo.data.supabase.SupabaseStorage
+import ai.create.photo.ui.auth.SessionViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -119,7 +119,7 @@ class LoginViewModel : SessionViewModel() {
     }
 
     fun deleteAllData() = viewModelScope.launch {
-        val userId = userId ?: return@launch
+        val userId = user?.id ?: return@launch
 
         Logger.i("deleteAllData")
         try {

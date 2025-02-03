@@ -24,7 +24,9 @@ data class SettingsUiState(
         LoginItem(),
         PlaceholderItem(Res.string.top_up, Icons.Default.Paid),
         PlaceholderItem(Res.string.about, Icons.AutoMirrored.Default.Help),
-    )
+    ),
+
+    val email: String? = null,
 ) {
 
     @Immutable

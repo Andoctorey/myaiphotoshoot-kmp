@@ -71,7 +71,12 @@ fun SettingsScreen(
         } else {
             Column {
                 Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
-                Screen(state.items, state.currentDestination, viewModel::saveDestination)
+                Screen(
+                    email = state.email,
+                    items = state.items,
+                    savedDestination = state.currentDestination,
+                    onSaveDestination = viewModel::saveDestination
+                )
             }
         }
 
@@ -86,6 +91,7 @@ fun SettingsScreen(
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 private fun Screen(
+    email: String?,
     items: List<Item>,
     savedDestination: Item?,
     onSaveDestination: (Item?) -> Unit,
@@ -113,6 +119,7 @@ private fun Screen(
         listPane = {
             AnimatedPane(modifier = Modifier) {
                 SettingsItems(
+                    email = email,
                     expanded = expanded,
                     items = items,
                     onItemClick = { item ->
@@ -146,6 +153,7 @@ private fun Screen(
 
 @Composable
 fun SettingsItems(
+    email: String?,
     expanded: Boolean,
     items: List<Item>,
     onItemClick: (Item) -> Unit,
@@ -173,7 +181,12 @@ fun SettingsItems(
                             )
                             Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
                             Text(
-                                text = stringResource(item.nameRes),
+                                text = when (item) {
+                                    is SettingsUiState.LoginItem -> email
+                                        ?: stringResource(item.nameRes)
+
+                                    is SettingsUiState.PlaceholderItem -> stringResource(item.nameRes)
+                                },
                                 fontSize = 16.sp,
                             )
                         }

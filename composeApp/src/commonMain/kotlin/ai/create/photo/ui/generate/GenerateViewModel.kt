@@ -1,10 +1,10 @@
 package ai.create.photo.ui.generate
 
-import ai.create.photo.data.supabase.SessionViewModel
 import ai.create.photo.data.supabase.SupabaseFunction
 import ai.create.photo.data.supabase.SupabaseStorage
 import ai.create.photo.data.supabase.database.UserTrainingsRepository
 import ai.create.photo.platform.resizeToWidth
+import ai.create.photo.ui.auth.SessionViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -36,7 +36,7 @@ class GenerateViewModel : SessionViewModel() {
 
     fun loadTrainings() = viewModelScope.launch {
         Logger.i("loadTrainings")
-        val userId = userId ?: return@launch
+        val userId = user?.id ?: return@launch
 
         uiState = uiState.copy(isLoading = true, loadingError = null)
         try {
@@ -170,7 +170,7 @@ class GenerateViewModel : SessionViewModel() {
     }
 
     fun pictureToPrompt(file: PlatformFile) = viewModelScope.launch {
-        val userId = userId ?: return@launch
+        val userId = user?.id ?: return@launch
         Logger.i("pictureToPrompt: ${file.name}")
         uiState = uiState.copy(isLoadingPictureToPrompt = true)
         try {

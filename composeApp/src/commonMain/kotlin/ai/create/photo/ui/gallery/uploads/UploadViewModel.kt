@@ -1,6 +1,5 @@
 package ai.create.photo.ui.gallery.uploads
 
-import ai.create.photo.data.supabase.SessionViewModel
 import ai.create.photo.data.supabase.Supabase
 import ai.create.photo.data.supabase.SupabaseFunction
 import ai.create.photo.data.supabase.SupabaseStorage
@@ -9,6 +8,7 @@ import ai.create.photo.data.supabase.database.UserFilesRepository
 import ai.create.photo.data.supabase.database.UserTrainingsRepository
 import ai.create.photo.data.supabase.model.AnalysisStatus
 import ai.create.photo.data.supabase.model.TrainingStatus
+import ai.create.photo.ui.auth.SessionViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -54,7 +54,7 @@ class UploadViewModel : SessionViewModel() {
 
     private fun loadPhotos() = viewModelScope.launch {
         Logger.i("loadPhotos")
-        val userId = userId ?: return@launch
+        val userId = user?.id ?: return@launch
         uiState = uiState.copy(isLoadingPhotos = uiState.photos == null)
         try {
             val files = UserFilesRepository.getInputPhotos(userId).getOrThrow()
@@ -82,7 +82,7 @@ class UploadViewModel : SessionViewModel() {
 
     fun uploadPhotos(files: PlatformFiles) = viewModelScope.launch {
         Logger.i("uploadPhotos: ${files.joinToString { it.name }}")
-        val userId = userId ?: return@launch
+        val userId = user?.id ?: return@launch
         if (files.isEmpty()) return@launch
 
         uiState = uiState.copy(uploadProgress = 1, errorPopup = null)
@@ -120,7 +120,7 @@ class UploadViewModel : SessionViewModel() {
         val updatedPhotos = photos.filter { it.id != photo.id }
         uiState = uiState.copy(photos = updatedPhotos)
         try {
-            SupabaseStorage.deleteFile("$userId/$UPLOADS/${photo.name}")
+            SupabaseStorage.deleteFile("${user?.id}/$UPLOADS/${photo.name}")
             UserFilesRepository.deleteFile(photo.id)
         } catch (e: Exception) {
             Logger.e("deletePhoto failed, $photo", e)
@@ -166,7 +166,7 @@ class UploadViewModel : SessionViewModel() {
         val badPhotos = photos.filter { it.analysisStatus == AnalysisStatus.DECLINED }
         try {
             UserFilesRepository.deleteFiles(badPhotos.map { it.id })
-            SupabaseStorage.deleteFiles(badPhotos.map { "$userId/$UPLOADS/${it.name}" })
+            SupabaseStorage.deleteFiles(badPhotos.map { "${user?.id}/$UPLOADS/${it.name}" })
             loadPhotos()
         } catch (e: Exception) {
             Logger.e("Delete unsuitable photos failed", e)
@@ -200,7 +200,7 @@ class UploadViewModel : SessionViewModel() {
 
     private fun loadTraining(): Job = viewModelScope.launch {
         Logger.i("loadTraining, trainingStatus: ${uiState.trainingStatus}")
-        val userId = userId ?: return@launch
+        val userId = user?.id ?: return@launch
         if (uiState.trainingStatus != TrainingStatus.PROCESSING) {
             uiState = uiState.copy(isLoadingTraining = true)
         }

@@ -1,5 +1,7 @@
-package ai.create.photo.data.supabase
+package ai.create.photo.ui.auth
 
+import ai.create.photo.data.supabase.Supabase
+import ai.create.photo.data.supabase.SupabaseAuth
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
@@ -12,7 +14,7 @@ abstract class SessionViewModel : ViewModel() {
 
     val auth = Supabase.supabase.auth
 
-    var userId: String? = null
+    var user: User? = null
 
     fun loadSession() = viewModelScope.launch {
         Logger.i("loadSession from ${this@SessionViewModel}")
@@ -21,11 +23,15 @@ abstract class SessionViewModel : ViewModel() {
                 Logger.i("Auth status: $it")
                 when (it) {
                     is SessionStatus.Authenticated -> {
-                        val userId =
-                            it.session.user?.id ?: throw IllegalStateException("User id is null")
-                        Logger.i("userId: $userId")
-                        onAuthenticated(this@SessionViewModel.userId != userId)
-                        this@SessionViewModel.userId = userId
+                        val supabaseUser = it.session.user
+                        val emailChanged = user?.id != supabaseUser?.id
+                        val user = User(
+                            id = supabaseUser?.id ?: throw IllegalStateException("User id is null"),
+                            email = supabaseUser.email,
+                        )
+                        Logger.i("user: $user")
+                        this@SessionViewModel.user = user
+                        onAuthenticated(emailChanged)
                     }
 
                     is SessionStatus.NotAuthenticated -> SupabaseAuth.signInAnonymously()

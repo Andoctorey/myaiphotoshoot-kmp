@@ -1,9 +1,9 @@
 package ai.create.photo.ui.gallery.creations
 
-import ai.create.photo.data.supabase.SessionViewModel
 import ai.create.photo.data.supabase.SupabaseStorage
 import ai.create.photo.data.supabase.database.UserFilesRepository
 import ai.create.photo.data.supabase.database.UserGenerationsRepository
+import ai.create.photo.ui.auth.SessionViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -38,7 +38,7 @@ class CreationsViewModel : SessionViewModel() {
     }
 
     fun refreshCreations(silent: Boolean = false) = viewModelScope.launch {
-        val userId = userId ?: return@launch
+        val userId = user?.id ?: return@launch
         if (uiState.isRefreshing) return@launch
         // user can generate 10 photos at once and last generate appears first
         val latestCreatedAt = uiState.photos.getOrNull(10)?.createdAt ?: return@launch
@@ -63,7 +63,7 @@ class CreationsViewModel : SessionViewModel() {
     }
 
     fun loadCreations() = viewModelScope.launch {
-        val userId = userId ?: return@launch
+        val userId = user?.id ?: return@launch
         if (uiState.isLoadingNextPage) return@launch
         Logger.i("loadCreations")
         uiState = uiState.copy(isLoadingNextPage = true)
