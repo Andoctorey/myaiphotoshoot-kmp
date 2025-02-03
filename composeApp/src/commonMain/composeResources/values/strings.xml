@@ -54,4 +54,5 @@
     <string name="select_photos_popup_message">To ensure accurate training, please select at least 10 good photos to train your AI model.</string>
     <string name="make_public">Make Public</string>
     <string name="make_private">Make Private</string>
+    <string name="copy_link">Copy Link</string>
 </resources>
