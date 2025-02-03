@@ -22,6 +22,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
@@ -33,7 +34,6 @@ import photocreateai.composeapp.generated.resources.cancel
 import photocreateai.composeapp.generated.resources.cost_per_photo
 import photocreateai.composeapp.generated.resources.minutes
 import photocreateai.composeapp.generated.resources.photos_required
-import photocreateai.composeapp.generated.resources.stay_tuned_to_get_more_models
 import photocreateai.composeapp.generated.resources.steps
 import photocreateai.composeapp.generated.resources.train_ai_model
 
@@ -110,11 +110,7 @@ private fun StepsSelector(onStepsSelected: (Int) -> Unit) {
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            text = stringResource(Res.string.stay_tuned_to_get_more_models),
-            fontSize = 14.sp,
-        )
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Model(
             steps = 1000,
             minutes = 30,
@@ -139,6 +135,7 @@ private fun StepsSelector(onStepsSelected: (Int) -> Unit) {
         Text(
             text = stringResource(Res.string.cost_per_photo),
             fontSize = 16.sp,
+            fontWeight = FontWeight.Medium,
         )
     }
 }
