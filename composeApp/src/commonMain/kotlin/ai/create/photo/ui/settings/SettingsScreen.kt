@@ -191,10 +191,10 @@ fun SettingsItems(
                                     is SettingsUiState.LoginItem -> email
                                         ?: stringResource(item.nameRes)
 
-                                    is SettingsUiState.BalanceItem -> stringResource(
-                                        Res.string.balance,
-                                        balance
-                                    )
+                                    is SettingsUiState.BalanceItem ->
+                                        stringResource(Res.string.balance, balance)
+                                            .takeIf { balance != "0" }
+                                            ?: stringResource(item.nameRes)
                                     is SettingsUiState.PlaceholderItem -> stringResource(item.nameRes)
                                 },
                                 fontSize = 16.sp,
