@@ -441,7 +441,6 @@ private fun Photos(
     hideDeletePhotoButton: Boolean,
     onDelete: (UploadUiState.Photo) -> Unit,
 ) {
-    var showAnalysis by remember { mutableStateOf(false) }
 
     LazyVerticalStaggeredGrid(
         state = listState,
@@ -460,8 +459,6 @@ private fun Photos(
                 photo = photos[item],
                 hideDeletePhotoButton = hideDeletePhotoButton,
                 onDelete = onDelete,
-                showAnalysis = showAnalysis,
-                onToggleShowAnalysis = { showAnalysis = !showAnalysis },
             )
         }
     }
@@ -473,11 +470,10 @@ private fun Photo(
     photo: UploadUiState.Photo,
     hideDeletePhotoButton: Boolean,
     onDelete: (UploadUiState.Photo) -> Unit,
-    showAnalysis: Boolean,
-    onToggleShowAnalysis: () -> Unit,
 ) {
     var loading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<Throwable?>(null) }
+    var showAnalysis by remember { mutableStateOf(false) }
 
     if (error != null) {
         Box(
@@ -535,7 +531,7 @@ private fun Photo(
 
         if (!loading && photo.analysisStatus != null) {
             IconButton(
-                onClick = onToggleShowAnalysis,
+                onClick = { showAnalysis = !showAnalysis },
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .padding(8.dp)
