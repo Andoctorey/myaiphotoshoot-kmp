@@ -137,7 +137,7 @@ class UploadViewModel : SessionViewModel() {
 
         uiState = uiState.copy(analyzingPhotos = true)
         try {
-            if (Supabase.local) {
+            if (Supabase.LOCAL) {
                 notAnalyzedPhotos.forEach { photo ->
                     SupabaseFunction.analyzePhoto(photo.id)
                 }

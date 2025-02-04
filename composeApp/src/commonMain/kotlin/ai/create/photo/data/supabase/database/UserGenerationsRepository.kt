@@ -42,7 +42,7 @@ object UserGenerationsRepository {
     @OptIn(ExperimentalSerializationApi::class)
     suspend fun getCreationsAfter(
         userId: String,
-        latestCreatedAt: Instant,
+        latestCreatedAt: Instant?,
     ): Result<List<UserGeneration>> = runCatching {
         Logger.i("getCreationsAfter $latestCreatedAt")
         Supabase.supabase
@@ -51,7 +51,9 @@ object UserGenerationsRepository {
                 filter {
                     eq("user_id", userId)
                     eq("status", "succeeded")
-                    gt("created_at", latestCreatedAt)
+                    if (latestCreatedAt != null) {
+                        gt("created_at", latestCreatedAt)
+                    }
                 }
                 order(column = "created_at", order = Order.DESCENDING)
             }
@@ -112,7 +114,7 @@ object UserGenerationsRepository {
             .also { Logger.i("deleteGeneratedPhotoId: $photoId") }
     }
 
-    suspend fun downloadGeneratedPhoto(id: String, photoUrl: String){
+    suspend fun downloadGeneratedPhoto(id: String, photoUrl: String) {
         Logger.i("downloadGeneratedPhoto - $photoUrl")
         try {
             val bytes = HttpClient().get(photoUrl).readRawBytes()

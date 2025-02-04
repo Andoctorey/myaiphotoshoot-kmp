@@ -41,7 +41,7 @@ class CreationsViewModel : SessionViewModel() {
         val userId = user?.id ?: return@launch
         if (uiState.isRefreshing) return@launch
         // user can generate 10 photos at once and last generate appears first
-        val latestCreatedAt = uiState.photos.getOrNull(10)?.createdAt ?: return@launch
+        val latestCreatedAt = uiState.photos.getOrNull(10)?.createdAt
         Logger.i("refreshCreations, silent=$silent")
         if (!silent) uiState = uiState.copy(isRefreshing = true)
 
