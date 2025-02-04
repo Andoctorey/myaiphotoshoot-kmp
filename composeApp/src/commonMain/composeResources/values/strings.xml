@@ -44,6 +44,7 @@
     <string name="wrong_code">Wrong code. Please try again.</string>
     <string name="verify">Verify</string>
     <string name="photos_to_generate">Photos to Generate</string>
+    <string name="prompt">Prompt</string>
     <string name="surprise_me">Surprise Me</string>
     <string name="enhance_prompt">Enhance Prompt</string>
     <string name="picture_to_prompt">Picture to Prompt</string>

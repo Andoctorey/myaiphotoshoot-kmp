@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
@@ -58,6 +59,7 @@ import photocreateai.composeapp.generated.resources.download
 import photocreateai.composeapp.generated.resources.link_copied
 import photocreateai.composeapp.generated.resources.make_private
 import photocreateai.composeapp.generated.resources.make_public
+import photocreateai.composeapp.generated.resources.prompt
 import photocreateai.composeapp.generated.resources.share
 
 
@@ -65,6 +67,7 @@ import photocreateai.composeapp.generated.resources.share
 @Composable
 fun CreationsScreen(
     viewModel: CreationsViewModel = viewModel { CreationsViewModel() },
+    generate: (String) -> Unit,
     generationsInProgress: Int,
     addPhotoToPublicGallery: (UserGeneration) -> Unit,
     removePhotoFromPublicGallery: (String) -> Unit,
@@ -105,7 +108,6 @@ fun CreationsScreen(
                 loadNextPage = viewModel::loadCreations,
                 isRefreshing = state.isRefreshing,
                 onRefresh = viewModel::refreshCreations,
-                onDelete = viewModel::delete,
                 onTogglePublic = {
                     viewModel.togglePublic(it) {
                         if (it.isPublic) {
@@ -116,6 +118,8 @@ fun CreationsScreen(
                     }
                 },
                 onDownload = viewModel::downloadGeneratedPhoto,
+                onDelete = viewModel::delete,
+                onPrompt = generate,
             )
         }
     }
@@ -137,9 +141,10 @@ private fun Photos(
     loadNextPage: () -> Unit = {},
     isRefreshing: Boolean = false,
     onRefresh: () -> Unit,
-    onDelete: (CreationsUiState.Photo) -> Unit,
     onDownload: (CreationsUiState.Photo) -> Unit,
     onTogglePublic: (CreationsUiState.Photo) -> Unit,
+    onPrompt: (String) -> Unit,
+    onDelete: (CreationsUiState.Photo) -> Unit,
 ) {
     PullToRefreshBox(
         isRefreshing = isRefreshing,
@@ -160,9 +165,10 @@ private fun Photos(
                 Photo(
                     modifier = Modifier.animateItem(),
                     photo = photos[item],
-                    onDelete = { onDelete(photos[item]) },
                     onTogglePublic = onTogglePublic,
                     onDownload = { onDownload(photos[item]) },
+                    onPrompt = onPrompt,
+                    onDelete = { onDelete(photos[item]) },
                 )
             }
 
@@ -199,8 +205,9 @@ private fun Photo(
     modifier: Modifier,
     photo: CreationsUiState.Photo,
     onDownload: (CreationsUiState.Photo) -> Unit,
-    onDelete: (CreationsUiState.Photo) -> Unit,
     onTogglePublic: (CreationsUiState.Photo) -> Unit,
+    onPrompt: (String) -> Unit,
+    onDelete: (CreationsUiState.Photo) -> Unit,
 ) {
     var loading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<Throwable?>(null) }
@@ -242,11 +249,12 @@ private fun Photo(
                 modifier = Modifier.align(Alignment.TopEnd),
                 photo = photo,
                 onDownload = onDownload,
-                onDelete = onDelete,
                 onShare = {
                     shareLink(photo.url)
                 },
                 onTogglePublic = onTogglePublic,
+                onPrompt = onPrompt,
+                onDelete = onDelete,
             )
         }
     }
@@ -257,9 +265,10 @@ private fun PhotoDropMenu(
     modifier: Modifier,
     photo: CreationsUiState.Photo,
     onDownload: (CreationsUiState.Photo) -> Unit,
-    onDelete: (CreationsUiState.Photo) -> Unit,
     onShare: (CreationsUiState.Photo) -> Unit,
     onTogglePublic: (CreationsUiState.Photo) -> Unit,
+    onPrompt: (String) -> Unit,
+    onDelete: (CreationsUiState.Photo) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
     var showConfirmDeletePopup by remember { mutableStateOf(false) }
@@ -353,6 +362,25 @@ private fun PhotoDropMenu(
                 onClick = {
                     expanded = false
                     onTogglePublic(photo)
+                }
+            )
+
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = stringResource(Res.string.prompt)
+                    )
+                },
+                leadingIcon = {
+                    val icon = Icons.AutoMirrored.Default.Send
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = icon.name,
+                    )
+                },
+                onClick = {
+                    expanded = false
+                    onPrompt(photo.prompt)
                 }
             )
 

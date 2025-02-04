@@ -49,6 +49,7 @@ fun GalleryScreen(
             )
 
             1 -> CreationsScreen(
+                generate = { openGenerateTab(it) },
                 generationsInProgress = generationsInProgress,
                 addPhotoToPublicGallery = { viewModel.addPhotoToPublicGallery(it) },
                 removePhotoFromPublicGallery = { viewModel.removePhotoFromPublicGallery(it) },
