@@ -31,6 +31,8 @@
     <string name="delete_photo_confirmation">Would you like to delete this photo?</string>
     <string name="delete">Delete</string>
     <string name="share">Share</string>
+    <string name="copy_link">Copy Link</string>
+    <string name="link_copied">Link Copied</string>
     <string name="download">Download</string>
     <string name="cancel">Cancel</string>
     <string name="data_deleted">All your stored data has been deleted successfully.</string>
@@ -55,5 +57,4 @@
     <string name="gallery_uploads_tab">Uploads</string>
     <string name="make_public">Make Public</string>
     <string name="make_private">Make Private</string>
-    <string name="copy_link">Copy Link</string>
 </resources>

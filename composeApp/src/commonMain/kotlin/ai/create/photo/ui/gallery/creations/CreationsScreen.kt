@@ -1,18 +1,30 @@
 package ai.create.photo.ui.gallery.creations
 
-import GeneratedPhotoSharing
 import ai.create.photo.data.supabase.model.UserGeneration
 import ai.create.photo.platform.Platforms
 import ai.create.photo.platform.platform
+import ai.create.photo.platform.shareLink
+import ai.create.photo.ui.compose.ConfirmationPopup
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
-import ai.create.photo.ui.compose.PhotoDropMenu
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.DownloadDone
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -20,6 +32,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -32,8 +45,20 @@ import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import photocreateai.composeapp.generated.resources.Res
+import photocreateai.composeapp.generated.resources.copy_link
+import photocreateai.composeapp.generated.resources.delete
+import photocreateai.composeapp.generated.resources.delete_photo_confirmation
+import photocreateai.composeapp.generated.resources.download
+import photocreateai.composeapp.generated.resources.link_copied
+import photocreateai.composeapp.generated.resources.make_private
+import photocreateai.composeapp.generated.resources.make_public
+import photocreateai.composeapp.generated.resources.share
 
 
 @Preview
@@ -212,28 +237,152 @@ private fun Photo(
             },
         )
 
-        val snackbarHostState = remember { SnackbarHostState() }
+        if (!loading) {
+            PhotoDropMenu(
+                modifier = Modifier.align(Alignment.TopEnd),
+                photo = photo,
+                onDownload = onDownload,
+                onDelete = onDelete,
+                onShare = {
+                    shareLink(photo.url)
+                },
+                onTogglePublic = onTogglePublic,
+            )
+        }
+    }
+}
 
-        PhotoDropMenu(
-            modifier = modifier.align(Alignment.TopEnd),
-            item = photo,
-            onDelete = onDelete,
-            onShare = {
-                GeneratedPhotoSharing().sharePhoto(photo.url)
-            },
-            onTogglePublic = onTogglePublic,
-            onDownload = onDownload,
-            snackbarHostState = snackbarHostState
-        )
-        if (platform().platform != Platforms.ANDROID || platform().platform != Platforms.IOS) {
-            Box(contentAlignment = Alignment.BottomCenter) {
-                SnackbarHost(hostState = snackbarHostState) {
-                    Snackbar(
-                        snackbarData = it,
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        contentColor = MaterialTheme.colorScheme.onSurface
-                    )
+@Composable
+private fun PhotoDropMenu(
+    modifier: Modifier,
+    photo: CreationsUiState.Photo,
+    onDownload: (CreationsUiState.Photo) -> Unit,
+    onDelete: (CreationsUiState.Photo) -> Unit,
+    onShare: (CreationsUiState.Photo) -> Unit,
+    onTogglePublic: (CreationsUiState.Photo) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var showConfirmDeletePopup by remember { mutableStateOf(false) }
+    var isDownloaded by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = modifier.wrapContentSize()
+            .padding(8.dp)
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f), shape = CircleShape),
+    ) {
+        IconButton(onClick = { expanded = !expanded }) {
+            Icon(Icons.Default.MoreVert, contentDescription = Icons.Default.MoreVert.name)
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text(text = stringResource(Res.string.download)) },
+                leadingIcon = {
+                    if (!isDownloaded) {
+                        Icon(
+                            Icons.Default.Download,
+                            contentDescription = Icons.Default.Download.name
+                        )
+                    } else {
+                        Icon(
+                            Icons.Default.DownloadDone,
+                            contentDescription = Icons.Default.DownloadDone.name
+                        )
+                    }
+                },
+                onClick = {
+                    expanded = false
+                    isDownloaded = true
+                    onDownload(photo)
                 }
+            )
+
+            val copyLinkInsteadOfShare =
+                remember { platform().platform !in listOf(Platforms.ANDROID, Platforms.IOS) }
+            var linkCopied by remember { mutableStateOf(false) }
+            val coroutineScope = rememberCoroutineScope()
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = if (linkCopied) stringResource(Res.string.link_copied)
+                        else if (copyLinkInsteadOfShare) stringResource(Res.string.copy_link)
+                        else stringResource(Res.string.share)
+                    )
+                },
+                leadingIcon = {
+                    val icon = if (linkCopied) Icons.Default.Check
+                    else if (copyLinkInsteadOfShare) Icons.Default.Link
+                    else Icons.Default.Share
+                    Icon(icon, contentDescription = icon.name)
+                },
+                onClick = {
+                    if (copyLinkInsteadOfShare) {
+                        linkCopied = true
+                        coroutineScope.launch {
+                            delay(1500)
+                            linkCopied = false
+                            expanded = false
+                        }
+                    } else {
+                        expanded = false
+                    }
+                    onShare(photo)
+                },
+            )
+
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = stringResource(
+                            if (photo.isPublic) Res.string.make_private
+                            else Res.string.make_public
+                        )
+                    )
+                },
+                leadingIcon = {
+                    val icon = if (photo.isPublic) Icons.Default.VisibilityOff
+                    else Icons.Default.Visibility
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = icon.name,
+                    )
+                },
+                onClick = {
+                    expanded = false
+                    onTogglePublic(photo)
+                }
+            )
+
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = stringResource(Res.string.delete),
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = Icons.Default.Delete.name,
+                        tint = MaterialTheme.colorScheme.error,
+                    )
+                },
+                onClick = {
+                    showConfirmDeletePopup = true
+                }
+            )
+
+            if (showConfirmDeletePopup) {
+                ConfirmationPopup(
+                    icon = Icons.Default.Delete,
+                    message = stringResource(Res.string.delete_photo_confirmation),
+                    confirmButton = stringResource(Res.string.delete),
+                    onConfirm = { onDelete(photo) },
+                    onDismiss = { showConfirmDeletePopup = false }
+                )
             }
         }
     }

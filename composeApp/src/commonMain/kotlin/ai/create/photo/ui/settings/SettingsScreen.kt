@@ -189,6 +189,7 @@ fun SettingsItems(
                             Text(
                                 text = when (item) {
                                     is SettingsUiState.LoginItem -> email
+                                        ?.takeIf { it.isNotBlank() }
                                         ?: stringResource(item.nameRes)
 
                                     is SettingsUiState.BalanceItem ->
