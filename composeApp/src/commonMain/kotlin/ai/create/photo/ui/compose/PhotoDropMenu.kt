@@ -1,5 +1,7 @@
 package ai.create.photo.ui.compose
 
+import ai.create.photo.platform.Platforms
+import ai.create.photo.platform.platform
 import ai.create.photo.ui.gallery.creations.CreationsUiState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -8,25 +10,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import photocreateai.composeapp.generated.resources.*
-import photocreateai.composeapp.generated.resources.Res
-import photocreateai.composeapp.generated.resources.delete
-import photocreateai.composeapp.generated.resources.delete_photo_confirmation
-import photocreateai.composeapp.generated.resources.make_private
-import photocreateai.composeapp.generated.resources.make_public
-import photocreateai.composeapp.generated.resources.share
 
 @Composable
 fun <Item> PhotoDropMenu(
@@ -36,9 +28,21 @@ fun <Item> PhotoDropMenu(
     onDelete: (Item) -> Unit,
     onShare: (Item) -> Unit,
     onTogglePublic: (Item) -> Unit,
+    snackbarHostState: SnackbarHostState
 ) {
     var expanded by remember { mutableStateOf(false) }
     var showConfirmDeletePopup by remember { mutableStateOf(false) }
+    var isDownloaded by remember { mutableStateOf(false) }
+
+    val (shareIcon, shareText) = when(platform().platform) {
+        Platforms.ANDROID -> Icons.Default.Share to stringResource(Res.string.share)
+        Platforms.IOS -> Icons.Default.Share to stringResource(Res.string.share)
+        Platforms.DESKTOP -> Icons.Default.Link to stringResource(Res.string.copy_link)
+        Platforms.WEB_DESKTOP -> Icons.Default.Link to stringResource(Res.string.copy_link)
+        Platforms.WEB_MOBILE -> Icons.Default.Link to stringResource(Res.string.copy_link)
+    }
+
+    val coroutineScope = rememberCoroutineScope()
 
     Box(
         modifier = modifier
@@ -58,26 +62,34 @@ fun <Item> PhotoDropMenu(
             DropdownMenuItem(
                 text = { Text(text = stringResource(Res.string.download)) },
                 leadingIcon = {
-                    Icon(
-                        Icons.Default.Download,
-                        contentDescription = Icons.Default.Download.name
-                    )
+                    if (!isDownloaded) {
+                        Icon(
+                            Icons.Default.Download,
+                            contentDescription = Icons.Default.Download.name
+                        )
+                    } else {
+                        Icon(
+                            Icons.Default.DownloadDone,
+                            contentDescription = Icons.Default.DownloadDone.name
+                        )
+                    }
                 },
                 onClick = {
                     expanded = false
+                    isDownloaded = true
                     onDownload(item)
                 }
             )
 
             DropdownMenuItem(
-                text = { Text(text = stringResource(Res.string.share)) },
-                leadingIcon = {
-                    Icon(
-                        Icons.Default.Share,
-                        contentDescription = Icons.Default.Share.name
-                    )
-                },
+                text = { Text(text = shareText) },
+                leadingIcon = { Icon(shareIcon, contentDescription = shareIcon.name) },
                 onClick = {
+                    if (platform().platform == Platforms.DESKTOP) {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar("Link was copied")
+                        }
+                    }
                     expanded = false
                     onShare.invoke(item)
                 }

@@ -112,7 +112,7 @@ object UserGenerationsRepository {
             .also { Logger.i("deleteGeneratedPhotoId: $photoId") }
     }
 
-    suspend fun downloadGeneratedPhoto(id: String, photoUrl: String) {
+    suspend fun downloadGeneratedPhoto(id: String, photoUrl: String){
         Logger.i("downloadGeneratedPhoto - $photoUrl")
         try {
             val bytes = HttpClient().get(photoUrl).readRawBytes()

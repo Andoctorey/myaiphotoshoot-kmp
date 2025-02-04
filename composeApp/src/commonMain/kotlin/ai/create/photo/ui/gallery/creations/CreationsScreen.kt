@@ -1,25 +1,19 @@
 package ai.create.photo.ui.gallery.creations
 
+import GeneratedPhotoSharing
 import ai.create.photo.data.supabase.model.UserGeneration
+import ai.create.photo.platform.Platforms
+import ai.create.photo.platform.platform
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.compose.PhotoDropMenu
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsTopHeight
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -218,15 +212,29 @@ private fun Photo(
             },
         )
 
+        val snackbarHostState = remember { SnackbarHostState() }
+
         PhotoDropMenu(
             modifier = modifier.align(Alignment.TopEnd),
             item = photo,
-            onDelete = {
-                onDelete(photo)
+            onDelete = onDelete,
+            onShare = {
+                GeneratedPhotoSharing().sharePhoto(photo.url)
             },
-            onShare = { },
             onTogglePublic = onTogglePublic,
-            onDownload = onDownload
+            onDownload = onDownload,
+            snackbarHostState = snackbarHostState
         )
+        if (platform().platform != Platforms.ANDROID || platform().platform != Platforms.IOS) {
+            Box(contentAlignment = Alignment.BottomCenter) {
+                SnackbarHost(hostState = snackbarHostState) {
+                    Snackbar(
+                        snackbarData = it,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
+        }
     }
 }
