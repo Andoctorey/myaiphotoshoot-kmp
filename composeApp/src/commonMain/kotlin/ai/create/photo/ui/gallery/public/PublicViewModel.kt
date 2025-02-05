@@ -2,7 +2,7 @@ package ai.create.photo.ui.gallery.public
 
 import ai.create.photo.data.supabase.database.UserGenerationsRepository
 import ai.create.photo.data.supabase.model.UserGeneration
-import ai.create.photo.ui.auth.SessionViewModel
+import ai.create.photo.ui.auth.AuthViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,14 +12,10 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 
-class PublicViewModel : SessionViewModel() {
+class PublicViewModel : AuthViewModel() {
 
     var uiState by mutableStateOf(PublicUiState())
         private set
-
-    init {
-        loadSession()
-    }
 
     override fun onAuthInitializing() {
         uiState = uiState.copy(isLoading = true)

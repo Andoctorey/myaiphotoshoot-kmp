@@ -9,20 +9,28 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.RefreshFailureCause
 import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 
-abstract class SessionViewModel : ViewModel() {
+abstract class AuthViewModel : ViewModel() {
 
     val auth = supabase.auth
-
     var user: User? = null
 
+    init {
+        loadSession()
+    }
+
     fun loadSession() = viewModelScope.launch {
-        Logger.i("loadSession from ${this@SessionViewModel}")
+        // to init extended classes variables
+        delay(1)
+        Logger.i("loadSession from ${this@AuthViewModel::class.simpleName}")
         try {
             auth.sessionStatus.collect {
-                Logger.i("Auth status: $it")
+                if (it !is SessionStatus.Authenticated) {
+                    Logger.i("Auth status: $it")
+                }
                 when (it) {
                     is SessionStatus.Authenticated -> {
                         val supabaseUser = it.session.user
@@ -58,8 +66,8 @@ abstract class SessionViewModel : ViewModel() {
             email = supabaseUser.email,
             balance = 0f,
         )
-        Logger.i("user: $user")
-        this@SessionViewModel.user = user
+        Logger.i("$user")
+        this@AuthViewModel.user = user
     }
 
     abstract fun onAuthInitializing()

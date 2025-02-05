@@ -8,7 +8,7 @@ import ai.create.photo.data.supabase.database.UserFilesRepository
 import ai.create.photo.data.supabase.database.UserTrainingsRepository
 import ai.create.photo.data.supabase.model.AnalysisStatus
 import ai.create.photo.data.supabase.model.TrainingStatus
-import ai.create.photo.ui.auth.SessionViewModel
+import ai.create.photo.ui.auth.AuthViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlin.math.max
 
-class UploadViewModel : SessionViewModel() {
+class UploadViewModel : AuthViewModel() {
 
     private val uploadPhotoUseCase = UploadPhotoUseCase(
         storage = SupabaseStorage,
@@ -36,10 +36,6 @@ class UploadViewModel : SessionViewModel() {
 
     var uiState by mutableStateOf(UploadUiState())
         private set
-
-    init {
-        loadSession()
-    }
 
     override fun onAuthInitializing() {
         uiState = uiState.copy(isLoadingPhotos = true)

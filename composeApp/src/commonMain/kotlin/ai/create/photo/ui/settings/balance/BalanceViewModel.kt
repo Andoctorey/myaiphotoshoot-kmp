@@ -1,19 +1,14 @@
 package ai.create.photo.ui.settings.balance
 
-import ai.create.photo.ui.auth.SessionViewModel
+import ai.create.photo.ui.auth.AuthViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import co.touchlab.kermit.Logger
 
-class BalanceViewModel : SessionViewModel() {
+class BalanceViewModel : AuthViewModel() {
 
     var uiState by mutableStateOf(BalanceUiState())
         private set
-
-    init {
-        loadSession()
-    }
 
     override fun onAuthInitializing() {
         uiState = uiState.copy(isLoading = true)
@@ -26,9 +21,5 @@ class BalanceViewModel : SessionViewModel() {
 
     override fun onAuthError(error: Throwable) {
         uiState = uiState.copy(loadingError = error)
-    }
-
-    private fun loadUser() {
-        Logger.i("loadUser")
     }
 }

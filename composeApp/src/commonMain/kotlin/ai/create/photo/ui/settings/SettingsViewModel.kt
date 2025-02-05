@@ -1,19 +1,15 @@
 package ai.create.photo.ui.settings
 
-import ai.create.photo.ui.auth.SessionViewModel
+import ai.create.photo.ui.auth.AuthViewModel
 import ai.create.photo.ui.settings.SettingsUiState.Item
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
-class SettingsViewModel : SessionViewModel() {
+class SettingsViewModel : AuthViewModel() {
 
     var uiState by mutableStateOf(SettingsUiState())
         private set
-
-    init {
-        loadSession()
-    }
 
     override fun onAuthInitializing() {
         uiState = uiState.copy(isLoading = true)

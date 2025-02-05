@@ -4,7 +4,7 @@ import ai.create.photo.data.supabase.SupabaseFunction
 import ai.create.photo.data.supabase.SupabaseStorage
 import ai.create.photo.data.supabase.database.UserTrainingsRepository
 import ai.create.photo.platform.resizeToWidth
-import ai.create.photo.ui.auth.SessionViewModel
+import ai.create.photo.ui.auth.AuthViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -15,14 +15,10 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 
-class GenerateViewModel : SessionViewModel() {
+class GenerateViewModel : AuthViewModel() {
 
     var uiState by mutableStateOf(GenerateUiState())
         private set
-
-    init {
-        loadSession()
-    }
 
     override fun onAuthInitializing() {
         uiState = uiState.copy(isLoading = true)
