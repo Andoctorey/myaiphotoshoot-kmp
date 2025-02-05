@@ -38,6 +38,7 @@ class CreationsViewModel : AuthViewModel() {
     fun refreshCreations(silent: Boolean = false) = viewModelScope.launch {
         val userId = user?.id ?: return@launch
         if (uiState.isRefreshing) return@launch
+        if (uiState.isLoadingNextPage && uiState.photos.isEmpty()) return@launch
         // user can generate 10 photos at once and last generate appears first
         val latestCreatedAt = uiState.photos.getOrNull(10)?.createdAt
         Logger.i("refreshCreations, silent=$silent")
