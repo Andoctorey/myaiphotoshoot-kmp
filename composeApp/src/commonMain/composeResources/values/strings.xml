@@ -58,4 +58,6 @@
     <string name="gallery_uploads_tab">Uploads</string>
     <string name="make_public">Make Public</string>
     <string name="make_private">Make Private</string>
+    <string name="enter_promo_code">Enter Promo Code</string>
+    <string name="apply">Apply</string>
 </resources>

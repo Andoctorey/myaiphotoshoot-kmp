@@ -22,4 +22,8 @@ class BalanceViewModel : AuthViewModel() {
     override fun onAuthError(error: Throwable) {
         uiState = uiState.copy(loadingError = error)
     }
+
+    fun onPromoCodeChanged(promoCode: String) {
+        uiState = uiState.copy(promoCode = promoCode)
+    }
 }
