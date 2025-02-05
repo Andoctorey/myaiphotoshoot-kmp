@@ -1,6 +1,7 @@
 package ai.create.photo.ui.settings.balance
 
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
+import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -66,8 +67,14 @@ fun BalanceScreen(
                 )
                 ApplyPromoCodeButton(
                     isLoading = state.isApplyingPromoCode,
-                    onClick = { /* TODO */ }
+                    onClick = viewModel::applyPromoCode
                 )
+            }
+        }
+
+        if (state.errorPopup != null) {
+            ErrorPopup(state.errorPopup) {
+                viewModel.hideErrorPopup()
             }
         }
     }
