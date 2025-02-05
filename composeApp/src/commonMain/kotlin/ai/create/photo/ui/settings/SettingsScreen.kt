@@ -4,6 +4,7 @@ import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.settings.SettingsUiState.Item
+import ai.create.photo.ui.settings.balance.BalanceScreen
 import ai.create.photo.ui.settings.login.LoginScreen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -245,7 +246,7 @@ fun SettingsDetails(
             ) {
                 when (item) {
                     is SettingsUiState.LoginItem -> LoginScreen()
-                    is SettingsUiState.BalanceItem -> TODO()
+                    is SettingsUiState.BalanceItem -> BalanceScreen()
                     is SettingsUiState.PlaceholderItem -> {
                         Text(
                             text = "TODO: ${stringResource(item.nameRes)}",
