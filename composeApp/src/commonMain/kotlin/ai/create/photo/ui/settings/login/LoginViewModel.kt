@@ -12,7 +12,6 @@ import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.exception.AuthRestException
-import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
@@ -31,21 +30,12 @@ class LoginViewModel : SessionViewModel() {
     }
 
     override fun onAuthenticated(userChanged: Boolean) {
-        uiState = uiState.copy(isLoading = false)
+        uiState = uiState.copy(isLoading = false, email = user?.email)
         loadUser()
     }
 
     override fun onAuthError(error: Throwable) {
         uiState = uiState.copy(loadingError = error)
-    }
-
-    private fun loadUser() {
-        Logger.i("loadUser")
-        val sessionStatus = supabase.auth.sessionStatus.value
-        if (sessionStatus !is SessionStatus.Authenticated) return
-        val user = sessionStatus.session.user
-        val email = user?.email?.takeIf { user.confirmedAt != null }
-        uiState = uiState.copy(email = email)
     }
 
     fun hideErrorPopup() {
@@ -90,8 +80,8 @@ class LoginViewModel : SessionViewModel() {
 
         try {
             SupabaseAuth.verifyEmailOtp(uiState.emailToVerify, uiState.otp)
-            uiState = uiState.copy(isVerifyingOtp = false)
             loadUser()
+            uiState = uiState.copy(isVerifyingOtp = false, email = user?.email)
         } catch (e: Exception) {
             currentCoroutineContext().ensureActive()
             if (e is AuthRestException) {

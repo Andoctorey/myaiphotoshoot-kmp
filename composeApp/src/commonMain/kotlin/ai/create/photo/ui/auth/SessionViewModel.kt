@@ -1,6 +1,6 @@
 package ai.create.photo.ui.auth
 
-import ai.create.photo.data.supabase.Supabase
+import ai.create.photo.data.supabase.Supabase.supabase
 import ai.create.photo.data.supabase.SupabaseAuth
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 abstract class SessionViewModel : ViewModel() {
 
-    val auth = Supabase.supabase.auth
+    val auth = supabase.auth
 
     var user: User? = null
 
@@ -27,13 +27,7 @@ abstract class SessionViewModel : ViewModel() {
                     is SessionStatus.Authenticated -> {
                         val supabaseUser = it.session.user
                         val emailChanged = user?.id != supabaseUser?.id
-                        val user = User(
-                            id = supabaseUser?.id ?: throw IllegalStateException("User id is null"),
-                            email = supabaseUser.email,
-                            balance = 0f,
-                        )
-                        Logger.i("user: $user")
-                        this@SessionViewModel.user = user
+                        loadUser()
                         onAuthenticated(emailChanged)
                     }
 
@@ -55,6 +49,18 @@ abstract class SessionViewModel : ViewModel() {
         }
     }
 
+    fun loadUser() {
+        val sessionStatus = supabase.auth.sessionStatus.value
+        if (sessionStatus !is SessionStatus.Authenticated) return
+        val supabaseUser = sessionStatus.session.user
+        val user = User(
+            id = supabaseUser?.id ?: throw IllegalStateException("User id is null"),
+            email = supabaseUser.email,
+            balance = 0f,
+        )
+        Logger.i("user: $user")
+        this@SessionViewModel.user = user
+    }
 
     abstract fun onAuthInitializing()
 
