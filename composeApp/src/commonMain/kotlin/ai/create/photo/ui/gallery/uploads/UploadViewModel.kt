@@ -19,6 +19,7 @@ import io.github.vinceglb.filekit.core.PlatformFiles
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.catch
@@ -74,6 +75,7 @@ class UploadViewModel : SessionViewModel() {
             )
             loadTraining()
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Logger.e("loadPhotos failed", e)
             uiState = uiState.copy(isLoadingPhotos = false, loadingError = e)
         }
@@ -123,6 +125,7 @@ class UploadViewModel : SessionViewModel() {
             SupabaseStorage.deleteFile("${user?.id}/$UPLOADS/${photo.name}")
             UserFilesRepository.deleteFile(photo.id)
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Logger.e("deletePhoto failed, $photo", e)
             uiState = uiState.copy(photos = photos, errorPopup = e)
         }
@@ -152,6 +155,7 @@ class UploadViewModel : SessionViewModel() {
             uiState = uiState.copy(analyzingPhotos = false)
             loadPhotos()
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Logger.e("analyzePhotos failed", e)
             uiState = uiState.copy(analyzingPhotos = false, errorPopup = e)
         }
@@ -169,6 +173,7 @@ class UploadViewModel : SessionViewModel() {
             SupabaseStorage.deleteFiles(badPhotos.map { "${user?.id}/$UPLOADS/${it.name}" })
             loadPhotos()
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Logger.e("Delete unsuitable photos failed", e)
             uiState = uiState.copy(errorPopup = e, photos = photos)
         }
@@ -193,6 +198,7 @@ class UploadViewModel : SessionViewModel() {
             SupabaseFunction.trainAiModel(steps)
             loadTraining()
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Logger.e("trainAiModel failed", e)
             uiState = uiState.copy(trainingStatus = null, errorPopup = e)
         }
@@ -226,6 +232,7 @@ class UploadViewModel : SessionViewModel() {
                 loadingError = null,
             )
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Logger.e("loadTraining failed", e)
             uiState = uiState.copy(isLoadingTraining = false, errorPopup = e)
         }

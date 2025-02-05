@@ -9,6 +9,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 
 class CreationsViewModel : SessionViewModel() {
@@ -57,6 +59,7 @@ class CreationsViewModel : SessionViewModel() {
                 loadingError = null,
             )
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Logger.e("refreshCreations failed", e)
             uiState = uiState.copy(isRefreshing = false, errorPopup = e)
         }
@@ -82,6 +85,7 @@ class CreationsViewModel : SessionViewModel() {
                 pagingLimitReach = newPhotos.isEmpty(),
             )
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Logger.e("loadCreations failed", e)
             uiState = uiState.copy(isLoadingNextPage = false, loadingError = e)
         }
@@ -102,6 +106,7 @@ class CreationsViewModel : SessionViewModel() {
                 UserGenerationsRepository.deleteGeneratedPhoto(photo.id)
             }
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Logger.e("deleteGeneratedPhoto failed, $photo", e)
             uiState = uiState.copy(photos = photos, errorPopup = e)
         }
@@ -123,6 +128,7 @@ class CreationsViewModel : SessionViewModel() {
             UserGenerationsRepository.setPublic(photo.id, public)
             onSuccess()
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Logger.e("makePublic failed, $photo", e)
             uiState = uiState.copy(photos = photos, errorPopup = e)
         }
@@ -133,6 +139,7 @@ class CreationsViewModel : SessionViewModel() {
         try {
             UserGenerationsRepository.downloadGeneratedPhoto(photo.id, photo.url)
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Logger.e("downloadGeneratedPhoto failed", e)
         }
     }

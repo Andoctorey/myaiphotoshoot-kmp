@@ -8,6 +8,8 @@ import co.touchlab.kermit.Logger
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.RefreshFailureCause
 import io.github.jan.supabase.auth.status.SessionStatus
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 
 abstract class SessionViewModel : ViewModel() {
@@ -47,6 +49,7 @@ abstract class SessionViewModel : ViewModel() {
                 }
             }
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Logger.e("Sign in failed", e)
             onAuthError(e)
         }

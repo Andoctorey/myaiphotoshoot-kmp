@@ -11,6 +11,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import io.github.vinceglb.filekit.core.PlatformFile
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 
 class GenerateViewModel : SessionViewModel() {
@@ -56,6 +58,7 @@ class GenerateViewModel : SessionViewModel() {
 
             uiState.training?.let { selectTraining(it) }
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Logger.e("Load training failed", e)
             uiState = uiState.copy(isLoading = false, loadingError = e)
         }
@@ -97,6 +100,7 @@ class GenerateViewModel : SessionViewModel() {
                 uiState = uiState.copy(originalPersonDescription = newDescription)
                 onGenerate(trainingId, uiState.userPrompt, uiState.photosToGenerateX100 / 100)
             } catch (e: Exception) {
+                currentCoroutineContext().ensureActive()
                 Logger.e("Update description failed", e)
                 uiState = uiState.copy(errorPopup = e)
             }
@@ -117,6 +121,7 @@ class GenerateViewModel : SessionViewModel() {
                 )
 
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Logger.e("onRefreshAiVisionPrompt failed", e)
             uiState = uiState.copy(isLoadingPersonDescription = false, errorPopup = e)
         }
@@ -132,6 +137,7 @@ class GenerateViewModel : SessionViewModel() {
                 isLoadingSurpriseMe = false
             )
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Logger.e("surpriseMe failed", e)
             uiState = uiState.copy(isLoadingSurpriseMe = false, errorPopup = e)
         }
@@ -164,6 +170,7 @@ class GenerateViewModel : SessionViewModel() {
             uiState =
                 uiState.copy(userPrompt = prompt, isEnhancingPrompt = false)
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Logger.e("surpriseMe failed", e)
             uiState = uiState.copy(isEnhancingPrompt = false, errorPopup = e)
         }
@@ -184,6 +191,7 @@ class GenerateViewModel : SessionViewModel() {
             val prompt = SupabaseFunction.pictureToPrompt(url)
             uiState = uiState.copy(userPrompt = prompt, isLoadingPictureToPrompt = false)
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Logger.e("pictureToPrompt failed", e)
             uiState = uiState.copy(isLoadingPictureToPrompt = false, errorPopup = e)
         }

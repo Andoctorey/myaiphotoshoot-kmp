@@ -8,6 +8,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 
 class PublicViewModel : SessionViewModel() {
@@ -54,6 +56,7 @@ class PublicViewModel : SessionViewModel() {
                 loadingError = null,
             )
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Logger.e("refreshPublicGallery failed", e)
             uiState = uiState.copy(isRefreshing = false, errorPopup = e)
         }
@@ -76,6 +79,7 @@ class PublicViewModel : SessionViewModel() {
                 pagingLimitReach = newPhotos.isEmpty(),
             )
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Logger.e("loadPublicGallery failed", e)
             uiState = uiState.copy(isLoadingNextPage = false, loadingError = e)
         }

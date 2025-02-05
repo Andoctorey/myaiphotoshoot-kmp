@@ -115,13 +115,8 @@ object UserGenerationsRepository {
     }
 
     suspend fun downloadGeneratedPhoto(id: String, photoUrl: String) {
-        Logger.i("downloadGeneratedPhoto - $photoUrl")
-        try {
-            val bytes = HttpClient().get(photoUrl).readRawBytes()
-            FileKit.saveFile(bytes = bytes, baseName = id, extension = "jpg")
-        } catch (e: Exception) {
-            Logger.e("downloadGeneratedPhoto failed", e)
-        }
+        val bytes = HttpClient().get(photoUrl).readRawBytes()
+        FileKit.saveFile(bytes = bytes, baseName = id, extension = "jpg")
     }
 
     suspend fun setPublic(photoId: String, public: Boolean) {

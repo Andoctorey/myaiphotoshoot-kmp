@@ -13,6 +13,8 @@ import co.touchlab.kermit.Logger
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.status.SessionStatus
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 
 class LoginViewModel : SessionViewModel() {
@@ -72,6 +74,7 @@ class LoginViewModel : SessionViewModel() {
             SupabaseAuth.signInWithEmailOtp(uiState.emailToVerify)
             uiState = uiState.copy(isSendingOtp = false, enterOtp = true)
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Logger.e("sendOtp failed", e)
             uiState = uiState.copy(isSendingOtp = false, errorPopup = e)
         }
@@ -90,6 +93,7 @@ class LoginViewModel : SessionViewModel() {
             uiState = uiState.copy(isVerifyingOtp = false)
             loadUser()
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             if (e is AuthRestException) {
                 uiState = uiState.copy(isIncorrectOtp = true, isVerifyingOtp = false)
                 return@launch
@@ -129,6 +133,7 @@ class LoginViewModel : SessionViewModel() {
             logout()
             uiState = uiState.copy(dataDeletedPopup = true)
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Logger.e("deleteAllData failed", e)
             uiState = uiState.copy(isLoading = false, errorPopup = e)
         }

@@ -7,6 +7,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
@@ -25,6 +27,7 @@ class MainViewModel : ViewModel() {
                     try {
                         SupabaseFunction.generatePhoto(trainingId, prompt)
                     } catch (e: Exception) {
+                        currentCoroutineContext().ensureActive()
                         Logger.e("Generate photo failed", e)
                         uiState = uiState.copy(errorPopup = e)
                     } finally {
@@ -34,6 +37,7 @@ class MainViewModel : ViewModel() {
                 }
             }
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Logger.e("Generate photo failed", e)
             uiState = uiState.copy(
                 generationsInProgress = uiState.generationsInProgress - 1,
