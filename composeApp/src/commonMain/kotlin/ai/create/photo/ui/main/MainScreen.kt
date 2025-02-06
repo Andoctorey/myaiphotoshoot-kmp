@@ -1,5 +1,6 @@
 package ai.create.photo.ui.main
 
+import ai.create.photo.platform.BackHandler
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.gallery.GalleryScreen
 import ai.create.photo.ui.generate.GenerateScreen
@@ -36,6 +37,7 @@ import org.jetbrains.compose.resources.stringResource
 fun MainScreen(
     viewModel: MainViewModel = viewModel { MainViewModel() },
     navController: NavHostController = rememberNavController(),
+    onExitApp: () -> Unit = {}
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     AppNavigationRoutes.valueOf(
@@ -44,6 +46,15 @@ fun MainScreen(
 
     val state = viewModel.uiState
     var currentDestination by rememberSaveable { mutableStateOf(AppNavigationRoutes.TAB_1_GALLERY) }
+
+    BackHandler {
+        if (currentDestination != AppNavigationRoutes.TAB_1_GALLERY) {
+            currentDestination = AppNavigationRoutes.TAB_1_GALLERY
+        } else {
+            onExitApp()
+        }
+    }
+
     LaunchedEffect(currentDestination) {
         Logger.i("change tab: ${currentDestination.name}")
     }
