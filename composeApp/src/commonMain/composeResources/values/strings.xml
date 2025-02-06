@@ -61,4 +61,8 @@
     <string name="make_private">Make Private</string>
     <string name="enter_promo_code">Enter Promo Code</string>
     <string name="apply">Apply</string>
+    <string name="lowest_market_price">No hidden fees. No unfair subscriptions. Enjoy the best quality at the lowest market price.</string>
+    <string name="one_time_ai_training">One-Time AI Training</string>
+    <string name="powered_by_flux">Powered by Flux.1 — the industry’s best fine-tuning model.</string>
+    <string name="photo_creation">Photo Creation</string>
 </resources>
