@@ -1,5 +1,6 @@
 package ai.create.photo.ui.settings.pricing
 
+import ai.create.photo.platform.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,8 +33,14 @@ import photocreateai.composeapp.generated.resources.powered_by_flux
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PricingScreen(
-    viewModel: PricingViewModel = viewModel { PricingViewModel() }
+    viewModel: PricingViewModel = viewModel { PricingViewModel() },
+    onBackClick: () -> Unit,
 ) {
+
+    BackHandler {
+        onBackClick()
+    }
+
     val state = viewModel.uiState
     Column(
         modifier = Modifier

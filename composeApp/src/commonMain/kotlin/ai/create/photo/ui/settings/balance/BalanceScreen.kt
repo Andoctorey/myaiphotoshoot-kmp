@@ -1,5 +1,6 @@
 package ai.create.photo.ui.settings.balance
 
+import ai.create.photo.platform.BackHandler
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
@@ -39,7 +40,13 @@ import photocreateai.composeapp.generated.resources.wrong_code
 @Composable
 fun BalanceScreen(
     viewModel: BalanceViewModel = viewModel { BalanceViewModel() },
+    onBackClick: () -> Unit,
 ) {
+
+    BackHandler {
+        onBackClick()
+    }
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,

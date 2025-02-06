@@ -222,7 +222,7 @@ fun SettingsItems(
 fun SettingsDetails(
     expanded: Boolean,
     item: SettingsUiState.DetailedItem,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -252,9 +252,9 @@ fun SettingsDetails(
                     .padding(24.dp),
             ) {
                 when (item) {
-                    is SettingsUiState.LoginItem -> LoginScreen()
-                    is SettingsUiState.BalanceItem -> BalanceScreen()
-                    is SettingsUiState.PricingItem -> PricingScreen()
+                    is SettingsUiState.LoginItem -> LoginScreen(onBackClick = onBackClick)
+                    is SettingsUiState.BalanceItem -> BalanceScreen(onBackClick = onBackClick)
+                    is SettingsUiState.PricingItem -> PricingScreen(onBackClick = onBackClick)
                     is SettingsUiState.ContactItem -> {}
                 }
             }

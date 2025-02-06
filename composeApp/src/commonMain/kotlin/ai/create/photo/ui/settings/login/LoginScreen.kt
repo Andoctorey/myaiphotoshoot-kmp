@@ -1,5 +1,6 @@
 package ai.create.photo.ui.settings.login
 
+import ai.create.photo.platform.BackHandler
 import ai.create.photo.ui.compose.ConfirmationPopup
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
@@ -59,7 +60,13 @@ import photocreateai.composeapp.generated.resources.wrong_code
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = viewModel { LoginViewModel() },
+    onBackClick: () -> Unit,
 ) {
+
+    BackHandler {
+        onBackClick()
+    }
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
