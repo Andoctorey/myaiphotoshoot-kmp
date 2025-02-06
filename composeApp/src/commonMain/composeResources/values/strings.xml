@@ -24,6 +24,7 @@
     <string name="logout">Log Out</string>
     <string name="top_up">Top Up</string>
     <string name="pricing">Pricing</string>
+    <string name="contact">Contact</string>
     <string name="balance">Balance: $%1$s</string>
     <string name="privacy_policy">Privacy Policy</string>
     <string name="about">About</string>

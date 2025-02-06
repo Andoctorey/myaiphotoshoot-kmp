@@ -1,10 +1,13 @@
 package ai.create.photo.ui.settings
 
+import ai.create.photo.platform.openUrl
 import ai.create.photo.ui.auth.AuthViewModel
 import ai.create.photo.ui.settings.SettingsUiState.Item
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 
 class SettingsViewModel : AuthViewModel() {
 
@@ -33,5 +36,9 @@ class SettingsViewModel : AuthViewModel() {
 
     fun saveDestination(currentDestination: Item? = null) {
         uiState = uiState.copy(currentDestination = currentDestination)
+    }
+
+    fun contact() = viewModelScope.launch {
+        openUrl("https://x.com/andoctorey")
     }
 }
