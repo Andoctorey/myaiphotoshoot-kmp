@@ -6,6 +6,7 @@ import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.settings.SettingsUiState.Item
 import ai.create.photo.ui.settings.balance.BalanceScreen
 import ai.create.photo.ui.settings.login.LoginScreen
+import ai.create.photo.ui.settings.pricing.PricingScreen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -197,7 +198,11 @@ fun SettingsItems(
                                         stringResource(Res.string.balance, balance)
                                             .takeIf { balance != "0" }
                                             ?: stringResource(item.nameRes)
+
+                                    is SettingsUiState.PricingItem -> stringResource(item.nameRes)
+
                                     is SettingsUiState.PlaceholderItem -> stringResource(item.nameRes)
+
                                 },
                                 fontSize = 16.sp,
                             )
@@ -247,6 +252,7 @@ fun SettingsDetails(
                 when (item) {
                     is SettingsUiState.LoginItem -> LoginScreen()
                     is SettingsUiState.BalanceItem -> BalanceScreen()
+                    is SettingsUiState.PricingItem -> PricingScreen()
                     is SettingsUiState.PlaceholderItem -> {
                         Text(
                             text = "TODO: ${stringResource(item.nameRes)}",
