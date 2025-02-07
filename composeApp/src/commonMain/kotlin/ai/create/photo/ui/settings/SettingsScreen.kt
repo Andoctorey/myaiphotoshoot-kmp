@@ -59,6 +59,7 @@ import photocreateai.composeapp.generated.resources.balance
 fun SettingsScreen(
     viewModel: SettingsViewModel = viewModel { SettingsViewModel() },
     trainAiModel: () -> Unit,
+    openGenerateTab: () -> Unit,
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -83,6 +84,7 @@ fun SettingsScreen(
                     onSaveDestination = viewModel::saveDestination,
                     contact = viewModel::contact,
                     trainAiModel = trainAiModel,
+                    openGenerateTab = openGenerateTab,
                 )
             }
         }
@@ -105,6 +107,7 @@ private fun Screen(
     onSaveDestination: (Item?) -> Unit,
     contact: () -> Unit,
     trainAiModel: () -> Unit,
+    openGenerateTab: () -> Unit,
 ) {
     val navigator = rememberListDetailPaneScaffoldNavigator<Item>()
     var hasNavigated by remember { mutableStateOf(false) }
@@ -154,6 +157,7 @@ private fun Screen(
                             SettingsDetails(
                                 expanded = navigator.scaffoldValue.secondary == PaneAdaptedValue.Expanded,
                                 item = it,
+                                openGenerateTab = openGenerateTab,
                                 trainAiModel = trainAiModel,
                             ) {
                                 onSaveDestination(null)
@@ -227,6 +231,7 @@ fun SettingsDetails(
     expanded: Boolean,
     item: SettingsUiState.DetailedItem,
     trainAiModel: () -> Unit,
+    openGenerateTab: () -> Unit,
     onBackClick: () -> Unit,
 ) {
     Scaffold(
@@ -262,6 +267,7 @@ fun SettingsDetails(
                     is SettingsUiState.PricingItem -> PricingScreen(
                         onBackClick = onBackClick,
                         trainAiModel = trainAiModel,
+                        openGenerateTab = openGenerateTab,
                     )
 
                     is SettingsUiState.ContactItem -> {}

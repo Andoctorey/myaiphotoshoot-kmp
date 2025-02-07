@@ -130,6 +130,9 @@ fun MainScreen(
 
             AppNavigationRoutes.TAB_3_SETTINGS -> SettingsScreen(
                 trainAiModel = trainAiModel,
+                openGenerateTab = {
+                    currentDestination = AppNavigationRoutes.TAB_2_GENERATE
+                }
             )
         }
     }

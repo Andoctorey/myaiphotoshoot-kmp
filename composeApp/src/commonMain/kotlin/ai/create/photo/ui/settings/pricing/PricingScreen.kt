@@ -37,6 +37,7 @@ fun PricingScreen(
     viewModel: PricingViewModel = viewModel { PricingViewModel() },
     onBackClick: () -> Unit,
     trainAiModel: () -> Unit,
+    openGenerateTab: () -> Unit,
 ) {
 
     BackHandler {
@@ -82,7 +83,7 @@ fun PricingScreen(
         }
 
         OutlinedCard {
-            Column(modifier = Modifier.clickable { trainAiModel() }.padding(16.dp)) {
+            Column(modifier = Modifier.clickable { openGenerateTab() }.padding(16.dp)) {
                 Row {
                     Text(
                         modifier = Modifier.weight(1f),
