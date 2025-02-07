@@ -100,6 +100,11 @@ fun MainScreen(
         }
     ) {
 
+        val trainAiModel = {
+            currentDestination = AppNavigationRoutes.TAB_1_GALLERY
+            viewModel.toggleOpenUploads(true)
+        }
+
         when (currentDestination) {
             AppNavigationRoutes.TAB_1_GALLERY -> GalleryScreen(
                 generationsInProgress = state.generationsInProgress,
@@ -114,10 +119,7 @@ fun MainScreen(
 
             AppNavigationRoutes.TAB_2_GENERATE -> {
                 GenerateScreen(
-                    trainAiModel = {
-                        currentDestination = AppNavigationRoutes.TAB_1_GALLERY
-                        viewModel.toggleOpenUploads(true)
-                    },
+                    trainAiModel = trainAiModel,
                     onGenerate = { trainingId, prompt, photosToGenerate ->
                         viewModel.generatePhoto(trainingId, prompt, photosToGenerate)
                     },
@@ -126,7 +128,9 @@ fun MainScreen(
             }
 
 
-            AppNavigationRoutes.TAB_3_SETTINGS -> SettingsScreen()
+            AppNavigationRoutes.TAB_3_SETTINGS -> SettingsScreen(
+                trainAiModel = trainAiModel,
+            )
         }
     }
 

@@ -2,6 +2,7 @@ package ai.create.photo.ui.settings.pricing
 
 import ai.create.photo.platform.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -35,6 +36,7 @@ import photocreateai.composeapp.generated.resources.powered_by_flux
 fun PricingScreen(
     viewModel: PricingViewModel = viewModel { PricingViewModel() },
     onBackClick: () -> Unit,
+    trainAiModel: () -> Unit,
 ) {
 
     BackHandler {
@@ -52,7 +54,7 @@ fun PricingScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
     ) {
         OutlinedCard {
-            Column(modifier = Modifier.padding(15.dp)) {
+            Column(modifier = Modifier.clickable { trainAiModel() }.padding(16.dp)) {
                 Row {
                     Text(
                         modifier = Modifier.weight(1f),
@@ -80,7 +82,7 @@ fun PricingScreen(
         }
 
         OutlinedCard {
-            Column(modifier = Modifier.padding(15.dp)) {
+            Column(modifier = Modifier.clickable { trainAiModel() }.padding(16.dp)) {
                 Row {
                     Text(
                         modifier = Modifier.weight(1f),

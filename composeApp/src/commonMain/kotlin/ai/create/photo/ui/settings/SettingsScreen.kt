@@ -58,6 +58,7 @@ import photocreateai.composeapp.generated.resources.balance
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel = viewModel { SettingsViewModel() },
+    trainAiModel: () -> Unit,
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -81,6 +82,7 @@ fun SettingsScreen(
                     savedDestination = state.currentDestination,
                     onSaveDestination = viewModel::saveDestination,
                     contact = viewModel::contact,
+                    trainAiModel = trainAiModel,
                 )
             }
         }
@@ -102,6 +104,7 @@ private fun Screen(
     savedDestination: Item?,
     onSaveDestination: (Item?) -> Unit,
     contact: () -> Unit,
+    trainAiModel: () -> Unit,
 ) {
     val navigator = rememberListDetailPaneScaffoldNavigator<Item>()
     var hasNavigated by remember { mutableStateOf(false) }
@@ -150,7 +153,8 @@ private fun Screen(
                         is SettingsUiState.DetailedItem -> {
                             SettingsDetails(
                                 expanded = navigator.scaffoldValue.secondary == PaneAdaptedValue.Expanded,
-                                item = it
+                                item = it,
+                                trainAiModel = trainAiModel,
                             ) {
                                 onSaveDestination(null)
                                 navigator.navigateBack()
@@ -222,6 +226,7 @@ fun SettingsItems(
 fun SettingsDetails(
     expanded: Boolean,
     item: SettingsUiState.DetailedItem,
+    trainAiModel: () -> Unit,
     onBackClick: () -> Unit,
 ) {
     Scaffold(
@@ -254,7 +259,11 @@ fun SettingsDetails(
                 when (item) {
                     is SettingsUiState.LoginItem -> LoginScreen(onBackClick = onBackClick)
                     is SettingsUiState.BalanceItem -> BalanceScreen(onBackClick = onBackClick)
-                    is SettingsUiState.PricingItem -> PricingScreen(onBackClick = onBackClick)
+                    is SettingsUiState.PricingItem -> PricingScreen(
+                        onBackClick = onBackClick,
+                        trainAiModel = trainAiModel,
+                    )
+
                     is SettingsUiState.ContactItem -> {}
                 }
             }
