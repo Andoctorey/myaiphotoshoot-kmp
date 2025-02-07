@@ -43,6 +43,7 @@ fun LoadingPlaceholder(modifier: Modifier = Modifier) {
 }
 
 @Composable
+// ai.create.photo.data.logger.SlackLogWriter.log
 fun Throwable.getFriendlyError() = when (this) {
     is HttpRequestException -> stringResource(Res.string.connection_error)
     is IOException -> stringResource(Res.string.connection_error)
