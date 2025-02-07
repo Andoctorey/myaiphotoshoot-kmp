@@ -1,7 +1,7 @@
 package ai.create.photo.ui.settings
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ContactSupport
+import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.Paid
@@ -46,5 +46,5 @@ data class SettingsUiState(
     class LoginItem() : DetailedItem(Res.string.account, Icons.Default.AccountCircle)
     class BalanceItem() : DetailedItem(Res.string.top_up, Icons.Default.CreditCard)
     class PricingItem() : DetailedItem(Res.string.pricing, Icons.Default.Paid)
-    class ContactItem() : DetailedItem(Res.string.contact, Icons.AutoMirrored.Filled.ContactSupport)
+    class ContactItem() : DetailedItem(Res.string.contact, Icons.AutoMirrored.Filled.Help)
 }
