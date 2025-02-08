@@ -67,4 +67,5 @@
     <string name="one_time_ai_training">One-Time AI Training</string>
     <string name="powered_by_flux">Powered by Flux.1 — the industry’s best fine-tuning model.</string>
     <string name="photo_creation">Photo Creation</string>
+    <string name="promo_code_applied">Promo code applied successfully! Your new balance: $%1$s.</string>
 </resources>

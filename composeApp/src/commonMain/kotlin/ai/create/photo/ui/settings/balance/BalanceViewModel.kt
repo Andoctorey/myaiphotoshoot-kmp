@@ -39,7 +39,15 @@ class BalanceViewModel : AuthViewModel() {
         uiState = uiState.copy(isApplyingPromoCode = true, isIncorrectPromoCode = false)
         try {
             val isApplied = SupabaseFunction.applyPromoCode(promoCode)
-            uiState = uiState.copy(isApplyingPromoCode = false, isIncorrectPromoCode = !isApplied)
+            if (isApplied) {
+                loadUser()
+            }
+            uiState = uiState.copy(
+                isApplyingPromoCode = false,
+                isIncorrectPromoCode = !isApplied,
+                showPromoCodeAppliedPopup = isApplied,
+                balance = user?.balance ?: 0f,
+            )
         } catch (e: Exception) {
             currentCoroutineContext().ensureActive()
             Logger.e("applyPromoCode failed", e)
@@ -49,5 +57,9 @@ class BalanceViewModel : AuthViewModel() {
 
     fun hideErrorPopup() {
         uiState = uiState.copy(errorPopup = null)
+    }
+
+    fun hidePromoCodeAppliedPopup() {
+        uiState = uiState.copy(showPromoCodeAppliedPopup = false)
     }
 }

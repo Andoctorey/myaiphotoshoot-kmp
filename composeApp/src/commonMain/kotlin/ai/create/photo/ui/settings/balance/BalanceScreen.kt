@@ -3,6 +3,7 @@ package ai.create.photo.ui.settings.balance
 import ai.create.photo.platform.BackHandler
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
+import ai.create.photo.ui.compose.InfoPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +36,7 @@ import org.jetbrains.compose.resources.stringResource
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.apply
 import photocreateai.composeapp.generated.resources.enter_promo_code
+import photocreateai.composeapp.generated.resources.promo_code_applied
 import photocreateai.composeapp.generated.resources.wrong_code
 
 @Composable
@@ -82,6 +84,13 @@ fun BalanceScreen(
         if (state.errorPopup != null) {
             ErrorPopup(state.errorPopup) {
                 viewModel.hideErrorPopup()
+            }
+        }
+
+        if (state.showPromoCodeAppliedPopup) {
+            InfoPopup(stringResource(Res.string.promo_code_applied, state.balance)) {
+                viewModel.hidePromoCodeAppliedPopup()
+                onBackClick()
             }
         }
     }
