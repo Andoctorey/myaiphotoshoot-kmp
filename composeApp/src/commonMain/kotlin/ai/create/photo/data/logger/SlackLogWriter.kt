@@ -3,6 +3,7 @@ package ai.create.photo.data.logger
 import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Severity
 import io.github.jan.supabase.exceptions.HttpRequestException
+import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.*
@@ -67,10 +68,12 @@ class SlackLogWriter : LogWriter(), Closeable {
         message: String,
         throwable: Throwable?
     ) {
+        // ai.create.photo.ui.compose.PlaceHoldersKt.getFriendlyError
         if (severity == Severity.Error) {
             if (throwable is HttpRequestException ||
                 throwable is IOException ||
-                throwable is UnresolvedAddressException
+                throwable is UnresolvedAddressException ||
+                throwable is UnauthorizedRestException
             ) {
                 return
             }

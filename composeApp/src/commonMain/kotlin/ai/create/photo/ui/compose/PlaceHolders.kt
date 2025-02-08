@@ -1,5 +1,6 @@
 package ai.create.photo.ui.compose
 
+import ai.create.photo.data.supabase.model.ErrorResponse
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -23,10 +24,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.HttpRequestException
+import io.github.jan.supabase.exceptions.RestException
 import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.io.IOException
+import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
@@ -48,7 +50,15 @@ fun Throwable.getFriendlyError() = when (this) {
     is HttpRequestException -> stringResource(Res.string.connection_error)
     is IOException -> stringResource(Res.string.connection_error)
     is UnresolvedAddressException -> stringResource(Res.string.connection_error)
-    is BadRequestRestException -> this.error.toString()
+    is RestException -> {
+        var message = this.error.toString()
+        try {
+            message = Json.decodeFromString<ErrorResponse>(message).error
+        } catch (_: Exception) {
+        }
+        message
+    }
+
     else -> this.message.toString()
 }
 
