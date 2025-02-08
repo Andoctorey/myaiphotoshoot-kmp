@@ -35,7 +35,7 @@ class BalanceViewModel : AuthViewModel() {
 
     fun applyPromoCode() = viewModelScope.launch {
         val userId = user?.id ?: return@launch
-        val promoCode = uiState.promoCode.takeIf { it.isNotEmpty() } ?: return@launch
+        val promoCode = uiState.promoCode.trim().takeIf { it.isNotEmpty() } ?: return@launch
         Logger.i("applyPromoCode: $promoCode")
         uiState = uiState.copy(isApplyingPromoCode = true, isIncorrectPromoCode = false)
         try {
