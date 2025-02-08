@@ -34,9 +34,11 @@ class SettingsViewModel : AuthViewModel() {
             isLoading = false,
             email = user?.email,
         )
-        viewModelScope.launch {
-            user?.id?.let { ProfilesRepository.get(it) }
-        }
+        loadProfile()
+    }
+
+    fun loadProfile() = viewModelScope.launch {
+        ProfilesRepository.reload(user?.id)
     }
 
     override fun onAuthError(error: Throwable) {

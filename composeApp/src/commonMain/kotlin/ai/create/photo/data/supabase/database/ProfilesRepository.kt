@@ -17,7 +17,8 @@ object ProfilesRepository {
     val profile: Profile?
         get() = profileFlow.value
 
-    suspend fun get(userId: String): Result<Profile?> = runCatching {
+    suspend fun reload(userId: String?): Result<Profile?> = runCatching {
+        if (userId == null) return@runCatching null
         Supabase.supabase
             .from(PROFILES_TABLE)
             .select(columns = Columns.list(Profile.columns)) {
