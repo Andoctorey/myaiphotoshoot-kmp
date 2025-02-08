@@ -60,7 +60,6 @@ fun PricingScreen(
                     Text(
                         modifier = Modifier.weight(1f),
                         text = stringResource(Res.string.one_time_ai_training),
-                        fontWeight = FontWeight.Light,
                         fontSize = 24.sp,
                     )
                     Spacer(modifier = Modifier.width(16.dp))
@@ -76,7 +75,6 @@ fun PricingScreen(
 
                 Text(
                     text = stringResource(Res.string.powered_by_flux),
-                    fontWeight = FontWeight.Light,
                     fontSize = 14.sp,
                 )
             }
@@ -88,7 +86,6 @@ fun PricingScreen(
                     Text(
                         modifier = Modifier.weight(1f),
                         text = stringResource(Res.string.photo_creation),
-                        fontWeight = FontWeight.Light,
                         fontSize = 24.sp,
                     )
                     Spacer(modifier = Modifier.width(16.dp))
@@ -106,7 +103,6 @@ fun PricingScreen(
 
         Text(
             text = stringResource(Res.string.lowest_market_price),
-            fontWeight = FontWeight.Light,
             textAlign = TextAlign.Center,
             fontSize = 16.sp,
         )
