@@ -2,6 +2,7 @@ package ai.create.photo.ui.auth
 
 import ai.create.photo.data.supabase.Supabase.supabase
 import ai.create.photo.data.supabase.SupabaseAuth
+import ai.create.photo.data.supabase.model.User
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
@@ -61,10 +62,10 @@ abstract class AuthViewModel : ViewModel() {
         val sessionStatus = supabase.auth.sessionStatus.value
         if (sessionStatus !is SessionStatus.Authenticated) return
         val supabaseUser = sessionStatus.session.user
+
         val user = User(
             id = supabaseUser?.id ?: throw IllegalStateException("User id is null"),
             email = supabaseUser.email,
-            balance = 0f,
         )
         Logger.i("$user")
         this@AuthViewModel.user = user

@@ -1,5 +1,6 @@
 package ai.create.photo.ui.settings
 
+import ai.create.photo.data.supabase.database.ProfilesRepository
 import ai.create.photo.platform.openUrl
 import ai.create.photo.ui.auth.AuthViewModel
 import ai.create.photo.ui.settings.SettingsUiState.Item
@@ -14,6 +15,16 @@ class SettingsViewModel : AuthViewModel() {
     var uiState by mutableStateOf(SettingsUiState())
         private set
 
+    init {
+        viewModelScope.launch {
+            ProfilesRepository.profileFlow.collect { profile ->
+                uiState = uiState.copy(
+                    balance = profile?.formattedBalance ?: "0"
+                )
+            }
+        }
+    }
+
     override fun onAuthInitializing() {
         uiState = uiState.copy(isLoading = true)
     }
@@ -22,8 +33,10 @@ class SettingsViewModel : AuthViewModel() {
         uiState = uiState.copy(
             isLoading = false,
             email = user?.email,
-            balance = user?.formattedBalance ?: "0",
         )
+        viewModelScope.launch {
+            user?.id?.let { ProfilesRepository.get(it) }
+        }
     }
 
     override fun onAuthError(error: Throwable) {

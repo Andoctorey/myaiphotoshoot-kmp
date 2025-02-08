@@ -12,5 +12,5 @@ data class BalanceUiState(
     val isApplyingPromoCode: Boolean = false,
     val isIncorrectPromoCode: Boolean = false,
     val showPromoCodeAppliedPopup: Boolean = false,
-    val balance: Float = 0f,
+    val balance: String = "0",
 )

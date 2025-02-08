@@ -160,6 +160,7 @@ private fun Screen(
                                 openGenerateTab = openGenerateTab,
                                 trainAiModel = trainAiModel,
                             ) {
+                                Logger.i("Back clicked")
                                 onSaveDestination(null)
                                 navigator.navigateBack()
                             }

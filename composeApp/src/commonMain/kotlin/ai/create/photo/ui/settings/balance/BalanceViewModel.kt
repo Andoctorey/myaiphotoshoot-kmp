@@ -1,6 +1,7 @@
 package ai.create.photo.ui.settings.balance
 
 import ai.create.photo.data.supabase.SupabaseFunction
+import ai.create.photo.data.supabase.database.ProfilesRepository
 import ai.create.photo.ui.auth.AuthViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,7 +23,6 @@ class BalanceViewModel : AuthViewModel() {
 
     override fun onAuthenticated(userChanged: Boolean) {
         uiState = uiState.copy(isLoading = false)
-        loadUser()
     }
 
     override fun onAuthError(error: Throwable) {
@@ -34,19 +34,20 @@ class BalanceViewModel : AuthViewModel() {
     }
 
     fun applyPromoCode() = viewModelScope.launch {
+        val userId = user?.id ?: return@launch
         val promoCode = uiState.promoCode.takeIf { it.isNotEmpty() } ?: return@launch
         Logger.i("applyPromoCode: $promoCode")
         uiState = uiState.copy(isApplyingPromoCode = true, isIncorrectPromoCode = false)
         try {
             val isApplied = SupabaseFunction.applyPromoCode(promoCode)
             if (isApplied) {
-                loadUser()
+                ProfilesRepository.get(userId)
             }
             uiState = uiState.copy(
                 isApplyingPromoCode = false,
                 isIncorrectPromoCode = !isApplied,
                 showPromoCodeAppliedPopup = isApplied,
-                balance = user?.balance ?: 0f,
+                balance = ProfilesRepository.profile?.formattedBalance ?: "0",
             )
         } catch (e: Exception) {
             currentCoroutineContext().ensureActive()

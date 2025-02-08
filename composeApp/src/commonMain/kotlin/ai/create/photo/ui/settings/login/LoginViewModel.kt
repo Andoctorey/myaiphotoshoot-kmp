@@ -28,7 +28,6 @@ class LoginViewModel : AuthViewModel() {
 
     override fun onAuthenticated(userChanged: Boolean) {
         uiState = uiState.copy(isLoading = false, email = user?.email)
-        loadUser()
     }
 
     override fun onAuthError(error: Throwable) {
