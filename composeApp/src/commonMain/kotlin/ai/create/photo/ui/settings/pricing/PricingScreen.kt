@@ -1,9 +1,9 @@
 package ai.create.photo.ui.settings.pricing
 
 import ai.create.photo.platform.BackHandler
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
@@ -44,68 +45,72 @@ fun PricingScreen(
         onBackClick()
     }
 
-    val state = viewModel.uiState
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 24.dp)
-            .verticalScroll(state.scrollState)
-            .background(MaterialTheme.colorScheme.background),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
     ) {
-        OutlinedCard {
-            Column(modifier = Modifier.clickable { trainAiModel() }.padding(16.dp)) {
-                Row {
-                    Text(
-                        modifier = Modifier.weight(1f),
-                        text = stringResource(Res.string.one_time_ai_training),
-                        fontSize = 24.sp,
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Text(
-                        text = "$3.99–$7.99",
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 24.sp,
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                }
+        val state = viewModel.uiState
+        Column(
+            modifier = Modifier
+                .widthIn(max = 600.dp)
+                .padding(horizontal = 24.dp)
+                .verticalScroll(state.scrollState),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
+        ) {
+            OutlinedCard {
+                Column(modifier = Modifier.clickable { trainAiModel() }.padding(16.dp)) {
+                    Row {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = stringResource(Res.string.one_time_ai_training),
+                            fontSize = 24.sp,
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(
+                            text = "$3.99–$7.99",
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 24.sp,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    }
 
-                Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
 
-                Text(
-                    text = stringResource(Res.string.powered_by_flux),
-                    fontSize = 14.sp,
-                )
-            }
-        }
-
-        OutlinedCard {
-            Column(modifier = Modifier.clickable { openGenerateTab() }.padding(16.dp)) {
-                Row {
                     Text(
-                        modifier = Modifier.weight(1f),
-                        text = stringResource(Res.string.photo_creation),
-                        fontSize = 24.sp,
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Text(
-                        text = "$0.03",
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 24.sp,
-                        color = MaterialTheme.colorScheme.primary,
+                        text = stringResource(Res.string.powered_by_flux),
+                        fontSize = 14.sp,
                     )
                 }
             }
+
+            OutlinedCard {
+                Column(modifier = Modifier.clickable { openGenerateTab() }.padding(16.dp)) {
+                    Row {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = stringResource(Res.string.photo_creation),
+                            fontSize = 24.sp,
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(
+                            text = "$0.03",
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 24.sp,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = stringResource(Res.string.lowest_market_price),
+                textAlign = TextAlign.Center,
+                fontSize = 16.sp,
+            )
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = stringResource(Res.string.lowest_market_price),
-            textAlign = TextAlign.Center,
-            fontSize = 16.sp,
-        )
     }
 }
 
