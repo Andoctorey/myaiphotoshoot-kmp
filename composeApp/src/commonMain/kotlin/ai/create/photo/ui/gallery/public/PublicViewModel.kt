@@ -68,7 +68,7 @@ class PublicViewModel : AuthViewModel() {
             val newPhotos = generations.map { PublicUiState.Photo(it) }
             uiState = uiState.copy(
                 loadingError = null,
-                photos = uiState.photos + newPhotos,
+                photos = (uiState.photos + newPhotos).distinctBy { photo -> photo.id },
                 isLoadingNextPage = false,
                 isLoading = false,
                 page = uiState.page + 1,
@@ -90,7 +90,7 @@ class PublicViewModel : AuthViewModel() {
         val newPhotos = generations.map { generation ->
             PublicUiState.Photo(generation)
         }
-        val combinedPhotos = uiState.photos + newPhotos
+        val combinedPhotos = (uiState.photos + newPhotos).distinctBy { photo -> photo.id }
         val sortedPhotos = combinedPhotos.sortedByDescending { it.createdAt }
         uiState = uiState.copy(photos = sortedPhotos)
     }
