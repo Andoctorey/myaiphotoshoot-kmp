@@ -66,7 +66,11 @@ class GenerateViewModel : AuthViewModel() {
     }
 
     fun onUserPromptChanged(prompt: String) {
-        uiState = uiState.copy(userPrompt = prompt, promptBeforeEnhancing = "")
+        uiState = uiState.copy(
+            userPrompt = prompt,
+            promptBeforeEnhancing = "",
+            showTranslateButton = !isLikelyEnglish(prompt),
+        )
     }
 
     fun hideErrorPopup() {
@@ -199,5 +203,51 @@ class GenerateViewModel : AuthViewModel() {
 
     fun putPrompt(prompt: String) {
         uiState = uiState.copy(userPrompt = prompt)
+    }
+
+    fun translate() = viewModelScope.launch {
+        uiState = uiState.copy(isTranslating = true)
+        try {
+            val translated = SupabaseFunction.translate(uiState.userPrompt)
+            uiState = uiState.copy(userPrompt = translated, isTranslating = false)
+        } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
+            Logger.e("translate failed", e)
+            uiState = uiState.copy(isTranslating = false, errorPopup = e)
+        }
+    }
+
+    // This regex allows:
+    // - Basic English letters: A-Z, a-z
+    // - Accented Latin letters: À-Ö, Ø-ö, ø-ÿ
+    // - Digits: 0-9
+    // - Whitespace: \s (spaces, tabs, etc.)
+    // - Common punctuation and symbols often seen in English text
+    private val englishRegex = Regex(
+        // The character class includes:
+        // A-Za-z           -> basic English letters
+        // À-ÖØ-öø-ÿ       -> extended accented characters from Latin-1 Supplement
+        // 0-9             -> digits
+        // \s              -> whitespace characters
+        // \.,!?           -> period, comma, exclamation, question marks
+        // '"              -> straight single and double quotes
+        // “”, ‘’         -> “smart” quotes
+        // ()              -> parentheses
+        // \[\]            -> square brackets
+        // \{\}            -> curly braces
+        // :;              -> colon and semicolon
+        // @#$%&*+         -> various symbols
+        // \-              -> hyphen (dash)
+        // _=              -> underscore and equals
+        // \/\\           -> forward and back slashes
+        // —–              -> em dash and en dash
+        // …               -> ellipsis
+        // `               -> backtick
+        """^[A-Za-zÀ-ÖØ-öø-ÿ0-9\s.,!?'"“”‘’()\[\]{}:;@#$%&*+\-_=/\\—–…`]+$"""
+    )
+
+    private fun isLikelyEnglish(text: String): Boolean {
+        if (text.isEmpty()) return true
+        return englishRegex.matches(text)
     }
 }

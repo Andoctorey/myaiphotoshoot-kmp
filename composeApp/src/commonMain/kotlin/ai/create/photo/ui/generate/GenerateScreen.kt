@@ -41,6 +41,7 @@ import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -90,6 +91,7 @@ import photocreateai.composeapp.generated.resources.photos_to_generate
 import photocreateai.composeapp.generated.resources.picture_to_prompt
 import photocreateai.composeapp.generated.resources.surprise_me
 import photocreateai.composeapp.generated.resources.train_ai_model
+import photocreateai.composeapp.generated.resources.translate
 
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -201,7 +203,8 @@ fun GenerateScreen(
 
                 // middle of the screen
                 FlowRow(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)
+                        .animateContentSize(),
                     horizontalArrangement = Arrangement.Center,
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
@@ -237,6 +240,13 @@ fun GenerateScreen(
                             modifier = Modifier.padding(horizontal = 4.dp),
                             isLoading = state.isLoadingPictureToPrompt,
                             onClick = { launcher.launch() }
+                        )
+
+                        TranslateButton(
+                            modifier = Modifier.padding(horizontal = 4.dp).fillMaxWidth(),
+                            show = state.showTranslateButton,
+                            isTranslating = state.isTranslating,
+                            onClick = viewModel::translate,
                         )
                     }
                 }
@@ -427,6 +437,43 @@ private fun PictureToPromptButton(modifier: Modifier, isLoading: Boolean, onClic
                 color = MaterialTheme.colorScheme.primary,
                 strokeWidth = 2.dp,
             )
+        }
+    }
+}
+
+@Composable
+private fun TranslateButton(
+    modifier: Modifier,
+    show: Boolean,
+    isTranslating: Boolean,
+    onClick: () -> Unit
+) {
+    Crossfade(targetState = show) {
+        if (it) {
+            Box(modifier = modifier, contentAlignment = Alignment.Center) {
+                OutlinedButton(
+                    modifier = Modifier.alpha(if (isTranslating) 0f else 1f),
+                    onClick = onClick
+                ) {
+                    val icon = Icons.Default.Translate
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = icon.name,
+                    )
+                    Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
+                    Text(
+                        text = stringResource(Res.string.translate),
+                        fontSize = 16.sp,
+                    )
+                }
+                if (isTranslating) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.padding(horizontal = 8.dp).size(24.dp),
+                        color = MaterialTheme.colorScheme.primary,
+                        strokeWidth = 2.dp,
+                    )
+                }
+            }
         }
     }
 }

@@ -52,6 +52,15 @@ object SupabaseFunction {
         return response.body<String>()
     }
 
+    suspend fun translate(prompt: String): String {
+        Logger.i("translate prompt: $prompt")
+        val response = Supabase.supabase.functions.invoke(
+            function = "translate",
+            body = mapOf("prompt" to prompt)
+        )
+        return response.body<String>()
+    }
+
     suspend fun enhancePrompt(prompt: String): String {
         Logger.i("enhancePrompt, prompt: $prompt")
         val response = Supabase.supabase.functions.invoke(

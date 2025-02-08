@@ -24,6 +24,9 @@ data class GenerateUiState(
     val isEnhancingPrompt: Boolean = false,
     val isLoadingPictureToPrompt: Boolean = false,
 
+    val showTranslateButton: Boolean = false,
+    val isTranslating: Boolean = false,
+
     val photosToGenerateX100: Int = 100,
 ) {
     @Immutable
