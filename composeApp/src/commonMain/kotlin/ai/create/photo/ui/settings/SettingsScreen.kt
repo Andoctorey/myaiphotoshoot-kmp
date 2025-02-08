@@ -23,9 +23,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -96,6 +98,7 @@ fun SettingsScreen(
                 Screen(
                     email = state.email,
                     balance = state.balance,
+                    isBalanceLoading = state.isBalanceLoading,
                     items = state.items,
                     savedDestination = state.currentDestination,
                     onSaveDestination = viewModel::saveDestination,
@@ -119,6 +122,7 @@ fun SettingsScreen(
 private fun Screen(
     email: String?,
     balance: String,
+    isBalanceLoading: Boolean,
     items: List<Item>,
     savedDestination: Item?,
     onSaveDestination: (Item?) -> Unit,
@@ -151,6 +155,7 @@ private fun Screen(
                 SettingsItems(
                     email = email,
                     balance = balance,
+                    isBalanceLoading = isBalanceLoading,
                     expanded = expanded,
                     items = items,
                     onItemClick = { item ->
@@ -193,6 +198,7 @@ private fun Screen(
 fun SettingsItems(
     email: String?,
     balance: String,
+    isBalanceLoading: Boolean,
     expanded: Boolean,
     items: List<Item>,
     onItemClick: (Item) -> Unit,
@@ -211,13 +217,23 @@ fun SettingsItems(
                     }
 
                     is SettingsUiState.DetailedItem -> {
+
                         OutlinedButton(
                             onClick = { onItemClick(item) },
                         ) {
-                            Icon(
-                                imageVector = item.icon,
-                                contentDescription = item.icon.name,
-                            )
+                            if (item is SettingsUiState.BalanceItem && isBalanceLoading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(16.dp),
+                                    color = MaterialTheme.colorScheme.primary,
+                                    strokeWidth = 2.dp,
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = item.icon,
+                                    contentDescription = item.icon.name,
+                                )
+                            }
+
                             Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
                             Text(
                                 text = when (item) {

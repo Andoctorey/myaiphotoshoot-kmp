@@ -24,6 +24,7 @@ data class SettingsUiState(
 
     val email: String? = null,
     val balance: String = "0",
+    val isBalanceLoading: Boolean = false,
 
     val items: List<Item> = listOf(
         LoginItem(),

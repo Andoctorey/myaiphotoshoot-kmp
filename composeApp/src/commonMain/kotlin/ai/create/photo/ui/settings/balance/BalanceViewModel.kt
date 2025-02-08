@@ -41,7 +41,7 @@ class BalanceViewModel : AuthViewModel() {
         try {
             val isApplied = SupabaseFunction.applyPromoCode(promoCode)
             if (isApplied) {
-                ProfilesRepository.reload(userId)
+                ProfilesRepository.loadProfile(userId)
             }
             uiState = uiState.copy(
                 isApplyingPromoCode = false,

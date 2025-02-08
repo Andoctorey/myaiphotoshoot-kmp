@@ -8,6 +8,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 
 class SettingsViewModel : AuthViewModel() {
@@ -19,7 +23,8 @@ class SettingsViewModel : AuthViewModel() {
         viewModelScope.launch {
             ProfilesRepository.profileFlow.collect { profile ->
                 uiState = uiState.copy(
-                    balance = profile?.formattedBalance ?: "0"
+                    balance = profile?.formattedBalance ?: "0",
+                    isBalanceLoading = false,
                 )
             }
         }
@@ -38,7 +43,25 @@ class SettingsViewModel : AuthViewModel() {
     }
 
     fun loadProfile() = viewModelScope.launch {
-        ProfilesRepository.reload(user?.id)
+        val userId = user?.id ?: return@launch
+        val loadingJob = launch {
+            delay(2000)
+            uiState = uiState.copy(isBalanceLoading = true)
+        }
+
+        try {
+            val profile = ProfilesRepository.loadProfile(userId)
+            loadingJob.cancel()
+            uiState = uiState.copy(
+                isBalanceLoading = false,
+                balance = profile?.formattedBalance ?: "0"
+            )
+        } catch (e: Exception) {
+            loadingJob.cancel()
+            currentCoroutineContext().ensureActive()
+            Logger.e("loadProfile failed", e)
+            uiState = uiState.copy(isBalanceLoading = false, errorPopup = e)
+        }
     }
 
     override fun onAuthError(error: Throwable) {

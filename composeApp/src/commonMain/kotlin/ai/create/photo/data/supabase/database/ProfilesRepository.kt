@@ -17,20 +17,17 @@ object ProfilesRepository {
     val profile: Profile?
         get() = profileFlow.value
 
-    suspend fun reload(userId: String?): Result<Profile?> = runCatching {
-        if (userId == null) return@runCatching null
-        Supabase.supabase
-            .from(PROFILES_TABLE)
-            .select(columns = Columns.list(Profile.columns)) {
-                filter {
-                    eq("id", userId)
-                }
-                limit(1)
+    suspend fun loadProfile(userId: String) = Supabase.supabase
+        .from(PROFILES_TABLE)
+        .select(columns = Columns.list(Profile.columns)) {
+            filter {
+                eq("id", userId)
             }
-            .decodeSingleOrNull<Profile>()
-            .also {
-                _profileFlow.value = it
-                Logger.i("getProfile: $it")
-            }
-    }
+            limit(1)
+        }
+        .decodeSingleOrNull<Profile>()
+        .also {
+            _profileFlow.value = it
+            Logger.i("getProfile: $it")
+        }
 }
