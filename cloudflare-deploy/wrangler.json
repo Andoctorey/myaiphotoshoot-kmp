@@ -1,0 +1,7 @@
+{
+  "name": "myaiphotoshoot",
+  "build": {
+    "command": "",
+    "cwd": "./composeApp/build/dist/wasmJs/productionExecutable"
+  }
+}
