@@ -65,7 +65,7 @@ abstract class AuthViewModel : ViewModel() {
 
         val user = User(
             id = supabaseUser?.id ?: throw IllegalStateException("User id is null"),
-            email = supabaseUser.email,
+            email = supabaseUser.email.takeIf { !it.isNullOrEmpty() },
         )
         Logger.i("$user")
         this@AuthViewModel.user = user
