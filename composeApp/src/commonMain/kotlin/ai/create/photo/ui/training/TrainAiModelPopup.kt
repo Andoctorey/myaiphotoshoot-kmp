@@ -114,21 +114,21 @@ private fun StepsSelector(onStepsSelected: (Int) -> Unit) {
         Model(
             steps = 1000,
             minutes = 30,
-            cost = 3.99f,
+            cost = "$3.99",
             onClick = { onStepsSelected(1000) }
         )
         Spacer(modifier = Modifier.height(24.dp))
         Model(
             steps = 1500,
             minutes = 45,
-            cost = 5.99f,
+            cost = "$7.99",
             onClick = { onStepsSelected(1500) }
         )
         Spacer(modifier = Modifier.height(24.dp))
         Model(
             steps = 2000,
             minutes = 60,
-            cost = 7.99f,
+            cost = "$7.99",
             onClick = { onStepsSelected(2000) }
         )
         Spacer(modifier = Modifier.height(24.dp))
@@ -141,7 +141,7 @@ private fun StepsSelector(onStepsSelected: (Int) -> Unit) {
 }
 
 @Composable
-private fun Model(steps: Int, minutes: Int, cost: Float, onClick: () -> Unit = {}) {
+private fun Model(steps: Int, minutes: Int, cost: String, onClick: () -> Unit = {}) {
     OutlinedButton(onClick = onClick) {
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -160,7 +160,7 @@ private fun Model(steps: Int, minutes: Int, cost: Float, onClick: () -> Unit = {
             }
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "$$cost",
+                text = cost,
                 fontSize = 32.sp
             )
         }
