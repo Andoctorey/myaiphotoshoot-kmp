@@ -20,7 +20,10 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cached
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -188,7 +191,8 @@ private fun Photo(
             modifier = modifier.fillMaxWidth().aspectRatio(1f),
             contentAlignment = Alignment.Center,
         ) {
-            LoadingPlaceholder()
+            val icon = Icons.Default.Cached
+            Icon(icon, contentDescription = icon.name)
         }
     }
 
@@ -203,6 +207,7 @@ private fun Photo(
             contentScale = ContentScale.FillWidth,
             onSuccess = { loading = false },
             onError = {
+                loading = false
                 Logger.e("error loading image ${photo.url}", it.result.throwable)
                 error = it.result.throwable
             },
