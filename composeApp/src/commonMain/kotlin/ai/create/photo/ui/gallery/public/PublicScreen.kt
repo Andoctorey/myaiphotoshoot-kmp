@@ -1,6 +1,8 @@
 package ai.create.photo.ui.gallery.public
 
 import ai.create.photo.data.supabase.model.UserGeneration
+import ai.create.photo.platform.Platforms
+import ai.create.photo.platform.platform
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolderSmall
 import ai.create.photo.ui.compose.ErrorPopup
@@ -191,8 +193,18 @@ private fun Photo(
             modifier = modifier.fillMaxWidth().aspectRatio(1f),
             contentAlignment = Alignment.Center,
         ) {
-            val icon = Icons.Default.Cached
-            Icon(icon, contentDescription = icon.name)
+            val optimizedVersion = remember {
+                platform().platform in listOf(
+                    Platforms.WEB_MOBILE,
+                    Platforms.WEB_DESKTOP
+                )
+            }
+            if (optimizedVersion) {
+                val icon = Icons.Default.Cached
+                Icon(icon, contentDescription = icon.name)
+            } else {
+                LoadingPlaceholder()
+            }
         }
     }
 
