@@ -119,7 +119,7 @@ private fun Photos(
         onRefresh = onRefresh
     ) {
         val density = LocalDensity.current
-        val width = 320
+        val width = 420
         val minSize = remember { with(density) { (width - 20).toDp() } } // paddings
         LazyVerticalGrid(
             state = listState,
