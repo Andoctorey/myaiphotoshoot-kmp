@@ -121,7 +121,7 @@ private fun StepsSelector(onStepsSelected: (Int) -> Unit) {
         Model(
             steps = 1500,
             minutes = 45,
-            cost = "$7.99",
+            cost = "5.99",
             onClick = { onStepsSelected(1500) }
         )
         Spacer(modifier = Modifier.height(24.dp))
