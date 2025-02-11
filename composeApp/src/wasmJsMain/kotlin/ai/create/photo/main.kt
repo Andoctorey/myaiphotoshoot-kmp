@@ -11,4 +11,6 @@ fun main() {
         SystemTheme()
         App()
     }
+
+    document.getElementById("loading")?.remove()
 }
