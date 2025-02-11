@@ -7,6 +7,7 @@ import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolderSmall
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,10 +23,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Cached
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -123,6 +122,12 @@ private fun Photos(
         val density = LocalDensity.current
         val width = 420
         val minSize = remember { with(density) { (width - 20).toDp() } } // paddings
+        val optimizedVersion = remember {
+            platform().platform in listOf(
+                Platforms.WEB_MOBILE,
+                Platforms.WEB_DESKTOP,
+            )
+        }
         LazyVerticalGrid(
             state = listState,
             modifier = Modifier.fillMaxSize(),
@@ -136,7 +141,12 @@ private fun Photos(
 
             items(photos.size, key = { photos[it].id }) { item ->
                 Photo(
-                    modifier = Modifier.animateItem(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .then(if (optimizedVersion) Modifier else Modifier.animateItem()),
+                    optimizedVersion = optimizedVersion,
                     photo = photos[item],
                     width = width,
                     onClick = onClick,
@@ -174,52 +184,27 @@ private fun Photos(
 @Composable
 private fun Photo(
     modifier: Modifier,
+    optimizedVersion: Boolean,
     photo: PublicUiState.Photo,
     width: Int,
     onClick: (PublicUiState.Photo) -> Unit,
 ) {
-    var loading by remember { mutableStateOf(true) }
-    var error by remember { mutableStateOf<Throwable?>(null) }
+    Box(modifier) {
+        var error by remember { mutableStateOf<Throwable?>(null) }
 
-    if (error != null) {
-        Box(
-            modifier = modifier.fillMaxWidth().aspectRatio(1f),
-            contentAlignment = Alignment.Center,
-        ) {
-            ErrorMessagePlaceHolderSmall(error!!)
+        error?.let {
+            ErrorMessagePlaceHolderSmall(it)
         }
-    } else if (loading) {
-        Box(
-            modifier = modifier.fillMaxWidth().aspectRatio(1f),
-            contentAlignment = Alignment.Center,
-        ) {
-            val optimizedVersion = remember {
-                platform().platform in listOf(
-                    Platforms.WEB_MOBILE,
-                    Platforms.WEB_DESKTOP
-                )
-            }
-            if (optimizedVersion) {
-                val icon = Icons.Default.Cached
-                Icon(icon, contentDescription = icon.name)
-            } else {
-                LoadingPlaceholder()
-            }
-        }
-    }
 
-    Box(modifier = modifier.fillMaxWidth()) {
         AsyncImage(
-            modifier = Modifier.fillMaxWidth().clickable { onClick(photo) },
+            modifier = Modifier.fillMaxSize().clickable { onClick(photo) },
             model = ImageRequest.Builder(LocalPlatformContext.current)
                 .data(photo.url + if (photo.url.contains("b-cdn.net")) "?width=$width" else "")
-                .crossfade(true)
+                .crossfade(!optimizedVersion)
                 .build(),
             contentDescription = photo.prompt,
             contentScale = ContentScale.FillWidth,
-            onSuccess = { loading = false },
             onError = {
-                loading = false
                 Logger.e("error loading image ${photo.url}", it.result.throwable)
                 error = it.result.throwable
             },
