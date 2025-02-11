@@ -55,7 +55,11 @@ class LoginViewModel : AuthViewModel() {
                 SupabaseAuth.convertAnonymousUserToEmail(uiState.emailToVerify)
             } catch (e: AuthRestException) {
                 Logger.i("convertAnonymousUserToEmail", e)
-                SupabaseFunction.deleteUser()
+                try {
+                    SupabaseFunction.deleteUser()
+                } catch (e: Exception) {
+                    Logger.w("deleteUser failed", e)
+                }
             }
             SupabaseAuth.signInWithEmailOtp(uiState.emailToVerify)
             uiState = uiState.copy(isSendingOtp = false, enterOtp = true)
