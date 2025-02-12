@@ -8,8 +8,8 @@ import kotlinx.browser.document
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
     ComposeViewport(document.body!!) {
-        SystemTheme()
         App()
+        SystemTheme()
     }
 
     document.getElementById("loading")?.remove()
