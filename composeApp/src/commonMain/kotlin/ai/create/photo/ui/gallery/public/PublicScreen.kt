@@ -140,17 +140,21 @@ private fun Photos(
             }
 
             items(photos.size, key = { photos[it].id }) { item ->
-                Photo(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(1f)
                         .background(MaterialTheme.colorScheme.surfaceVariant)
                         .then(if (optimizedVersion) Modifier else Modifier.animateItem()),
-                    optimizedVersion = optimizedVersion,
-                    photo = photos[item],
-                    width = width,
-                    onClick = onClick,
-                )
+                ) {
+                    Photo(
+                        optimizedVersion = optimizedVersion,
+                        isScrolling = listState.isScrollInProgress,
+                        photo = photos[item],
+                        width = width,
+                        onClick = onClick,
+                    )
+                }
             }
 
             if (isLoadingNextPage && !pagingLimitReach) {
@@ -183,13 +187,15 @@ private fun Photos(
 
 @Composable
 private fun Photo(
-    modifier: Modifier,
     optimizedVersion: Boolean,
+    isScrolling: Boolean,
     photo: PublicUiState.Photo,
     width: Int,
     onClick: (PublicUiState.Photo) -> Unit,
 ) {
-    Box(modifier) {
+    var loaded by remember { mutableStateOf(false) }
+
+    if (loaded || !isScrolling) {
         var error by remember { mutableStateOf<Throwable?>(null) }
 
         error?.let {
@@ -204,6 +210,7 @@ private fun Photo(
                 .build(),
             contentDescription = photo.prompt,
             contentScale = ContentScale.FillWidth,
+            onSuccess = { loaded = true },
             onError = {
                 Logger.e("error loading image ${photo.url}", it.result.throwable)
                 error = it.result.throwable
