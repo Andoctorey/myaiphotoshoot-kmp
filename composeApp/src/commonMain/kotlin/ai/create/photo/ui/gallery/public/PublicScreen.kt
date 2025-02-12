@@ -1,8 +1,6 @@
 package ai.create.photo.ui.gallery.public
 
 import ai.create.photo.data.supabase.model.UserGeneration
-import ai.create.photo.platform.Platforms
-import ai.create.photo.platform.platform
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolderSmall
 import ai.create.photo.ui.compose.ErrorPopup
@@ -122,12 +120,6 @@ private fun Photos(
         val density = LocalDensity.current
         val width = 420
         val minSize = remember { with(density) { (width - 20).toDp() } } // paddings
-        val optimizedVersion = remember {
-            platform().platform in listOf(
-                Platforms.WEB_MOBILE,
-                Platforms.WEB_DESKTOP,
-            )
-        }
         LazyVerticalGrid(
             state = listState,
             modifier = Modifier.fillMaxSize(),
@@ -145,10 +137,9 @@ private fun Photos(
                         .fillMaxWidth()
                         .aspectRatio(1f)
                         .background(MaterialTheme.colorScheme.surfaceVariant)
-                        .then(if (optimizedVersion) Modifier else Modifier.animateItem()),
+                        .animateItem(),
                 ) {
                     Photo(
-                        optimizedVersion = optimizedVersion,
                         isScrolling = listState.isScrollInProgress,
                         photo = photos[item],
                         width = width,
@@ -187,7 +178,6 @@ private fun Photos(
 
 @Composable
 private fun Photo(
-    optimizedVersion: Boolean,
     isScrolling: Boolean,
     photo: PublicUiState.Photo,
     width: Int,
@@ -206,7 +196,7 @@ private fun Photo(
             modifier = Modifier.fillMaxSize().clickable { onClick(photo) },
             model = ImageRequest.Builder(LocalPlatformContext.current)
                 .data(photo.url + if (photo.url.contains("b-cdn.net")) "?width=$width" else "")
-                .crossfade(!optimizedVersion)
+                .crossfade(true)
                 .build(),
             contentDescription = photo.prompt,
             contentScale = ContentScale.FillWidth,
