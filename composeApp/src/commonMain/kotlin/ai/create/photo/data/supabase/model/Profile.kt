@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.elementNames
 import kotlin.math.abs
 import kotlin.math.round
+import kotlin.math.roundToLong
 
 @Serializable
 data class Profile(
@@ -16,18 +17,21 @@ data class Profile(
         val columns = serializer().descriptor.elementNames.toList()
     }
 
-    val formattedBalance: String?
+    val formattedBalance: String
         get() {
             val rounded = round(balance * 100) / 100
-            val result = if (abs(balance - rounded) < 1e-10) {
-                balance
+            val valueToFormat = if (abs(balance - rounded) < 1e-10) balance else rounded
+            val scaled = (valueToFormat * 100).roundToLong()
+            val intPart = scaled / 100
+            val fracPart = (scaled % 100).toInt()
+
+            return if (fracPart == 0) {
+                intPart.toString()
             } else {
-                rounded
-            }.toString()
-            return if ('.' in result) {
-                result.trimEnd('0').trimEnd('.')
-            } else {
-                result
+                val frac = if (fracPart < 10) "0$fracPart" else fracPart.toString()
+                "$intPart.${frac.trimEnd('0')}"
             }
         }
+
+
 }
