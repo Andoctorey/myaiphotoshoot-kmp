@@ -28,6 +28,8 @@ data class GenerateUiState(
     val isTranslating: Boolean = false,
 
     val photosToGenerateX100: Int = 100,
+
+    val showOpenCreations: Boolean = false,
 ) {
     @Immutable
     data class Training(

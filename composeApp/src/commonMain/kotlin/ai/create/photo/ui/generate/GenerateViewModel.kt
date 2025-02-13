@@ -92,6 +92,7 @@ class GenerateViewModel : AuthViewModel() {
             val newDescription = uiState.personDescription
             if (oldDescription == newDescription) {
                 onGenerate(trainingId, uiState.userPrompt, uiState.photosToGenerateX100 / 100)
+                uiState = uiState.copy(showOpenCreations = true)
                 return@launch
             }
 
@@ -216,6 +217,10 @@ class GenerateViewModel : AuthViewModel() {
             Logger.e("translate failed", e)
             uiState = uiState.copy(isTranslating = false, errorPopup = e)
         }
+    }
+
+    fun hideOpenCreations() {
+        uiState = uiState.copy(showOpenCreations = false)
     }
 
     // This regex allows:

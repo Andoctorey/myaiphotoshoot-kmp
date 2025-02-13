@@ -32,6 +32,7 @@ fun GalleryScreen(
     generationsInProgress: Int,
     openGenerateTab: (String) -> Unit,
     openUploads: Boolean = false,
+    openCreations: Boolean = false,
 ) {
     val state = viewModel.uiState
     Box(
@@ -69,6 +70,12 @@ fun GalleryScreen(
     LaunchedEffect(openUploads) {
         if (openUploads) {
             viewModel.selectTab(2)
+        }
+    }
+
+    LaunchedEffect(openCreations) {
+        if (openCreations) {
+            viewModel.selectTab(1)
         }
     }
 }

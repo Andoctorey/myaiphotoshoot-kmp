@@ -46,6 +46,10 @@ class MainViewModel : ViewModel() {
         }
     }
 
+    fun toggleOpenCreations(openCreations: Boolean) {
+        uiState = uiState.copy(openCreations = openCreations)
+    }
+
     fun hideErrorPopup() {
         uiState = uiState.copy(errorPopup = null)
     }

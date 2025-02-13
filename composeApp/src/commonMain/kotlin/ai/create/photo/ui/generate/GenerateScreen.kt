@@ -39,6 +39,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Memory
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Translate
@@ -86,6 +87,7 @@ import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.ai_model
 import photocreateai.composeapp.generated.resources.enhance_photo_accuracy
 import photocreateai.composeapp.generated.resources.enhance_prompt
+import photocreateai.composeapp.generated.resources.open_creations
 import photocreateai.composeapp.generated.resources.photo_prompt
 import photocreateai.composeapp.generated.resources.photos_to_generate
 import photocreateai.composeapp.generated.resources.picture_to_prompt
@@ -100,11 +102,13 @@ import photocreateai.composeapp.generated.resources.translate
 fun GenerateScreen(
     viewModel: GenerateViewModel = viewModel { GenerateViewModel() },
     trainAiModel: () -> Unit,
+    openCreations: () -> Unit,
     onGenerate: (String, String, Int) -> Unit,
     prompt: String,
 ) {
     LaunchedEffect(Unit) {
         viewModel.loadTrainings()
+        viewModel.hideOpenCreations()
     }
 
     Box(
@@ -220,38 +224,49 @@ fun GenerateScreen(
                     }
 
                     if (!state.trainings.isNullOrEmpty()) {
-                        SurpriseMeButton(
-                            modifier = Modifier.padding(horizontal = 4.dp),
-                            isLoading = state.isLoadingSurpriseMe,
-                            onClick = viewModel::surpriseMe
-                        )
 
-                        EnhancePromptButton(
-                            modifier = Modifier.padding(horizontal = 4.dp),
-                            isLoading = state.isEnhancingPrompt,
-                            onClick = viewModel::enhancePrompt
-                        )
+                        if (state.userPrompt.isNotEmpty()) {
+                            EnhancePromptButton(
+                                modifier = Modifier.padding(horizontal = 4.dp),
+                                isLoading = state.isEnhancingPrompt,
+                                onClick = viewModel::enhancePrompt,
+                            )
 
-                        val launcher = rememberFilePickerLauncher(
-                            title = stringResource(Res.string.picture_to_prompt),
-                            type = PickerType.Image,
-                            mode = PickerMode.Single
-                        ) { file ->
-                            if (file == null) return@rememberFilePickerLauncher
-                            viewModel.pictureToPrompt(file)
+                            if (state.showOpenCreations) {
+                                ShowOpenCreationsButton(
+                                    modifier = Modifier.padding(horizontal = 4.dp),
+                                    onClick = openCreations,
+                                )
+                            }
+
+                            TranslateButton(
+                                modifier = Modifier.padding(horizontal = 4.dp).fillMaxWidth(),
+                                show = state.showTranslateButton,
+                                isTranslating = state.isTranslating,
+                                onClick = viewModel::translate,
+                            )
+                        } else {
+                            SurpriseMeButton(
+                                modifier = Modifier.padding(horizontal = 4.dp),
+                                isLoading = state.isLoadingSurpriseMe,
+                                onClick = viewModel::surpriseMe
+                            )
+
+                            val launcher = rememberFilePickerLauncher(
+                                title = stringResource(Res.string.picture_to_prompt),
+                                type = PickerType.Image,
+                                mode = PickerMode.Single
+                            ) { file ->
+                                if (file == null) return@rememberFilePickerLauncher
+                                viewModel.pictureToPrompt(file)
+                            }
+                            PictureToPromptButton(
+                                modifier = Modifier.padding(horizontal = 4.dp),
+                                isLoading = state.isLoadingPictureToPrompt,
+                                onClick = { launcher.launch() }
+                            )
                         }
-                        PictureToPromptButton(
-                            modifier = Modifier.padding(horizontal = 4.dp),
-                            isLoading = state.isLoadingPictureToPrompt,
-                            onClick = { launcher.launch() }
-                        )
 
-                        TranslateButton(
-                            modifier = Modifier.padding(horizontal = 4.dp).fillMaxWidth(),
-                            show = state.showTranslateButton,
-                            isTranslating = state.isTranslating,
-                            onClick = viewModel::translate,
-                        )
                     }
                 }
 
@@ -415,6 +430,22 @@ private fun EnhancePromptButton(modifier: Modifier, isLoading: Boolean, onClick:
                 strokeWidth = 2.dp,
             )
         }
+    }
+}
+
+@Composable
+private fun ShowOpenCreationsButton(modifier: Modifier, onClick: () -> Unit) {
+    OutlinedButton(modifier = modifier, onClick = onClick) {
+        val icon = Icons.Default.PhotoLibrary
+        Icon(
+            imageVector = Icons.Default.PhotoLibrary,
+            contentDescription = icon.name,
+        )
+        Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
+        Text(
+            text = stringResource(Res.string.open_creations),
+            fontSize = 16.sp,
+        )
     }
 }
 

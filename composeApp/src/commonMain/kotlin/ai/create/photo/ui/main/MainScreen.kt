@@ -115,6 +115,7 @@ fun MainScreen(
                     }
                 },
                 openUploads = state.openUploads,
+                openCreations = state.openCreations,
             )
 
             AppNavigationRoutes.TAB_2_GENERATE -> {
@@ -122,6 +123,10 @@ fun MainScreen(
                     trainAiModel = trainAiModel,
                     onGenerate = { trainingId, prompt, photosToGenerate ->
                         viewModel.generatePhoto(trainingId, prompt, photosToGenerate)
+                    },
+                    openCreations = {
+                        currentDestination = AppNavigationRoutes.TAB_1_GALLERY
+                        viewModel.toggleOpenCreations(true)
                     },
                     prompt = state.putPrompt
                 )
@@ -146,6 +151,12 @@ fun MainScreen(
     LaunchedEffect(state.openUploads) {
         if (state.openUploads) {
             viewModel.toggleOpenUploads(false)
+        }
+    }
+
+    LaunchedEffect(state.openCreations) {
+        if (state.openCreations) {
+            viewModel.toggleOpenCreations(false)
         }
     }
 
