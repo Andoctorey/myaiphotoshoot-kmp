@@ -148,8 +148,8 @@ private fun Photos(
                         .animateItem(),
                 ) {
                     Photo(
-                        doNotLoad = optimizedVersion && listState.isScrollInProgress,
                         photo = photos[item],
+                        doNotLoad = optimizedVersion && listState.isScrollInProgress,
                         width = width,
                         onClick = onClick,
                     )
@@ -186,33 +186,31 @@ private fun Photos(
 
 @Composable
 private fun Photo(
-    doNotLoad: Boolean,
     photo: PublicUiState.Photo,
+    doNotLoad: Boolean,
     width: Int,
     onClick: (PublicUiState.Photo) -> Unit,
 ) {
     var loaded by remember { mutableStateOf(false) }
+    if (!loaded && doNotLoad) return
 
-    if (loaded || !doNotLoad) {
-        var error by remember { mutableStateOf<Throwable?>(null) }
-
-        error?.let {
-            ErrorMessagePlaceHolderSmall(it)
-        }
-
-        AsyncImage(
-            modifier = Modifier.fillMaxSize().clickable { onClick(photo) },
-            model = ImageRequest.Builder(LocalPlatformContext.current)
-                .data(photo.url + if (photo.url.contains("b-cdn.net")) "?width=$width" else "")
-                .crossfade(true)
-                .build(),
-            contentDescription = photo.prompt,
-            contentScale = ContentScale.FillWidth,
-            onSuccess = { loaded = true },
-            onError = {
-                Logger.e("error loading image ${photo.url}", it.result.throwable)
-                error = it.result.throwable
-            },
-        )
+    var error by remember { mutableStateOf<Throwable?>(null) }
+    error?.let {
+        ErrorMessagePlaceHolderSmall(it)
     }
+
+    AsyncImage(
+        modifier = Modifier.fillMaxSize().clickable { onClick(photo) },
+        model = ImageRequest.Builder(LocalPlatformContext.current)
+            .data(photo.url + if (photo.url.contains("b-cdn.net")) "?width=$width" else "")
+            .crossfade(true)
+            .build(),
+        contentDescription = photo.prompt,
+        contentScale = ContentScale.FillWidth,
+        onSuccess = { loaded = true },
+        onError = {
+            Logger.e("error loading image ${photo.url}", it.result.throwable)
+            error = it.result.throwable
+        },
+    )
 }

@@ -2,8 +2,11 @@ package ai.create.photo.ui.gallery.uploads
 
 import ai.create.photo.data.supabase.model.AnalysisStatus
 import ai.create.photo.data.supabase.model.TrainingStatus
+import ai.create.photo.platform.Platforms
+import ai.create.photo.platform.platform
 import ai.create.photo.ui.compose.ConfirmationPopup
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
+import ai.create.photo.ui.compose.ErrorMessagePlaceHolderSmall
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.InfoPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
@@ -500,6 +503,13 @@ private fun Photos(
     onDelete: (UploadUiState.Photo) -> Unit,
 ) {
 
+    val optimizedVersion = remember {
+        platform().platform in listOf(
+            Platforms.WEB_MOBILE,
+            Platforms.WEB_DESKTOP,
+        )
+    }
+
     LazyVerticalStaggeredGrid(
         state = listState,
         modifier = Modifier.fillMaxSize(),
@@ -512,50 +522,47 @@ private fun Photos(
         }
 
         items(photos.size, key = { photos[it].id }) { item ->
-            Photo(
-                modifier = Modifier.animateItem(),
-                photo = photos[item],
-                showAnalysisForAll = showAnalysisForAll,
-                hideDeletePhotoButton = hideDeletePhotoButton,
-                onDelete = onDelete,
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .animateItem(),
+            ) {
+                Photo(
+                    photo = photos[item],
+                    doNotLoad = optimizedVersion && listState.isScrollInProgress,
+                    showAnalysisForAll = showAnalysisForAll,
+                    hideDeletePhotoButton = hideDeletePhotoButton,
+                    onDelete = onDelete,
+                )
+            }
         }
     }
 }
 
 @Composable
 private fun Photo(
-    modifier: Modifier,
     photo: UploadUiState.Photo,
+    doNotLoad: Boolean,
     showAnalysisForAll: Boolean,
     hideDeletePhotoButton: Boolean,
     onDelete: (UploadUiState.Photo) -> Unit,
 ) {
-    var loading by remember { mutableStateOf(true) }
+    var loaded by remember { mutableStateOf(false) }
+    if (!loaded && doNotLoad) return
+
     var error by remember { mutableStateOf<Throwable?>(null) }
+    error?.let {
+        ErrorMessagePlaceHolderSmall(it)
+    }
+
     var showAnalysis by remember { mutableStateOf(false) }
     LaunchedEffect(showAnalysisForAll) {
         showAnalysis = showAnalysisForAll
     }
 
-    if (error != null) {
-        Box(
-            modifier = modifier.fillMaxWidth().aspectRatio(1f),
-            contentAlignment = Alignment.Center,
-        ) {
-            ErrorMessagePlaceHolder(error!!)
-        }
-    } else if (loading) {
-        Box(
-            modifier = modifier.fillMaxWidth().aspectRatio(1f),
-            contentAlignment = Alignment.Center,
-        ) {
-            LoadingPlaceholder()
-        }
-    }
-
     Box(
-        modifier = modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth().then(if (loaded) Modifier else Modifier.aspectRatio(1f))
     ) {
         AsyncImage(
             modifier = Modifier.fillMaxWidth(),
@@ -565,15 +572,14 @@ private fun Photo(
                 .build(),
             contentDescription = photo.analysis,
             contentScale = ContentScale.FillWidth,
-            onSuccess = { loading = false },
+            onSuccess = { loaded = true },
             onError = {
                 Logger.e("error loading image ${photo.url}", it.result.throwable)
                 error = it.result.throwable
-                loading = false
             },
         )
 
-        if (!hideDeletePhotoButton && !loading) {
+        if (loaded && !hideDeletePhotoButton) {
             IconButton(
                 onClick = { onDelete(photo) },
                 modifier = Modifier
@@ -592,7 +598,7 @@ private fun Photo(
         }
 
 
-        if (!loading && photo.analysisStatus != null) {
+        if (loaded && photo.analysisStatus != null) {
             IconButton(
                 onClick = { showAnalysis = !showAnalysis },
                 modifier = Modifier
@@ -615,7 +621,7 @@ private fun Photo(
             }
         }
 
-        if (!loading && showAnalysis && !photo.analysis.isNullOrEmpty()) {
+        if (loaded && showAnalysis && !photo.analysis.isNullOrEmpty()) {
             Text(
                 modifier = Modifier.fillMaxWidth()
                     .padding(vertical = 8.dp, horizontal = 64.dp)

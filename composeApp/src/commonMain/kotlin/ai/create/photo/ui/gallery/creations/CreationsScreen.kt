@@ -6,6 +6,7 @@ import ai.create.photo.platform.platform
 import ai.create.photo.platform.shareLink
 import ai.create.photo.ui.compose.ConfirmationPopup
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
+import ai.create.photo.ui.compose.ErrorMessagePlaceHolderSmall
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import androidx.compose.foundation.background
@@ -150,6 +151,15 @@ private fun Photos(
         isRefreshing = isRefreshing,
         onRefresh = onRefresh
     ) {
+
+        val optimizedVersion = remember {
+            platform().platform in listOf(
+                Platforms.WEB_MOBILE,
+                Platforms.WEB_DESKTOP,
+            )
+        }
+
+
         LazyVerticalGrid(
             state = listState,
             modifier = Modifier.fillMaxSize(),
@@ -162,14 +172,21 @@ private fun Photos(
             }
 
             items(photos.size, key = { photos[it].id }) { item ->
-                Photo(
-                    modifier = Modifier.animateItem(),
-                    photo = photos[item],
-                    onTogglePublic = onTogglePublic,
-                    onDownload = { onDownload(photos[item]) },
-                    onPrompt = onPrompt,
-                    onDelete = { onDelete(photos[item]) },
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .animateItem(),
+                ) {
+                    Photo(
+                        photo = photos[item],
+                        doNotLoad = optimizedVersion && listState.isScrollInProgress,
+                        onTogglePublic = onTogglePublic,
+                        onDownload = { onDownload(photos[item]) },
+                        onPrompt = onPrompt,
+                        onDelete = { onDelete(photos[item]) },
+                    )
+                }
             }
 
             if (isLoadingNextPage && !pagingLimitReach) {
@@ -202,33 +219,24 @@ private fun Photos(
 
 @Composable
 private fun Photo(
-    modifier: Modifier,
     photo: CreationsUiState.Photo,
+    doNotLoad: Boolean,
     onDownload: (CreationsUiState.Photo) -> Unit,
     onTogglePublic: (CreationsUiState.Photo) -> Unit,
     onPrompt: (String) -> Unit,
     onDelete: (CreationsUiState.Photo) -> Unit,
 ) {
-    var loading by remember { mutableStateOf(true) }
-    var error by remember { mutableStateOf<Throwable?>(null) }
+    var loaded by remember { mutableStateOf(false) }
+    if (!loaded && doNotLoad) return
 
-    if (error != null) {
-        Box(
-            modifier = modifier.fillMaxWidth().aspectRatio(1f),
-            contentAlignment = Alignment.Center,
-        ) {
-            ErrorMessagePlaceHolder(error!!)
-        }
-    } else if (loading) {
-        Box(
-            modifier = modifier.fillMaxWidth().aspectRatio(1f),
-            contentAlignment = Alignment.Center,
-        ) {
-            LoadingPlaceholder()
-        }
+    var error by remember { mutableStateOf<Throwable?>(null) }
+    error?.let {
+        ErrorMessagePlaceHolderSmall(it)
     }
 
-    Box(modifier = modifier.fillMaxWidth()) {
+    Box(
+        modifier = Modifier.fillMaxWidth().then(if (loaded) Modifier else Modifier.aspectRatio(1f))
+    ) {
         AsyncImage(
             modifier = Modifier.fillMaxWidth(),
             model = ImageRequest.Builder(LocalPlatformContext.current)
@@ -237,14 +245,14 @@ private fun Photo(
                 .build(),
             contentDescription = photo.prompt,
             contentScale = ContentScale.FillWidth,
-            onSuccess = { loading = false },
+            onSuccess = { loaded = true },
             onError = {
                 Logger.e("error loading image ${photo.url}", it.result.throwable)
                 error = it.result.throwable
             },
         )
 
-        if (!loading) {
+        if (loaded) {
             PhotoDropMenu(
                 modifier = Modifier.align(Alignment.TopEnd),
                 photo = photo,
