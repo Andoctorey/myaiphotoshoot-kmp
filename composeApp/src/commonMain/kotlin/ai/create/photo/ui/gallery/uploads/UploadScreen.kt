@@ -549,7 +549,6 @@ private fun Photo(
     onDelete: (UploadUiState.Photo) -> Unit,
 ) {
     var loaded by remember { mutableStateOf(false) }
-    if (!loaded && doNotLoad) return
 
     var error by remember { mutableStateOf<Throwable?>(null) }
     error?.let {
@@ -564,6 +563,7 @@ private fun Photo(
     Box(
         modifier = Modifier.fillMaxWidth().then(if (loaded) Modifier else Modifier.aspectRatio(1f))
     ) {
+        if (!loaded && doNotLoad) return
         AsyncImage(
             modifier = Modifier.fillMaxWidth(),
             model = ImageRequest.Builder(LocalPlatformContext.current)
