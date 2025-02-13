@@ -269,6 +269,15 @@ class UploadViewModel : AuthViewModel() {
     }
 
     fun toggleTrainAiModelPopup(show: Boolean) {
+        if (show) {
+            val photos = uiState.photos ?: return
+            val hasBadPhotos = photos.any { it.analysisStatus == AnalysisStatus.DECLINED }
+            if (hasBadPhotos && !uiState.deleteSomePhotosPopupShown) {
+                toggleDeleteUnsuitablePhotosPopup(true)
+                uiState = uiState.copy(deleteSomePhotosPopupShown = true)
+                return
+            }
+        }
         uiState = uiState.copy(showTrainAiModelPopup = show)
     }
 
