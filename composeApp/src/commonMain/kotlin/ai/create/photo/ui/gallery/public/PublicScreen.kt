@@ -1,6 +1,8 @@
 package ai.create.photo.ui.gallery.public
 
 import ai.create.photo.data.supabase.model.UserGeneration
+import ai.create.photo.platform.Platforms
+import ai.create.photo.platform.platform
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolderSmall
 import ai.create.photo.ui.compose.ErrorPopup
@@ -120,6 +122,12 @@ private fun Photos(
         val density = LocalDensity.current
         val width = 420
         val minSize = remember { with(density) { (width - 20).toDp() } } // paddings
+        val optimizedVersion = remember {
+            platform().platform in listOf(
+                Platforms.WEB_MOBILE,
+                Platforms.WEB_DESKTOP,
+            )
+        }
         LazyVerticalGrid(
             state = listState,
             modifier = Modifier.fillMaxSize(),
@@ -140,7 +148,7 @@ private fun Photos(
                         .animateItem(),
                 ) {
                     Photo(
-                        isScrolling = listState.isScrollInProgress,
+                        doNotLoad = optimizedVersion && listState.isScrollInProgress,
                         photo = photos[item],
                         width = width,
                         onClick = onClick,
@@ -178,14 +186,14 @@ private fun Photos(
 
 @Composable
 private fun Photo(
-    isScrolling: Boolean,
+    doNotLoad: Boolean,
     photo: PublicUiState.Photo,
     width: Int,
     onClick: (PublicUiState.Photo) -> Unit,
 ) {
     var loaded by remember { mutableStateOf(false) }
 
-    if (loaded || !isScrolling) {
+    if (loaded || !doNotLoad) {
         var error by remember { mutableStateOf<Throwable?>(null) }
 
         error?.let {
