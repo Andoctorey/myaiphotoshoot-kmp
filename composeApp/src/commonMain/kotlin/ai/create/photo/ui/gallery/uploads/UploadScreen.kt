@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
@@ -62,6 +61,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -88,7 +88,16 @@ import photocreateai.composeapp.generated.resources.delete_unsuitable_photos
 import photocreateai.composeapp.generated.resources.generate_photo
 import photocreateai.composeapp.generated.resources.train_ai_model
 import photocreateai.composeapp.generated.resources.training_ai_model
-import photocreateai.composeapp.generated.resources.upload_guidelines_message
+import photocreateai.composeapp.generated.resources.upload_guidelines_footer
+import photocreateai.composeapp.generated.resources.upload_guidelines_header
+import photocreateai.composeapp.generated.resources.upload_guidelines_message_1
+import photocreateai.composeapp.generated.resources.upload_guidelines_message_2
+import photocreateai.composeapp.generated.resources.upload_guidelines_message_3
+import photocreateai.composeapp.generated.resources.upload_guidelines_message_4
+import photocreateai.composeapp.generated.resources.upload_guidelines_step_1
+import photocreateai.composeapp.generated.resources.upload_guidelines_step_2
+import photocreateai.composeapp.generated.resources.upload_guidelines_step_3
+import photocreateai.composeapp.generated.resources.upload_guidelines_step_4
 import photocreateai.composeapp.generated.resources.upload_more_photos
 
 
@@ -120,7 +129,7 @@ fun UploadScreen(
         } else if (state.loadingError != null) {
             ErrorMessagePlaceHolder(state.loadingError)
         } else if (state.photos.isNullOrEmpty()) {
-            Placeholder(modifier = Modifier.align(Alignment.Center))
+            Placeholder(modifier = Modifier.align(Alignment.TopCenter))
         } else {
             LaunchedEffect(state.scrollToTop) {
                 if (state.scrollToTop && state.listState.firstVisibleItemIndex > 1) {
@@ -254,18 +263,58 @@ fun UploadScreen(
 }
 
 @Composable
-private fun Placeholder(modifier: Modifier) {
+private fun Placeholder(modifier: Modifier = Modifier) {
     Column(
-        modifier = modifier.widthIn(max = 600.dp)
-            .verticalScroll(rememberScrollState()).safeDrawingPadding()
-            .padding(horizontal = 24.dp, vertical = 82.dp), // fab
+        modifier = modifier
+            .verticalScroll(rememberScrollState())
+            .safeDrawingPadding()
+            .padding(start = 24.dp, end = 24.dp, top = 48.dp, bottom = 160.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text = stringResource(Res.string.upload_guidelines_message),
-            style = MaterialTheme.typography.bodyLarge,
+            text = stringResource(Res.string.upload_guidelines_header),
+            fontSize = 18.sp,
+        )
+
+        UploadGuidelineStep(
+            step = stringResource(Res.string.upload_guidelines_step_1),
+            message = stringResource(Res.string.upload_guidelines_message_1)
+        )
+        UploadGuidelineStep(
+            step = stringResource(Res.string.upload_guidelines_step_2),
+            message = stringResource(Res.string.upload_guidelines_message_2)
+        )
+        UploadGuidelineStep(
+            step = stringResource(Res.string.upload_guidelines_step_3),
+            message = stringResource(Res.string.upload_guidelines_message_3)
+        )
+        UploadGuidelineStep(
+            step = stringResource(Res.string.upload_guidelines_step_4),
+            message = stringResource(Res.string.upload_guidelines_message_4)
+        )
+
+        Text(
+            text = stringResource(Res.string.upload_guidelines_footer),
+            fontSize = 18.sp,
         )
     }
 }
+
+@Composable
+private fun UploadGuidelineStep(step: String, message: String) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(
+            text = step,
+            fontWeight = FontWeight.Medium,
+            fontSize = 16.sp,
+        )
+        Text(
+            text = message,
+            fontSize = 14.sp,
+        )
+    }
+}
+
 
 @Composable
 private fun AddPhotosFab(

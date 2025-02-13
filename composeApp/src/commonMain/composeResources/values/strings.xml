@@ -4,7 +4,16 @@
     <string name="tab_settings">Settings</string>
     <string name="back_button">Back</string>
     <string name="add_your_photos">Add Selfies</string>
-    <string name="upload_guidelines_message">Make and upload 10-20 high-quality selfies with varied angles. Don’t worry about getting every photo perfect - AI will review and exclude any unsupported images. </string>
+    <string name="upload_guidelines_header">Transform Your Selfies into Stunning, Professional Photos in 4 Easy Steps:</string>
+    <string name="upload_guidelines_step_1">📸 Capture or Select Your Shots</string>
+    <string name="upload_guidelines_message_1">Have 10-20 high-quality selfies? Upload them! Not sure if you have the perfect ones? No worries—simply take 10 new selfies from different angles right now.</string>
+    <string name="upload_guidelines_step_2">🔍 Analyze Your Photos</string>
+    <string name="upload_guidelines_message_2">Our AI carefully reviews your images and highlights any that may not meet our quality standards, so you know which ones to delete.</string>
+    <string name="upload_guidelines_step_3">🤖 Custom AI Training</string>
+    <string name="upload_guidelines_message_3">We build a personalized AI model using your selected photos (this takes about one hour).</string>
+    <string name="upload_guidelines_step_4">🎉 Enjoy Your New Photos</string>
+    <string name="upload_guidelines_message_4">Generate thousands of amazing images—without the high cost of a traditional photo shoot!</string>
+    <string name="upload_guidelines_footer">Let’s create your professional photo shoot. Get started today!</string>
     <string name="connection_error">Problem connecting with server. Please check your connection.</string>
     <string name="upload_more_photos">Oops! It looks like you need to upload at least 10 photos before training your model. Try taking some selfies in portrait mode from different angles to get started.</string>
     <string name="delete_some_photos">Please delete some photos. For optimal training, please keep no more than 20 photos for training.</string>
