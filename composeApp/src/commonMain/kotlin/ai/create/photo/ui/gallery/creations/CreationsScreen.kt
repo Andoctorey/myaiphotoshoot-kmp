@@ -9,6 +9,7 @@ import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolderSmall
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
+import ai.create.photo.ui.compose.PullToRefreshBoxNoDesktop
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -28,7 +29,6 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -147,9 +147,9 @@ private fun Photos(
     onPrompt: (String) -> Unit,
     onDelete: (CreationsUiState.Photo) -> Unit,
 ) {
-    PullToRefreshBox(
+    PullToRefreshBoxNoDesktop(
         isRefreshing = isRefreshing,
-        onRefresh = onRefresh
+        onRefresh = onRefresh,
     ) {
 
         val optimizedVersion = remember {
