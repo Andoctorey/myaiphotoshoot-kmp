@@ -199,6 +199,7 @@ fun UploadScreen(
                     modifier = Modifier.align(Alignment.BottomCenter)
                         .padding(bottom = buttonsBottomPadding),
                     uploadProgress = state.uploadProgress,
+                    uploaded = state.photos.size,
                     onClick = onAddPhotoClick,
                 )
                 SmallFloatingActionButton(
@@ -320,6 +321,7 @@ private fun UploadGuidelineStep(step: String, message: String) {
 private fun AddPhotosFab(
     modifier: Modifier = Modifier,
     uploadProgress: Int,
+    uploaded: Int,
     onClick: () -> Unit
 ) {
     val isLoading = uploadProgress in 1 until 100
@@ -342,12 +344,12 @@ private fun AddPhotosFab(
             ) {
                 Icon(
                     imageVector = Icons.Default.AddAPhoto,
-                    contentDescription = stringResource(Res.string.add_your_photos),
+                    contentDescription = Icons.Default.AddAPhoto.name,
                     tint = MaterialTheme.colorScheme.onSurface,
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
-                    text = stringResource(Res.string.add_your_photos),
+                    text = stringResource(Res.string.add_your_photos, uploaded),
                     textAlign = TextAlign.Center,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
