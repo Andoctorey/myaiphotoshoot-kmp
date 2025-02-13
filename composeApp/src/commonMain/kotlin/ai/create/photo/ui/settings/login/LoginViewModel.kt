@@ -81,7 +81,7 @@ class LoginViewModel : AuthViewModel() {
         try {
             SupabaseAuth.verifyEmailOtp(uiState.emailToVerify, uiState.otp)
             loadUser()
-            uiState = uiState.copy(isVerifyingOtp = false, email = user?.email)
+            uiState = uiState.copy(isVerifyingOtp = false, otpVerified = true, email = user?.email)
         } catch (e: Exception) {
             currentCoroutineContext().ensureActive()
             if (e is AuthRestException) {
@@ -135,5 +135,9 @@ class LoginViewModel : AuthViewModel() {
 
     fun toggleConfirmDeletePopup(show: Boolean) {
         uiState = uiState.copy(confirmDeletedPopup = show)
+    }
+
+    fun resetOtpVerified() {
+        uiState = uiState.copy(otpVerified = false)
     }
 }

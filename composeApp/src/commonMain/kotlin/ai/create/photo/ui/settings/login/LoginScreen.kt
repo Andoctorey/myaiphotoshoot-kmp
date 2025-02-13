@@ -150,6 +150,10 @@ fun LoginScreen(
                 onDismiss = { viewModel.toggleConfirmDeletePopup(false) },
             )
         }
+        if (state.otpVerified) {
+            viewModel.resetOtpVerified()
+            onBackClick()
+        }
     }
 }
 
