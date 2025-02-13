@@ -151,7 +151,7 @@ class UploadViewModel : AuthViewModel() {
                 }
                 analysisJobs.awaitAll()
             }
-            uiState = uiState.copy(analyzingPhotos = 0)
+            uiState = uiState.copy(analyzingPhotos = 0, showAnalysisForAll = true)
             loadPhotos()
         } catch (e: Exception) {
             currentCoroutineContext().ensureActive()

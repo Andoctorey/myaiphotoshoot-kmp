@@ -18,6 +18,7 @@ data class UploadUiState(
     val uploadProgress: Int = 0,
 
     val analyzingPhotos: Int = 0,
+    val showAnalysisForAll: Boolean = false,
 
     val isLoadingTraining: Boolean = false,
     val trainingStatus: TrainingStatus? = null,

@@ -141,6 +141,7 @@ fun UploadScreen(
             Photos(
                 photos = state.photos,
                 listState = state.listState,
+                showAnalysisForAll = state.showAnalysisForAll,
                 hideDeletePhotoButton = hideDeletePhotoButton,
                 onDelete = viewModel::deletePhoto,
             )
@@ -490,11 +491,11 @@ private fun TrainModelFab(
     }
 }
 
-
 @Composable
 private fun Photos(
     photos: List<UploadUiState.Photo>,
     listState: LazyStaggeredGridState,
+    showAnalysisForAll: Boolean,
     hideDeletePhotoButton: Boolean,
     onDelete: (UploadUiState.Photo) -> Unit,
 ) {
@@ -514,6 +515,7 @@ private fun Photos(
             Photo(
                 modifier = Modifier.animateItem(),
                 photo = photos[item],
+                showAnalysisForAll = showAnalysisForAll,
                 hideDeletePhotoButton = hideDeletePhotoButton,
                 onDelete = onDelete,
             )
@@ -525,12 +527,16 @@ private fun Photos(
 private fun Photo(
     modifier: Modifier,
     photo: UploadUiState.Photo,
+    showAnalysisForAll: Boolean,
     hideDeletePhotoButton: Boolean,
     onDelete: (UploadUiState.Photo) -> Unit,
 ) {
     var loading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<Throwable?>(null) }
     var showAnalysis by remember { mutableStateOf(false) }
+    LaunchedEffect(showAnalysisForAll) {
+        showAnalysis = showAnalysisForAll
+    }
 
     if (error != null) {
         Box(
