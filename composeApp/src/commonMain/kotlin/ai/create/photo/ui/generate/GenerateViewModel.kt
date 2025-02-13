@@ -37,7 +37,7 @@ class GenerateViewModel : AuthViewModel() {
         if (uiState.isLoading) return@launch
 
         Logger.i("loadTrainings")
-        uiState = uiState.copy(isLoading = true, loadingError = null)
+        uiState = uiState.copy(isLoading = uiState.trainings.isNullOrEmpty(), loadingError = null)
         try {
             var trainings = UserTrainingsRepository.getTrainings(userId).getOrThrow().map {
                 GenerateUiState.Training(
