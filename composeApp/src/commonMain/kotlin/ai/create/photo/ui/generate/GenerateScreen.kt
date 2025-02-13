@@ -103,6 +103,10 @@ fun GenerateScreen(
     onGenerate: (String, String, Int) -> Unit,
     prompt: String,
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.loadTrainings()
+    }
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,

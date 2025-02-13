@@ -33,9 +33,10 @@ class GenerateViewModel : AuthViewModel() {
     }
 
     fun loadTrainings() = viewModelScope.launch {
-        Logger.i("loadTrainings")
         val userId = user?.id ?: return@launch
+        if (uiState.isLoading) return@launch
 
+        Logger.i("loadTrainings")
         uiState = uiState.copy(isLoading = true, loadingError = null)
         try {
             var trainings = UserTrainingsRepository.getTrainings(userId).getOrThrow().map {
