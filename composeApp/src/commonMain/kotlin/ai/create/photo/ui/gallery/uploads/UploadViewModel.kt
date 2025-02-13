@@ -128,32 +128,35 @@ class UploadViewModel : AuthViewModel() {
     }
 
     fun analyzePhotos() = viewModelScope.launch {
-        if (uiState.analyzingPhotos) return@launch
+        if (uiState.analyzingPhotos != 0) return@launch
         val notAnalyzedPhotos = uiState.photos?.filter { it.analysis == null }
         if (notAnalyzedPhotos.isNullOrEmpty()) return@launch
 
         Logger.i("analyzePhotos: ${notAnalyzedPhotos.size}")
 
-        uiState = uiState.copy(analyzingPhotos = true)
+        uiState =
+            uiState.copy(analyzingPhotos = (uiState.photos?.size ?: 0) - notAnalyzedPhotos.size + 1)
         try {
             if (Supabase.LOCAL) {
                 notAnalyzedPhotos.forEach { photo ->
                     SupabaseFunction.analyzePhoto(photo.id)
+                    uiState = uiState.copy(analyzingPhotos = uiState.analyzingPhotos + 1)
                 }
             } else {
                 val analysisJobs = notAnalyzedPhotos.map { photo ->
                     async {
                         SupabaseFunction.analyzePhoto(photo.id)
+                        uiState = uiState.copy(analyzingPhotos = uiState.analyzingPhotos + 1)
                     }
                 }
                 analysisJobs.awaitAll()
             }
-            uiState = uiState.copy(analyzingPhotos = false)
+            uiState = uiState.copy(analyzingPhotos = 0)
             loadPhotos()
         } catch (e: Exception) {
             currentCoroutineContext().ensureActive()
             Logger.e("analyzePhotos failed", e)
-            uiState = uiState.copy(analyzingPhotos = false, errorPopup = e)
+            uiState = uiState.copy(analyzingPhotos = 0, errorPopup = e)
         }
     }
 

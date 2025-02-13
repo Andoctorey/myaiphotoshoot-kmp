@@ -156,6 +156,7 @@ fun UploadScreen(
                         modifier = Modifier.align(Alignment.BottomCenter)
                             .padding(bottom = buttonsBottomPadding),
                         analyzingPhotos = state.analyzingPhotos,
+                        totalPhotos = state.photos.size,
                         onClick = viewModel::analyzePhotos,
                     )
                 } else {
@@ -363,14 +364,15 @@ private fun AddPhotosFab(
 @Composable
 private fun AnalyzePhotosFab(
     modifier: Modifier = Modifier,
-    analyzingPhotos: Boolean,
+    analyzingPhotos: Int,
+    totalPhotos: Int,
     onClick: () -> Unit
 ) {
     ExtendedFloatingActionButton(
         modifier = modifier,
         onClick = onClick,
     ) {
-        if (analyzingPhotos) {
+        if (analyzingPhotos > 0) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(24.dp),
@@ -379,7 +381,11 @@ private fun AnalyzePhotosFab(
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
-                    text = stringResource(Res.string.analyzing_photos),
+                    text = stringResource(
+                        Res.string.analyzing_photos,
+                        analyzingPhotos,
+                        totalPhotos
+                    ),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     fontSize = 14.sp,
