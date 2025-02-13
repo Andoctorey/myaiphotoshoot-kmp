@@ -59,8 +59,8 @@ class PublicViewModel : AuthViewModel() {
     }
 
     fun loadPublicGallery() = viewModelScope.launch {
-        Logger.i("loadPublicGallery")
         if (uiState.isLoadingNextPage) return@launch
+        Logger.i("loadPublicGallery")
         uiState = uiState.copy(isLoadingNextPage = true)
         try {
             val generations =
