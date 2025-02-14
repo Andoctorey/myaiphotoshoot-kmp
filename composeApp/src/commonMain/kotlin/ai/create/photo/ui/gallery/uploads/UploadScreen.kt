@@ -2,8 +2,6 @@ package ai.create.photo.ui.gallery.uploads
 
 import ai.create.photo.data.supabase.model.AnalysisStatus
 import ai.create.photo.data.supabase.model.TrainingStatus
-import ai.create.photo.platform.Platforms
-import ai.create.photo.platform.platform
 import ai.create.photo.ui.compose.ConfirmationPopup
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolderSmall
@@ -18,7 +16,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -503,13 +500,6 @@ private fun Photos(
     onDelete: (UploadUiState.Photo) -> Unit,
 ) {
 
-    val optimizedVersion = remember {
-        platform().platform in listOf(
-            Platforms.WEB_MOBILE,
-            Platforms.WEB_DESKTOP,
-        )
-    }
-
     LazyVerticalStaggeredGrid(
         state = listState,
         modifier = Modifier.fillMaxSize(),
@@ -525,12 +515,10 @@ private fun Photos(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .animateItem(),
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
             ) {
                 Photo(
                     photo = photos[item],
-                    doNotLoad = optimizedVersion && listState.isScrollInProgress,
                     showAnalysisForAll = showAnalysisForAll,
                     hideDeletePhotoButton = hideDeletePhotoButton,
                     onDelete = onDelete,
@@ -543,7 +531,6 @@ private fun Photos(
 @Composable
 private fun Photo(
     photo: UploadUiState.Photo,
-    doNotLoad: Boolean,
     showAnalysisForAll: Boolean,
     hideDeletePhotoButton: Boolean,
     onDelete: (UploadUiState.Photo) -> Unit,
@@ -561,9 +548,8 @@ private fun Photo(
     }
 
     Box(
-        modifier = Modifier.fillMaxWidth().then(if (loaded) Modifier else Modifier.aspectRatio(1f))
+        modifier = Modifier.fillMaxWidth()
     ) {
-        if (!loaded && doNotLoad) return
         AsyncImage(
             modifier = Modifier.fillMaxWidth(),
             model = ImageRequest.Builder(LocalPlatformContext.current)

@@ -152,13 +152,6 @@ private fun Photos(
         onRefresh = onRefresh,
     ) {
 
-        val optimizedVersion = remember {
-            platform().platform in listOf(
-                Platforms.WEB_MOBILE,
-                Platforms.WEB_DESKTOP,
-            )
-        }
-
         LazyVerticalGrid(
             state = listState,
             modifier = Modifier.fillMaxSize(),
@@ -175,11 +168,10 @@ private fun Photos(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(MaterialTheme.colorScheme.surfaceVariant)
-                        .animateItem(),
+                        .then(if (item < 3) Modifier.animateItem() else Modifier),
                 ) {
                     Photo(
                         photo = photos[item],
-                        doNotLoad = optimizedVersion && listState.isScrollInProgress,
                         onTogglePublic = onTogglePublic,
                         onDownload = { onDownload(photos[item]) },
                         onPrompt = onPrompt,
@@ -219,7 +211,6 @@ private fun Photos(
 @Composable
 private fun Photo(
     photo: CreationsUiState.Photo,
-    doNotLoad: Boolean,
     onDownload: (CreationsUiState.Photo) -> Unit,
     onTogglePublic: (CreationsUiState.Photo) -> Unit,
     onPrompt: (String) -> Unit,
@@ -235,8 +226,6 @@ private fun Photo(
     Box(
         modifier = Modifier.fillMaxWidth().then(if (loaded) Modifier else Modifier.aspectRatio(1f))
     ) {
-        if (!loaded && doNotLoad) return
-
         AsyncImage(
             modifier = Modifier.fillMaxWidth(),
             model = ImageRequest.Builder(LocalPlatformContext.current)
