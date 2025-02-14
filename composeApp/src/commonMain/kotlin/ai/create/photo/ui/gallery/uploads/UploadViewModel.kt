@@ -216,7 +216,7 @@ class UploadViewModel : AuthViewModel() {
             var trainingStatus = userTraining?.status
             if (userTraining != null) {
                 val lastPhotoUploadDate =
-                    uiState.photos?.first()?.createdAt ?: Instant.DISTANT_FUTURE
+                    uiState.photos?.firstOrNull()?.createdAt ?: Instant.DISTANT_FUTURE
                 Logger.i("last photo upload date: $lastPhotoUploadDate")
                 val newPhotoSet = userTraining.createdAt
                 if (lastPhotoUploadDate > newPhotoSet) {
