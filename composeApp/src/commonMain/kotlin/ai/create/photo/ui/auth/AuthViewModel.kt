@@ -35,7 +35,7 @@ abstract class AuthViewModel : ViewModel() {
                 when (it) {
                     is SessionStatus.Authenticated -> {
                         val supabaseUser = it.session.user
-                        val emailChanged = user?.id != supabaseUser?.id
+                        val emailChanged = user != null && user?.id != supabaseUser?.id
                         loadUser()
                         onAuthenticated(emailChanged)
                     }

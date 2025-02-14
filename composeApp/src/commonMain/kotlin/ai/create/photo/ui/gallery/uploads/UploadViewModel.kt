@@ -42,6 +42,9 @@ class UploadViewModel : AuthViewModel() {
     }
 
     override fun onAuthenticated(userChanged: Boolean) {
+        if (userChanged) {
+            uiState = UploadUiState()
+        }
         loadPhotos()
     }
 

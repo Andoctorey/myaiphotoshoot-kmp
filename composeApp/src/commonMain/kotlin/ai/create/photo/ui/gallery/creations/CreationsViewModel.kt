@@ -26,6 +26,9 @@ class CreationsViewModel : AuthViewModel() {
         if (uiState.photos.isNotEmpty()) {
             uiState = uiState.copy(isLoading = false)
         }
+        if (userChanged) {
+            uiState = CreationsUiState()
+        }
         if (userChanged || uiState.photos.isEmpty()) {
             loadCreations()
         }

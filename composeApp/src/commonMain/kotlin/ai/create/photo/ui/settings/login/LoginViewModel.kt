@@ -27,7 +27,9 @@ class LoginViewModel : AuthViewModel() {
     }
 
     override fun onAuthenticated(userChanged: Boolean) {
-        uiState = uiState.copy(isLoading = false, email = user?.email)
+        uiState = uiState.copy(
+            isLoading = false,
+            email = user?.email?.takeIf { !uiState.isSendingOtp && !uiState.enterOtp })
     }
 
     override fun onAuthError(error: Throwable) {
@@ -81,7 +83,10 @@ class LoginViewModel : AuthViewModel() {
         try {
             SupabaseAuth.verifyEmailOtp(uiState.emailToVerify, uiState.otp)
             loadUser()
-            uiState = uiState.copy(isVerifyingOtp = false, otpVerified = true, email = user?.email)
+            uiState = uiState.copy(
+                isVerifyingOtp = false, otpVerified = true,
+                otp = "", email = user?.email
+            )
         } catch (e: Exception) {
             currentCoroutineContext().ensureActive()
             if (e is AuthRestException) {
@@ -110,6 +115,7 @@ class LoginViewModel : AuthViewModel() {
     fun logout() = viewModelScope.launch {
         Logger.i("logout")
         supabase.auth.signOut()
+        uiState = LoginUiState()
     }
 
     fun deleteAllData() = viewModelScope.launch {
