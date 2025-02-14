@@ -61,7 +61,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -90,14 +89,9 @@ import photocreateai.composeapp.generated.resources.train_ai_model
 import photocreateai.composeapp.generated.resources.training_ai_model
 import photocreateai.composeapp.generated.resources.upload_guidelines_footer
 import photocreateai.composeapp.generated.resources.upload_guidelines_header
-import photocreateai.composeapp.generated.resources.upload_guidelines_message_1
-import photocreateai.composeapp.generated.resources.upload_guidelines_message_2
-import photocreateai.composeapp.generated.resources.upload_guidelines_message_3
-import photocreateai.composeapp.generated.resources.upload_guidelines_message_4
 import photocreateai.composeapp.generated.resources.upload_guidelines_step_1
 import photocreateai.composeapp.generated.resources.upload_guidelines_step_2
 import photocreateai.composeapp.generated.resources.upload_guidelines_step_3
-import photocreateai.composeapp.generated.resources.upload_guidelines_step_4
 import photocreateai.composeapp.generated.resources.upload_more_photos
 
 
@@ -279,22 +273,9 @@ private fun Placeholder(modifier: Modifier = Modifier) {
             fontSize = 18.sp,
         )
 
-        UploadGuidelineStep(
-            step = stringResource(Res.string.upload_guidelines_step_1),
-            message = stringResource(Res.string.upload_guidelines_message_1)
-        )
-        UploadGuidelineStep(
-            step = stringResource(Res.string.upload_guidelines_step_2),
-            message = stringResource(Res.string.upload_guidelines_message_2)
-        )
-        UploadGuidelineStep(
-            step = stringResource(Res.string.upload_guidelines_step_3),
-            message = stringResource(Res.string.upload_guidelines_message_3)
-        )
-        UploadGuidelineStep(
-            step = stringResource(Res.string.upload_guidelines_step_4),
-            message = stringResource(Res.string.upload_guidelines_message_4)
-        )
+        UploadGuidelineStep(stringResource(Res.string.upload_guidelines_step_1))
+        UploadGuidelineStep(stringResource(Res.string.upload_guidelines_step_2))
+        UploadGuidelineStep(stringResource(Res.string.upload_guidelines_step_3))
 
         Text(
             text = stringResource(Res.string.upload_guidelines_footer),
@@ -304,16 +285,12 @@ private fun Placeholder(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun UploadGuidelineStep(step: String, message: String) {
+private fun UploadGuidelineStep(step: String) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(
             text = step,
-            fontWeight = FontWeight.Medium,
-            fontSize = 16.sp,
-        )
-        Text(
-            text = message,
-            fontSize = 14.sp,
+            color = MaterialTheme.colorScheme.primary,
+            fontSize = 18.sp,
         )
     }
 }
