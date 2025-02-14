@@ -148,8 +148,13 @@ class UploadViewModel : AuthViewModel() {
             } else {
                 val analysisJobs = notAnalyzedPhotos.map { photo ->
                     async {
-                        SupabaseFunction.analyzePhoto(photo.id)
-                        uiState = uiState.copy(analyzingPhotos = uiState.analyzingPhotos + 1)
+                        try {
+                            SupabaseFunction.analyzePhoto(photo.id)
+                        } catch (_: Exception) {
+
+                        } finally {
+                            uiState = uiState.copy(analyzingPhotos = uiState.analyzingPhotos + 1)
+                        }
                     }
                 }
                 analysisJobs.awaitAll()
