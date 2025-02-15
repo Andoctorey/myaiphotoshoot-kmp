@@ -27,7 +27,7 @@ data class GenerateUiState(
     val showTranslateButton: Boolean = false,
     val isTranslating: Boolean = false,
 
-    val photosToGenerateX100: Int = 100,
+    val photosToGenerateX100: Int = 300,
 
     val showOpenCreations: Boolean = false,
 ) {
