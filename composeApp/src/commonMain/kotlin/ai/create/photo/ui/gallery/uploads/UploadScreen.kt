@@ -2,6 +2,8 @@ package ai.create.photo.ui.gallery.uploads
 
 import ai.create.photo.data.supabase.model.AnalysisStatus
 import ai.create.photo.data.supabase.model.TrainingStatus
+import ai.create.photo.platform.Platforms
+import ai.create.photo.platform.platform
 import ai.create.photo.ui.compose.ConfirmationPopup
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolderSmall
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -74,6 +77,7 @@ import coil3.request.crossfade
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
@@ -477,6 +481,13 @@ private fun Photos(
     onDelete: (UploadUiState.Photo) -> Unit,
 ) {
 
+    val optimizedVersion = remember {
+        platform().platform in listOf(
+            Platforms.WEB_MOBILE,
+            Platforms.WEB_DESKTOP,
+        )
+    }
+
     LazyVerticalStaggeredGrid(
         state = listState,
         modifier = Modifier.fillMaxSize(),
@@ -492,10 +503,12 @@ private fun Photos(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .animateItem()
                     .background(MaterialTheme.colorScheme.surfaceVariant),
             ) {
                 Photo(
                     photo = photos[item],
+                    optimizedVersion = optimizedVersion,
                     showAnalysisForAll = showAnalysisForAll,
                     hideDeletePhotoButton = hideDeletePhotoButton,
                     onDelete = onDelete,
@@ -508,15 +521,21 @@ private fun Photos(
 @Composable
 private fun Photo(
     photo: UploadUiState.Photo,
+    optimizedVersion: Boolean,
     showAnalysisForAll: Boolean,
     hideDeletePhotoButton: Boolean,
     onDelete: (UploadUiState.Photo) -> Unit,
 ) {
     var loaded by remember { mutableStateOf(false) }
-
+    var showImage by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<Throwable?>(null) }
     error?.let {
         ErrorMessagePlaceHolderSmall(it)
+    }
+
+    LaunchedEffect(photo.url) {
+        if (optimizedVersion) delay(1000L)
+        showImage = true
     }
 
     var showAnalysis by remember { mutableStateOf(false) }
@@ -525,22 +544,24 @@ private fun Photo(
     }
 
     Box(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth().then(if (loaded) Modifier else Modifier.aspectRatio(1f))
     ) {
-        AsyncImage(
-            modifier = Modifier.fillMaxWidth(),
-            model = ImageRequest.Builder(LocalPlatformContext.current)
-                .data(photo.url)
-                .crossfade(true)
-                .build(),
-            contentDescription = photo.analysis,
-            contentScale = ContentScale.FillWidth,
-            onSuccess = { loaded = true },
-            onError = {
-                Logger.e("error loading image ${photo.url}", it.result.throwable)
-                error = it.result.throwable
-            },
-        )
+        if (showImage) {
+            AsyncImage(
+                modifier = Modifier.fillMaxWidth(),
+                model = ImageRequest.Builder(LocalPlatformContext.current)
+                    .data(photo.url)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = photo.analysis,
+                contentScale = ContentScale.FillWidth,
+                onSuccess = { loaded = true },
+                onError = {
+                    Logger.e("error loading image ${photo.url}", it.result.throwable)
+                    error = it.result.throwable
+                },
+            )
+        }
 
         if (loaded && !hideDeletePhotoButton) {
             IconButton(

@@ -152,6 +152,13 @@ private fun Photos(
         onRefresh = onRefresh,
     ) {
 
+        val optimizedVersion = remember {
+            platform().platform in listOf(
+                Platforms.WEB_MOBILE,
+                Platforms.WEB_DESKTOP,
+            )
+        }
+
         LazyVerticalGrid(
             state = listState,
             modifier = Modifier.fillMaxSize(),
@@ -167,11 +174,12 @@ private fun Photos(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                        .then(if (item < 3) Modifier.animateItem() else Modifier),
+                        .animateItem()
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
                 ) {
                     Photo(
                         photo = photos[item],
+                        optimizedVersion = optimizedVersion,
                         onTogglePublic = onTogglePublic,
                         onDownload = { onDownload(photos[item]) },
                         onPrompt = onPrompt,
@@ -211,44 +219,50 @@ private fun Photos(
 @Composable
 private fun Photo(
     photo: CreationsUiState.Photo,
+    optimizedVersion: Boolean,
     onDownload: (CreationsUiState.Photo) -> Unit,
     onTogglePublic: (CreationsUiState.Photo) -> Unit,
     onPrompt: (String) -> Unit,
     onDelete: (CreationsUiState.Photo) -> Unit,
 ) {
     var loaded by remember { mutableStateOf(false) }
-
+    var showImage by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<Throwable?>(null) }
     error?.let {
         ErrorMessagePlaceHolderSmall(it)
     }
 
+    LaunchedEffect(photo.url) {
+        if (optimizedVersion) delay(1000L)
+        showImage = true
+    }
+
     Box(
         modifier = Modifier.fillMaxWidth().then(if (loaded) Modifier else Modifier.aspectRatio(1f))
     ) {
-        AsyncImage(
-            modifier = Modifier.fillMaxWidth(),
-            model = ImageRequest.Builder(LocalPlatformContext.current)
-                .data(photo.url)
-                .crossfade(true)
-                .build(),
-            contentDescription = photo.prompt,
-            contentScale = ContentScale.FillWidth,
-            onSuccess = { loaded = true },
-            onError = {
-                Logger.e("error loading image ${photo.url}", it.result.throwable)
-                error = it.result.throwable
-            },
-        )
+        if (showImage) {
+            AsyncImage(
+                modifier = Modifier.fillMaxWidth(),
+                model = ImageRequest.Builder(LocalPlatformContext.current)
+                    .data(photo.url)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = photo.prompt,
+                contentScale = ContentScale.FillWidth,
+                onSuccess = { loaded = true },
+                onError = {
+                    Logger.e("error loading image ${photo.url}", it.result.throwable)
+                    error = it.result.throwable
+                },
+            )
+        }
 
         if (loaded) {
             PhotoDropMenu(
                 modifier = Modifier.align(Alignment.TopEnd),
                 photo = photo,
                 onDownload = onDownload,
-                onShare = {
-                    shareLink(photo.url)
-                },
+                onShare = { shareLink(photo.url) },
                 onTogglePublic = onTogglePublic,
                 onPrompt = onPrompt,
                 onDelete = onDelete,
