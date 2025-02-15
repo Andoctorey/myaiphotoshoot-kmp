@@ -503,8 +503,8 @@ private fun Photos(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .animateItem()
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .then(if (!optimizedVersion || item < 3) Modifier.animateItem() else Modifier),
             ) {
                 Photo(
                     photo = photos[item],
@@ -551,7 +551,7 @@ private fun Photo(
                 modifier = Modifier.fillMaxWidth(),
                 model = ImageRequest.Builder(LocalPlatformContext.current)
                     .data(photo.url)
-                    .crossfade(true)
+                    .crossfade(!optimizedVersion)
                     .build(),
                 contentDescription = photo.analysis,
                 contentScale = ContentScale.FillWidth,
