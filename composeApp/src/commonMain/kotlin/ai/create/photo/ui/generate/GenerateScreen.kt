@@ -549,8 +549,7 @@ private fun Trainings(
     selectTraining: (GenerateUiState.Training) -> Unit,
     trainAiModel: () -> Unit
 ) {
-    val options = trainings.toMutableList()
-    options.add(null)
+    val options = trainings.filterNotNull() + listOf(null)
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(selectedTraining) }
     val aiModelString = stringResource(Res.string.ai_model)
