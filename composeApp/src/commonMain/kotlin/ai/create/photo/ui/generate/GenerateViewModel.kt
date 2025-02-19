@@ -12,7 +12,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import io.github.vinceglb.filekit.core.PlatformFile
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 
@@ -20,6 +22,8 @@ class GenerateViewModel : AuthViewModel() {
 
     var uiState by mutableStateOf(GenerateUiState())
         private set
+
+    private var updatePrefsJob: Job? = null
 
     override fun onAuthInitializing() {
         uiState = uiState.copy(isLoading = true)
@@ -134,6 +138,24 @@ class GenerateViewModel : AuthViewModel() {
         }
     }
 
+
+    fun loadProfile() = viewModelScope.launch {
+        val userId = user?.id ?: return@launch
+
+        try {
+            val profile = ProfilesRepository.loadProfile(userId)
+            val photosToGenerate = profile?.preferences?.photosToGenerate
+            uiState = uiState.copy(
+                photosToGenerateX100 = if (photosToGenerate != null) photosToGenerate * 100
+                else uiState.photosToGenerateX100,
+            )
+        } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
+            Logger.e("loadProfile failed", e)
+            uiState = uiState.copy(errorPopup = e)
+        }
+    }
+
     fun surpriseMe() = viewModelScope.launch {
         uiState = uiState.copy(isLoadingSurpriseMe = true)
         try {
@@ -163,7 +185,26 @@ class GenerateViewModel : AuthViewModel() {
     }
 
     fun onPhotosToGenerateChanged(photosToGenerate: Int) {
+        updatePrefsJob?.cancel()
+        val userId = user?.id ?: return
+        val originalPhotosToGenerate = uiState.photosToGenerateX100
         uiState = uiState.copy(photosToGenerateX100 = photosToGenerate)
+        val photosToGenerate = photosToGenerate / 100
+
+        updatePrefsJob = viewModelScope.launch {
+            delay(2000L)
+            try {
+                val profile = ProfilesRepository.loadProfile(userId)
+                var preferences = profile?.preferences ?: return@launch
+                preferences = preferences.copy(photosToGenerate = photosToGenerate)
+                ProfilesRepository.updateProfilePreference(userId, preferences)
+            } catch (e: Exception) {
+                currentCoroutineContext().ensureActive()
+                Logger.e("onPhotosToGenerateChanged failed", e)
+                uiState =
+                    uiState.copy(photosToGenerateX100 = originalPhotosToGenerate, errorPopup = e)
+            }
+        }
     }
 
     fun enhancePrompt() = viewModelScope.launch {
@@ -262,22 +303,5 @@ class GenerateViewModel : AuthViewModel() {
     private fun isLikelyEnglish(text: String): Boolean {
         if (text.isEmpty()) return true
         return englishRegex.matches(text)
-    }
-
-    fun loadProfile() = viewModelScope.launch {
-        val userId = user?.id ?: return@launch
-
-        try {
-            val profile = ProfilesRepository.loadProfile(userId)
-            val photosToGenerate = profile?.preferences?.photosToGenerate
-            uiState = uiState.copy(
-                photosToGenerateX100 = if (photosToGenerate != null) photosToGenerate * 100
-                else uiState.photosToGenerateX100,
-            )
-        } catch (e: Exception) {
-            currentCoroutineContext().ensureActive()
-            Logger.e("loadProfile failed", e)
-            uiState = uiState.copy(errorPopup = e)
-        }
     }
 }

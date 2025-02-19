@@ -1,6 +1,7 @@
 package ai.create.photo.data.supabase.database
 
-import ai.create.photo.data.supabase.Supabase
+import ai.create.photo.data.supabase.Supabase.supabase
+import ai.create.photo.data.supabase.model.Preferences
 import ai.create.photo.data.supabase.model.Profile
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.postgrest.from
@@ -17,7 +18,7 @@ object ProfilesRepository {
     val profile: Profile?
         get() = profileFlow.value
 
-    suspend fun loadProfile(userId: String) = Supabase.supabase
+    suspend fun loadProfile(userId: String) = supabase
         .from(PROFILES_TABLE)
         .select(columns = Columns.list(Profile.columns)) {
             filter {
@@ -30,4 +31,16 @@ object ProfilesRepository {
             _profileFlow.value = it
             Logger.i("getProfile: $it")
         }
+
+    suspend fun updateProfilePreference(userId: String, preferences: Preferences) {
+        supabase
+            .from(PROFILES_TABLE)
+            .update(mapOf("preferences" to preferences)) {
+                filter {
+                    eq("id", userId)
+                }
+            }.also {
+                Logger.i("updateProfilePreference: $preferences")
+            }
+    }
 }
