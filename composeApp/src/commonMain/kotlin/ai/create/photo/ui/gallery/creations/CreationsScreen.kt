@@ -11,12 +11,15 @@ import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.compose.PullToRefreshBoxNoDesktop
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Check
@@ -41,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import co.touchlab.kermit.Logger
 import coil3.compose.AsyncImage
@@ -54,6 +58,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.copy_link
+import photocreateai.composeapp.generated.resources.creations_placeholder
 import photocreateai.composeapp.generated.resources.delete
 import photocreateai.composeapp.generated.resources.delete_photo_confirmation
 import photocreateai.composeapp.generated.resources.download
@@ -93,6 +98,10 @@ fun CreationsScreen(
             LoadingPlaceholder()
         } else if (state.loadingError != null) {
             ErrorMessagePlaceHolder(state.loadingError)
+        } else if (state.photos.isEmpty()) {
+            Placeholder(modifier = Modifier.align(Alignment.Center)) {
+                generate("")
+            }
         } else {
             LaunchedEffect(state.scrollToTop) {
                 if (state.scrollToTop && state.listState.firstVisibleItemIndex > 1) {
@@ -129,6 +138,23 @@ fun CreationsScreen(
         ErrorPopup(state.errorPopup) {
             viewModel.hideErrorPopup()
         }
+    }
+}
+
+@Composable
+private fun Placeholder(modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Column(
+        modifier = modifier
+            .verticalScroll(rememberScrollState())
+            .safeDrawingPadding()
+            .padding(start = 24.dp, end = 24.dp, top = 48.dp, bottom = 160.dp)
+            .clickable(onClick = onClick),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text(
+            text = stringResource(Res.string.creations_placeholder),
+            fontSize = 18.sp,
+        )
     }
 }
 
