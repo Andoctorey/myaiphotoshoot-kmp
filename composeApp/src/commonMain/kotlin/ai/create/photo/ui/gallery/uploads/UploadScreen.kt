@@ -12,6 +12,7 @@ import ai.create.photo.ui.compose.InfoPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.training.TrainAiModelPopup
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -125,7 +126,9 @@ fun UploadScreen(
         } else if (state.loadingError != null) {
             ErrorMessagePlaceHolder(state.loadingError)
         } else if (state.photos.isNullOrEmpty()) {
-            Placeholder(modifier = Modifier.align(Alignment.Center))
+            Placeholder(modifier = Modifier.align(Alignment.Center)) {
+                onAddPhotoClick()
+            }
         } else {
             LaunchedEffect(state.scrollToTop) {
                 if (state.scrollToTop && state.listState.firstVisibleItemIndex > 1) {
@@ -262,12 +265,13 @@ fun UploadScreen(
 }
 
 @Composable
-private fun Placeholder(modifier: Modifier = Modifier) {
+private fun Placeholder(modifier: Modifier = Modifier, onClick: () -> Unit) {
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
             .safeDrawingPadding()
-            .padding(start = 24.dp, end = 24.dp, top = 48.dp, bottom = 160.dp),
+            .padding(start = 24.dp, end = 24.dp, top = 48.dp, bottom = 160.dp)
+            .clickable(onClick = onClick),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
