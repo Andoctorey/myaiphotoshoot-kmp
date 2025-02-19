@@ -4,6 +4,7 @@ import ai.create.photo.platform.Platforms
 import ai.create.photo.platform.platform
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
+import ai.create.photo.ui.compose.GenerationIcon
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
@@ -39,7 +40,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Memory
-import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Translate
@@ -103,6 +103,7 @@ fun GenerateScreen(
     viewModel: GenerateViewModel = viewModel { GenerateViewModel() },
     trainAiModel: () -> Unit,
     openCreations: () -> Unit,
+    generationsInProgress: Int,
     onGenerate: (String, String, Int) -> Unit,
     prompt: String,
 ) {
@@ -231,14 +232,9 @@ fun GenerateScreen(
                                 isLoading = state.isEnhancingPrompt,
                                 onClick = viewModel::enhancePrompt,
                             )
+                        }
 
-                            if (state.showOpenCreations) {
-                                ShowOpenCreationsButton(
-                                    modifier = Modifier.padding(horizontal = 4.dp),
-                                    onClick = openCreations,
-                                )
-                            }
-
+                        if (state.userPrompt.isNotEmpty()) {
                             TranslateButton(
                                 modifier = Modifier.padding(horizontal = 4.dp).fillMaxWidth(),
                                 show = state.showTranslateButton,
@@ -271,6 +267,13 @@ fun GenerateScreen(
                             )
                         }
 
+                        if (state.showOpenCreations) {
+                            OpenCreationsButton(
+                                modifier = Modifier.padding(horizontal = 4.dp),
+                                generationsInProgress = generationsInProgress,
+                                onClick = openCreations,
+                            )
+                        }
                     }
                 }
 
@@ -438,13 +441,13 @@ private fun EnhancePromptButton(modifier: Modifier, isLoading: Boolean, onClick:
 }
 
 @Composable
-private fun ShowOpenCreationsButton(modifier: Modifier, onClick: () -> Unit) {
+private fun OpenCreationsButton(
+    modifier: Modifier,
+    generationsInProgress: Int,
+    onClick: () -> Unit
+) {
     OutlinedButton(modifier = modifier, onClick = onClick) {
-        val icon = Icons.Default.PhotoLibrary
-        Icon(
-            imageVector = Icons.Default.PhotoLibrary,
-            contentDescription = icon.name,
-        )
+        GenerationIcon(generationsInProgress)
         Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
         Text(
             text = stringResource(Res.string.open_creations),
