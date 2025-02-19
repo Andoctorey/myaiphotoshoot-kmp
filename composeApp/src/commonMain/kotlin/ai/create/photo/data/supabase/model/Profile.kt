@@ -11,6 +11,7 @@ import kotlin.math.roundToLong
 @Serializable
 data class Profile(
     @SerialName("balance") val balance: Float,
+    @SerialName("preferences") val preferences: Preferences,
 ) {
     companion object {
         @OptIn(ExperimentalSerializationApi::class)

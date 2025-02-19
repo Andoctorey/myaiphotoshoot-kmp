@@ -2,6 +2,7 @@ package ai.create.photo.ui.generate
 
 import ai.create.photo.data.supabase.SupabaseFunction
 import ai.create.photo.data.supabase.SupabaseStorage
+import ai.create.photo.data.supabase.database.ProfilesRepository
 import ai.create.photo.data.supabase.database.UserTrainingsRepository
 import ai.create.photo.platform.resizeToWidth
 import ai.create.photo.ui.auth.AuthViewModel
@@ -25,6 +26,9 @@ class GenerateViewModel : AuthViewModel() {
     }
 
     override fun onAuthenticated(userChanged: Boolean) {
+        if (userChanged || uiState.trainings == null) {
+            loadProfile()
+        }
         loadTrainings()
     }
 
@@ -258,5 +262,22 @@ class GenerateViewModel : AuthViewModel() {
     private fun isLikelyEnglish(text: String): Boolean {
         if (text.isEmpty()) return true
         return englishRegex.matches(text)
+    }
+
+    fun loadProfile() = viewModelScope.launch {
+        val userId = user?.id ?: return@launch
+
+        try {
+            val profile = ProfilesRepository.loadProfile(userId)
+            val photosToGenerate = profile?.preferences?.photosToGenerate
+            uiState = uiState.copy(
+                photosToGenerateX100 = if (photosToGenerate != null) photosToGenerate * 100
+                else uiState.photosToGenerateX100,
+            )
+        } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
+            Logger.e("loadProfile failed", e)
+            uiState = uiState.copy(errorPopup = e)
+        }
     }
 }
