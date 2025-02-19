@@ -3,12 +3,10 @@
     <string name="tab_generate">Generate</string>
     <string name="tab_settings">Settings</string>
     <string name="back_button">Back</string>
-    <string name="add_your_photos">Add Selfies (%1$s/20)</string>
-    <string name="upload_guidelines_header">Transform Your Selfies into AI Photos in 3 Easy Steps:</string>
-    <string name="upload_guidelines_step_1">Step 1: Capture 10-20 selfies in portrait mode using your device's built-in camera, then upload them to the app. For best results, vary your angles and expressions with each shot, then upload them to the app.</string>
-    <string name="upload_guidelines_step_2">Step 2: Tap the Analyze button, review your photos, and remove any that are not suitable for AI training.</string>
-    <string name="upload_guidelines_step_3">Step 3: Tap the Train AI Model button, and wait for your personalized AI to be ready.</string>
-    <string name="upload_guidelines_footer">Generate thousands of amazing images and share them with friends!</string>
+    <string name="add_your_photos">Upload Selfies (%1$s/20)</string>
+    <string name="upload_guidelines_title">Add Your Selfies</string>
+    <string name="upload_guidelines_message">Use your device’s native camera app to capture 10-20 selfies in portrait mode. Then, select your best shots to upload for a personalized AI experience. For best results, vary your angles and expressions with each shot, or mix in some of your favorite photos you already share on social media.</string>
+    <string name="creations_placeholder">Generate thousands of amazing images and share them with friends!</string>
     <string name="connection_error">Problem connecting with server. Please check your connection.</string>
     <string name="upload_more_photos">Oops! It looks like you need to upload at least 10 photos before training your model. Try taking some selfies in portrait mode from different angles to get started.</string>
     <string name="delete_some_photos">Please delete some photos. For optimal training, please keep no more than 20 photos for training.</string>
