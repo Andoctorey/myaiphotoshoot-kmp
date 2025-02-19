@@ -245,13 +245,9 @@ fun GenerateScreen(
                                 isTranslating = state.isTranslating,
                                 onClick = viewModel::translate,
                             )
-                        } else {
-                            SurpriseMeButton(
-                                modifier = Modifier.padding(horizontal = 4.dp),
-                                isLoading = state.isLoadingSurpriseMe,
-                                onClick = viewModel::surpriseMe
-                            )
+                        }
 
+                        if (state.userPrompt.isEmpty()) {
                             val launcher = rememberFilePickerLauncher(
                                 title = stringResource(Res.string.picture_to_prompt),
                                 type = PickerType.Image,
@@ -264,6 +260,14 @@ fun GenerateScreen(
                                 modifier = Modifier.padding(horizontal = 4.dp),
                                 isLoading = state.isLoadingPictureToPrompt,
                                 onClick = { launcher.launch() }
+                            )
+                        }
+
+                        if (state.userPrompt.isEmpty() || state.surpriseMePrompt) {
+                            SurpriseMeButton(
+                                modifier = Modifier.padding(horizontal = 4.dp),
+                                isLoading = state.isLoadingSurpriseMe,
+                                onClick = viewModel::surpriseMe
                             )
                         }
 

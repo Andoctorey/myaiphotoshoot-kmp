@@ -70,6 +70,7 @@ class GenerateViewModel : AuthViewModel() {
         uiState = uiState.copy(
             userPrompt = prompt,
             promptBeforeEnhancing = "",
+            surpriseMePrompt = false,
             showTranslateButton = !isLikelyEnglish(prompt),
         )
     }
@@ -136,7 +137,8 @@ class GenerateViewModel : AuthViewModel() {
             uiState = uiState.copy(
                 userPrompt = prompt,
                 promptBeforeEnhancing = "",
-                isLoadingSurpriseMe = false
+                isLoadingSurpriseMe = false,
+                surpriseMePrompt = true,
             )
         } catch (e: Exception) {
             currentCoroutineContext().ensureActive()
@@ -162,6 +164,7 @@ class GenerateViewModel : AuthViewModel() {
 
     fun enhancePrompt() = viewModelScope.launch {
         if (uiState.userPrompt.isEmpty()) return@launch
+        Logger.i("enhancePrompt")
         uiState = uiState.copy(isEnhancingPrompt = true)
         if (uiState.promptBeforeEnhancing.isEmpty()) {
             uiState = uiState.copy(promptBeforeEnhancing = uiState.userPrompt)
@@ -173,7 +176,7 @@ class GenerateViewModel : AuthViewModel() {
                 uiState.copy(userPrompt = prompt, isEnhancingPrompt = false)
         } catch (e: Exception) {
             currentCoroutineContext().ensureActive()
-            Logger.e("surpriseMe failed", e)
+            Logger.e("enhancePrompt failed", e)
             uiState = uiState.copy(isEnhancingPrompt = false, errorPopup = e)
         }
     }

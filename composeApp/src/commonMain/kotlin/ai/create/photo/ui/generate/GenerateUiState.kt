@@ -19,6 +19,7 @@ data class GenerateUiState(
 
     val userPrompt: String = "",
     val promptBeforeEnhancing: String = "",
+    val surpriseMePrompt: Boolean = false,
 
     val isLoadingSurpriseMe: Boolean = false,
     val isEnhancingPrompt: Boolean = false,
