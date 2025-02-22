@@ -8,12 +8,14 @@
       "purpose": "maskable"
     },
     {
-      "src": "./images/icon_192.png",
+      "src": "./images/icon_512.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "maskable"
     }
   ],
   "start_url": "./",
-  "display": "standalone"
+  "display": "standalone",
+  "theme_color": "#FFFBFF",
+  "background_color": "#FFFBFF"
 }
