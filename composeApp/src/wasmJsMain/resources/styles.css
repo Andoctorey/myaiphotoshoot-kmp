@@ -57,3 +57,22 @@ html, body {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+#warning {
+    position: absolute;
+    top: 100px;
+    left: 100px;
+    max-width: 830px;
+    z-index: 100;
+    background-color: white;
+    font-size: initial;
+    display: none;
+}
+
+#warning li {
+    padding-bottom: 15px;
+}
+
+#warning span.code {
+    font-family: monospace;
+}
