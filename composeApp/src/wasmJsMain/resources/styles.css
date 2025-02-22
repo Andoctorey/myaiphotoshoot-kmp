@@ -1,12 +1,12 @@
  @media (prefers-color-scheme: dark) {
     body {
-        background-color: #201A1B;
+        background-color: #1f1f25;
     }
  }
 
 @media (prefers-color-scheme: light) {
     body {
-        background-color: #FFFBFF;
+        background-color: #f2edf6;
     }
 }
 
@@ -32,9 +32,15 @@ html, body {
   z-index: 9999;
 }
 
+@media (prefers-color-scheme: light) {
+  #loading {
+    background-color: #f2edf6;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   #loading {
-    background-color: #201A1B; /* Dark theme background */
+    background-color: #1f1f25;
   }
 }
 
