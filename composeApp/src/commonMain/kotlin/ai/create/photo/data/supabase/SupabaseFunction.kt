@@ -87,4 +87,12 @@ object SupabaseFunction {
         )
         return response.body<Boolean>()
     }
+
+    suspend fun sendSlackError(error: String) {
+        Logger.i("sendSlackError: $error")
+        Supabase.supabase.functions.invoke(
+            function = "slack-error",
+            body = mapOf("error" to error)
+        )
+    }
 }
