@@ -1,0 +1,19 @@
+{
+  "name": "My AI Photo Shoot",
+  "icons": [
+    {
+      "src": "./images/icon_192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./images/icon_192.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ],
+  "start_url": "./",
+  "display": "standalone"
+}
