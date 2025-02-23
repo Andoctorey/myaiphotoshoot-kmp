@@ -23,7 +23,8 @@ class GenerateViewModel : AuthViewModel() {
     var uiState by mutableStateOf(GenerateUiState())
         private set
 
-    private var updatePrefsJob: Job? = null
+    private var updatePhotosToGenerateJob: Job? = null
+    private var updateSelectedTrainingJob: Job? = null
 
     override fun onAuthInitializing() {
         uiState = uiState.copy(isLoading = true)
@@ -144,10 +145,13 @@ class GenerateViewModel : AuthViewModel() {
 
         try {
             val profile = ProfilesRepository.loadProfile(userId)
-            val photosToGenerate = profile?.preferences?.photosToGenerate
+            val preferences = profile?.preferences
+            val photosToGenerate = preferences?.photosToGenerate
+            val trainingId = preferences?.selectedTrainingId
             uiState = uiState.copy(
                 photosToGenerateX100 = if (photosToGenerate != null) photosToGenerate * 100
                 else uiState.photosToGenerateX100,
+                training = uiState.trainings?.find { it.id == trainingId } ?: uiState.training,
             )
         } catch (e: Exception) {
             currentCoroutineContext().ensureActive()
@@ -182,16 +186,32 @@ class GenerateViewModel : AuthViewModel() {
             originalPersonDescription = training.personDescription ?: "",
             personDescription = training.personDescription ?: ""
         )
+
+        updateSelectedTrainingJob?.cancel()
+        val userId = user?.id ?: return@launch
+        updateSelectedTrainingJob = viewModelScope.launch {
+            delay(2000L)
+            try {
+                val profile = ProfilesRepository.loadProfile(userId)
+                var preferences = profile?.preferences ?: return@launch
+                preferences = preferences.copy(selectedTrainingId = training.id)
+                ProfilesRepository.updateProfilePreference(userId, preferences)
+            } catch (e: Exception) {
+                currentCoroutineContext().ensureActive()
+                Logger.e("selectTraining failed", e)
+                uiState = uiState.copy(errorPopup = e)
+            }
+        }
     }
 
     fun onPhotosToGenerateChanged(photosToGenerate: Int) {
-        updatePrefsJob?.cancel()
+        updatePhotosToGenerateJob?.cancel()
         val userId = user?.id ?: return
         val originalPhotosToGenerate = uiState.photosToGenerateX100
         uiState = uiState.copy(photosToGenerateX100 = photosToGenerate)
         val photosToGenerate = photosToGenerate / 100
 
-        updatePrefsJob = viewModelScope.launch {
+        updatePhotosToGenerateJob = viewModelScope.launch {
             delay(2000L)
             try {
                 val profile = ProfilesRepository.loadProfile(userId)
