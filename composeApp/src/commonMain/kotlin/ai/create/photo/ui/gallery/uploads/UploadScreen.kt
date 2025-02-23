@@ -522,8 +522,11 @@ private fun Photo(
     }
 
     LaunchedEffect(photo.url) {
+        val currentUrl = photo.url
         if (optimizedVersion) delay(1000L)
-        showImage = true
+        if (currentUrl == photo.url) {
+            showImage = true
+        }
     }
 
     var showAnalysis by remember { mutableStateOf(false) }
