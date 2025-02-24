@@ -179,6 +179,7 @@ class GenerateViewModel : AuthViewModel() {
 
     fun selectTraining(training: GenerateUiState.Training) = viewModelScope.launch {
         if (training.personDescription.isNullOrEmpty()) {
+            uiState = uiState.copy(showSettings = true)
             onRefreshPersonDescription()
         }
         uiState = uiState.copy(
