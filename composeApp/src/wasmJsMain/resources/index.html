@@ -22,19 +22,7 @@
 
     <title>My AI Photo Shoot</title>
 
-    <script defer type="application/javascript" src="composeApp.js">
-        const unhandledError = (event, error) => {
-          if (error instanceof WebAssembly.CompileError) {
-            document.getElementById("warning").style.display = "block"; // Ensures the warning appears
-
-            // Hide the webpack overlay if present
-            const webpackOverlay = document.getElementById("webpack-dev-server-client-overlay");
-            if (webpackOverlay != null) webpackOverlay.style.display = "none";
-          }
-        };
-        addEventListener("error", (event) => unhandledError(event, event.error));
-        addEventListener("unhandledrejection", (event) => unhandledError(event, event.reason));
-    </script>
+    <script defer type="application/javascript" src="composeApp.js"></script>
 
     <noscript>
         <p>This app requires JavaScript to run. Please enable JavaScript in your browser.</p>
@@ -55,8 +43,7 @@
     <ul>
         <li>
             If you are using <b>Chrome</b>, <b>Edge</b>, <b>Brave</b>, or any other Chromium-based
-            browser,
-            please update to version 119 or later.
+            browser, please update to version 119 or later.
         </li>
         <li>
             If you are using <b>Firefox</b>, please update to version 120 or later.
@@ -76,5 +63,31 @@
     </ul>
 </div>
 </body>
+
+<script defer type="application/javascript">
+    const showWarning = () => {
+      const warningEl = document.getElementById("warning");
+      if (warningEl) {
+        warningEl.style.display = "block";
+      }
+      const webpackOverlay = document.getElementById("webpack-dev-server-client-overlay");
+      if (webpackOverlay) {
+        webpackOverlay.style.display = "none";
+      }
+    };
+
+    const unhandledError = (event, error) => {
+      if (error instanceof WebAssembly.CompileError) {
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", showWarning);
+        } else {
+          showWarning();
+        }
+      }
+    };
+
+    addEventListener("error", (event) => unhandledError(event, event.error));
+    addEventListener("unhandledrejection", (event) => unhandledError(event, event.reason));
+</script>
 
 </html>
