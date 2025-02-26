@@ -163,7 +163,7 @@ fun TopUpButton(onClick: () -> Unit) {
     ) {
         Text(
             text = stringResource(Res.string.top_up),
-            fontSize = 18.sp,
+            fontSize = 20.sp,
         )
     }
 }
