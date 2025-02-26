@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -37,6 +38,7 @@ import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.apply
 import photocreateai.composeapp.generated.resources.enter_promo_code
 import photocreateai.composeapp.generated.resources.promo_code_applied
+import photocreateai.composeapp.generated.resources.top_up
 import photocreateai.composeapp.generated.resources.wrong_code
 
 @Composable
@@ -64,20 +66,31 @@ fun BalanceScreen(
             Column(
                 modifier = Modifier
                     .widthIn(max = 600.dp)
+                    .fillMaxSize()
                     .padding(horizontal = 24.dp)
                     .verticalScroll(state = rememberScrollState()),
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.SpaceAround,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                EnterPromoCode(
-                    promoCode = state.promoCode,
-                    isIncorrectCode = state.isIncorrectPromoCode,
-                    onCodeChanged = viewModel::onPromoCodeChanged
+                Box {}
+
+                TopUpButton(
+                    onClick = viewModel::topUp
                 )
-                ApplyPromoCodeButton(
-                    isLoading = state.isApplyingPromoCode,
-                    onClick = viewModel::applyPromoCode
-                )
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    EnterPromoCode(
+                        promoCode = state.promoCode,
+                        isIncorrectCode = state.isIncorrectPromoCode,
+                        onCodeChanged = viewModel::onPromoCodeChanged
+                    )
+                    ApplyPromoCodeButton(
+                        isLoading = state.isApplyingPromoCode,
+                        onClick = viewModel::applyPromoCode
+                    )
+                }
             }
         }
 
@@ -140,5 +153,17 @@ fun ApplyPromoCodeButton(isLoading: Boolean, onClick: () -> Unit) {
                 fontSize = 18.sp,
             )
         }
+    }
+}
+
+@Composable
+fun TopUpButton(onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+    ) {
+        Text(
+            text = stringResource(Res.string.top_up),
+            fontSize = 18.sp,
+        )
     }
 }

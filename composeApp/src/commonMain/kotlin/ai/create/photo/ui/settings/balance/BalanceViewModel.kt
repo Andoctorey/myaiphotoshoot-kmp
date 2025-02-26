@@ -1,7 +1,9 @@
 package ai.create.photo.ui.settings.balance
 
+import ai.create.photo.data.supabase.Supabase
 import ai.create.photo.data.supabase.SupabaseFunction
 import ai.create.photo.data.supabase.database.ProfilesRepository
+import ai.create.photo.platform.openUrl
 import ai.create.photo.ui.auth.AuthViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -62,5 +64,12 @@ class BalanceViewModel : AuthViewModel() {
 
     fun hidePromoCodeAppliedPopup() {
         uiState = uiState.copy(showPromoCodeAppliedPopup = false)
+    }
+
+    fun topUp() {
+        val userId = user?.id ?: return
+        val paymentLink = if (Supabase.LOCAL) "https://buy.stripe.com/test_fZe7uK1F05vQgF228a"
+        else "https://buy.stripe.com/aEU3gf2hvce14fK4gg"
+        openUrl("$paymentLink?client_reference_id=$userId")
     }
 }
