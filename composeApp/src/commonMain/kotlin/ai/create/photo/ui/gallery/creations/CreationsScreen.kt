@@ -315,7 +315,7 @@ private fun PhotoDropMenu(
     var isDownloaded by remember { mutableStateOf(false) }
 
     Box(
-        modifier = modifier.wrapContentSize()
+        modifier = modifier
             .padding(8.dp)
             .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f), shape = CircleShape),
     ) {
