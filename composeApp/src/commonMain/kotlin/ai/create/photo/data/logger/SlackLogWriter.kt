@@ -82,8 +82,8 @@ class SlackLogWriter : LogWriter(), Closeable {
 
     override fun log(
         severity: Severity,
-        tag: String,
         message: String,
+        tag: String,
         throwable: Throwable?
     ) {
         if (severity == Severity.Error) {
@@ -94,12 +94,12 @@ class SlackLogWriter : LogWriter(), Closeable {
                 throwable is IOException ||
                 throwable is UnresolvedAddressException ||
                 throwable is UnauthorizedRestException
-            ) {
-                return
-            }
+            ) return
+
+            if (tag == "Supabase-Core") return
 
             val errorText = buildString {
-                append("[$tag] $message")
+                append("[$tag] $message\n")
                 throwable?.let { append("\nException: ${it.stackTraceToString()}") }
             }
 
