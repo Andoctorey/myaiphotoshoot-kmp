@@ -253,7 +253,7 @@ private fun TopUp(
                 TextButton(onClick = { enterPromoCode() }) {
                     Text(
                         text = stringResource(Res.string.enter_promo_code),
-                        fontSize = 18.sp,
+                        fontSize = 16.sp,
                     )
                 }
             }
