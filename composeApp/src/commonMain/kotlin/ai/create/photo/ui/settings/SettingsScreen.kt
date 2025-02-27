@@ -65,6 +65,7 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = viewModel { SettingsViewModel() },
     trainAiModel: () -> Unit,
     openGenerateTab: () -> Unit,
+    goToRootScreen: Boolean,
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -101,6 +102,7 @@ fun SettingsScreen(
                     items = state.items,
                     savedDestination = state.currentDestination,
                     onSaveDestination = viewModel::saveDestination,
+                    goToRootScreen = goToRootScreen,
                     contact = viewModel::contact,
                     trainAiModel = trainAiModel,
                     openGenerateTab = openGenerateTab,
@@ -125,6 +127,7 @@ private fun Screen(
     items: List<Item>,
     savedDestination: Item?,
     onSaveDestination: (Item?) -> Unit,
+    goToRootScreen: Boolean,
     contact: () -> Unit,
     trainAiModel: () -> Unit,
     openGenerateTab: () -> Unit,
@@ -144,6 +147,16 @@ private fun Screen(
             hasNavigated = true
         }
     }
+
+    LaunchedEffect(goToRootScreen) {
+        if (goToRootScreen) {
+            onSaveDestination(null)
+            while (navigator.canNavigateBack()) {
+                navigator.navigateBack()
+            }
+        }
+    }
+
     val expanded = navigator.scaffoldValue.primary == PaneAdaptedValue.Expanded
             && navigator.scaffoldValue.secondary == PaneAdaptedValue.Expanded
     ListDetailPaneScaffold(

@@ -10,4 +10,5 @@ data class MainUiState(
     val openUploads: Boolean = false,
     val openCreations: Boolean = false,
     val putPrompt: String = "",
+    val resetSettingTab: Boolean = false
 )

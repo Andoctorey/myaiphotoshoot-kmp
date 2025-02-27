@@ -71,7 +71,14 @@ fun MainScreen(
                     },
                     label = { Text(stringResource(it.label)) },
                     selected = it == currentDestination,
-                    onClick = { currentDestination = it }
+                    onClick = {
+                        if (currentDestination == it) {
+                            if (it == AppNavigationRoutes.TAB_3_SETTINGS) {
+                                viewModel.toggleResetSettingTab(true)
+                            }
+                        }
+                        currentDestination = it
+                    }
                 )
             }
         }
@@ -115,7 +122,8 @@ fun MainScreen(
                 trainAiModel = trainAiModel,
                 openGenerateTab = {
                     currentDestination = AppNavigationRoutes.TAB_2_GENERATE
-                }
+                },
+                goToRootScreen = state.resetSettingTab
             )
         }
     }
@@ -144,4 +152,9 @@ fun MainScreen(
         }
     }
 
+    LaunchedEffect(state.resetSettingTab) {
+        if (state.resetSettingTab) {
+            viewModel.toggleResetSettingTab(false)
+        }
+    }
 }

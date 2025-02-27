@@ -62,4 +62,8 @@ class MainViewModel : ViewModel() {
         uiState = uiState.copy(putPrompt = prompt)
     }
 
+    fun toggleResetSettingTab(reset: Boolean) {
+        uiState = uiState.copy(resetSettingTab = reset)
+    }
+
 }
