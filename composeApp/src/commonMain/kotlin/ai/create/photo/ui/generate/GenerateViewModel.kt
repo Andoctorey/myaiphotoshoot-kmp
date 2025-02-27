@@ -63,9 +63,10 @@ class GenerateViewModel : AuthViewModel() {
 
             uiState.training?.let { selectTraining(it) }
         } catch (e: Exception) {
+            uiState = uiState.copy(isLoading = false)
             currentCoroutineContext().ensureActive()
             Logger.e("Load training failed", e)
-            uiState = uiState.copy(isLoading = false, loadingError = e)
+            uiState = uiState.copy(loadingError = e)
         }
     }
 
@@ -132,9 +133,10 @@ class GenerateViewModel : AuthViewModel() {
                 )
 
         } catch (e: Exception) {
+            uiState = uiState.copy(isLoadingPersonDescription = false)
             currentCoroutineContext().ensureActive()
             Logger.e("onRefreshAiVisionPrompt failed", e)
-            uiState = uiState.copy(isLoadingPersonDescription = false, errorPopup = e)
+            uiState = uiState.copy(errorPopup = e)
         }
     }
 
@@ -170,9 +172,10 @@ class GenerateViewModel : AuthViewModel() {
                 surpriseMePrompt = true,
             )
         } catch (e: Exception) {
+            uiState = uiState.copy(isLoadingSurpriseMe = false)
             currentCoroutineContext().ensureActive()
             Logger.e("surpriseMe failed", e)
-            uiState = uiState.copy(isLoadingSurpriseMe = false, errorPopup = e)
+            uiState = uiState.copy(errorPopup = e)
         }
     }
 
@@ -240,9 +243,10 @@ class GenerateViewModel : AuthViewModel() {
             uiState =
                 uiState.copy(userPrompt = prompt, isEnhancingPrompt = false)
         } catch (e: Exception) {
+            uiState = uiState.copy(isEnhancingPrompt = false)
             currentCoroutineContext().ensureActive()
             Logger.e("enhancePrompt failed", e)
-            uiState = uiState.copy(isEnhancingPrompt = false, errorPopup = e)
+            uiState = uiState.copy(errorPopup = e)
         }
     }
 
@@ -261,9 +265,10 @@ class GenerateViewModel : AuthViewModel() {
             val prompt = SupabaseFunction.pictureToPrompt(url)
             uiState = uiState.copy(userPrompt = prompt, isLoadingPictureToPrompt = false)
         } catch (e: Exception) {
+            uiState = uiState.copy(isLoadingPictureToPrompt = false)
             currentCoroutineContext().ensureActive()
             Logger.e("pictureToPrompt failed", e)
-            uiState = uiState.copy(isLoadingPictureToPrompt = false, errorPopup = e)
+            uiState = uiState.copy(errorPopup = e)
         }
     }
 
@@ -281,9 +286,10 @@ class GenerateViewModel : AuthViewModel() {
             val translated = SupabaseFunction.translate(uiState.userPrompt)
             uiState = uiState.copy(userPrompt = translated, isTranslating = false)
         } catch (e: Exception) {
+            uiState = uiState.copy(isTranslating = false)
             currentCoroutineContext().ensureActive()
             Logger.e("translate failed", e)
-            uiState = uiState.copy(isTranslating = false, errorPopup = e)
+            uiState = uiState.copy(errorPopup = e)
         }
     }
 

@@ -51,9 +51,10 @@ class BalanceViewModel : AuthViewModel() {
                 balance = ProfilesRepository.profile?.formattedBalance ?: "0",
             )
         } catch (e: Exception) {
+            uiState = uiState.copy(isApplyingPromoCode = false)
             currentCoroutineContext().ensureActive()
             Logger.e("applyPromoCode failed", e)
-            uiState = uiState.copy(isApplyingPromoCode = false, errorPopup = e)
+            uiState = uiState.copy(errorPopup = e)
         }
     }
 

@@ -66,9 +66,10 @@ class LoginViewModel : AuthViewModel() {
             SupabaseAuth.signInWithEmailOtp(uiState.emailToVerify)
             uiState = uiState.copy(isSendingOtp = false, enterOtp = true)
         } catch (e: Exception) {
+            uiState = uiState.copy(isSendingOtp = false)
             currentCoroutineContext().ensureActive()
             Logger.e("sendOtp failed", e)
-            uiState = uiState.copy(isSendingOtp = false, errorPopup = e)
+            uiState = uiState.copy(errorPopup = e)
         }
     }
 
@@ -88,13 +89,14 @@ class LoginViewModel : AuthViewModel() {
                 otp = "", email = user?.email
             )
         } catch (e: Exception) {
-            currentCoroutineContext().ensureActive()
             if (e is AuthRestException) {
                 uiState = uiState.copy(isIncorrectOtp = true, isVerifyingOtp = false)
                 return@launch
             }
+            uiState = uiState.copy(isVerifyingOtp = false)
+            currentCoroutineContext().ensureActive()
             Logger.e("verifyOtp failed", e)
-            uiState = uiState.copy(isVerifyingOtp = false, errorPopup = e)
+            uiState = uiState.copy(errorPopup = e)
         }
     }
 
@@ -129,9 +131,10 @@ class LoginViewModel : AuthViewModel() {
             logout()
             uiState = uiState.copy(dataDeletedPopup = true)
         } catch (e: Exception) {
+            uiState = uiState.copy(isLoading = false)
             currentCoroutineContext().ensureActive()
             Logger.e("deleteAllData failed", e)
-            uiState = uiState.copy(isLoading = false, errorPopup = e)
+            uiState = uiState.copy(errorPopup = e)
         }
     }
 

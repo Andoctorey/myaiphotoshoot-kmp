@@ -74,9 +74,10 @@ class UploadViewModel : AuthViewModel() {
             )
             loadTraining()
         } catch (e: Exception) {
+            uiState = uiState.copy(isLoadingPhotos = false)
             currentCoroutineContext().ensureActive()
             Logger.e("loadPhotos failed", e)
-            uiState = uiState.copy(isLoadingPhotos = false, loadingError = e)
+            uiState = uiState.copy(loadingError = e)
         }
     }
 
@@ -239,9 +240,10 @@ class UploadViewModel : AuthViewModel() {
                 loadingError = null,
             )
         } catch (e: Exception) {
+            uiState = uiState.copy(isLoadingTraining = false)
             currentCoroutineContext().ensureActive()
             Logger.e("loadTraining failed", e)
-            uiState = uiState.copy(isLoadingTraining = false, errorPopup = e)
+            uiState = uiState.copy(errorPopup = e)
         }
 
         if (uiState.trainingStatus == TrainingStatus.PROCESSING) {

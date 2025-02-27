@@ -52,9 +52,10 @@ class PublicViewModel : AuthViewModel() {
                 loadingError = null,
             )
         } catch (e: Exception) {
+            uiState = uiState.copy(isRefreshing = false)
             currentCoroutineContext().ensureActive()
             Logger.e("refreshPublicGallery failed", e)
-            uiState = uiState.copy(isRefreshing = false, errorPopup = e)
+            uiState = uiState.copy(errorPopup = e)
         }
     }
 
@@ -75,9 +76,10 @@ class PublicViewModel : AuthViewModel() {
                 pagingLimitReach = newPhotos.isEmpty(),
             )
         } catch (e: Exception) {
+            uiState = uiState.copy(isLoadingNextPage = false)
             currentCoroutineContext().ensureActive()
             Logger.e("loadPublicGallery failed", e)
-            uiState = uiState.copy(isLoadingNextPage = false, loadingError = e)
+            uiState = uiState.copy(loadingError = e)
         }
     }
 

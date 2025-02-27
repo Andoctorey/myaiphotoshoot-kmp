@@ -58,9 +58,10 @@ class SettingsViewModel : AuthViewModel() {
             )
         } catch (e: Exception) {
             loadingJob.cancel()
+            uiState = uiState.copy(isBalanceLoading = false)
             currentCoroutineContext().ensureActive()
             Logger.e("loadProfile failed", e)
-            uiState = uiState.copy(isBalanceLoading = false, errorPopup = e)
+            uiState = uiState.copy(errorPopup = e)
         }
     }
 
