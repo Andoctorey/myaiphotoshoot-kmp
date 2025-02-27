@@ -93,6 +93,19 @@ fun BalanceScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
 
+                Card(
+                    modifier = Modifier.padding(8.dp),
+                    border = CardDefaults.outlinedCardBorder(),
+                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Pricing(
+                        trainAiModel = trainAiModel,
+                        openGenerateTab = openGenerateTab
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
 
                 Card(
                     modifier = Modifier.padding(8.dp),
@@ -109,20 +122,6 @@ fun BalanceScreen(
                         isApplyingPromoCode = state.isApplyingPromoCode,
                         applyPromoCode = viewModel::applyPromoCode,
                         enterPromoCode = viewModel::enterPromoCode,
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Card(
-                    modifier = Modifier.padding(8.dp),
-                    border = CardDefaults.outlinedCardBorder(),
-                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Pricing(
-                        trainAiModel = trainAiModel,
-                        openGenerateTab = openGenerateTab
                     )
                 }
             }
