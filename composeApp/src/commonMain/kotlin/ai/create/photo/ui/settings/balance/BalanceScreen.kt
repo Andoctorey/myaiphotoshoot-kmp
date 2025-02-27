@@ -5,6 +5,7 @@ import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.InfoPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
+import ai.create.photo.ui.settings.pricing.PricingPopup
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
@@ -49,6 +50,8 @@ import photocreateai.composeapp.generated.resources.wrong_code
 @Composable
 fun BalanceScreen(
     viewModel: BalanceViewModel = viewModel { BalanceViewModel() },
+    trainAiModel: () -> Unit,
+    openGenerateTab: () -> Unit,
     onBackClick: () -> Unit,
 ) {
 
@@ -79,9 +82,7 @@ fun BalanceScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                TextButton(
-                    onClick = {},
-                ) {
+                TextButton(onClick = { viewModel.togglePricingPopup(true) }) {
                     Text(
                         text = stringResource(Res.string.pricing),
                         fontSize = 18.sp,
@@ -133,6 +134,14 @@ fun BalanceScreen(
                 viewModel.hidePromoCodeAppliedPopup()
                 onBackClick()
             }
+        }
+
+        if (state.showPricingPopup) {
+            PricingPopup(
+                trainAiModel = trainAiModel,
+                openGenerateTab = openGenerateTab,
+                onDismiss = { viewModel.togglePricingPopup(false) }
+            )
         }
     }
 }

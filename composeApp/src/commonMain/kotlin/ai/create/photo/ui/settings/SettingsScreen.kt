@@ -6,7 +6,6 @@ import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.settings.SettingsUiState.Item
 import ai.create.photo.ui.settings.balance.BalanceScreen
 import ai.create.photo.ui.settings.login.LoginScreen
-import ai.create.photo.ui.settings.pricing.PricingScreen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -297,8 +296,8 @@ fun SettingsDetails(
             ) {
                 when (item) {
                     is SettingsUiState.LoginItem -> LoginScreen(onBackClick = onBackClick)
-                    is SettingsUiState.BalanceItem -> BalanceScreen(onBackClick = onBackClick)
-                    is SettingsUiState.PricingItem -> PricingScreen(
+
+                    is SettingsUiState.BalanceItem -> BalanceScreen(
                         onBackClick = onBackClick,
                         trainAiModel = trainAiModel,
                         openGenerateTab = openGenerateTab,

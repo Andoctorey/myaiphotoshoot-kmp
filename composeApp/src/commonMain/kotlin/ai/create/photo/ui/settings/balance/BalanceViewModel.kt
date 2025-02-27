@@ -73,4 +73,8 @@ class BalanceViewModel : AuthViewModel() {
     fun enterPromoCode() {
         uiState = uiState.copy(enterPromoCode = true)
     }
+
+    fun togglePricingPopup(show: Boolean) {
+        uiState = uiState.copy(showPricingPopup = show)
+    }
 }

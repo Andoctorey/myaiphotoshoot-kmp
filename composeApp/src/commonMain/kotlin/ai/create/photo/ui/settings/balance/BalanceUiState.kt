@@ -29,6 +29,8 @@ data class BalanceUiState(
     val isApplyingPromoCode: Boolean = false,
     val isIncorrectPromoCode: Boolean = false,
     val showPromoCodeAppliedPopup: Boolean = false,
+
+    val showPricingPopup: Boolean = false,
 )
 
 enum class Pricing(

@@ -24,6 +24,7 @@
     <string name="account">Account</string>
     <string name="attach_email">You’re currently signed in as a guest. Adding an email will secure your data and let you sign in on any device, anytime.</string>
     <string name="logout">Log Out</string>
+    <string name="top_up_pricing">Pricing / Top Up</string>
     <string name="top_up">Top Up</string>
     <string name="pricing">Pricing</string>
     <string name="contact">Contact</string>
@@ -38,6 +39,7 @@
     <string name="copy_link">Copy Link</string>
     <string name="link_copied">Link Copied</string>
     <string name="download">Download</string>
+    <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="data_deleted">All your stored data has been deleted successfully.</string>
     <string name="report_a_problem">Report a Problem</string>

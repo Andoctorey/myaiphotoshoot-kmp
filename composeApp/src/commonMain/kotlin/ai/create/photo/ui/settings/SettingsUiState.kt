@@ -4,15 +4,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.CreditCard
-import androidx.compose.material.icons.filled.Paid
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.vector.ImageVector
 import org.jetbrains.compose.resources.StringResource
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.account
 import photocreateai.composeapp.generated.resources.contact
-import photocreateai.composeapp.generated.resources.pricing
-import photocreateai.composeapp.generated.resources.top_up
+import photocreateai.composeapp.generated.resources.top_up_pricing
 
 
 @Immutable
@@ -29,7 +27,6 @@ data class SettingsUiState(
     val items: List<Item> = listOf(
         LoginItem(),
         BalanceItem(),
-        PricingItem(),
         ContactItem(),
     ),
 
@@ -45,7 +42,6 @@ data class SettingsUiState(
 
     class SpacerItem : Item()
     class LoginItem() : DetailedItem(Res.string.account, Icons.Default.AccountCircle)
-    class BalanceItem() : DetailedItem(Res.string.top_up, Icons.Default.CreditCard)
-    class PricingItem() : DetailedItem(Res.string.pricing, Icons.Default.Paid)
+    class BalanceItem() : DetailedItem(Res.string.top_up_pricing, Icons.Default.CreditCard)
     class ContactItem() : DetailedItem(Res.string.contact, Icons.AutoMirrored.Filled.Help)
 }
