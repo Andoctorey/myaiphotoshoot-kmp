@@ -302,10 +302,7 @@ fun SettingsDetails(
         },
         content = { paddingValues ->
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(24.dp),
+                modifier = Modifier.fillMaxSize().padding(paddingValues),
             ) {
                 when (item) {
                     is SettingsUiState.LoginItem -> LoginScreen(onBackClick = onBackClick)

@@ -22,9 +22,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -57,7 +59,6 @@ import photocreateai.composeapp.generated.resources.promo_code_applied
 import photocreateai.composeapp.generated.resources.top_up
 import photocreateai.composeapp.generated.resources.wrong_code
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun BalanceScreen(
     viewModel: BalanceViewModel = viewModel { BalanceViewModel() },
@@ -86,71 +87,44 @@ fun BalanceScreen(
                 modifier = Modifier
                     .widthIn(max = 600.dp)
                     .fillMaxSize()
-                    .padding(horizontal = 24.dp)
                     .verticalScroll(state = state.scrollState)
                     .animateContentSize(),
                 verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
 
-//                TextButton(onClick = { viewModel.togglePricingPopup(true) }) {
-//                    Text(
-//                        text = stringResource(Res.string.pricing),
-//                        fontSize = 18.sp,
-//                    )
-//                }
+
+                Card(
+                    modifier = Modifier.padding(8.dp),
+                    border = CardDefaults.outlinedCardBorder(),
+                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    TopUp(
+                        topUp = viewModel::topUp,
+                        showEnterPromoCode = state.showEnterPromoCode,
+                        promoCode = state.promoCode,
+                        isIncorrectPromoCode = state.isIncorrectPromoCode,
+                        onPromoCodeChanged = viewModel::onPromoCodeChanged,
+                        isApplyingPromoCode = state.isApplyingPromoCode,
+                        applyPromoCode = viewModel::applyPromoCode,
+                        enterPromoCode = viewModel::enterPromoCode,
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text(
-                    text = stringResource(Res.string.top_up),
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Medium,
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                FlowRow(
-                    modifier = Modifier.fillMaxWidth().animateContentSize(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalArrangement = Arrangement.Center,
+                Card(
+                    modifier = Modifier.padding(8.dp),
+                    border = CardDefaults.outlinedCardBorder(),
+                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
-                    TopUpButton(Pricing.STARTER) { viewModel.topUp(it) }
-                    TopUpButton(Pricing.CREATIVE) { viewModel.topUp(it) }
-                    TopUpButton(Pricing.FAMILY) { viewModel.topUp(it) }
+                    Pricing(
+                        trainAiModel = trainAiModel,
+                        openGenerateTab = openGenerateTab
+                    )
                 }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Crossfade(state.enterPromoCode) {
-                    if (state.enterPromoCode) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            EnterPromoCode(
-                                promoCode = state.promoCode,
-                                isIncorrectCode = state.isIncorrectPromoCode,
-                                onCodeChanged = viewModel::onPromoCodeChanged
-                            )
-                            ApplyPromoCodeButton(
-                                isLoading = state.isApplyingPromoCode,
-                                onClick = viewModel::applyPromoCode
-                            )
-                        }
-                    } else {
-                        TextButton(onClick = { viewModel.enterPromoCode() }) {
-                            Text(
-                                text = stringResource(Res.string.enter_promo_code),
-                                fontSize = 18.sp,
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(48.dp))
-
-                Pricing(
-                    trainAiModel = trainAiModel,
-                    openGenerateTab = openGenerateTab
-                )
             }
         }
 
@@ -227,72 +201,138 @@ fun TopUpButton(pricing: Pricing, onClick: (String) -> Unit) {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun Pricing(trainAiModel: () -> Unit, openGenerateTab: () -> Unit) {
-    Text(
-        text = stringResource(Res.string.pricing),
-        fontSize = 24.sp,
-        fontWeight = FontWeight.Medium,
-    )
-    Spacer(modifier = Modifier.height(16.dp))
-    OutlinedCard(
-        colors = CardDefaults.outlinedCardColors().copy(
-            containerColor = Color.Transparent,
-        )
+private fun TopUp(
+    topUp: (String) -> Unit,
+    showEnterPromoCode: Boolean,
+    promoCode: String,
+    isIncorrectPromoCode: Boolean,
+    onPromoCodeChanged: (String) -> Unit,
+    isApplyingPromoCode: Boolean,
+    applyPromoCode: () -> Unit,
+    enterPromoCode: () -> Unit,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Column(modifier = Modifier.clickable { trainAiModel() }.padding(16.dp)) {
-            Row {
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = stringResource(Res.string.one_time_ai_training),
-                    fontSize = 20.sp,
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(
-                    text = "$3.99–$7.99",
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 20.sp,
-                    color = MaterialTheme.colorScheme.primary,
-                )
+        Text(
+            text = stringResource(Res.string.top_up),
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Medium,
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        FlowRow(
+            modifier = Modifier.fillMaxWidth().animateContentSize(),
+            horizontalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            TopUpButton(Pricing.STARTER) { topUp(it) }
+            TopUpButton(Pricing.CREATIVE) { topUp(it) }
+            TopUpButton(Pricing.FAMILY) { topUp(it) }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Crossfade(showEnterPromoCode) {
+            if (showEnterPromoCode) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    EnterPromoCode(
+                        promoCode = promoCode,
+                        isIncorrectCode = isIncorrectPromoCode,
+                        onCodeChanged = onPromoCodeChanged,
+                    )
+                    ApplyPromoCodeButton(
+                        isLoading = isApplyingPromoCode,
+                        onClick = applyPromoCode,
+                    )
+                }
+            } else {
+                TextButton(onClick = { enterPromoCode() }) {
+                    Text(
+                        text = stringResource(Res.string.enter_promo_code),
+                        fontSize = 18.sp,
+                    )
+                }
             }
+        }
+    }
+}
 
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = stringResource(Res.string.powered_by_flux),
-                fontSize = 14.sp,
+@Composable
+private fun Pricing(trainAiModel: () -> Unit, openGenerateTab: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = stringResource(Res.string.pricing),
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Medium,
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        OutlinedCard(
+            colors = CardDefaults.outlinedCardColors().copy(
+                containerColor = Color.Transparent,
             )
-        }
-    }
-    Spacer(modifier = Modifier.height(16.dp))
-    OutlinedCard(
-        colors = CardDefaults.outlinedCardColors().copy(
-            containerColor = Color.Transparent,
-        )
-    ) {
-        Column(modifier = Modifier.clickable { openGenerateTab() }.padding(16.dp)) {
-            Row {
+        ) {
+            Column(modifier = Modifier.clickable { trainAiModel() }.padding(16.dp)) {
+                Row {
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = stringResource(Res.string.one_time_ai_training),
+                        fontSize = 20.sp,
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(
+                        text = "$3.99–$7.99",
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 20.sp,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
                 Text(
-                    modifier = Modifier.weight(1f),
-                    text = stringResource(Res.string.photo_creation),
-                    fontSize = 20.sp,
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(
-                    text = "$0.03",
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 20.sp,
-                    color = MaterialTheme.colorScheme.primary,
+                    text = stringResource(Res.string.powered_by_flux),
+                    fontSize = 14.sp,
                 )
             }
         }
+        Spacer(modifier = Modifier.height(16.dp))
+        OutlinedCard(
+            colors = CardDefaults.outlinedCardColors().copy(
+                containerColor = Color.Transparent,
+            )
+        ) {
+            Column(modifier = Modifier.clickable { openGenerateTab() }.padding(16.dp)) {
+                Row {
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = stringResource(Res.string.photo_creation),
+                        fontSize = 20.sp,
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(
+                        text = "$0.03",
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 20.sp,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = stringResource(Res.string.lowest_market_price),
+            textAlign = TextAlign.Center,
+            fontSize = 16.sp,
+        )
     }
-
-    Spacer(modifier = Modifier.height(16.dp))
-
-    Text(
-        text = stringResource(Res.string.lowest_market_price),
-        textAlign = TextAlign.Center,
-        fontSize = 16.sp,
-    )
 }

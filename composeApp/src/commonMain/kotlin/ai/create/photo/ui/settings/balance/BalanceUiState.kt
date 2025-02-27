@@ -14,7 +14,7 @@ data class BalanceUiState(
     val scrollState: ScrollState = ScrollState(0),
     val balance: String = "0",
 
-    val enterPromoCode: Boolean = false,
+    val showEnterPromoCode: Boolean = false,
     val promoCode: String = "",
     val isApplyingPromoCode: Boolean = false,
     val isIncorrectPromoCode: Boolean = false,

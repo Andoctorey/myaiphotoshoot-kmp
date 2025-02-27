@@ -72,6 +72,6 @@ class BalanceViewModel : AuthViewModel() {
     }
 
     fun enterPromoCode() {
-        uiState = uiState.copy(enterPromoCode = true)
+        uiState = uiState.copy(showEnterPromoCode = true)
     }
 }
