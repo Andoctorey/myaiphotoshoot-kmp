@@ -107,17 +107,19 @@ fun GenerateScreen(
     onGenerate: (String, String, Int) -> Unit,
     prompt: String,
 ) {
+    val state = viewModel.uiState
+
     LaunchedEffect(Unit) {
-        viewModel.loadTrainings()
-        viewModel.hideOpenCreations()
+        if (!state.isLoading) {
+            viewModel.loadTrainings()
+            viewModel.hideOpenCreations()
+        }
     }
 
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
-        val state = viewModel.uiState
-
         if (state.isLoading) {
             Spacer(modifier = Modifier.height(20.dp))
             LoadingPlaceholder()
