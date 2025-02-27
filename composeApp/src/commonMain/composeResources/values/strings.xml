@@ -71,4 +71,13 @@
     <string name="photo_creation">Photo Creation</string>
     <string name="promo_code_applied">Promo code applied successfully! Your new balance: $%1$s.</string>
     <string name="open_creations">Open Creations</string>
+    <string name="starter">Starter</string>
+    <string name="starter_description_1">165 photos without training</string>
+    <string name="starter_description_2">or one basic AI training and 30 photos</string>
+    <string name="creative">Creative</string>
+    <string name="creative_description_1">330 photos without training</string>
+    <string name="creative_description_2">or one mid-level AI training and 130 photos</string>
+    <string name="family">Family &amp; Friends</string>
+    <string name="family_description_1">660 photos without training</string>
+    <string name="family_description_2">or one advanced AI training and 400 photos</string>
 </resources>
