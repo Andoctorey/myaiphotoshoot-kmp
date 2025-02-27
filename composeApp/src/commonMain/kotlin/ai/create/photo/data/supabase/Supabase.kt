@@ -15,7 +15,7 @@ import kotlin.time.Duration.Companion.minutes
 
 object Supabase {
 
-    const val LOCAL = false
+    const val LOCAL = true
 
     val supabase = createSupabaseClient(
         supabaseUrl = if (LOCAL) (if (platform().platform in listOf(

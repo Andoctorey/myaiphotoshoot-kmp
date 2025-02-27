@@ -166,7 +166,7 @@ class GenerateViewModel : AuthViewModel() {
     }
 
     fun surpriseMe() = viewModelScope.launch {
-        uiState = uiState.copy(isLoadingSurpriseMe = true)
+        uiState = uiState.copy(isLoadingSurpriseMe = true, userPrompt = "")
         try {
             val prompt = SupabaseFunction.surpriseMe()
             uiState = uiState.copy(
