@@ -53,15 +53,17 @@ class GenerateViewModel : AuthViewModel() {
                     personDescription = it.personDescription,
                 )
             }
+            val training =
+                trainings.find { it.id == uiState.selectedTrainingId } ?: trainings.firstOrNull()
             uiState = uiState.copy(
                 isLoading = false,
                 trainings = trainings,
-                training = uiState.training ?: trainings.firstOrNull(),
+                selectedTrainingId = training?.id,
                 personDescription = "",
                 originalPersonDescription = "",
             )
 
-            uiState.training?.let { selectTraining(it) }
+            selectTraining(training)
         } catch (e: Exception) {
             uiState = uiState.copy(isLoading = false)
             currentCoroutineContext().ensureActive()
@@ -90,7 +92,7 @@ class GenerateViewModel : AuthViewModel() {
 
     fun prepareToGenerate(onGenerate: (String, String, Int) -> Unit, trainAiModel: () -> Unit) =
         viewModelScope.launch {
-            val trainingId = uiState.training?.id
+            val trainingId = uiState.selectedTrainingId
             if (trainingId.isNullOrEmpty()) {
                 trainAiModel()
                 return@launch
@@ -119,7 +121,7 @@ class GenerateViewModel : AuthViewModel() {
         }
 
     fun onRefreshPersonDescription() = viewModelScope.launch {
-        val trainingId = uiState.training?.id ?: return@launch
+        val trainingId = uiState.selectedTrainingId ?: return@launch
         Logger.i("onRefreshAiVisionPrompt: $trainingId")
         uiState = uiState.copy(isLoadingPersonDescription = true, personDescription = " ")
         try {
@@ -152,8 +154,10 @@ class GenerateViewModel : AuthViewModel() {
             uiState = uiState.copy(
                 photosToGenerateX100 = if (photosToGenerate != null) photosToGenerate * 100
                 else uiState.photosToGenerateX100,
-                training = uiState.trainings?.find { it.id == trainingId } ?: uiState.training,
+                selectedTrainingId = trainingId,
             )
+            val training = uiState.trainings?.find { it.id == trainingId }
+            selectTraining(training)
         } catch (e: Exception) {
             currentCoroutineContext().ensureActive()
             Logger.e("loadProfile failed", e)
@@ -179,21 +183,24 @@ class GenerateViewModel : AuthViewModel() {
         }
     }
 
-    fun selectTraining(training: GenerateUiState.Training) = viewModelScope.launch {
+    fun selectTraining(training: GenerateUiState.Training?, saveInDb: Boolean = false) =
+        viewModelScope.launch {
+            if (training == null) return@launch
         if (training.personDescription.isNullOrEmpty()) {
             uiState = uiState.copy(showSettings = true)
             onRefreshPersonDescription()
         }
         uiState = uiState.copy(
-            training = training,
+            selectedTrainingId = training.id,
             originalPersonDescription = training.personDescription ?: "",
             personDescription = training.personDescription ?: ""
         )
 
+            if (!saveInDb) return@launch
         updateSelectedTrainingJob?.cancel()
         val userId = user?.id ?: return@launch
         updateSelectedTrainingJob = viewModelScope.launch {
-            delay(2000L)
+            delay(1000L)
             try {
                 val profile = ProfilesRepository.loadProfile(userId)
                 var preferences = profile?.preferences ?: return@launch

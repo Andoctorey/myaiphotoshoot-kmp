@@ -11,7 +11,7 @@ data class GenerateUiState(
     val showSettings: Boolean = false,
 
     val trainings: List<Training>? = null,
-    val training: Training? = null,
+    val selectedTrainingId: String? = null,
 
     val isLoadingPersonDescription: Boolean = false,
     val originalPersonDescription: String = "",

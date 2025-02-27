@@ -164,8 +164,13 @@ fun GenerateScreen(
                                     modifier = Modifier.align(Alignment.Center)
                                         .padding(top = 12.dp),
                                     trainings = state.trainings,
-                                    selectedTraining = state.training,
-                                    selectTraining = viewModel::selectTraining,
+                                    selectedTraining = state.trainings.find { it.id == state.selectedTrainingId },
+                                    selectTraining = {
+                                        viewModel.selectTraining(
+                                            it,
+                                            saveInDb = true
+                                        )
+                                    },
                                     trainAiModel = trainAiModel,
                                 )
                                 IconButton(
@@ -560,7 +565,7 @@ private fun Trainings(
 ) {
     val options = trainings.filterNotNull() + listOf(null)
     var expanded by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf(selectedTraining) }
+    var selectedOption by remember(selectedTraining) { mutableStateOf(selectedTraining) }
     val aiModelString = stringResource(Res.string.ai_model)
     val createAiModelString = stringResource(Res.string.train_ai_model)
     ExposedDropdownMenuBox(
