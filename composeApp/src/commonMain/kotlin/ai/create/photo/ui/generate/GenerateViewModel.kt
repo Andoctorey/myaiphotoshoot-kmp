@@ -98,26 +98,26 @@ class GenerateViewModel : AuthViewModel() {
                 return@launch
             }
 
-            uiState = uiState.copy(showSettings = false, userPrompt = "")
+            uiState = uiState.copy(showSettings = false)
 
             val oldDescription = uiState.originalPersonDescription
             val newDescription = uiState.personDescription
             if (oldDescription == newDescription) {
                 onGenerate(trainingId, uiState.userPrompt, uiState.photosToGenerateX100 / 100)
-                uiState = uiState.copy(showOpenCreations = true)
-                return@launch
+                uiState = uiState.copy(showOpenCreations = true, userPrompt = "")
+            } else {
+                try {
+                    UserTrainingsRepository.updatePersonDescription(trainingId, newDescription)
+                        .getOrThrow()
+                    uiState = uiState.copy(originalPersonDescription = newDescription)
+                    onGenerate(trainingId, uiState.userPrompt, uiState.photosToGenerateX100 / 100)
+                } catch (e: Exception) {
+                    currentCoroutineContext().ensureActive()
+                    Logger.e("Update description failed", e)
+                    uiState = uiState.copy(errorPopup = e)
+                }
             }
-
-            try {
-                UserTrainingsRepository.updatePersonDescription(trainingId, newDescription)
-                    .getOrThrow()
-                uiState = uiState.copy(originalPersonDescription = newDescription)
-                onGenerate(trainingId, uiState.userPrompt, uiState.photosToGenerateX100 / 100)
-            } catch (e: Exception) {
-                currentCoroutineContext().ensureActive()
-                Logger.e("Update description failed", e)
-                uiState = uiState.copy(errorPopup = e)
-            }
+            uiState = uiState.copy(showOpenCreations = true, userPrompt = "")
         }
 
     fun onRefreshPersonDescription() = viewModelScope.launch {
@@ -186,33 +186,33 @@ class GenerateViewModel : AuthViewModel() {
     fun selectTraining(training: GenerateUiState.Training?, saveInDb: Boolean = false) =
         viewModelScope.launch {
             if (training == null) return@launch
-        if (training.personDescription.isNullOrEmpty()) {
-            uiState = uiState.copy(showSettings = true)
-            onRefreshPersonDescription()
-        }
-        uiState = uiState.copy(
-            selectedTrainingId = training.id,
-            originalPersonDescription = training.personDescription ?: "",
-            personDescription = training.personDescription ?: ""
-        )
+            if (training.personDescription.isNullOrEmpty()) {
+                uiState = uiState.copy(showSettings = true)
+                onRefreshPersonDescription()
+            }
+            uiState = uiState.copy(
+                selectedTrainingId = training.id,
+                originalPersonDescription = training.personDescription ?: "",
+                personDescription = training.personDescription ?: ""
+            )
 
             if (!saveInDb) return@launch
-        updateSelectedTrainingJob?.cancel()
-        val userId = user?.id ?: return@launch
-        updateSelectedTrainingJob = viewModelScope.launch {
-            delay(1000L)
-            try {
-                val profile = ProfilesRepository.loadProfile(userId)
-                var preferences = profile?.preferences ?: return@launch
-                preferences = preferences.copy(selectedTrainingId = training.id)
-                ProfilesRepository.updateProfilePreference(userId, preferences)
-            } catch (e: Exception) {
-                currentCoroutineContext().ensureActive()
-                Logger.e("selectTraining failed", e)
-                uiState = uiState.copy(errorPopup = e)
+            updateSelectedTrainingJob?.cancel()
+            val userId = user?.id ?: return@launch
+            updateSelectedTrainingJob = viewModelScope.launch {
+                delay(1000L)
+                try {
+                    val profile = ProfilesRepository.loadProfile(userId)
+                    var preferences = profile?.preferences ?: return@launch
+                    preferences = preferences.copy(selectedTrainingId = training.id)
+                    ProfilesRepository.updateProfilePreference(userId, preferences)
+                } catch (e: Exception) {
+                    currentCoroutineContext().ensureActive()
+                    Logger.e("selectTraining failed", e)
+                    uiState = uiState.copy(errorPopup = e)
+                }
             }
         }
-    }
 
     fun onPhotosToGenerateChanged(photosToGenerate: Int) {
         updatePhotosToGenerateJob?.cancel()
