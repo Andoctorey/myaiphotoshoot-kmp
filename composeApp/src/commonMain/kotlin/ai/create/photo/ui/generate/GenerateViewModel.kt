@@ -98,7 +98,7 @@ class GenerateViewModel : AuthViewModel() {
                 return@launch
             }
 
-            uiState = uiState.copy(showSettings = false)
+            uiState = uiState.copy(showSettings = false, userPrompt = "")
 
             val oldDescription = uiState.originalPersonDescription
             val newDescription = uiState.personDescription
