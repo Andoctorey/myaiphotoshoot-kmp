@@ -52,6 +52,7 @@ import photocreateai.composeapp.generated.resources.apply
 import photocreateai.composeapp.generated.resources.enter_promo_code
 import photocreateai.composeapp.generated.resources.lowest_market_price
 import photocreateai.composeapp.generated.resources.one_time_ai_training
+import photocreateai.composeapp.generated.resources.per_generated_photo
 import photocreateai.composeapp.generated.resources.photo_creation
 import photocreateai.composeapp.generated.resources.powered_by_flux
 import photocreateai.composeapp.generated.resources.pricing
@@ -287,7 +288,7 @@ private fun Pricing(trainAiModel: () -> Unit, openGenerateTab: () -> Unit) {
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                     Text(
-                        text = "$3.99–$7.99",
+                        text = "$3.99+",
                         fontWeight = FontWeight.Medium,
                         fontSize = 20.sp,
                         color = MaterialTheme.colorScheme.primary,
@@ -323,6 +324,13 @@ private fun Pricing(trainAiModel: () -> Unit, openGenerateTab: () -> Unit) {
                         color = MaterialTheme.colorScheme.primary,
                     )
                 }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = stringResource(Res.string.per_generated_photo),
+                    fontSize = 14.sp,
+                )
             }
         }
 
