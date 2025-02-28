@@ -521,12 +521,13 @@ private fun Photo(
         ErrorMessagePlaceHolderSmall(it)
     }
 
-    LaunchedEffect(photo.url) {
-        val currentUrl = photo.url
-        if (optimizedVersion) delay(1000L)
-        if (currentUrl == photo.url) {
+    if (optimizedVersion) {
+        LaunchedEffect(photo.url) {
+            delay(1000L)
             showImage = true
         }
+    } else {
+        showImage = true
     }
 
     var showAnalysis by remember { mutableStateOf(false) }
