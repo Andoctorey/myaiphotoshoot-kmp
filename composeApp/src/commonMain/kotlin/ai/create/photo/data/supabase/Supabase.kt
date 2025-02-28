@@ -31,6 +31,7 @@ object Supabase {
             ignoreUnknownKeys = true
             coerceInputValues = true
         })
+
         install(Auth)
         install(Postgrest)
         install(Storage)

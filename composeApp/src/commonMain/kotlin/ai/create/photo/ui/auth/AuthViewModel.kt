@@ -21,6 +21,10 @@ abstract class AuthViewModel : ViewModel() {
         loadSession()
     }
 
+    companion object {
+        var refreshToken: String? = null
+    }
+
     fun loadSession() = viewModelScope.launch {
         // to init extended classes variables
         delay(1)
@@ -33,6 +37,7 @@ abstract class AuthViewModel : ViewModel() {
                 when (it) {
                     is SessionStatus.Authenticated -> {
                         val supabaseUser = it.session.user
+                        refreshToken = it.session.refreshToken
                         val emailChanged = user != null && user?.id != supabaseUser?.id
                         loadUser()
                         onAuthenticated(emailChanged)
@@ -51,6 +56,13 @@ abstract class AuthViewModel : ViewModel() {
             }
         } catch (e: Exception) {
             Logger.e("Sign in failed", e)
+            if (e.message?.contains("JWT expired") == true && refreshToken != null) {
+                try {
+                    supabase.auth.refreshSession(refreshToken!!)
+                } catch (e: Exception) {
+                    Logger.e("Refresh session failed", e)
+                }
+            }
             onAuthError(e)
         }
     }

@@ -90,11 +90,13 @@ class SlackLogWriter : LogWriter(), Closeable {
             // Limit to max 5 error messages per session
             if (errorCount++ >= 5) return
 
+            if (throwable?.message?.contains("JWT expired") != true) {
             if (throwable is HttpRequestException ||
                 throwable is IOException ||
                 throwable is UnresolvedAddressException ||
                 throwable is UnauthorizedRestException
             ) return
+            }
 
             if (tag == "Supabase-Core") return
 
