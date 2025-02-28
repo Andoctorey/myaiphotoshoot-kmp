@@ -42,7 +42,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -52,7 +51,6 @@ import photocreateai.composeapp.generated.resources.apply
 import photocreateai.composeapp.generated.resources.enter_promo_code
 import photocreateai.composeapp.generated.resources.lowest_market_price
 import photocreateai.composeapp.generated.resources.one_time_ai_training
-import photocreateai.composeapp.generated.resources.per_generated_photo
 import photocreateai.composeapp.generated.resources.photo_creation
 import photocreateai.composeapp.generated.resources.powered_by_flux
 import photocreateai.composeapp.generated.resources.pricing
@@ -328,18 +326,10 @@ private fun Pricing(trainAiModel: () -> Unit, openGenerateTab: () -> Unit) {
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = stringResource(Res.string.per_generated_photo),
+                    text = stringResource(Res.string.lowest_market_price),
                     fontSize = 14.sp,
                 )
             }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = stringResource(Res.string.lowest_market_price),
-            textAlign = TextAlign.Center,
-            fontSize = 16.sp,
-        )
     }
 }
