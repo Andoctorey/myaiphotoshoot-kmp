@@ -2,18 +2,24 @@
   "name": "My AI Photo Shoot",
   "icons": [
     {
-      "src": "./images/icon_192.png",
+      "src": "./images/icon_pwa_192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "./images/icon_512.png",
+      "src": "./images/icon_pwa_512.png",
       "type": "image/png",
       "sizes": "512x512"
+    },
+    {
+      "src": "icons/icon_pwa_512_maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "start_url": "./",
   "display": "standalone",
-  "theme_color": "#FFFBFF",
-  "background_color": "#FFFBFF"
+  "theme_color": "#1f1f25",
+  "background_color": "#1f1f25"
 }
