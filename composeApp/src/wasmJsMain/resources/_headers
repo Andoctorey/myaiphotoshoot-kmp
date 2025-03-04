@@ -1,9 +1,7 @@
-/*.wasm
-  Content-Type: application/wasm
-
-/*
+/*.html
   Cross-Origin-Embedder-Policy: require-corp
   Cross-Origin-Opener-Policy: same-origin
+  Cache-Control: public, max-age=600, must-revalidate
 
 /*.wasm
   Content-Type: application/wasm
@@ -14,6 +12,3 @@
 
 /*.css
   Cache-Control: public, max-age=31536000, immutable
-
-/*.html
-  Cache-Control: public, max-age=600
