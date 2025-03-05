@@ -37,6 +37,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Memory
@@ -293,8 +294,10 @@ fun GenerateScreen(
                     previousText = state.userPrompt
                 }
 
-                PhotoPrompt(prompt = state.userPrompt,
+                PhotoPrompt(
+                    prompt = state.userPrompt,
                     onPromptChanged = viewModel::onUserPromptChanged,
+                    onHistoryClicked = viewModel::onHistoryClicked,
                     onGenerate = { viewModel.prepareToGenerate(onGenerate, trainAiModel) })
             }
         }
@@ -356,7 +359,8 @@ private fun EnhancePhotoAccuracy(
 private fun PhotoPrompt(
     prompt: String,
     onPromptChanged: (String) -> Unit,
-    onGenerate: () -> Unit
+    onHistoryClicked: () -> Unit,
+    onGenerate: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     val onDone = {
@@ -374,6 +378,19 @@ private fun PhotoPrompt(
             keyboardType = KeyboardType.Text,
         ),
         maxLines = 10,
+        leadingIcon = {
+            IconButton(
+                onClick = {
+                    onHistoryClicked()
+                },
+            ) {
+                Icon(
+                    imageVector = Icons.Default.History,
+                    contentDescription = Icons.Default.History.name,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+        },
         trailingIcon = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Crossfade(targetState = prompt.isNotEmpty()) {
@@ -385,7 +402,6 @@ private fun PhotoPrompt(
                             },
                         ) {
                             Icon(
-                                modifier = Modifier.clickable { onPromptChanged("") },
                                 imageVector = Icons.Default.Close,
                                 contentDescription = Icons.Default.Close.name,
                                 tint = MaterialTheme.colorScheme.onSurface,

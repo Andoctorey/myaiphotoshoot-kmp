@@ -6,7 +6,7 @@
     <string name="add_your_photos">Upload Selfies (%1$s/20)</string>
     <string name="upload_guidelines_title">Add Your Selfies</string>
     <string name="upload_guidelines_message">Use your device’s native camera app to capture 10-20 selfies in portrait mode. Then, select your best shots to upload for a personalized AI experience. For best results, vary your angles and expressions with each shot, or mix in some of your favorite photos you already share on social media.</string>
-    <string name="creations_placeholder">Generate thousands of amazing photos and share them with friends!</string>
+    <string name="creations_placeholder">Generate thousands of amazing photos of yourself and share them in socials!</string>
     <string name="connection_error">Problem connecting with server. Please check your connection.</string>
     <string name="upload_more_photos">Oops! It looks like you need to upload at least 10 photos before training your model. Try taking some selfies in portrait mode from different angles to get started.</string>
     <string name="delete_some_photos">Please delete some photos. For optimal training, please keep no more than 20 photos for training.</string>

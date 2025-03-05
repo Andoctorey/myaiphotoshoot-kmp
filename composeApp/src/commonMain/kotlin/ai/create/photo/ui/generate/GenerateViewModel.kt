@@ -86,6 +86,21 @@ class GenerateViewModel : AuthViewModel() {
         )
     }
 
+    fun onHistoryClicked() {
+        val history = uiState.promptsHistory
+        val currentPrompt = uiState.userPrompt
+
+        val newPrompt = if (currentPrompt.isEmpty() || !history.contains(currentPrompt)) {
+            history.lastOrNull() ?: ""
+        } else {
+            val index = history.indexOf(currentPrompt)
+            if (index > 0) history[index - 1] else history.last()
+        }
+
+        uiState = uiState.copy(userPrompt = newPrompt)
+    }
+
+
     fun hideErrorPopup() {
         uiState = uiState.copy(errorPopup = null)
     }
@@ -98,7 +113,14 @@ class GenerateViewModel : AuthViewModel() {
                 return@launch
             }
 
-            uiState = uiState.copy(showSettings = false)
+            uiState = uiState.copy(
+                showSettings = false,
+                promptsHistory = if (uiState.userPrompt.isNotBlank() && !uiState.promptsHistory.contains(
+                        uiState.userPrompt
+                    )
+                )
+                    uiState.promptsHistory + uiState.userPrompt else uiState.promptsHistory,
+            )
 
             val oldDescription = uiState.originalPersonDescription
             val newDescription = uiState.personDescription

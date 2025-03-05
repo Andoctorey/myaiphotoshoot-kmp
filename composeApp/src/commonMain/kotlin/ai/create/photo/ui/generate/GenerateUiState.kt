@@ -17,6 +17,7 @@ data class GenerateUiState(
     val originalPersonDescription: String = "",
     val personDescription: String = "",
 
+    val promptsHistory: List<String> = emptyList(),
     val userPrompt: String = "",
     val promptBeforeEnhancing: String = "",
     val surpriseMePrompt: Boolean = false,
