@@ -208,7 +208,11 @@ class UploadViewModel : AuthViewModel() {
         } catch (e: Exception) {
             currentCoroutineContext().ensureActive()
             Logger.e("trainAiModel failed", e)
-            uiState = uiState.copy(trainingStatus = null, errorPopup = e)
+            if (e.message?.contains("Insufficient funds") == true) {
+                uiState = uiState.copy(trainingStatus = null, topUpErrorPopup = e)
+            } else {
+                uiState = uiState.copy(trainingStatus = null, errorPopup = e)
+            }
         }
     }
 
@@ -275,7 +279,7 @@ class UploadViewModel : AuthViewModel() {
     }
 
     fun hideErrorPopup() {
-        uiState = uiState.copy(errorPopup = null)
+        uiState = uiState.copy(errorPopup = null, topUpErrorPopup = null)
     }
 
     fun checkBadPhotosAndToggleTrainAiModelPopup(show: Boolean) {

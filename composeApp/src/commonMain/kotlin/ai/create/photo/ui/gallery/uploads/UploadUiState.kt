@@ -30,6 +30,7 @@ data class UploadUiState(
 
     val showDeleteSomePhotosPopup: Boolean = false,
     val deleteUnsuitablePhotosPopup: Boolean = false,
+    val topUpErrorPopup: Throwable? = null,
 ) {
 
     @Immutable

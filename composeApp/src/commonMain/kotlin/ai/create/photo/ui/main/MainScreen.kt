@@ -7,8 +7,10 @@ import ai.create.photo.ui.gallery.GalleryScreen
 import ai.create.photo.ui.generate.GenerateScreen
 import ai.create.photo.ui.settings.SettingsScreen
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material3.*
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -97,6 +99,9 @@ fun MainScreen(
                     if (prompt.isNotEmpty()) {
                         viewModel.putPrompt(prompt)
                     }
+                },
+                openTopUpTab = {
+                    currentDestination = AppNavigationRoutes.TAB_3_SETTINGS
                 },
                 openUploads = state.openUploads,
                 openCreations = state.openCreations,

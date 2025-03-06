@@ -10,6 +10,7 @@ import ai.create.photo.ui.compose.ErrorMessagePlaceHolderSmall
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.InfoPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
+import ai.create.photo.ui.compose.TopUpErrorPopup
 import ai.create.photo.ui.training.TrainAiModelPopup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -104,6 +105,7 @@ import photocreateai.composeapp.generated.resources.upload_more_photos
 fun UploadScreen(
     viewModel: UploadViewModel = viewModel { UploadViewModel() },
     openGenerateTab: () -> Unit,
+    openTopUpTab: () -> Unit,
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -241,6 +243,15 @@ fun UploadScreen(
             }
         }
 
+        if (state.topUpErrorPopup != null) {
+            TopUpErrorPopup(
+                state.topUpErrorPopup,
+                onDismiss = { viewModel.hideErrorPopup() },
+                onTopUp = {
+                    viewModel.hideErrorPopup()
+                    openTopUpTab()
+                })
+        }
 
         if (state.showTrainAiModelPopup) {
             TrainAiModelPopup(

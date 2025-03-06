@@ -31,6 +31,7 @@ fun GalleryScreen(
     viewModel: GalleryViewModel = viewModel { GalleryViewModel() },
     generationsInProgress: Int,
     openGenerateTab: (String) -> Unit,
+    openTopUpTab: () -> Unit,
     openUploads: Boolean = false,
     openCreations: Boolean = false,
 ) {
@@ -56,7 +57,10 @@ fun GalleryScreen(
                 removePhotoFromPublicGallery = { viewModel.removePhotoFromPublicGallery(it) },
             )
 
-            2 -> UploadScreen(openGenerateTab = { openGenerateTab("") })
+            2 -> UploadScreen(
+                openGenerateTab = { openGenerateTab("") },
+                openTopUpTab = openTopUpTab,
+            )
         }
 
         Tabs(

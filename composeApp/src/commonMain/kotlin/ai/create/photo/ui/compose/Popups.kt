@@ -15,6 +15,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.sp
+import org.jetbrains.compose.resources.stringResource
+import photocreateai.composeapp.generated.resources.Res
+import photocreateai.composeapp.generated.resources.cancel
+import photocreateai.composeapp.generated.resources.top_up
 
 @Composable
 fun ErrorPopup(e: Throwable, onDismiss: () -> Unit) {
@@ -29,6 +33,29 @@ fun ErrorPopup(e: Throwable, onDismiss: () -> Unit) {
         confirmButton = {
             TextButton(onClick = onDismiss) {
                 Text("OK")
+            }
+        }
+    )
+}
+
+@Composable
+fun TopUpErrorPopup(e: Throwable, onDismiss: () -> Unit, onTopUp: () -> Unit) {
+    AlertDialog(
+        icon = { Icon(Icons.Default.Error, contentDescription = "error") },
+        onDismissRequest = onDismiss,
+        text = {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                Text(text = e.getFriendlyError())
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(Res.string.cancel))
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onTopUp) {
+                Text(stringResource(Res.string.top_up))
             }
         }
     )
