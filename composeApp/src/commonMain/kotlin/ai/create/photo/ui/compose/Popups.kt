@@ -15,9 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.sp
-import org.jetbrains.compose.resources.stringResource
-import photocreateai.composeapp.generated.resources.Res
-import photocreateai.composeapp.generated.resources.cancel
 
 @Composable
 fun ErrorPopup(e: Throwable, onDismiss: () -> Unit) {
@@ -57,6 +54,7 @@ fun ConfirmationPopup(
     icon: ImageVector,
     message: String,
     confirmButton: String,
+    dismissButton: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -68,7 +66,7 @@ fun ConfirmationPopup(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(Res.string.cancel))
+                Text(dismissButton)
             }
         },
         confirmButton = {

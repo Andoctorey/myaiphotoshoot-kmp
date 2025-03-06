@@ -86,6 +86,7 @@ import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.add_your_photos
 import photocreateai.composeapp.generated.resources.analyze_photos
 import photocreateai.composeapp.generated.resources.analyzing_photos
+import photocreateai.composeapp.generated.resources.continue_
 import photocreateai.composeapp.generated.resources.creating_model_hint
 import photocreateai.composeapp.generated.resources.delete
 import photocreateai.composeapp.generated.resources.delete_some_photos
@@ -164,7 +165,7 @@ fun UploadScreen(
                         modifier = Modifier.align(Alignment.BottomCenter)
                             .padding(bottom = buttonsBottomPadding),
                         trainingStatus = state.trainingStatus,
-                        createModel = { viewModel.toggleTrainAiModelPopup(true) },
+                        createModel = { viewModel.checkBadPhotosAndToggleTrainAiModelPopup(true) },
                         onCreatingModelClick = viewModel::onCreatingModelClick,
                         generatePhotos = openGenerateTab,
                     )
@@ -206,7 +207,7 @@ fun UploadScreen(
                 SmallFloatingActionButton(
                     modifier = Modifier.align(Alignment.BottomEnd)
                         .padding(bottom = buttonsBottomPadding, end = 24.dp),
-                    onClick = { viewModel.toggleTrainAiModelPopup(true) },
+                    onClick = { viewModel.checkBadPhotosAndToggleTrainAiModelPopup(true) },
                 ) {
                     Icon(
                         imageVector = Icons.Default.Memory,
@@ -257,8 +258,12 @@ fun UploadScreen(
                 icon = Icons.Default.Delete,
                 message = stringResource(Res.string.delete_unsuitable_photos),
                 confirmButton = stringResource(Res.string.delete),
+                dismissButton = stringResource(Res.string.continue_),
                 onConfirm = viewModel::deleteUnsuitablePhotos,
-                onDismiss = { viewModel.toggleDeleteUnsuitablePhotosPopup(false) },
+                onDismiss = {
+                    viewModel.toggleDeleteUnsuitablePhotosPopup(false)
+                    viewModel.toggleTrainAiModelPopup(true)
+                },
             )
         }
     }

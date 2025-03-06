@@ -45,6 +45,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import org.jetbrains.compose.resources.stringResource
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.attach_email
+import photocreateai.composeapp.generated.resources.cancel
 import photocreateai.composeapp.generated.resources.confirm_data_delete
 import photocreateai.composeapp.generated.resources.data_deleted
 import photocreateai.composeapp.generated.resources.delete
@@ -143,6 +144,7 @@ fun LoginScreen(
                 icon = Icons.Default.Delete,
                 message = stringResource(Res.string.confirm_data_delete),
                 confirmButton = stringResource(Res.string.delete),
+                dismissButton = stringResource(Res.string.cancel),
                 onConfirm = {
                     viewModel.toggleConfirmDeletePopup(false)
                     viewModel.deleteAllData()

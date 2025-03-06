@@ -29,7 +29,6 @@ data class UploadUiState(
     val showTrainingAiModelPopup: Boolean = false,
 
     val showDeleteSomePhotosPopup: Boolean = false,
-    val deleteSomePhotosPopupShown: Boolean = false,
     val deleteUnsuitablePhotosPopup: Boolean = false,
 ) {
 

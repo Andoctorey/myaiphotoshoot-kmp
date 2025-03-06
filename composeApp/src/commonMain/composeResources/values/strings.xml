@@ -73,4 +73,5 @@
     <string name="photo_creation">Photo Creation</string>
     <string name="promo_code_applied">Promo code applied successfully! Your new balance: $%1$s.</string>
     <string name="open_creations">Open Creations</string>
+    <string name="continue_">Continue</string>
 </resources>
