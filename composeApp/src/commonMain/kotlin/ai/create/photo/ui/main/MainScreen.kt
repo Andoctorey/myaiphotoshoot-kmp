@@ -96,9 +96,7 @@ fun MainScreen(
                 generationsInProgress = state.generationsInProgress,
                 openGenerateTab = { prompt ->
                     currentDestination = AppNavigationRoutes.TAB_2_GENERATE
-                    if (prompt.isNotEmpty()) {
-                        viewModel.putPrompt(prompt)
-                    }
+                    if (prompt != null) viewModel.putPrompt(prompt)
                 },
                 openTopUpTab = {
                     currentDestination = AppNavigationRoutes.TAB_3_SETTINGS
@@ -152,8 +150,8 @@ fun MainScreen(
     }
 
     LaunchedEffect(state.putPrompt) {
-        if (state.putPrompt.isNotEmpty()) {
-            viewModel.putPrompt("")
+        if (state.putPrompt != null) {
+            viewModel.putPrompt(null)
         }
     }
 

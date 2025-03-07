@@ -80,6 +80,7 @@ class GenerateViewModel : AuthViewModel() {
     fun onUserPromptChanged(prompt: String) {
         uiState = uiState.copy(
             userPrompt = prompt,
+            promptBgUrl = null,
             promptBeforeEnhancing = "",
             surpriseMePrompt = false,
             showTranslateButton = !isLikelyEnglish(prompt),
@@ -97,7 +98,7 @@ class GenerateViewModel : AuthViewModel() {
             if (index > 0) history[index - 1] else history.last()
         }
 
-        uiState = uiState.copy(userPrompt = newPrompt)
+        uiState = uiState.copy(userPrompt = newPrompt, promptBgUrl = null)
     }
 
 
@@ -126,7 +127,8 @@ class GenerateViewModel : AuthViewModel() {
             val newDescription = uiState.personDescription
             if (oldDescription == newDescription) {
                 onGenerate(trainingId, uiState.userPrompt, uiState.photosToGenerateX100 / 100)
-                uiState = uiState.copy(showOpenCreations = true, userPrompt = "")
+                uiState =
+                    uiState.copy(showOpenCreations = true, userPrompt = "", promptBgUrl = null)
             } else {
                 try {
                     UserTrainingsRepository.updatePersonDescription(trainingId, newDescription)
@@ -139,7 +141,7 @@ class GenerateViewModel : AuthViewModel() {
                     uiState = uiState.copy(errorPopup = e)
                 }
             }
-            uiState = uiState.copy(showOpenCreations = true, userPrompt = "")
+            uiState = uiState.copy(showOpenCreations = true, userPrompt = "", promptBgUrl = null)
         }
 
     fun onRefreshPersonDescription() = viewModelScope.launch {
@@ -188,7 +190,7 @@ class GenerateViewModel : AuthViewModel() {
     }
 
     fun surpriseMe() = viewModelScope.launch {
-        uiState = uiState.copy(isLoadingSurpriseMe = true, userPrompt = "")
+        uiState = uiState.copy(isLoadingSurpriseMe = true, userPrompt = "", promptBgUrl = null)
         try {
             val prompt = SupabaseFunction.surpriseMe()
             uiState = uiState.copy(
@@ -270,7 +272,7 @@ class GenerateViewModel : AuthViewModel() {
         try {
             val prompt = SupabaseFunction.enhancePrompt(uiState.promptBeforeEnhancing)
             uiState =
-                uiState.copy(userPrompt = prompt, isEnhancingPrompt = false)
+                uiState.copy(userPrompt = prompt, promptBgUrl = null, isEnhancingPrompt = false)
         } catch (e: Exception) {
             uiState = uiState.copy(isEnhancingPrompt = false)
             currentCoroutineContext().ensureActive()
@@ -305,8 +307,8 @@ class GenerateViewModel : AuthViewModel() {
         uiState = uiState.copy(showSettings = !uiState.showSettings)
     }
 
-    fun putPrompt(prompt: String) {
-        uiState = uiState.copy(userPrompt = prompt)
+    fun setPredefinedPrompt(prompt: Prompt) {
+        uiState = uiState.copy(userPrompt = prompt.text, promptBgUrl = prompt.url)
     }
 
     fun translate() = viewModelScope.launch {

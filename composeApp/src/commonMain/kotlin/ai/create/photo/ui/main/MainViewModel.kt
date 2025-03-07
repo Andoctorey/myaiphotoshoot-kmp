@@ -1,6 +1,7 @@
 package ai.create.photo.ui.main
 
 import ai.create.photo.data.supabase.SupabaseFunction
+import ai.create.photo.ui.generate.Prompt
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -58,7 +59,7 @@ class MainViewModel : ViewModel() {
         uiState = uiState.copy(openUploads = openUploads)
     }
 
-    fun putPrompt(prompt: String) {
+    fun putPrompt(prompt: Prompt?) {
         uiState = uiState.copy(putPrompt = prompt)
     }
 

@@ -10,6 +10,7 @@ import ai.create.photo.ui.compose.ErrorMessagePlaceHolderSmall
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.compose.PullToRefreshBoxNoDesktop
+import ai.create.photo.ui.generate.Prompt
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -92,7 +93,7 @@ import photocreateai.composeapp.generated.resources.share
 @Composable
 fun CreationsScreen(
     viewModel: CreationsViewModel = viewModel { CreationsViewModel() },
-    generate: (String) -> Unit,
+    generate: (Prompt?) -> Unit,
     generationsInProgress: Int,
     addPhotoToPublicGallery: (UserGeneration) -> Unit,
     removePhotoFromPublicGallery: (String) -> Unit,
@@ -119,7 +120,7 @@ fun CreationsScreen(
             ErrorMessagePlaceHolder(state.loadingError)
         } else if (state.photos.isEmpty()) {
             Placeholder(modifier = Modifier.align(Alignment.Center)) {
-                generate("")
+                generate(null)
             }
         } else {
             LaunchedEffect(state.scrollToTop) {
@@ -189,7 +190,7 @@ private fun Photos(
     onRefresh: () -> Unit,
     onDownload: (CreationsUiState.Photo) -> Unit,
     onTogglePublic: (CreationsUiState.Photo) -> Unit,
-    onPrompt: (String) -> Unit,
+    onPrompt: (Prompt) -> Unit,
     onDelete: (CreationsUiState.Photo) -> Unit,
 ) {
     PullToRefreshBoxNoDesktop(
@@ -267,7 +268,7 @@ private fun Photo(
     optimizedVersion: Boolean,
     onDownload: (CreationsUiState.Photo) -> Unit,
     onTogglePublic: (CreationsUiState.Photo) -> Unit,
-    onPrompt: (String) -> Unit,
+    onPrompt: (Prompt) -> Unit,
     onDelete: (CreationsUiState.Photo) -> Unit,
 ) {
     var loaded by remember { mutableStateOf(false) }
@@ -327,7 +328,7 @@ private fun PhotoDropMenu(
     onDownload: (CreationsUiState.Photo) -> Unit,
     onShare: (CreationsUiState.Photo) -> Unit,
     onTogglePublic: (CreationsUiState.Photo) -> Unit,
-    onPrompt: (String) -> Unit,
+    onPrompt: (Prompt) -> Unit,
     onDelete: (CreationsUiState.Photo) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -440,7 +441,7 @@ private fun PhotoDropMenu(
                 },
                 onClick = {
                     expanded = false
-                    onPrompt(photo.prompt)
+                    onPrompt(Prompt(text = photo.prompt, url = photo.url))
                 }
             )
 

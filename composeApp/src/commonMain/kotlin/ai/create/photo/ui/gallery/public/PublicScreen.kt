@@ -8,6 +8,7 @@ import ai.create.photo.ui.compose.ErrorMessagePlaceHolderSmall
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.compose.PullToRefreshBoxNoDesktop
+import ai.create.photo.ui.generate.Prompt
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -52,7 +53,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun PublicScreen(
     viewModel: PublicViewModel = viewModel { PublicViewModel() },
-    generate: (String) -> Unit,
+    generate: (Prompt) -> Unit,
     addPhotosToPublicGallery: List<UserGeneration>,
     onAddedPhotosToPublicGallery: () -> Unit,
     removePhotosFromPublicGallery: List<String>,
@@ -91,7 +92,7 @@ fun PublicScreen(
                 isRefreshing = state.isRefreshing,
                 onRefresh = viewModel::refreshPublicGallery,
                 pagingLimitReach = state.pagingLimitReach,
-                onClick = { generate(it.prompt) }
+                onClick = { generate(Prompt(text = it.prompt, url = it.url)) }
             )
         }
     }
@@ -188,7 +189,7 @@ private fun Photos(
 private fun Photo(
     photo: PublicUiState.Photo,
     doNotLoad: Boolean,
-    width: Int,
+    @Suppress("SameParameterValue") width: Int,
     onClick: (PublicUiState.Photo) -> Unit,
 ) {
     var loaded by remember { mutableStateOf(false) }

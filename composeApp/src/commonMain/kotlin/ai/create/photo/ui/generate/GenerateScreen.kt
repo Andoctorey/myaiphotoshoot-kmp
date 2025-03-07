@@ -9,6 +9,7 @@ import ai.create.photo.ui.compose.LoadingPlaceholder
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +36,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.History
@@ -57,6 +59,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -70,6 +73,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -79,6 +83,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil3.compose.AsyncImage
+import coil3.compose.LocalPlatformContext
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
@@ -88,6 +96,7 @@ import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.ai_model
 import photocreateai.composeapp.generated.resources.enhance_photo_accuracy
 import photocreateai.composeapp.generated.resources.enhance_prompt
+import photocreateai.composeapp.generated.resources.generate_your_photo
 import photocreateai.composeapp.generated.resources.open_creations
 import photocreateai.composeapp.generated.resources.photo_prompt
 import photocreateai.composeapp.generated.resources.photos_to_generate
@@ -106,7 +115,7 @@ fun GenerateScreen(
     openCreations: () -> Unit,
     generationsInProgress: Int,
     onGenerate: (String, String, Int) -> Unit,
-    prompt: String,
+    prompt: Prompt? = null,
 ) {
     val state = viewModel.uiState
 
@@ -130,14 +139,37 @@ fun GenerateScreen(
             Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
 
             val hasSoftKeyboard = remember {
-                platform().platform in
-                        listOf(Platforms.ANDROID, Platforms.IOS, Platforms.WEB_MOBILE)
+                platform().platform in listOf(
+                    Platforms.ANDROID,
+                    Platforms.IOS,
+                    Platforms.WEB_MOBILE
+                )
+            }
+
+            if (state.promptBgUrl != null) {
+                var loaded by remember { mutableStateOf(false) }
+                AsyncImage(
+                    modifier = Modifier.fillMaxSize(),
+                    model = ImageRequest.Builder(LocalPlatformContext.current)
+                        .data(state.promptBgUrl)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = state.promptBgUrl,
+                    contentScale = ContentScale.Crop,
+                    onSuccess = { loaded = true }
+                )
+                if (loaded) {
+                    Box(
+                        modifier = Modifier.fillMaxSize()
+                            .background(color = Color.Black.copy(alpha = 0.7f))
+                    )
+                }
             }
 
             val scrollState = rememberScrollState()
             Column(
-                modifier = Modifier.widthIn(max = 600.dp).fillMaxSize()
-                    .animateContentSize().verticalScroll(scrollState),
+                modifier = Modifier.widthIn(max = 600.dp).fillMaxSize().animateContentSize()
+                    .verticalScroll(scrollState),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = if (hasSoftKeyboard) Arrangement.SpaceBetween else Arrangement.SpaceAround
             ) {
@@ -146,8 +178,7 @@ fun GenerateScreen(
                 Card(
                     modifier = Modifier.systemBarsPadding().padding(8.dp),
                     border = if (state.showSettings) BorderStroke(
-                        0.5.dp,
-                        MaterialTheme.colorScheme.onSurface
+                        0.5.dp, MaterialTheme.colorScheme.onSurface
                     ) else null,
                     colors = CardDefaults.cardColors(
                         containerColor = Color.Transparent
@@ -168,8 +199,7 @@ fun GenerateScreen(
                                     selectedTraining = state.trainings.find { it.id == state.selectedTrainingId },
                                     selectTraining = {
                                         viewModel.selectTraining(
-                                            it,
-                                            saveInDb = true
+                                            it, saveInDb = true
                                         )
                                     },
                                     trainAiModel = trainAiModel,
@@ -228,6 +258,7 @@ fun GenerateScreen(
                     if (state.trainings.isNullOrEmpty()) {
                         CreateAiModelButton(
                             modifier = Modifier.padding(horizontal = 4.dp),
+                            bgImageShown = state.promptBgUrl != null,
                             onClick = trainAiModel,
                         )
                     }
@@ -263,8 +294,7 @@ fun GenerateScreen(
                             PictureToPromptButton(
                                 modifier = Modifier.padding(horizontal = 4.dp),
                                 isLoading = state.isLoadingPictureToPrompt,
-                                onClick = { launcher.launch() }
-                            )
+                                onClick = { launcher.launch() })
                         }
 
                         if (state.userPrompt.isEmpty() || state.surpriseMePrompt) {
@@ -308,9 +338,10 @@ fun GenerateScreen(
             }
         }
 
-        LaunchedEffect(prompt) {
-            if (prompt.isNotEmpty()) {
-                viewModel.putPrompt(prompt)
+        LaunchedEffect(prompt?.text) {
+            co.touchlab.kermit.Logger.i("prompt: ${prompt?.text}")
+            if (prompt != null) {
+                viewModel.setPredefinedPrompt(prompt)
             }
         }
     }
@@ -323,8 +354,8 @@ private fun EnhancePhotoAccuracy(
     isLoadingPersonDescription: Boolean = false, onRefreshPersonDescription: () -> Unit,
 ) {
     OutlinedTextField(
-        modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().padding(horizontal = 24.dp)
-            .animateContentSize(),
+        modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth()
+            .padding(horizontal = 24.dp).animateContentSize(),
         value = personDescription,
         trailingIcon = {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -351,6 +382,11 @@ private fun EnhancePhotoAccuracy(
             imeAction = ImeAction.Next,
             capitalization = KeyboardCapitalization.Sentences,
             keyboardType = KeyboardType.Text,
+        ),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.background,
+            unfocusedContainerColor = MaterialTheme.colorScheme.background,
+            disabledContainerColor = MaterialTheme.colorScheme.background,
         )
     )
 }
@@ -422,16 +458,19 @@ private fun PhotoPrompt(
 }
 
 @Composable
-private fun CreateAiModelButton(modifier: Modifier, onClick: () -> Unit) {
+private fun CreateAiModelButton(modifier: Modifier, bgImageShown: Boolean, onClick: () -> Unit) {
     OutlinedButton(modifier = modifier, onClick = onClick) {
+        val icon = if (bgImageShown) Icons.Default.Brush else Icons.Default.Memory
         Icon(
-            imageVector = Icons.Default.Memory,
-            contentDescription = stringResource(Res.string.train_ai_model)
+            imageVector = icon,
+            contentDescription = icon.name,
+            modifier = Modifier.size(28.dp),
         )
         Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
         Text(
-            text = stringResource(Res.string.train_ai_model),
-            fontSize = 16.sp,
+            text = stringResource(if (bgImageShown) Res.string.generate_your_photo else Res.string.train_ai_model),
+            fontSize = 20.sp,
+            textAlign = TextAlign.Center,
         )
     }
 }
@@ -440,8 +479,7 @@ private fun CreateAiModelButton(modifier: Modifier, onClick: () -> Unit) {
 private fun EnhancePromptButton(modifier: Modifier, isLoading: Boolean, onClick: () -> Unit) {
     Box(contentAlignment = Alignment.Center) {
         OutlinedButton(
-            modifier = modifier.alpha(if (isLoading) 0f else 1f),
-            onClick = onClick
+            modifier = modifier.alpha(if (isLoading) 0f else 1f), onClick = onClick
         ) {
             Icon(
                 imageVector = Icons.Default.Build,
@@ -465,9 +503,7 @@ private fun EnhancePromptButton(modifier: Modifier, isLoading: Boolean, onClick:
 
 @Composable
 private fun OpenCreationsButton(
-    modifier: Modifier,
-    generationsInProgress: Int,
-    onClick: () -> Unit
+    modifier: Modifier, generationsInProgress: Int, onClick: () -> Unit
 ) {
     OutlinedButton(modifier = modifier, onClick = onClick) {
         GenerationIcon(generationsInProgress)
@@ -483,8 +519,7 @@ private fun OpenCreationsButton(
 private fun PictureToPromptButton(modifier: Modifier, isLoading: Boolean, onClick: () -> Unit) {
     Box(contentAlignment = Alignment.Center) {
         OutlinedButton(
-            modifier = modifier.alpha(if (isLoading) 0f else 1f),
-            onClick = onClick
+            modifier = modifier.alpha(if (isLoading) 0f else 1f), onClick = onClick
         ) {
             Icon(
                 imageVector = Icons.Default.Image,
@@ -508,17 +543,13 @@ private fun PictureToPromptButton(modifier: Modifier, isLoading: Boolean, onClic
 
 @Composable
 private fun TranslateButton(
-    modifier: Modifier,
-    show: Boolean,
-    isTranslating: Boolean,
-    onClick: () -> Unit
+    modifier: Modifier, show: Boolean, isTranslating: Boolean, onClick: () -> Unit
 ) {
     Crossfade(targetState = show) {
         if (it) {
             Box(modifier = modifier, contentAlignment = Alignment.Center) {
                 OutlinedButton(
-                    modifier = Modifier.alpha(if (isTranslating) 0f else 1f),
-                    onClick = onClick
+                    modifier = Modifier.alpha(if (isTranslating) 0f else 1f), onClick = onClick
                 ) {
                     val icon = Icons.Default.Translate
                     Icon(
@@ -585,10 +616,7 @@ private fun Trainings(
     val aiModelString = stringResource(Res.string.ai_model)
     val createAiModelString = stringResource(Res.string.train_ai_model)
     ExposedDropdownMenuBox(
-        modifier = modifier,
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded }
-    ) {
+        modifier = modifier, expanded = expanded, onExpandedChange = { expanded = !expanded }) {
         TextButton(
             modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable),
             onClick = { },
@@ -612,24 +640,19 @@ private fun Trainings(
             )
         }
         ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
+            expanded = expanded, onDismissRequest = { expanded = false }) {
             options.forEachIndexed { index, option ->
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text = if (option == null) createAiModelString
-                            else "$aiModelString ${options.size - index - 1}",
-                        )
-                    },
-                    onClick = {
-                        selectedOption = option
-                        expanded = false
-                        if (selectedOption == null) trainAiModel()
-                        else selectTraining(selectedOption!!)
-                    }
-                )
+                DropdownMenuItem(text = {
+                    Text(
+                        text = if (option == null) createAiModelString
+                        else "$aiModelString ${options.size - index - 1}",
+                    )
+                }, onClick = {
+                    selectedOption = option
+                    expanded = false
+                    if (selectedOption == null) trainAiModel()
+                    else selectTraining(selectedOption!!)
+                })
             }
         }
     }

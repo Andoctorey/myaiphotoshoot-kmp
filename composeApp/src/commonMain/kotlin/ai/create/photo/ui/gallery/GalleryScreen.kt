@@ -3,6 +3,7 @@ package ai.create.photo.ui.gallery
 import ai.create.photo.ui.gallery.creations.CreationsScreen
 import ai.create.photo.ui.gallery.public.PublicScreen
 import ai.create.photo.ui.gallery.uploads.UploadScreen
+import ai.create.photo.ui.generate.Prompt
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -30,7 +31,7 @@ import photocreateai.composeapp.generated.resources.gallery_uploads_tab
 fun GalleryScreen(
     viewModel: GalleryViewModel = viewModel { GalleryViewModel() },
     generationsInProgress: Int,
-    openGenerateTab: (String) -> Unit,
+    openGenerateTab: (Prompt?) -> Unit,
     openTopUpTab: () -> Unit,
     openUploads: Boolean = false,
     openCreations: Boolean = false,
@@ -58,7 +59,7 @@ fun GalleryScreen(
             )
 
             2 -> UploadScreen(
-                openGenerateTab = { openGenerateTab("") },
+                openGenerateTab = { openGenerateTab(null) },
                 openTopUpTab = openTopUpTab,
             )
         }
