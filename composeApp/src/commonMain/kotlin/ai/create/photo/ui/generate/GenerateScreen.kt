@@ -161,7 +161,7 @@ fun GenerateScreen(
                 if (loaded) {
                     Box(
                         modifier = Modifier.fillMaxSize()
-                            .background(color = Color.Black.copy(alpha = 0.7f))
+                            .background(color = MaterialTheme.colorScheme.background.copy(alpha = 0.9f))
                     )
                 }
             }
