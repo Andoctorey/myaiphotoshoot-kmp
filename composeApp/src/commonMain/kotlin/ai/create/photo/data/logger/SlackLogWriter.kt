@@ -6,18 +6,27 @@ import ai.create.photo.platform.platform
 import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
+import coil3.network.HttpException
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
-import io.ktor.client.*
+import io.github.jan.supabase.exceptions.UnknownRestException
+import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.*
-import io.ktor.http.*
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.util.network.UnresolvedAddressException
 import io.ktor.utils.io.core.Closeable
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock.System
 import kotlinx.io.IOException
 import kotlinx.serialization.SerialName
@@ -91,11 +100,14 @@ class SlackLogWriter : LogWriter(), Closeable {
             if (errorCount++ >= 5) return
 
             if (throwable?.message?.contains("JWT expired") != true) {
-            if (throwable is HttpRequestException ||
-                throwable is IOException ||
-                throwable is UnresolvedAddressException ||
-                throwable is UnauthorizedRestException
-            ) return
+                if (throwable is HttpRequestException ||
+                    throwable is IOException ||
+                    throwable is UnresolvedAddressException ||
+                    throwable is UnauthorizedRestException ||
+                    throwable is HttpException ||
+                    throwable is UnknownRestException ||
+                    throwable?.message?.contains("Fail to fetch") == true
+                ) return
             }
 
             if (tag == "Supabase-Core") return
