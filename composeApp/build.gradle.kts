@@ -5,6 +5,10 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
+import java.time.Instant
+
+val timestamp = Instant.now().epochSecond
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
@@ -43,7 +47,7 @@ kotlin {
             val rootDirPath = project.rootDir.path
             val projectDirPath = project.projectDir.path
             commonWebpackConfig {
-                outputFileName = "composeApp.js?v=070325a"
+                outputFileName = "composeApp.js?v=$timestamp"
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
                     static = (static ?: mutableListOf()).apply {
                         // Serve sources to debug inside browser
@@ -176,4 +180,31 @@ tasks.withType<DependencyUpdatesTask> {
     outputFormatter = "json"
     outputDir = "build/dependencyUpdates"
     reportfileName = "report"
+}
+
+val updateHtmlTimestamp by tasks.registering {
+    val indexHtml = file("src/wasmJsMain/resources/index.html")
+    inputs.file(indexHtml)
+    outputs.file(indexHtml)
+
+    doLast {
+        val updatedContent = indexHtml.readText()
+            .replace(
+                Regex("""composeApp\.js\?v=\d+|composeApp\.js\?v=timestamp"""),
+                "composeApp.js?v=$timestamp"
+            )
+        indexHtml.writeText(updatedContent)
+    }
+}
+
+tasks.named("wasmJsProcessResources") {
+    dependsOn(updateHtmlTimestamp)
+}
+
+tasks.named("wasmJsBrowserProductionWebpack") {
+    dependsOn(updateHtmlTimestamp)
+}
+
+tasks.named("wasmJsBrowserDevelopmentWebpack") {
+    dependsOn(updateHtmlTimestamp)
 }
