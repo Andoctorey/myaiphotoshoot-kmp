@@ -172,7 +172,7 @@ fun UploadScreen(
                         generatePhotos = openGenerateTab,
                     )
                 }
-                if (state.photos.size < 20) {
+                if (state.photos.size < 20 && state.trainingStatus != TrainingStatus.PROCESSING) {
                     SmallFloatingActionButton(
                         modifier = Modifier.align(Alignment.BottomEnd)
                             .padding(bottom = buttonsBottomPadding, end = 24.dp),
@@ -186,7 +186,7 @@ fun UploadScreen(
                 }
 
                 val hasBadPhotos = state.photos.any { it.analysisStatus == AnalysisStatus.DECLINED }
-                if (hasBadPhotos) {
+                if (hasBadPhotos && state.trainingStatus != TrainingStatus.PROCESSING) {
                     SmallFloatingActionButton(
                         modifier = Modifier.align(Alignment.BottomStart)
                             .padding(bottom = buttonsBottomPadding, start = 24.dp),
