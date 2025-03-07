@@ -53,7 +53,7 @@
     <string name="prompt">Prompt</string>
     <string name="surprise_me">Surprise Me</string>
     <string name="enhance_prompt">Enhance Prompt</string>
-    <string name="picture_to_prompt">Picture to Prompt</string>
+    <string name="picture_to_prompt">Make a Similar Photo</string>
     <string name="translate">Translate</string>
     <string name="cancel_popup">Cancel</string>
     <string name="steps">steps</string>
