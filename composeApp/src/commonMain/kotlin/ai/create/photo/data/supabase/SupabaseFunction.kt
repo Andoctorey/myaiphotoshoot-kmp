@@ -82,7 +82,7 @@ object SupabaseFunction {
     suspend fun applyPromoCode(code: String): Boolean {
         Logger.i("enterPromoCode: $code")
         val response = Supabase.supabase.functions.invoke(
-            function = "promo_code",
+            function = "promo-code",
             body = mapOf("promo_code" to code)
         )
         return response.body<Boolean>()
