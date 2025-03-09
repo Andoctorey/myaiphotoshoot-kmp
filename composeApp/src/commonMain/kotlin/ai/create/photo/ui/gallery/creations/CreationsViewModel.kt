@@ -3,6 +3,7 @@ package ai.create.photo.ui.gallery.creations
 import ai.create.photo.data.supabase.SupabaseStorage
 import ai.create.photo.data.supabase.database.UserFilesRepository
 import ai.create.photo.data.supabase.database.UserGenerationsRepository
+import ai.create.photo.platform.openUrl
 import ai.create.photo.ui.auth.AuthViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -91,6 +92,10 @@ class CreationsViewModel : AuthViewModel() {
             Logger.e("loadCreations failed", e)
             uiState = uiState.copy(loadingError = e)
         }
+    }
+
+    fun onPhotoClick(photo: CreationsUiState.Photo) {
+        openUrl(photo.url)
     }
 
     fun delete(photo: CreationsUiState.Photo) = viewModelScope.launch {

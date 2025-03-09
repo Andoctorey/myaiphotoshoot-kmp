@@ -139,6 +139,7 @@ fun CreationsScreen(
                 loadNextPage = viewModel::loadCreations,
                 isRefreshing = state.isRefreshing,
                 onRefresh = viewModel::refreshCreations,
+                onPhotoClick = viewModel::onPhotoClick,
                 onTogglePublic = {
                     viewModel.togglePublic(it) {
                         if (it.isPublic) {
@@ -190,6 +191,7 @@ private fun Photos(
     loadNextPage: () -> Unit = {},
     isRefreshing: Boolean = false,
     onRefresh: () -> Unit,
+    onPhotoClick: (CreationsUiState.Photo) -> Unit,
     onDownload: (CreationsUiState.Photo) -> Unit,
     onTogglePublic: (CreationsUiState.Photo) -> Unit,
     onPrompt: (Prompt) -> Unit,
@@ -228,6 +230,7 @@ private fun Photos(
                     Photo(
                         photo = photos[item],
                         optimizedVersion = optimizedVersion,
+                        onPhotoClick = onPhotoClick,
                         onTogglePublic = onTogglePublic,
                         onDownload = { onDownload(photos[item]) },
                         onPrompt = onPrompt,
@@ -268,6 +271,7 @@ private fun Photos(
 private fun Photo(
     photo: CreationsUiState.Photo,
     optimizedVersion: Boolean,
+    onPhotoClick: (CreationsUiState.Photo) -> Unit,
     onDownload: (CreationsUiState.Photo) -> Unit,
     onTogglePublic: (CreationsUiState.Photo) -> Unit,
     onPrompt: (Prompt) -> Unit,
@@ -294,7 +298,7 @@ private fun Photo(
     ) {
         if (showImage) {
             AsyncImage(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().clickable { onPhotoClick(photo) },
                 model = ImageRequest.Builder(LocalPlatformContext.current)
                     .data(photo.url)
                     .crossfade(!optimizedVersion)
