@@ -18,7 +18,12 @@ class MainViewModel : ViewModel() {
         private set
 
 
-    fun generatePhoto(trainingId: String, prompt: String, photosToGenerate: Int) =
+    fun generatePhoto(
+        trainingId: String,
+        prompt: String,
+        parentGenerationId: String?,
+        photosToGenerate: Int
+    ) =
         viewModelScope.launch {
             uiState =
                 uiState.copy(generationsInProgress = uiState.generationsInProgress + photosToGenerate)
@@ -26,7 +31,7 @@ class MainViewModel : ViewModel() {
             repeat(photosToGenerate) {
                 launch {
                     try {
-                        SupabaseFunction.generatePhoto(trainingId, prompt)
+                        SupabaseFunction.generatePhoto(trainingId, prompt, parentGenerationId)
                     } catch (e: Exception) {
                         currentCoroutineContext().ensureActive()
                         Logger.e("Generate photo failed", e)

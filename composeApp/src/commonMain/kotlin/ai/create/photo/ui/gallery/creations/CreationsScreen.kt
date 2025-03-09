@@ -443,7 +443,7 @@ private fun PhotoDropMenu(
                 },
                 onClick = {
                     expanded = false
-                    onPrompt(Prompt(text = photo.prompt, url = photo.url))
+                    onPrompt(Prompt(generationId = photo.id, text = photo.prompt, url = photo.url))
                 }
             )
 

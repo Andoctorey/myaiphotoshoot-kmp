@@ -14,13 +14,14 @@ object SupabaseFunction {
         )
     }
 
-    suspend fun generatePhoto(trainingId: String, prompt: String) {
-        Logger.i("generatePhoto trainingId: $trainingId, prompt: $prompt")
+    suspend fun generatePhoto(trainingId: String, prompt: String, parentGenerationId: String?) {
+        Logger.i("generatePhoto trainingId: $trainingId, parentGenerationId: $parentGenerationId, prompt: $prompt")
         Supabase.supabase.functions.invoke(
             function = "generate",
             body = mapOf(
                 "training_id" to trainingId,
-                "prompt" to prompt
+                "prompt" to prompt,
+                "parent_generation_id" to parentGenerationId,
             )
         )
     }

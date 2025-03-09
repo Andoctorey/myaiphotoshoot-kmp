@@ -109,8 +109,13 @@ fun MainScreen(
                 GenerateScreen(
                     trainAiModel = trainAiModel,
                     generationsInProgress = state.generationsInProgress,
-                    onGenerate = { trainingId, prompt, photosToGenerate ->
-                        viewModel.generatePhoto(trainingId, prompt, photosToGenerate)
+                    onGenerate = { trainingId, prompt, parentGenerationId, photosToGenerate ->
+                        viewModel.generatePhoto(
+                            trainingId,
+                            prompt,
+                            parentGenerationId,
+                            photosToGenerate
+                        )
                     },
                     openCreations = {
                         currentDestination = AppNavigationRoutes.TAB_1_GALLERY

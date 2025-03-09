@@ -114,7 +114,7 @@ fun GenerateScreen(
     trainAiModel: () -> Unit,
     openCreations: () -> Unit,
     generationsInProgress: Int,
-    onGenerate: (String, String, Int) -> Unit,
+    onGenerate: (String, String, String?, Int) -> Unit,
     prompt: Prompt? = null,
 ) {
     val state = viewModel.uiState

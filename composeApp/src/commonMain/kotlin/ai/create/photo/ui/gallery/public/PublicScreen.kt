@@ -92,7 +92,7 @@ fun PublicScreen(
                 isRefreshing = state.isRefreshing,
                 onRefresh = viewModel::refreshPublicGallery,
                 pagingLimitReach = state.pagingLimitReach,
-                onClick = { generate(Prompt(text = it.prompt, url = it.url)) }
+                onClick = { generate(Prompt(generationId = it.id, text = it.prompt, url = it.url)) }
             )
         }
     }

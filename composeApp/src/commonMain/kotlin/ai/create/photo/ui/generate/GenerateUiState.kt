@@ -20,6 +20,7 @@ data class GenerateUiState(
     val promptsHistory: List<String> = emptyList(),
     val userPrompt: String = "",
     val promptBgUrl: String? = null,
+    val parentGenerationId: String? = null,
     val promptBeforeEnhancing: String = "",
     val surpriseMePrompt: Boolean = false,
 

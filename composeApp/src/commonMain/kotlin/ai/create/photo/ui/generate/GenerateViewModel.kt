@@ -81,6 +81,7 @@ class GenerateViewModel : AuthViewModel() {
         uiState = uiState.copy(
             userPrompt = prompt,
             promptBgUrl = null,
+            parentGenerationId = if (prompt.isEmpty()) null else uiState.parentGenerationId,
             promptBeforeEnhancing = "",
             surpriseMePrompt = false,
             showTranslateButton = !isLikelyEnglish(prompt),
@@ -98,7 +99,8 @@ class GenerateViewModel : AuthViewModel() {
             if (index > 0) history[index - 1] else history.last()
         }
 
-        uiState = uiState.copy(userPrompt = newPrompt, promptBgUrl = null)
+        uiState =
+            uiState.copy(userPrompt = newPrompt, promptBgUrl = null, parentGenerationId = null)
     }
 
 
@@ -106,7 +108,10 @@ class GenerateViewModel : AuthViewModel() {
         uiState = uiState.copy(errorPopup = null)
     }
 
-    fun prepareToGenerate(onGenerate: (String, String, Int) -> Unit, trainAiModel: () -> Unit) =
+    fun prepareToGenerate(
+        onGenerate: (String, String, String?, Int) -> Unit,
+        trainAiModel: () -> Unit
+    ) =
         viewModelScope.launch {
             val trainingId = uiState.selectedTrainingId
             if (trainingId.isNullOrEmpty()) {
@@ -126,15 +131,26 @@ class GenerateViewModel : AuthViewModel() {
             val oldDescription = uiState.originalPersonDescription
             val newDescription = uiState.personDescription
             if (oldDescription == newDescription) {
-                onGenerate(trainingId, uiState.userPrompt, uiState.photosToGenerateX100 / 100)
+                onGenerate(
+                    trainingId,
+                    uiState.userPrompt,
+                    uiState.parentGenerationId,
+                    uiState.photosToGenerateX100 / 100
+                )
                 uiState =
-                    uiState.copy(showOpenCreations = true, userPrompt = "", promptBgUrl = null)
+                    uiState.copy(
+                        showOpenCreations = true, userPrompt = "",
+                        promptBgUrl = null, parentGenerationId = null,
+                    )
             } else {
                 try {
                     UserTrainingsRepository.updatePersonDescription(trainingId, newDescription)
                         .getOrThrow()
                     uiState = uiState.copy(originalPersonDescription = newDescription)
-                    onGenerate(trainingId, uiState.userPrompt, uiState.photosToGenerateX100 / 100)
+                    onGenerate(
+                        trainingId, uiState.userPrompt,
+                        uiState.parentGenerationId, uiState.photosToGenerateX100 / 100
+                    )
                 } catch (e: Exception) {
                     currentCoroutineContext().ensureActive()
                     Logger.e("Update description failed", e)
@@ -190,7 +206,10 @@ class GenerateViewModel : AuthViewModel() {
     }
 
     fun surpriseMe() = viewModelScope.launch {
-        uiState = uiState.copy(isLoadingSurpriseMe = true, userPrompt = "", promptBgUrl = null)
+        uiState = uiState.copy(
+            isLoadingSurpriseMe = true, userPrompt = "",
+            parentGenerationId = null, promptBgUrl = null
+        )
         try {
             val prompt = SupabaseFunction.surpriseMe()
             uiState = uiState.copy(
@@ -308,7 +327,11 @@ class GenerateViewModel : AuthViewModel() {
     }
 
     fun setPredefinedPrompt(prompt: Prompt) {
-        uiState = uiState.copy(userPrompt = prompt.text, promptBgUrl = prompt.url)
+        uiState = uiState.copy(
+            parentGenerationId = prompt.generationId,
+            userPrompt = prompt.text,
+            promptBgUrl = prompt.url,
+        )
     }
 
     fun translate() = viewModelScope.launch {
