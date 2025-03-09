@@ -1,11 +1,11 @@
 [versions]
 adaptive = "1.0.1"
-agp = "8.8.2"
+agp = "8.9.0"
 android-minSdk = "26"
 android-targetSdk = "35"
 androidx-activityCompose = "1.10.1"
 androidx-lifecycle = "2.8.4"
-# 2.8.0-alpha13 is crashing on desktop
+# "2.9.0-alpha14 is crashing on desktop
 androidx-navigation = "2.8.0-alpha12"
 coil = "3.1.0"
 compose-multiplatform = "1.7.3"
