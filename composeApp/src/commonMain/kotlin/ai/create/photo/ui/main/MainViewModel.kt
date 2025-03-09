@@ -1,6 +1,7 @@
 package ai.create.photo.ui.main
 
 import ai.create.photo.data.supabase.SupabaseFunction
+import ai.create.photo.platform.updateGenerationProgress
 import ai.create.photo.ui.generate.Prompt
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,10 +24,8 @@ class MainViewModel : ViewModel() {
         prompt: String,
         parentGenerationId: String?,
         photosToGenerate: Int
-    ) =
-        viewModelScope.launch {
-            uiState =
-                uiState.copy(generationsInProgress = uiState.generationsInProgress + photosToGenerate)
+    ) = viewModelScope.launch {
+        updateGenerationsInProgress(uiState.generationsInProgress + photosToGenerate)
         try {
             repeat(photosToGenerate) {
                 launch {
@@ -37,19 +36,20 @@ class MainViewModel : ViewModel() {
                         Logger.e("Generate photo failed", e)
                         uiState = uiState.copy(errorPopup = e)
                     } finally {
-                        uiState =
-                            uiState.copy(generationsInProgress = uiState.generationsInProgress - 1)
+                        updateGenerationsInProgress(uiState.generationsInProgress - 1)
                     }
                 }
             }
         } catch (e: Exception) {
             currentCoroutineContext().ensureActive()
             Logger.e("Generate photo failed", e)
-            uiState = uiState.copy(
-                generationsInProgress = uiState.generationsInProgress - 1,
-                errorPopup = e
-            )
+            updateGenerationsInProgress(uiState.generationsInProgress - 1)
         }
+    }
+
+    private fun updateGenerationsInProgress(progress: Int) {
+        uiState = uiState.copy(generationsInProgress = progress)
+        updateGenerationProgress(progress)
     }
 
     fun toggleOpenCreations(openCreations: Boolean) {
