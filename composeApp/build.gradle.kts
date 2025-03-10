@@ -126,7 +126,7 @@ android {
     compileSdk = libs.versions.android.targetSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "ai.create.photo"
+        applicationId = "com.myaiphotoshoot"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
