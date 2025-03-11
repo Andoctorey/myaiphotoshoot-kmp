@@ -17,6 +17,7 @@ plugins {
     alias(libs.plugins.serialization)
     alias(libs.plugins.versions)
     id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 kotlin {
@@ -70,6 +71,7 @@ kotlin {
             implementation(libs.ktor.client.cio)
             implementation(project.dependencies.platform(libs.firebase.bom))
             implementation(libs.firebase.analytics.ktx)
+            implementation(libs.firebase.crashlytics.ktx)
         }
 
         iosMain.dependencies {
