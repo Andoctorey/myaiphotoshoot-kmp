@@ -18,6 +18,7 @@ plugins {
     alias(libs.plugins.versions)
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
+    id("com.google.firebase.firebase-perf")
 }
 
 kotlin {
@@ -72,6 +73,7 @@ kotlin {
             implementation(project.dependencies.platform(libs.firebase.bom))
             implementation(libs.firebase.analytics.ktx)
             implementation(libs.firebase.crashlytics.ktx)
+            implementation(libs.firebase.perf)
         }
 
         iosMain.dependencies {

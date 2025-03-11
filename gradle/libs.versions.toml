@@ -34,6 +34,7 @@ filekit-compose = { module = "io.github.vinceglb:filekit-compose", version.ref =
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
 firebase-analytics-ktx = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
 firebase-crashlytics-ktx = { group = "com.google.firebase", name = "firebase-crashlytics-ktx" }
+firebase-perf = { group = "com.google.firebase", name = "firebase-perf" }
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktorClientCio" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktorClientCio" }
@@ -54,6 +55,7 @@ composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "k
 crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.3" }
 googleServices = { id = "com.google.gms.google-services", version = "4.4.2" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+perf = { id = "com.google.firebase.firebase-perf", version = "1.4.2" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 # ./gradlew dependencyUpdates -Drevision=release
 versions = { id = "com.github.ben-manes.versions", version = "0.52.0" }
