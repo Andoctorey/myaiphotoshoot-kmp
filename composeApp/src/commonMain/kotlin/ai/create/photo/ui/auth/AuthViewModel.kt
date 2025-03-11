@@ -3,6 +3,8 @@ package ai.create.photo.ui.auth
 import ai.create.photo.data.supabase.Supabase.supabase
 import ai.create.photo.data.supabase.SupabaseAuth
 import ai.create.photo.data.supabase.model.User
+import ai.create.photo.platform.logUserEmail
+import ai.create.photo.platform.logUserId
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
@@ -77,6 +79,8 @@ abstract class AuthViewModel : ViewModel() {
             email = supabaseUser.email.takeIf { !it.isNullOrEmpty() },
         )
         Logger.i("$user")
+        logUserId(user.id)
+        user.email?.run { logUserEmail(this) }
         this@AuthViewModel.user = user
     }
 
