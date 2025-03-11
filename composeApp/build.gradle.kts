@@ -74,6 +74,9 @@ kotlin {
             implementation(libs.firebase.analytics.ktx)
             implementation(libs.firebase.crashlytics.ktx)
             implementation(libs.firebase.perf)
+
+            // third-party
+            implementation(libs.kermit.crashlytics)
         }
 
         iosMain.dependencies {
