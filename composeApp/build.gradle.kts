@@ -16,6 +16,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.serialization)
     alias(libs.plugins.versions)
+    id("com.google.gms.google-services")
 }
 
 kotlin {
@@ -67,6 +68,8 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.multidex)
             implementation(libs.ktor.client.cio)
+            implementation(project.dependencies.platform(libs.firebase.bom))
+            implementation(libs.firebase.analytics.ktx)
         }
 
         iosMain.dependencies {
