@@ -1,6 +1,6 @@
  @media (prefers-color-scheme: dark) {
     body {
-        background-color: #1f1f25;
+        background-color: #211f25;
     }
  }
 
@@ -40,7 +40,7 @@ html, body {
 
 @media (prefers-color-scheme: dark) {
   #loading {
-    background-color: #1f1f25;
+    background-color: #211f25;
   }
 }
 
