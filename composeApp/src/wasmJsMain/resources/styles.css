@@ -28,7 +28,7 @@ html, body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #FFFBFF; /* Light theme background */
+  background-color: #FFF7FF; /* backgroundLight */
   z-index: 9999;
 }
 
@@ -45,8 +45,8 @@ html, body {
 }
 
 .spinner {
-  border: 4px solid #984062;
-  border-top: 4px solid #FFD9E2;
+  border: 4px solid #6C538C;  /* primaryLight */
+  border-top: 4px solid #EDDCFF;  /* primaryContainerLight */
   border-radius: 50%;
   width: 40px;
   height: 40px;
