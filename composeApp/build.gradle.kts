@@ -5,11 +5,10 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import java.io.FileInputStream
-
-import java.time.Instant
 import java.util.Properties
 
-val timestamp = Instant.now().epochSecond
+val gitVersionCode =
+    "git rev-list --all --count --full-history --no-max-parents HEAD".runCommand().toInt()
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -52,7 +51,7 @@ kotlin {
             val rootDirPath = project.rootDir.path
             val projectDirPath = project.projectDir.path
             commonWebpackConfig {
-                outputFileName = "composeApp.js?v=$timestamp"
+                outputFileName = "composeApp.js?v=$gitVersionCode"
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
                     static = (static ?: mutableListOf()).apply {
                         // Serve sources to debug inside browser
@@ -141,8 +140,8 @@ android {
         applicationId = "com.myaiphotoshoot"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = gitVersionCode
+        versionName = "1.0.$gitVersionCode"
     }
     packaging {
         resources {
@@ -233,7 +232,7 @@ val updateHtmlTimestamp by tasks.registering {
         val updatedContent = indexHtml.readText()
             .replace(
                 Regex("""composeApp\.js\?v=\d+|composeApp\.js\?v=timestamp"""),
-                "composeApp.js?v=$timestamp"
+                "composeApp.js?v=$gitVersionCode"
             )
         indexHtml.writeText(updatedContent)
     }
@@ -249,4 +248,16 @@ tasks.named("wasmJsBrowserProductionWebpack") {
 
 tasks.named("wasmJsBrowserDevelopmentWebpack") {
     dependsOn(updateHtmlTimestamp)
+}
+
+fun String.runCommand(workingDir: File = file("./")): String {
+    val parts = this.split("\\s".toRegex())
+    val process = ProcessBuilder(*parts.toTypedArray())
+        .directory(workingDir)
+        .redirectOutput(ProcessBuilder.Redirect.PIPE)
+        .redirectError(ProcessBuilder.Redirect.PIPE)
+        .start()
+
+    process.waitFor(1, TimeUnit.MINUTES)
+    return process.inputStream.bufferedReader().readText().trim()
 }
