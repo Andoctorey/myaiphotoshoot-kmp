@@ -1,5 +1,8 @@
 package ai.create.photo.ui.settings
 
+import ai.create.photo.platform.IgnoredOnParcel
+import ai.create.photo.platform.Parcelable
+import ai.create.photo.platform.Parcelize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.AccountCircle
@@ -30,18 +33,34 @@ data class SettingsUiState(
         ContactItem(),
     ),
 
-) {
+    ) {
 
     @Immutable
-    sealed class Item()
+    @Parcelize
+    sealed class Item() : Parcelable
 
+    @Immutable
+    @Parcelize
     sealed class DetailedItem(
-        val nameRes: StringResource,
-        val icon: ImageVector,
-    ) : Item()
+        @IgnoredOnParcel val nameRes: StringResource,
+        @IgnoredOnParcel val icon: ImageVector,
+    ) : Item(), Parcelable
 
-    class SpacerItem : Item()
-    class LoginItem() : DetailedItem(Res.string.account, Icons.Default.AccountCircle)
-    class BalanceItem() : DetailedItem(Res.string.top_up_pricing, Icons.Default.CreditCard)
-    class ContactItem() : DetailedItem(Res.string.contact, Icons.AutoMirrored.Filled.Help)
+    @Immutable
+    @Parcelize
+    class SpacerItem : Item(), Parcelable
+
+    @Immutable
+    @Parcelize
+    class LoginItem() : DetailedItem(Res.string.account, Icons.Default.AccountCircle), Parcelable
+
+    @Immutable
+    @Parcelize
+    class BalanceItem() : DetailedItem(Res.string.top_up_pricing, Icons.Default.CreditCard),
+        Parcelable
+
+    @Immutable
+    @Parcelize
+    class ContactItem() : DetailedItem(Res.string.contact, Icons.AutoMirrored.Filled.Help),
+        Parcelable
 }
