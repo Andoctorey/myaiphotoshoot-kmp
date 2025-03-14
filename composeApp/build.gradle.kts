@@ -11,15 +11,16 @@ val gitVersionCode =
     "git rev-list --all --count --full-history --no-max-parents HEAD".runCommand().toInt()
 
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
-    alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.crashlytics)
+    alias(libs.plugins.googleServices)
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.parcelize)
+    alias(libs.plugins.perf)
     alias(libs.plugins.serialization)
     alias(libs.plugins.versions)
-    id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics")
-    id("com.google.firebase.firebase-perf")
 }
 
 kotlin {
@@ -27,6 +28,10 @@ kotlin {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
+            freeCompilerArgs.addAll(
+                "-P",
+                "plugin:org.jetbrains.kotlin.parcelize:additionalAnnotation=ai.create.photo.platform.Parcelize"
+            )
         }
     }
 

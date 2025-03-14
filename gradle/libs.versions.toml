@@ -56,6 +56,7 @@ composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "k
 crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.3" }
 googleServices = { id = "com.google.gms.google-services", version = "4.4.2" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 perf = { id = "com.google.firebase.firebase-perf", version = "1.4.2" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 # ./gradlew dependencyUpdates -Drevision=release
