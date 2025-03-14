@@ -75,4 +75,6 @@
     <string name="open_creations">Open Creations</string>
     <string name="continue_">Continue</string>
     <string name="generate_your_photo">Make your own similar photo</string>
+    <string name="upload_tooltip_popup_title">Welcome to the Public Gallery!</string>
+    <string name="upload_tooltip_popup_message">Explore stunning photos made by our community.\n\nTap any photo to use its prompt and make your own.\n\nDon’t forget to share your creations!</string>
 </resources>

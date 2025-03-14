@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.cancel
+import photocreateai.composeapp.generated.resources.ok
 import photocreateai.composeapp.generated.resources.top_up
 
 @Composable
@@ -32,7 +33,7 @@ fun ErrorPopup(e: Throwable, onDismiss: () -> Unit) {
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("OK")
+                Text(stringResource(Res.string.ok))
             }
         }
     )
@@ -70,7 +71,22 @@ fun InfoPopup(message: String, onDismiss: () -> Unit) {
         text = { Text(text = message, fontSize = 16.sp) },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("OK")
+                Text(stringResource(Res.string.ok))
+            }
+        }
+    )
+}
+
+@Composable
+fun InfoPopup(icon: ImageVector, title: String, message: String, onDismiss: () -> Unit) {
+    AlertDialog(
+        icon = { Icon(icon, contentDescription = icon.name) },
+        onDismissRequest = onDismiss,
+        title = { Text(text = title) },
+        text = { Text(text = message) },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(Res.string.ok))
             }
         }
     )

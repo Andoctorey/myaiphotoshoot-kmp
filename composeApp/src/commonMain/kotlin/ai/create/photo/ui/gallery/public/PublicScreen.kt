@@ -6,6 +6,7 @@ import ai.create.photo.platform.platform
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolderSmall
 import ai.create.photo.ui.compose.ErrorPopup
+import ai.create.photo.ui.compose.InfoPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.compose.PullToRefreshBoxNoDesktop
 import ai.create.photo.ui.generate.Prompt
@@ -25,6 +26,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -46,7 +49,11 @@ import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import kotlinx.coroutines.flow.distinctUntilChanged
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import photocreateai.composeapp.generated.resources.Res
+import photocreateai.composeapp.generated.resources.upload_tooltip_popup_message
+import photocreateai.composeapp.generated.resources.upload_tooltip_popup_title
 
 
 @Preview
@@ -100,6 +107,16 @@ fun PublicScreen(
     if (state.errorPopup != null) {
         ErrorPopup(state.errorPopup) {
             viewModel.hideErrorPopup()
+        }
+    }
+
+    if (state.showTooltipPopup) {
+        InfoPopup(
+            icon = Icons.Default.Stars,
+            title = stringResource(Res.string.upload_tooltip_popup_title),
+            message = stringResource(Res.string.upload_tooltip_popup_message),
+        ) {
+            viewModel.toggleTooltipPopup(false)
         }
     }
 }

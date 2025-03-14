@@ -1,5 +1,6 @@
 package ai.create.photo.ui.gallery.public
 
+import ai.create.photo.data.supabase.database.ProfilesRepository
 import ai.create.photo.data.supabase.database.UserGenerationsRepository
 import ai.create.photo.data.supabase.model.UserGeneration
 import ai.create.photo.ui.auth.AuthViewModel
@@ -26,6 +27,7 @@ class PublicViewModel : AuthViewModel() {
             uiState = uiState.copy(isLoading = false)
         }
         if (userChanged || uiState.photos.isEmpty()) {
+            loadProfile()
             loadPublicGallery()
         }
     }
@@ -104,4 +106,37 @@ class PublicViewModel : AuthViewModel() {
         uiState = uiState.copy(photos = photos)
     }
 
+
+    fun toggleTooltipPopup(show: Boolean) {
+        uiState = uiState.copy(showTooltipPopup = show)
+        if (!show) {
+            viewModelScope.launch {
+                try {
+                    val userId = user?.id ?: return@launch
+                    val profile = ProfilesRepository.loadProfile(userId) ?: return@launch
+                    var preferences = profile.preferences
+                    preferences = preferences.copy(publicTooltipShown = true)
+                    ProfilesRepository.updateProfilePreference(userId, preferences)
+                } catch (e: Exception) {
+                    currentCoroutineContext().ensureActive()
+                    Logger.e("toggleTooltipPopup failed", e)
+                }
+            }
+        }
+    }
+
+    fun loadProfile() = viewModelScope.launch {
+        val userId = user?.id ?: return@launch
+
+        try {
+            val profile = ProfilesRepository.loadProfile(userId)
+            val preferences = profile?.preferences
+            val publicTooltipShown = preferences?.publicTooltipShown != true
+            if (publicTooltipShown) toggleTooltipPopup(true)
+        } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
+            Logger.e("loadProfile failed", e)
+            uiState = uiState.copy(errorPopup = e)
+        }
+    }
 }
