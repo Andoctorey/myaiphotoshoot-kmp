@@ -2,7 +2,7 @@ package ai.create.photo.ui.settings.balance
 
 import ai.create.photo.data.supabase.SupabaseFunction
 import ai.create.photo.data.supabase.database.ProfilesRepository
-import ai.create.photo.platform.openUrl
+import ai.create.photo.platform.topUpPlatform
 import ai.create.photo.ui.auth.AuthViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -66,9 +66,9 @@ class BalanceViewModel : AuthViewModel() {
         uiState = uiState.copy(showPromoCodeAppliedPopup = false)
     }
 
-    fun topUp(paymentLink: String) {
+    fun topUp(pricing: Pricing) {
         val userId = user?.id ?: return
-        openUrl("$paymentLink?client_reference_id=$userId")
+        topUpPlatform(userId, pricing)
     }
 
     fun enterPromoCode() {

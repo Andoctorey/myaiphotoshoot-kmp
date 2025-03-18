@@ -202,7 +202,7 @@ fun TopUpButton(pricing: Pricing, onClick: (String) -> Unit) {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun TopUp(
-    topUp: (String) -> Unit,
+    topUp: (Pricing) -> Unit,
     showEnterPromoCode: Boolean,
     promoCode: String,
     isIncorrectPromoCode: Boolean,
@@ -228,9 +228,9 @@ private fun TopUp(
             horizontalArrangement = Arrangement.Center,
             verticalArrangement = Arrangement.Center,
         ) {
-            TopUpButton(Pricing.STARTER) { topUp(it) }
-            TopUpButton(Pricing.CREATIVE) { topUp(it) }
-            TopUpButton(Pricing.FAMILY) { topUp(it) }
+            TopUpButton(Pricing.STARTER) { topUp(Pricing.STARTER) }
+            TopUpButton(Pricing.CREATIVE) { topUp(Pricing.CREATIVE) }
+            TopUpButton(Pricing.FAMILY) { topUp(Pricing.FAMILY) }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
