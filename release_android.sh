@@ -1,0 +1,1 @@
+./gradlew bundleRelease --stacktrace --console=plain
