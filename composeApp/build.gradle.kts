@@ -80,6 +80,7 @@ kotlin {
             implementation(libs.firebase.analytics.ktx)
             implementation(libs.firebase.crashlytics.ktx)
             implementation(libs.firebase.perf)
+            implementation(libs.billing.ktx)
 
             // third-party
             implementation(libs.kermit.crashlytics)
