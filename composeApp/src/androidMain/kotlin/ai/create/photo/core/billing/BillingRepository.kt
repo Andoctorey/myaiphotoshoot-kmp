@@ -88,7 +88,7 @@ object BillingRepository : PurchasesUpdatedListener {
         if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
             val error =
                 "debugMessage: ${billingResult.debugMessage}, code: ${billingResult.responseCode}"
-            Logger.e("billingResultOk failed", Warning(error))
+            Logger.w("billingResultOk failed", Warning(error))
             throw Exception(getString(Res.string.billing_service_unavailable))
         }
         productDetailsList = response.productDetailsList ?: emptyList()
