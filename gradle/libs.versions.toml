@@ -9,6 +9,7 @@ androidx-lifecycle = "2.8.4"
 androidx-navigation = "2.8.0-alpha12"
 billingKtx = "7.1.1"
 coil = "3.1.0"
+# https://www.jetbrains.com/help/kotlin-multiplatform-dev/whats-new-compose-180.html?s=35#browser-controls-supported-in-the-navigation-library
 compose-multiplatform = "1.7.3"
 filekitCompose = "0.8.8"
 firebase-bom = "33.10.0"

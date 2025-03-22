@@ -1,9 +1,10 @@
 package ai.create.photo.core.billing
 
-import ai.create.photo.app.App.Companion.context
+import ai.create.photo.app.App
 import ai.create.photo.core.extention.toast
 import ai.create.photo.core.log.Warning
 import ai.create.photo.ui.settings.balance.Pricing
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.os.Handler
@@ -19,7 +20,9 @@ import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
+import com.android.billingclient.api.QueryPurchasesParams
 import com.android.billingclient.api.queryProductDetails
+import com.android.billingclient.api.queryPurchasesAsync
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,16 +34,24 @@ import photocreateai.composeapp.generated.resources.billing_service_internal_err
 import photocreateai.composeapp.generated.resources.billing_service_outdated
 import photocreateai.composeapp.generated.resources.billing_service_unavailable
 
-enum class Sku(val productId: String, val productType: String, val dollars: Double) {
-    TOP_UP_5("top_up_5", BillingClient.ProductType.INAPP, 4.99),
-}
+class BillingRepository private constructor(context: Context) : PurchasesUpdatedListener,
+    BillingClientStateListener {
 
-/**
- * Handles all the interactions with Play Store (via Billing library), maintains connection to
- * it through BillingClient and caches temporary states/data if needed
- * https://developer.android.com/google/play/billing/billing_library_overview
- */
-class BillingRepository(context: Context) : PurchasesUpdatedListener, BillingClientStateListener {
+    companion object {
+        @SuppressLint("StaticFieldLeak")
+        @Volatile
+        private var instance: BillingRepository? = null
+
+        fun getInstance(context: Context): BillingRepository {
+            return instance ?: synchronized(this) {
+                instance ?: BillingRepository(context.applicationContext).also { instance = it }
+            }
+        }
+
+        fun launchBillingFlow(activity: Activity, pricing: Pricing): Boolean {
+            return getInstance(activity.applicationContext).startBillingFlow(activity, pricing)
+        }
+    }
 
     init {
         Logger.i("Creating BillingRepository")
@@ -48,13 +59,14 @@ class BillingRepository(context: Context) : PurchasesUpdatedListener, BillingCli
 
     private val base64Key =
         "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxVu6XM9IEajbV+MzAB7XtAuBK4iZoyk24ZBUNsWPhYS8yZlbxTUtbFpE7AAp7JQU/9tQeXF+n+VTgRil9qZDn7yPZsX6XJsd2yG1/SQRhNKOd2YAur8DICZj+XIABp0bqZWJbTeHHS1KbPc3rEowTKvpNqye2fAN25jzLqsu/E/yd3nZj2MENcvTDLvZ04qTItlPaEaxJaBNYUYVCYmHd2xG3Cl5lvNj8dMHZVH+nEIqGTPR3ZzLKM084oL2NvHbobpvkpGu8c4YUr5cOXIGhuBl7UoaRgit9QcsvY6hUcBYEAypLtoPcn+unTMkEHH0K678URXhdcpQGrHoCVqkmQIDAQAB"
-    private var billingClient: BillingClient = BillingClient.newBuilder(context)
+    private val billingClient: BillingClient = BillingClient.newBuilder(context)
         .enablePendingPurchases(
             PendingPurchasesParams.newBuilder()
                 .enableOneTimeProducts()
                 .build()
         )
-        .setListener(this).build()
+        .setListener(this)
+        .build()
     private var lastResponseCode = Int.MIN_VALUE
     private var lastResponseMessage = ""
     private var purchaseInProgress = false
@@ -62,8 +74,29 @@ class BillingRepository(context: Context) : PurchasesUpdatedListener, BillingCli
     private var reconnectMilliseconds: Long = 1000
     private var serviceConnected = false
     private var productDetailsList: List<ProductDetails> = listOf()
+    private var pendingLaunchActivity: Activity? = null
+    private var pendingLaunchPricing: Pricing? = null
+    private val maxReconnectDelayMs = 30_000L
 
-    fun connectToPlayBillingService() {
+    private fun startBillingFlow(activity: Activity, pricing: Pricing): Boolean {
+        Logger.i("startBillingFlow for $pricing, productDetailsList size: ${productDetailsList.size}")
+        if (billingClient.isReady && productDetailsList.isNotEmpty()) {
+            return launchFlow(activity, pricing)
+        } else {
+            pendingLaunchActivity = activity
+            pendingLaunchPricing = pricing
+            if (!billingClient.isReady) {
+                Logger.i("Billing client not ready, connecting...")
+                connectToPlayBillingService()
+            } else {
+                Logger.i("Billing client ready, querying product details...")
+                queryProductDetails()
+            }
+            return false
+        }
+    }
+
+    private fun connectToPlayBillingService() {
         if (!billingClient.isReady) {
             Logger.i("billingClient startConnection")
             billingClient.startConnection(this)
@@ -80,31 +113,26 @@ class BillingRepository(context: Context) : PurchasesUpdatedListener, BillingCli
             BillingClient.BillingResponseCode.OK -> {
                 queryProductDetails()
             }
-
             BillingClient.BillingResponseCode.BILLING_UNAVAILABLE -> {
                 Logger.i(billingResult.debugMessage)
                 if (purchaseInProgress) {
                     CoroutineScope(Dispatchers.Main).launch {
-                        context.toast(getString(Res.string.billing_service_unavailable))
+                        App.context.toast(getString(Res.string.billing_service_unavailable))
                     }
                 }
             }
-
             else -> Logger.i(billingResult.debugMessage)
         }
     }
 
     override fun onBillingServiceDisconnected() {
-        Logger.i("onBillingServiceDisconnected")
         serviceConnected = false
-        Handler(Looper.getMainLooper()).postDelayed(
-            {
-                if (serviceConnected) return@postDelayed
-                reconnectMilliseconds *= 2
-                connectToPlayBillingService()
-            },
-            reconnectMilliseconds
-        )
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (serviceConnected) return@postDelayed
+            reconnectMilliseconds = minOf(reconnectMilliseconds * 2, maxReconnectDelayMs)
+            connectToPlayBillingService()
+            queryProductDetails(forceRefresh = true)
+        }, reconnectMilliseconds)
     }
 
     fun endConnection() {
@@ -115,28 +143,26 @@ class BillingRepository(context: Context) : PurchasesUpdatedListener, BillingCli
         }
     }
 
-    private fun queryProductDetails() {
-        Logger.i("queryProductDetails")
+    private fun queryProductDetails(forceRefresh: Boolean = false) {
+        if (productDetailsList.isNotEmpty() && !forceRefresh) {
+            tryLaunchPendingFlow()
+            queryPurchases()
+            return
+        }
         CoroutineScope(Dispatchers.IO).launch {
-            val inApps = Sku.values()
-                .filter { it.productType == BillingClient.ProductType.INAPP }
-                .map {
-                    QueryProductDetailsParams.Product.newBuilder()
-                        .setProductId(it.productId)
-                        .setProductType(BillingClient.ProductType.INAPP)
-                        .build()
-                }
-            val inAppsParams = QueryProductDetailsParams.newBuilder().setProductList(inApps)
-            val response = billingClient.queryProductDetails(inAppsParams.build())
-            if (billingResultOk(response.billingResult)) {
-                if (response.productDetailsList.isNullOrEmpty()) {
-                    Logger.w("No inApps SkuDetailsList on Google Play side. Wrong app package?")
-                } else {
-                    Logger.v(Json.encodeToString(response.productDetailsList))
-                    productDetailsList = response.productDetailsList!!
-                }
+            val inApps = Pricing.entries.map {
+                QueryProductDetailsParams.Product.newBuilder()
+                    .setProductId(it.productId)
+                    .setProductType(BillingClient.ProductType.INAPP)
+                    .build()
             }
-
+            val response = billingClient.queryProductDetails(
+                QueryProductDetailsParams.newBuilder().setProductList(inApps).build()
+            )
+            if (billingResultOk(response.billingResult)) {
+                productDetailsList = response.productDetailsList ?: emptyList()
+            }
+            tryLaunchPendingFlow()
             queryPurchases()
         }
     }
@@ -156,19 +182,19 @@ class BillingRepository(context: Context) : PurchasesUpdatedListener, BillingCli
                 )
             ) {
                 val error =
-                    "debugMessage: " + billingResult.debugMessage + " , code: " + billingResult.responseCode
+                    "debugMessage: ${billingResult.debugMessage}, code: ${billingResult.responseCode}"
                 Logger.e("billingResultOk failed", Warning(error))
             }
         }
         return false
     }
 
-    fun launchBillingFlow(activity: Activity, pricing: Pricing): Boolean {
-        Logger.i("launchBillingFlow for $pricing, productDetailsList size: ${productDetailsList.size}")
+    private fun launchFlow(activity: Activity, pricing: Pricing): Boolean {
         var productDetails: ProductDetails? = null
         for (detail in productDetailsList) {
             if (detail.productId == pricing.productId) {
                 productDetails = detail
+                break
             }
         }
         if (productDetails == null) {
@@ -182,23 +208,19 @@ class BillingRepository(context: Context) : PurchasesUpdatedListener, BillingCli
                     BillingClient.BillingResponseCode.SERVICE_UNAVAILABLE,
                     BillingClient.BillingResponseCode.BILLING_UNAVAILABLE ->
                         getString(Res.string.billing_service_unavailable)
-
                     BillingClient.BillingResponseCode.FEATURE_NOT_SUPPORTED ->
                         getString(Res.string.billing_service_outdated)
-
                     BillingClient.BillingResponseCode.SERVICE_DISCONNECTED,
                     BillingClient.BillingResponseCode.NETWORK_ERROR ->
                         getString(Res.string.billing_service_disconnected)
-
                     BillingClient.BillingResponseCode.ERROR ->
                         getString(Res.string.billing_service_internal_error)
-
                     else -> {
-                        Logger.e("launchBillingFlow", Warning("Cannot launch billing flow"))
+                        Logger.e("launchFlow", Warning("Cannot launch billing flow"))
                         lastResponseMessage
                     }
                 }
-                context.toast(toastMessage)
+                App.context.toast(toastMessage)
             }
             return false
         }
@@ -206,9 +228,9 @@ class BillingRepository(context: Context) : PurchasesUpdatedListener, BillingCli
         purchaseInProgress = true
         Handler(Looper.getMainLooper()).postDelayed({ purchaseInProgress = false }, 1200000)
         val productDetailsParamsList = listOf(
-            BillingFlowParams.ProductDetailsParams.newBuilder().apply {
-                setProductDetails(productDetails)
-            }.build()
+            BillingFlowParams.ProductDetailsParams.newBuilder()
+                .setProductDetails(productDetails)
+                .build()
         )
         val billingFlowParams = BillingFlowParams.newBuilder()
             .setProductDetailsParamsList(productDetailsParamsList)
@@ -217,54 +239,54 @@ class BillingRepository(context: Context) : PurchasesUpdatedListener, BillingCli
         return true
     }
 
+    private fun tryLaunchPendingFlow() {
+        val activity = pendingLaunchActivity
+        val pricing = pendingLaunchPricing
+        if (activity != null && pricing != null && billingClient.isReady && productDetailsList.isNotEmpty()) {
+            Logger.i("Launching pending billing flow for $pricing")
+            launchFlow(activity, pricing)
+            pendingLaunchActivity = null
+            pendingLaunchPricing = null
+        }
+    }
+
     override fun onPurchasesUpdated(billingResult: BillingResult, purchases: List<Purchase>?) {
         when (billingResult.responseCode) {
             BillingClient.BillingResponseCode.OK -> {
                 Logger.i("onPurchasesUpdated")
-                // will handle server verification, consumables, and updating the local cache
                 purchases?.apply { processPurchases(this) }
             }
-
             BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> {
-                // item already owned? call queryPurchasesAsync to verify and process all such items
                 Logger.i("onPurchasesUpdated.ITEM_ALREADY_OWNED: ${billingResult.debugMessage}")
                 queryPurchases()
             }
-
             BillingClient.BillingResponseCode.SERVICE_DISCONNECTED -> {
                 Logger.i("onPurchasesUpdated: SERVICE_DISCONNECTED")
                 connectToPlayBillingService()
             }
-
             BillingClient.BillingResponseCode.USER_CANCELED -> {
                 Logger.i("onPurchasesUpdated() - user cancelled the purchase flow - skipping")
             }
-
             BillingClient.BillingResponseCode.SERVICE_UNAVAILABLE -> {
                 Logger.i("onPurchasesUpdated() - SERVICE_UNAVAILABLE")
             }
-
             BillingClient.BillingResponseCode.NETWORK_ERROR -> {
                 Logger.i("onPurchasesUpdated(): NETWORK_ERROR")
             }
-
             else -> {
-                Logger.i(
-                    "onPurchasesUpdated() got unknown resultCode: ${billingResult.responseCode}, " +
-                            "debugMessage: ${billingResult.debugMessage}",
-                )
+                Logger.i("onPurchasesUpdated() got unknown resultCode: ${billingResult.responseCode}, debugMessage: ${billingResult.debugMessage}")
             }
         }
     }
 
     private fun queryPurchases() = CoroutineScope(Dispatchers.IO).launch {
-        Logger.i("queryPurchases ")
-//        val inAppPurchases = billingClient.queryPurchasesAsync(
-//            QueryPurchasesParams.newBuilder()
-//                .setProductType(BillingClient.ProductType.INAPP)
-//                .build()
-//        )
-//        processPurchases(inAppPurchases)
+        val result = billingClient.queryPurchasesAsync(
+            QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP)
+                .build()
+        )
+        if (billingResultOk(result.billingResult)) {
+            processPurchases(result.purchasesList)
+        }
     }
 
     private fun processPurchases(purchasesResult: List<Purchase>) {
@@ -299,7 +321,7 @@ class BillingRepository(context: Context) : PurchasesUpdatedListener, BillingCli
                         billingClient.consumeAsync(params) { billingResult, _ ->
                             Logger.i("consumeAsync finished with code ${billingResult.responseCode} and message: ${billingResult.debugMessage}")
                             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-//                                user.payments.addSmsPackage(userRef, Sku.SMS_2.dollars)
+                                // Handle successful consumption
                             } else {
                                 processedPurchases.remove(orderId)
                             }
@@ -310,7 +332,7 @@ class BillingRepository(context: Context) : PurchasesUpdatedListener, BillingCli
                 processedPurchases.add(orderId)
             } catch (e: Exception) {
                 Logger.e("processPurchases", e)
-                context.toast(e.message)
+                App.context.toast(e.message)
             }
         }
     }
