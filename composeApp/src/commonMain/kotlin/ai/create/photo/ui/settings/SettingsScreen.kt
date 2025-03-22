@@ -43,6 +43,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,6 +54,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
@@ -157,6 +159,7 @@ private fun Screen(
         }
     }
 
+    val scope = rememberCoroutineScope()
     val expanded = navigator.scaffoldValue.primary == PaneAdaptedValue.Expanded
             && navigator.scaffoldValue.secondary == PaneAdaptedValue.Expanded
     ListDetailPaneScaffold(
@@ -177,14 +180,16 @@ private fun Screen(
                         }
                         Logger.i("Navigate to: $item")
                         onSaveDestination(item)
-                        navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, item)
+                        scope.launch {
+                            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, item)
+                        }
                     },
                 )
             }
         },
         detailPane = {
             AnimatedPane {
-                navigator.currentDestination?.content?.let {
+                navigator.currentDestination?.contentKey?.let {
                     when (it) {
                         is SettingsUiState.SpacerItem -> {}
                         is SettingsUiState.DetailedItem -> {
@@ -196,7 +201,9 @@ private fun Screen(
                             ) {
                                 Logger.i("Back clicked")
                                 onSaveDestination(null)
-                                navigator.navigateBack()
+                                scope.launch {
+                                    navigator.navigateBack()
+                                }
                             }
                         }
                     }

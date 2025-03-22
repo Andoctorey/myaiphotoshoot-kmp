@@ -1,12 +1,12 @@
 [versions]
-adaptive = "1.0.1"
+adaptive = "1.1.0-beta01"
 agp = "8.9.0"
 android-minSdk = "26"
 android-targetSdk = "35"
 androidx-activityCompose = "1.10.1"
 androidx-lifecycle = "2.8.4"
 #noinspection GradleDependency "2.9.0-alpha14 is crashing on desktop
-androidx-navigation = "2.8.0-alpha12"
+androidx-navigation = "2.9.0-alpha15"
 billingKtx = "7.1.1"
 coil = "3.1.0"
 # https://github.com/JetBrains/compose-multiplatform/releases
@@ -17,7 +17,7 @@ kermit = "2.0.5"
 kotlin = "2.1.20"
 kotlinx-coroutines = "1.10.1"
 ktorClientCio = "3.1.1"
-materialNavigation = "1.7.0-beta02"
+materialNavigation = "1.8.0-beta01"
 multidex = "2.0.1"
 supabase = "3.1.3"
 
