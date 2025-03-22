@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import co.touchlab.kermit.Logger
 import org.jetbrains.compose.resources.stringResource
 
@@ -31,8 +30,8 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun MainScreen(
     viewModel: MainViewModel = viewModel { MainViewModel() },
-    navController: NavHostController = rememberNavController(),
-    onExitApp: () -> Unit = {}
+    navController: NavHostController,
+    onExitApp: () -> Unit,
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     AppNavigationRoutes.valueOf(
