@@ -54,7 +54,7 @@ object BillingRepository : PurchasesUpdatedListener, BillingClientStateListener 
     private var productDetailsList: List<ProductDetails> = listOf()
     private var pendingLaunchActivity: Activity? = null
     private var pendingLaunchPricing: Pricing? = null
-    private val maxReconnectDelayMs = 30_000L
+    private const val MAX_RECONNECT_DELAY_MS = 30_000L
 
     private fun init(context: Context) {
         billingClient = BillingClient.newBuilder(context.applicationContext)
@@ -105,6 +105,7 @@ object BillingRepository : PurchasesUpdatedListener, BillingClientStateListener 
             BillingClient.BillingResponseCode.OK -> {
                 queryProductDetails()
             }
+
             BillingClient.BillingResponseCode.BILLING_UNAVAILABLE -> {
                 Logger.i(billingResult.debugMessage)
                 if (purchaseInProgress) {
@@ -113,6 +114,7 @@ object BillingRepository : PurchasesUpdatedListener, BillingClientStateListener 
                     }
                 }
             }
+
             else -> Logger.i(billingResult.debugMessage)
         }
     }
@@ -121,7 +123,7 @@ object BillingRepository : PurchasesUpdatedListener, BillingClientStateListener 
         serviceConnected = false
         Handler(Looper.getMainLooper()).postDelayed({
             if (serviceConnected) return@postDelayed
-            reconnectMilliseconds = minOf(reconnectMilliseconds * 2, maxReconnectDelayMs)
+            reconnectMilliseconds = minOf(reconnectMilliseconds * 2, MAX_RECONNECT_DELAY_MS)
             connectToPlayBillingService()
             queryProductDetails(forceRefresh = true)
         }, reconnectMilliseconds)
@@ -200,13 +202,17 @@ object BillingRepository : PurchasesUpdatedListener, BillingClientStateListener 
                     BillingClient.BillingResponseCode.SERVICE_UNAVAILABLE,
                     BillingClient.BillingResponseCode.BILLING_UNAVAILABLE ->
                         getString(Res.string.billing_service_unavailable)
+
                     BillingClient.BillingResponseCode.FEATURE_NOT_SUPPORTED ->
                         getString(Res.string.billing_service_outdated)
+
                     BillingClient.BillingResponseCode.SERVICE_DISCONNECTED,
                     BillingClient.BillingResponseCode.NETWORK_ERROR ->
                         getString(Res.string.billing_service_disconnected)
+
                     BillingClient.BillingResponseCode.ERROR ->
                         getString(Res.string.billing_service_internal_error)
+
                     else -> {
                         Logger.e("launchFlow", Warning("Cannot launch billing flow"))
                         lastResponseMessage
@@ -247,23 +253,29 @@ object BillingRepository : PurchasesUpdatedListener, BillingClientStateListener 
                 Logger.i("onPurchasesUpdated")
                 purchases?.apply { processPurchases(this) }
             }
+
             BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> {
                 Logger.i("onPurchasesUpdated.ITEM_ALREADY_OWNED: ${billingResult.debugMessage}")
                 queryPurchases()
             }
+
             BillingClient.BillingResponseCode.SERVICE_DISCONNECTED -> {
                 Logger.i("onPurchasesUpdated: SERVICE_DISCONNECTED")
                 connectToPlayBillingService()
             }
+
             BillingClient.BillingResponseCode.USER_CANCELED -> {
                 Logger.i("onPurchasesUpdated() - user cancelled the purchase flow - skipping")
             }
+
             BillingClient.BillingResponseCode.SERVICE_UNAVAILABLE -> {
                 Logger.i("onPurchasesUpdated() - SERVICE_UNAVAILABLE")
             }
+
             BillingClient.BillingResponseCode.NETWORK_ERROR -> {
                 Logger.i("onPurchasesUpdated(): NETWORK_ERROR")
             }
+
             else -> {
                 Logger.i("onPurchasesUpdated() got unknown resultCode: ${billingResult.responseCode}, debugMessage: ${billingResult.debugMessage}")
             }
@@ -316,6 +328,9 @@ object BillingRepository : PurchasesUpdatedListener, BillingClientStateListener 
                                 processedPurchases.remove(orderId)
                             }
                             purchaseInProgress = false
+                            if (processedPurchases.isEmpty()) {
+                                billingClient.endConnection()
+                            }
                         }
                     }
                 }
