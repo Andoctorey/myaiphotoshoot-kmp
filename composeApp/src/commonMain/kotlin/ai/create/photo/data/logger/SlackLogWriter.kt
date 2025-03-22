@@ -8,8 +8,7 @@ import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
 import coil3.network.HttpException
 import io.github.jan.supabase.exceptions.HttpRequestException
-import io.github.jan.supabase.exceptions.UnauthorizedRestException
-import io.github.jan.supabase.exceptions.UnknownRestException
+import io.github.jan.supabase.exceptions.RestException
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.post
@@ -103,9 +102,8 @@ class SlackLogWriter : LogWriter(), Closeable {
                 if (throwable is HttpRequestException ||
                     throwable is IOException ||
                     throwable is UnresolvedAddressException ||
-                    throwable is UnauthorizedRestException ||
                     throwable is HttpException ||
-                    throwable is UnknownRestException ||
+                    throwable is RestException ||
                     throwable?.message?.contains("Fail to fetch") == true
                 ) return
             }
