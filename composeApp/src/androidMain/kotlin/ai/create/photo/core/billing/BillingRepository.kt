@@ -34,39 +34,17 @@ import photocreateai.composeapp.generated.resources.billing_service_internal_err
 import photocreateai.composeapp.generated.resources.billing_service_outdated
 import photocreateai.composeapp.generated.resources.billing_service_unavailable
 
-class BillingRepository private constructor(context: Context) : PurchasesUpdatedListener,
-    BillingClientStateListener {
-
-    companion object {
-        @SuppressLint("StaticFieldLeak")
-        @Volatile
-        private var instance: BillingRepository? = null
-
-        fun getInstance(context: Context): BillingRepository {
-            return instance ?: synchronized(this) {
-                instance ?: BillingRepository(context.applicationContext).also { instance = it }
-            }
-        }
-
-        fun launchBillingFlow(activity: Activity, pricing: Pricing): Boolean {
-            return getInstance(activity.applicationContext).startBillingFlow(activity, pricing)
-        }
-    }
+@SuppressLint("StaticFieldLeak")
+object BillingRepository : PurchasesUpdatedListener, BillingClientStateListener {
 
     init {
         Logger.i("Creating BillingRepository")
     }
 
+    private lateinit var billingClient: BillingClient
+
     private val base64Key =
         "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxVu6XM9IEajbV+MzAB7XtAuBK4iZoyk24ZBUNsWPhYS8yZlbxTUtbFpE7AAp7JQU/9tQeXF+n+VTgRil9qZDn7yPZsX6XJsd2yG1/SQRhNKOd2YAur8DICZj+XIABp0bqZWJbTeHHS1KbPc3rEowTKvpNqye2fAN25jzLqsu/E/yd3nZj2MENcvTDLvZ04qTItlPaEaxJaBNYUYVCYmHd2xG3Cl5lvNj8dMHZVH+nEIqGTPR3ZzLKM084oL2NvHbobpvkpGu8c4YUr5cOXIGhuBl7UoaRgit9QcsvY6hUcBYEAypLtoPcn+unTMkEHH0K678URXhdcpQGrHoCVqkmQIDAQAB"
-    private val billingClient: BillingClient = BillingClient.newBuilder(context)
-        .enablePendingPurchases(
-            PendingPurchasesParams.newBuilder()
-                .enableOneTimeProducts()
-                .build()
-        )
-        .setListener(this)
-        .build()
     private var lastResponseCode = Int.MIN_VALUE
     private var lastResponseMessage = ""
     private var purchaseInProgress = false
@@ -78,7 +56,21 @@ class BillingRepository private constructor(context: Context) : PurchasesUpdated
     private var pendingLaunchPricing: Pricing? = null
     private val maxReconnectDelayMs = 30_000L
 
-    private fun startBillingFlow(activity: Activity, pricing: Pricing): Boolean {
+    private fun init(context: Context) {
+        billingClient = BillingClient.newBuilder(context.applicationContext)
+            .enablePendingPurchases(
+                PendingPurchasesParams.newBuilder()
+                    .enableOneTimeProducts()
+                    .build()
+            )
+            .setListener(this)
+            .build()
+    }
+
+    fun launchBillingFlow(activity: Activity, pricing: Pricing): Boolean {
+        if (!::billingClient.isInitialized) {
+            init(activity.applicationContext)
+        }
         Logger.i("startBillingFlow for $pricing, productDetailsList size: ${productDetailsList.size}")
         if (billingClient.isReady && productDetailsList.isNotEmpty()) {
             return launchFlow(activity, pricing)
@@ -224,7 +216,6 @@ class BillingRepository private constructor(context: Context) : PurchasesUpdated
             }
             return false
         }
-
         purchaseInProgress = true
         Handler(Looper.getMainLooper()).postDelayed({ purchaseInProgress = false }, 1200000)
         val productDetailsParamsList = listOf(
@@ -303,7 +294,6 @@ class BillingRepository private constructor(context: Context) : PurchasesUpdated
                 Logger.i("Received an invalid purchase: ${Json.encodeToString(purchase)}")
             }
         }
-
         Logger.i("valid purchases: $validPurchases")
         var processingIapPurchase = false
         for (purchase in validPurchases) {
@@ -337,10 +327,6 @@ class BillingRepository private constructor(context: Context) : PurchasesUpdated
         }
     }
 
-    /**
-     * Ideally your implementation will comprise a secure server, rendering this check
-     * unnecessary. @see [Security]
-     */
     private fun isSignatureValid(purchase: Purchase): Boolean {
         return Security.verifyPurchase(base64Key, purchase.originalJson, purchase.signature)
     }
