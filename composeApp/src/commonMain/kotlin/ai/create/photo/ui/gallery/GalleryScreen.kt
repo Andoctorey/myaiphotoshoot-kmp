@@ -7,6 +7,7 @@ import ai.create.photo.ui.generate.Prompt
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -65,7 +66,7 @@ fun GalleryScreen(
         }
 
         Tabs(
-            modifier = Modifier.align(Alignment.BottomCenter).padding(24.dp),
+            modifier = Modifier.align(Alignment.BottomCenter).padding(24.dp).safeDrawingPadding(),
             selectedTab = state.selectedTab
         ) {
             viewModel.selectTab(it)

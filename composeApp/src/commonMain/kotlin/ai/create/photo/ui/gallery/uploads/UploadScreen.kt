@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
@@ -157,7 +158,7 @@ fun UploadScreen(
                 if (shouldAnalyzePhotos) {
                     AnalyzePhotosFab(
                         modifier = Modifier.align(Alignment.BottomCenter)
-                            .padding(bottom = buttonsBottomPadding),
+                            .padding(bottom = buttonsBottomPadding).safeDrawingPadding(),
                         analyzingPhotos = state.analyzingPhotos,
                         totalPhotos = state.photos.size,
                         onClick = viewModel::analyzePhotos,
@@ -165,7 +166,7 @@ fun UploadScreen(
                 } else {
                     TrainModelFab(
                         modifier = Modifier.align(Alignment.BottomCenter)
-                            .padding(bottom = buttonsBottomPadding),
+                            .padding(bottom = buttonsBottomPadding).safeDrawingPadding(),
                         trainingStatus = state.trainingStatus,
                         createModel = { viewModel.checkBadPhotosAndToggleTrainAiModelPopup(true) },
                         onCreatingModelClick = viewModel::onCreatingModelClick,
@@ -175,7 +176,8 @@ fun UploadScreen(
                 if (state.photos.size < 20 && state.trainingStatus != TrainingStatus.PROCESSING) {
                     SmallFloatingActionButton(
                         modifier = Modifier.align(Alignment.BottomEnd)
-                            .padding(bottom = buttonsBottomPadding, end = 24.dp),
+                            .padding(bottom = buttonsBottomPadding, end = 24.dp)
+                            .safeDrawingPadding(),
                         onClick = onAddPhotoClick,
                     ) {
                         Icon(
@@ -189,7 +191,8 @@ fun UploadScreen(
                 if (hasBadPhotos && state.trainingStatus != TrainingStatus.PROCESSING) {
                     SmallFloatingActionButton(
                         modifier = Modifier.align(Alignment.BottomStart)
-                            .padding(bottom = buttonsBottomPadding, start = 24.dp),
+                            .padding(bottom = buttonsBottomPadding, start = 24.dp)
+                            .safeDrawingPadding(),
                         onClick = { viewModel.toggleDeleteUnsuitablePhotosPopup(true) },
                     ) {
                         Icon(
@@ -201,14 +204,14 @@ fun UploadScreen(
             } else {
                 AddPhotosFab(
                     modifier = Modifier.align(Alignment.BottomCenter)
-                        .padding(bottom = buttonsBottomPadding),
+                        .padding(bottom = buttonsBottomPadding).safeDrawingPadding(),
                     uploadProgress = state.uploadProgress,
                     uploaded = state.photos.size,
                     onClick = onAddPhotoClick,
                 )
                 SmallFloatingActionButton(
                     modifier = Modifier.align(Alignment.BottomEnd)
-                        .padding(bottom = buttonsBottomPadding, end = 24.dp),
+                        .padding(bottom = buttonsBottomPadding, end = 24.dp).safeDrawingPadding(),
                     onClick = { viewModel.checkBadPhotosAndToggleTrainAiModelPopup(true) },
                 ) {
                     Icon(
@@ -518,6 +521,10 @@ private fun Photos(
                     onDelete = onDelete,
                 )
             }
+        }
+
+        item {
+            Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.systemBars))
         }
     }
 }

@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -248,6 +249,10 @@ private fun Photos(
                         LoadingPlaceholder()
                     }
                 }
+            }
+
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.systemBars))
             }
         }
     }
