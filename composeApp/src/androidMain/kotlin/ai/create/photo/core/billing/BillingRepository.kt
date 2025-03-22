@@ -3,6 +3,7 @@ package ai.create.photo.core.billing
 import ai.create.photo.app.App
 import ai.create.photo.core.extention.toast
 import ai.create.photo.core.log.Warning
+import ai.create.photo.data.supabase.SupabaseFunction
 import ai.create.photo.ui.settings.balance.Pricing
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -21,6 +22,7 @@ import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchasesParams
+import com.android.billingclient.api.consumePurchase
 import com.android.billingclient.api.queryProductDetails
 import com.android.billingclient.api.queryPurchasesAsync
 import kotlinx.coroutines.CoroutineScope
@@ -67,7 +69,7 @@ object BillingRepository : PurchasesUpdatedListener, BillingClientStateListener 
             .build()
     }
 
-    fun launchBillingFlow(activity: Activity, pricing: Pricing): Boolean {
+    suspend fun launchBillingFlow(activity: Activity, pricing: Pricing): Boolean {
         if (!::billingClient.isInitialized) {
             init(activity.applicationContext)
         }
@@ -103,7 +105,9 @@ object BillingRepository : PurchasesUpdatedListener, BillingClientStateListener 
         lastResponseMessage = billingResult.debugMessage
         when (billingResult.responseCode) {
             BillingClient.BillingResponseCode.OK -> {
-                queryProductDetails()
+                CoroutineScope(Dispatchers.IO).launch {
+                    queryProductDetails()
+                }
             }
 
             BillingClient.BillingResponseCode.BILLING_UNAVAILABLE -> {
@@ -125,7 +129,9 @@ object BillingRepository : PurchasesUpdatedListener, BillingClientStateListener 
             if (serviceConnected) return@postDelayed
             reconnectMilliseconds = minOf(reconnectMilliseconds * 2, MAX_RECONNECT_DELAY_MS)
             connectToPlayBillingService()
-            queryProductDetails(forceRefresh = true)
+            CoroutineScope(Dispatchers.IO).launch {
+                queryProductDetails(forceRefresh = true)
+            }
         }, reconnectMilliseconds)
     }
 
@@ -137,28 +143,26 @@ object BillingRepository : PurchasesUpdatedListener, BillingClientStateListener 
         }
     }
 
-    private fun queryProductDetails(forceRefresh: Boolean = false) {
+    private suspend fun queryProductDetails(forceRefresh: Boolean = false) {
         if (productDetailsList.isNotEmpty() && !forceRefresh) {
             tryLaunchPendingFlow()
             queryPurchases()
             return
         }
-        CoroutineScope(Dispatchers.IO).launch {
-            val inApps = Pricing.entries.map {
-                QueryProductDetailsParams.Product.newBuilder()
-                    .setProductId(it.productId)
-                    .setProductType(BillingClient.ProductType.INAPP)
-                    .build()
-            }
-            val response = billingClient.queryProductDetails(
-                QueryProductDetailsParams.newBuilder().setProductList(inApps).build()
-            )
-            if (billingResultOk(response.billingResult)) {
-                productDetailsList = response.productDetailsList ?: emptyList()
-            }
-            tryLaunchPendingFlow()
-            queryPurchases()
+        val inApps = Pricing.entries.map {
+            QueryProductDetailsParams.Product.newBuilder()
+                .setProductId(it.productId)
+                .setProductType(BillingClient.ProductType.INAPP)
+                .build()
         }
+        val response = billingClient.queryProductDetails(
+            QueryProductDetailsParams.newBuilder().setProductList(inApps).build()
+        )
+        if (billingResultOk(response.billingResult)) {
+            productDetailsList = response.productDetailsList ?: emptyList()
+        }
+        tryLaunchPendingFlow()
+        queryPurchases()
     }
 
     private fun billingResultOk(billingResult: BillingResult): Boolean {
@@ -218,7 +222,9 @@ object BillingRepository : PurchasesUpdatedListener, BillingClientStateListener 
                         lastResponseMessage
                     }
                 }
-                App.context.toast(toastMessage)
+                CoroutineScope(Dispatchers.Main).launch {
+                    App.context.toast(toastMessage)
+                }
             }
             return false
         }
@@ -251,12 +257,14 @@ object BillingRepository : PurchasesUpdatedListener, BillingClientStateListener 
         when (billingResult.responseCode) {
             BillingClient.BillingResponseCode.OK -> {
                 Logger.i("onPurchasesUpdated")
-                purchases?.apply { processPurchases(this) }
+                purchases?.apply {
+                    CoroutineScope(Dispatchers.IO).launch { processPurchases(this@apply) }
+                }
             }
 
             BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> {
                 Logger.i("onPurchasesUpdated.ITEM_ALREADY_OWNED: ${billingResult.debugMessage}")
-                queryPurchases()
+                CoroutineScope(Dispatchers.IO).launch { queryPurchases() }
             }
 
             BillingClient.BillingResponseCode.SERVICE_DISCONNECTED -> {
@@ -282,7 +290,7 @@ object BillingRepository : PurchasesUpdatedListener, BillingClientStateListener 
         }
     }
 
-    private fun queryPurchases() = CoroutineScope(Dispatchers.IO).launch {
+    private suspend fun queryPurchases() {
         val result = billingClient.queryPurchasesAsync(
             QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP)
                 .build()
@@ -292,7 +300,7 @@ object BillingRepository : PurchasesUpdatedListener, BillingClientStateListener 
         }
     }
 
-    private fun processPurchases(purchasesResult: List<Purchase>) {
+    private suspend fun processPurchases(purchasesResult: List<Purchase>): Boolean {
         Logger.i("process purchases: $purchasesResult")
         val validPurchases = HashSet<Purchase>(purchasesResult.size)
         purchasesResult.forEach { purchase ->
@@ -306,40 +314,50 @@ object BillingRepository : PurchasesUpdatedListener, BillingClientStateListener 
                 Logger.i("Received an invalid purchase: ${Json.encodeToString(purchase)}")
             }
         }
+
         Logger.i("valid purchases: $validPurchases")
         var processingIapPurchase = false
         for (purchase in validPurchases) {
             val orderId = purchase.orderId ?: continue
             if (orderId in processedPurchases) continue
             try {
-                when {
-                    // TODO
-                    Pricing.CREATIVE.productId in purchase.products -> {
-                        processingIapPurchase = true
-                        Logger.i("consumeAsync")
-                        val params =
-                            ConsumeParams.newBuilder().setPurchaseToken(purchase.purchaseToken)
-                                .build()
-                        billingClient.consumeAsync(params) { billingResult, _ ->
-                            Logger.i("consumeAsync finished with code ${billingResult.responseCode} and message: ${billingResult.debugMessage}")
-                            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                                // Handle successful consumption
-                            } else {
-                                processedPurchases.remove(orderId)
-                            }
-                            purchaseInProgress = false
-                            if (processedPurchases.isEmpty()) {
-                                billingClient.endConnection()
-                            }
+                processingIapPurchase = true
+                Logger.i("consumeAsync")
+                val params =
+                    ConsumeParams.newBuilder().setPurchaseToken(purchase.purchaseToken)
+                        .build()
+                for (product in purchase.products) {
+                    val verified = SupabaseFunction.verifyAndroidPurchase(
+                        productId = product,
+                        purchaseToken = purchase.purchaseToken,
+                    )
+                    if (!verified) {
+                        Logger.e("processPurchases", Warning("Failed to verify purchase"))
+                        CoroutineScope(Dispatchers.Main).launch {
+                            App.context.toast(getString(Res.string.billing_service_internal_error))
                         }
+                        return false
                     }
+                }
+                val result = billingClient.consumePurchase(params).billingResult
+                Logger.i("consumeAsync finished with code ${result.responseCode} and message: ${result.debugMessage}")
+                if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+                    processedPurchases.remove(orderId)
+                }
+                purchaseInProgress = false
+                if (processedPurchases.isEmpty()) {
+                    billingClient.endConnection()
                 }
                 processedPurchases.add(orderId)
             } catch (e: Exception) {
                 Logger.e("processPurchases", e)
-                App.context.toast(e.message)
+                CoroutineScope(Dispatchers.Main).launch {
+                    App.context.toast(e.message)
+                }
+                return false
             }
         }
+        return true
     }
 
     private fun isSignatureValid(purchase: Purchase): Boolean {

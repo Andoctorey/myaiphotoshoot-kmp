@@ -96,4 +96,13 @@ object SupabaseFunction {
             body = mapOf("error" to error)
         )
     }
+
+    suspend fun verifyAndroidPurchase(productId: String, purchaseToken: String): Boolean {
+        Logger.i("verifyAndroidPurchase: $productId, $purchaseToken")
+        val response = Supabase.supabase.functions.invoke(
+            function = "verify-android-purchase",
+            body = mapOf("product_id" to productId, "purchase_token" to purchaseToken)
+        )
+        return response.body<Boolean>()
+    }
 }
