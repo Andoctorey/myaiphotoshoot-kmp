@@ -78,7 +78,4 @@
     <string name="upload_tooltip_popup_title">Welcome to the Public Gallery!</string>
     <string name="upload_tooltip_popup_message">Explore stunning photos made by our community.\n\nTap any photo to use its prompt and make your own.\n\nDon’t forget to share your creations!</string>
     <string name="billing_service_unavailable">Google Play Billing Service is unavailable</string>
-    <string name="billing_service_outdated">Update Play Store to use billing service</string>
-    <string name="billing_service_disconnected">Google Play Billing Service disconnected</string>
-    <string name="billing_service_internal_error">An internal error occurred in Google Play Billing</string>
 </resources>
