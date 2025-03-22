@@ -35,44 +35,63 @@ import photocreateai.composeapp.generated.resources.billing_service_disconnected
 import photocreateai.composeapp.generated.resources.billing_service_internal_error
 import photocreateai.composeapp.generated.resources.billing_service_outdated
 import photocreateai.composeapp.generated.resources.billing_service_unavailable
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 @SuppressLint("StaticFieldLeak")
-object BillingRepository : PurchasesUpdatedListener, BillingClientStateListener {
-
-    init {
-        Logger.i("Creating BillingRepository")
-    }
+object BillingRepository : PurchasesUpdatedListener {
 
     private lateinit var billingClient: BillingClient
 
-    private val base64Key =
+    private const val API_KEY =
         "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxVu6XM9IEajbV+MzAB7XtAuBK4iZoyk24ZBUNsWPhYS8yZlbxTUtbFpE7AAp7JQU/9tQeXF+n+VTgRil9qZDn7yPZsX6XJsd2yG1/SQRhNKOd2YAur8DICZj+XIABp0bqZWJbTeHHS1KbPc3rEowTKvpNqye2fAN25jzLqsu/E/yd3nZj2MENcvTDLvZ04qTItlPaEaxJaBNYUYVCYmHd2xG3Cl5lvNj8dMHZVH+nEIqGTPR3ZzLKM084oL2NvHbobpvkpGu8c4YUr5cOXIGhuBl7UoaRgit9QcsvY6hUcBYEAypLtoPcn+unTMkEHH0K678URXhdcpQGrHoCVqkmQIDAQAB"
     private var lastResponseCode = Int.MIN_VALUE
     private var lastResponseMessage = ""
     private var purchaseInProgress = false
     private var processedPurchases = mutableSetOf<String>()
-    private var reconnectMilliseconds: Long = 1000
-    private var serviceConnected = false
     private var productDetailsList: List<ProductDetails> = listOf()
     private var pendingLaunchActivity: Activity? = null
     private var pendingLaunchPricing: Pricing? = null
-    private const val MAX_RECONNECT_DELAY_MS = 30_000L
 
-    private fun init(context: Context) {
-        billingClient = BillingClient.newBuilder(context.applicationContext)
-            .enablePendingPurchases(
-                PendingPurchasesParams.newBuilder()
-                    .enableOneTimeProducts()
-                    .build()
-            )
-            .setListener(this)
-            .build()
+    private suspend fun initBillingClient(context: Context) {
+        if (!::billingClient.isInitialized) {
+            billingClient = BillingClient.newBuilder(context.applicationContext)
+                .enablePendingPurchases(
+                    PendingPurchasesParams.newBuilder()
+                        .enableOneTimeProducts()
+                        .build()
+                )
+                .setListener(this)
+                .build()
+        }
+        val billingResult = billingClient.connect()
+        onBillingSetupFinished(billingResult)
+    }
+
+    suspend fun onBillingSetupFinished(billingResult: BillingResult) {
+        Logger.i("onBillingSetupFinished with code ${billingResult.responseCode} and message: ${billingResult.debugMessage}")
+        lastResponseCode = billingResult.responseCode
+        lastResponseMessage = billingResult.debugMessage
+        when (billingResult.responseCode) {
+            BillingClient.BillingResponseCode.OK -> {
+                queryProductDetails()
+            }
+
+            BillingClient.BillingResponseCode.BILLING_UNAVAILABLE -> {
+                Logger.i(billingResult.debugMessage)
+                if (purchaseInProgress) {
+                    App.context.toast(getString(Res.string.billing_service_unavailable))
+                }
+            }
+
+            else -> Logger.i(billingResult.debugMessage)
+        }
     }
 
     suspend fun launchBillingFlow(activity: Activity, pricing: Pricing): Boolean {
-        if (!::billingClient.isInitialized) {
-            init(activity.applicationContext)
-        }
+        initBillingClient(activity.applicationContext)
+
         Logger.i("startBillingFlow for $pricing, productDetailsList size: ${productDetailsList.size}")
         if (billingClient.isReady && productDetailsList.isNotEmpty()) {
             return launchFlow(activity, pricing)
@@ -90,49 +109,11 @@ object BillingRepository : PurchasesUpdatedListener, BillingClientStateListener 
         }
     }
 
-    private fun connectToPlayBillingService() {
+    private suspend fun connectToPlayBillingService() {
         if (!billingClient.isReady) {
             Logger.i("billingClient startConnection")
-            billingClient.startConnection(this)
+            billingClient.connect()
         }
-    }
-
-    override fun onBillingSetupFinished(billingResult: BillingResult) {
-        Logger.i("onBillingSetupFinished with code ${billingResult.responseCode} and message: ${billingResult.debugMessage}")
-        reconnectMilliseconds = 1000
-        serviceConnected = true
-        lastResponseCode = billingResult.responseCode
-        lastResponseMessage = billingResult.debugMessage
-        when (billingResult.responseCode) {
-            BillingClient.BillingResponseCode.OK -> {
-                CoroutineScope(Dispatchers.IO).launch {
-                    queryProductDetails()
-                }
-            }
-
-            BillingClient.BillingResponseCode.BILLING_UNAVAILABLE -> {
-                Logger.i(billingResult.debugMessage)
-                if (purchaseInProgress) {
-                    CoroutineScope(Dispatchers.Main).launch {
-                        App.context.toast(getString(Res.string.billing_service_unavailable))
-                    }
-                }
-            }
-
-            else -> Logger.i(billingResult.debugMessage)
-        }
-    }
-
-    override fun onBillingServiceDisconnected() {
-        serviceConnected = false
-        Handler(Looper.getMainLooper()).postDelayed({
-            if (serviceConnected) return@postDelayed
-            reconnectMilliseconds = minOf(reconnectMilliseconds * 2, MAX_RECONNECT_DELAY_MS)
-            connectToPlayBillingService()
-            CoroutineScope(Dispatchers.IO).launch {
-                queryProductDetails(forceRefresh = true)
-            }
-        }, reconnectMilliseconds)
     }
 
     fun endConnection() {
@@ -187,7 +168,7 @@ object BillingRepository : PurchasesUpdatedListener, BillingClientStateListener 
         return false
     }
 
-    private fun launchFlow(activity: Activity, pricing: Pricing): Boolean {
+    private suspend fun launchFlow(activity: Activity, pricing: Pricing): Boolean {
         var productDetails: ProductDetails? = null
         for (detail in productDetailsList) {
             if (detail.productId == pricing.productId) {
@@ -200,32 +181,28 @@ object BillingRepository : PurchasesUpdatedListener, BillingClientStateListener 
                 "productDetails == null",
                 Warning("Code: $lastResponseCode, message: $lastResponseMessage")
             )
-            CoroutineScope(Dispatchers.Main).launch {
-                val toastMessage: String = when (lastResponseCode) {
-                    BillingClient.BillingResponseCode.OK,
-                    BillingClient.BillingResponseCode.SERVICE_UNAVAILABLE,
-                    BillingClient.BillingResponseCode.BILLING_UNAVAILABLE ->
-                        getString(Res.string.billing_service_unavailable)
+            val toastMessage: String = when (lastResponseCode) {
+                BillingClient.BillingResponseCode.OK,
+                BillingClient.BillingResponseCode.SERVICE_UNAVAILABLE,
+                BillingClient.BillingResponseCode.BILLING_UNAVAILABLE ->
+                    getString(Res.string.billing_service_unavailable)
 
-                    BillingClient.BillingResponseCode.FEATURE_NOT_SUPPORTED ->
-                        getString(Res.string.billing_service_outdated)
+                BillingClient.BillingResponseCode.FEATURE_NOT_SUPPORTED ->
+                    getString(Res.string.billing_service_outdated)
 
-                    BillingClient.BillingResponseCode.SERVICE_DISCONNECTED,
-                    BillingClient.BillingResponseCode.NETWORK_ERROR ->
-                        getString(Res.string.billing_service_disconnected)
+                BillingClient.BillingResponseCode.SERVICE_DISCONNECTED,
+                BillingClient.BillingResponseCode.NETWORK_ERROR ->
+                    getString(Res.string.billing_service_disconnected)
 
-                    BillingClient.BillingResponseCode.ERROR ->
-                        getString(Res.string.billing_service_internal_error)
+                BillingClient.BillingResponseCode.ERROR ->
+                    getString(Res.string.billing_service_internal_error)
 
-                    else -> {
-                        Logger.e("launchFlow", Warning("Cannot launch billing flow"))
-                        lastResponseMessage
-                    }
-                }
-                CoroutineScope(Dispatchers.Main).launch {
-                    App.context.toast(toastMessage)
+                else -> {
+                    Logger.e("launchFlow", Warning("Cannot launch billing flow"))
+                    lastResponseMessage
                 }
             }
+            App.context.toast(toastMessage)
             return false
         }
         purchaseInProgress = true
@@ -242,7 +219,7 @@ object BillingRepository : PurchasesUpdatedListener, BillingClientStateListener 
         return true
     }
 
-    private fun tryLaunchPendingFlow() {
+    private suspend fun tryLaunchPendingFlow() {
         val activity = pendingLaunchActivity
         val pricing = pendingLaunchPricing
         if (activity != null && pricing != null && billingClient.isReady && productDetailsList.isNotEmpty()) {
@@ -258,18 +235,18 @@ object BillingRepository : PurchasesUpdatedListener, BillingClientStateListener 
             BillingClient.BillingResponseCode.OK -> {
                 Logger.i("onPurchasesUpdated")
                 purchases?.apply {
-                    CoroutineScope(Dispatchers.IO).launch { processPurchases(this@apply) }
+                    CoroutineScope(Dispatchers.Main).launch { processPurchases(this@apply) }
                 }
             }
 
             BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> {
                 Logger.i("onPurchasesUpdated.ITEM_ALREADY_OWNED: ${billingResult.debugMessage}")
-                CoroutineScope(Dispatchers.IO).launch { queryPurchases() }
+                CoroutineScope(Dispatchers.Main).launch { queryPurchases() }
             }
 
             BillingClient.BillingResponseCode.SERVICE_DISCONNECTED -> {
                 Logger.i("onPurchasesUpdated: SERVICE_DISCONNECTED")
-                connectToPlayBillingService()
+                CoroutineScope(Dispatchers.Main).launch { connectToPlayBillingService() }
             }
 
             BillingClient.BillingResponseCode.USER_CANCELED -> {
@@ -333,9 +310,7 @@ object BillingRepository : PurchasesUpdatedListener, BillingClientStateListener 
                     )
                     if (!verified) {
                         Logger.e("processPurchases", Warning("Failed to verify purchase"))
-                        CoroutineScope(Dispatchers.Main).launch {
-                            App.context.toast(getString(Res.string.billing_service_internal_error))
-                        }
+                        App.context.toast(getString(Res.string.billing_service_internal_error))
                         return false
                     }
                 }
@@ -351,16 +326,27 @@ object BillingRepository : PurchasesUpdatedListener, BillingClientStateListener 
                 processedPurchases.add(orderId)
             } catch (e: Exception) {
                 Logger.e("processPurchases", e)
-                CoroutineScope(Dispatchers.Main).launch {
-                    App.context.toast(e.message)
-                }
+                App.context.toast(e.message)
                 return false
             }
         }
+        endConnection()
         return true
     }
 
     private fun isSignatureValid(purchase: Purchase): Boolean {
-        return Security.verifyPurchase(base64Key, purchase.originalJson, purchase.signature)
+        return Security.verifyPurchase(API_KEY, purchase.originalJson, purchase.signature)
     }
+}
+
+suspend fun BillingClient.connect(): BillingResult = suspendCoroutine { continuation ->
+    startConnection(object : BillingClientStateListener {
+        override fun onBillingSetupFinished(billingResult: BillingResult) {
+            continuation.resume(billingResult)
+        }
+
+        override fun onBillingServiceDisconnected() {
+            continuation.resumeWithException(Exception("Service disconnected"))
+        }
+    })
 }
