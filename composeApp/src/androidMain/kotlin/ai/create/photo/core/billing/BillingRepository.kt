@@ -26,6 +26,7 @@ import com.android.billingclient.api.queryPurchasesAsync
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.getString
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.billing_service_unavailable
@@ -59,6 +60,8 @@ object BillingRepository : PurchasesUpdatedListener {
     suspend fun purchase(activity: Activity, pricing: Pricing) = runCatching {
         initBillingClient(activity.applicationContext)
         val billingResult = billingClient.connect()
+        queryProductDetails()
+        queryPurchases()
         Logger.i("billingClient.connect() result: code ${billingResult.responseCode}, message: ${billingResult.debugMessage}")
         if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
             val error =
@@ -71,11 +74,7 @@ object BillingRepository : PurchasesUpdatedListener {
         openBillingPopup(activity, pricing)
     }
 
-    private suspend fun queryProductDetails(forceRefresh: Boolean = false) {
-        if (productDetailsList.isNotEmpty() && !forceRefresh) {
-            queryPurchases()
-            return
-        }
+    private suspend fun queryProductDetails() {
         val inApps = Pricing.entries.map {
             QueryProductDetailsParams.Product.newBuilder()
                 .setProductId(it.productId)
@@ -93,21 +92,11 @@ object BillingRepository : PurchasesUpdatedListener {
             throw Exception(getString(Res.string.billing_service_unavailable))
         }
         productDetailsList = response.productDetailsList ?: emptyList()
-        queryPurchases()
     }
 
     private suspend fun openBillingPopup(activity: Activity, pricing: Pricing) {
-        var productDetails: ProductDetails? = null
-        for (detail in productDetailsList) {
-            if (detail.productId == pricing.productId) {
-                productDetails = detail
-                break
-            }
-        }
-        if (productDetails == null) {
-            Logger.e("openBillingPopup, productDetails == null")
-            throw Exception(getString(Res.string.billing_service_unavailable))
-        }
+        val productDetails = productDetailsList.find { it.productId == pricing.productId }
+            ?: throw Exception(getString(Res.string.billing_service_unavailable))
         val productDetailsParamsList = listOf(
             BillingFlowParams.ProductDetailsParams.newBuilder()
                 .setProductDetails(productDetails)
@@ -124,13 +113,31 @@ object BillingRepository : PurchasesUpdatedListener {
             BillingClient.BillingResponseCode.OK -> {
                 Logger.i("onPurchasesUpdated")
                 purchases?.apply {
-                    CoroutineScope(Dispatchers.Main).launch { processPurchases(this@apply) }
+                    CoroutineScope(Dispatchers.IO).launch {
+                        try {
+                            processPurchases(this@apply)
+                        } catch (e: Exception) {
+                            Logger.e("onPurchasesUpdated", e)
+                            withContext(Dispatchers.Main) {
+                                App.context.toast(getString(Res.string.billing_service_unavailable))
+                            }
+                        }
+                    }
                 }
             }
 
             BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> {
                 Logger.i("onPurchasesUpdated.ITEM_ALREADY_OWNED: ${billingResult.debugMessage}")
-                CoroutineScope(Dispatchers.Main).launch { queryPurchases() }
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        queryPurchases() // try to consume again
+                    } catch (e: Exception) {
+                        Logger.e("onPurchasesUpdated", e)
+                        withContext(Dispatchers.Main) {
+                            App.context.toast(getString(Res.string.billing_service_unavailable))
+                        }
+                    }
+                }
             }
 
             BillingClient.BillingResponseCode.SERVICE_DISCONNECTED -> {
@@ -177,37 +184,26 @@ object BillingRepository : PurchasesUpdatedListener {
         }.toHashSet()
 
         Logger.i("valid purchases: $validPurchases")
-        var allProcessedSuccessfully = true
         for (purchase in validPurchases) {
             val orderId = purchase.orderId ?: continue
             if (orderId in processedPurchases) continue
-            try {
-                for (product in purchase.products) {
-                    val verified = SupabaseFunction.verifyAndroidPurchase(
-                        productId = product,
-                        purchaseToken = purchase.purchaseToken,
-                    )
-                    if (!verified) {
-                        Logger.e("processPurchases", Warning("Failed to verify purchase: $product"))
-                        App.context.toast(getString(Res.string.billing_service_unavailable))
-                        allProcessedSuccessfully = false
-                        continue
-                    }
+            for (product in purchase.products) {
+                val verified = SupabaseFunction.verifyAndroidPurchase(
+                    productId = product,
+                    purchaseToken = purchase.purchaseToken,
+                )
+                if (!verified) {
+                    Logger.e("processPurchases", Warning("Failed to verify purchase: $product"))
                 }
-                val params =
-                    ConsumeParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build()
-                val result = billingClient.consumePurchase(params).billingResult
-                Logger.i("consumeAsync finished with code ${result.responseCode} and message: ${result.debugMessage}")
-                if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                    processedPurchases.add(orderId)
-                } else {
-                    Logger.e("Consumption failed for $orderId", Warning(result.debugMessage))
-                    allProcessedSuccessfully = false
-                }
-            } catch (e: Exception) {
-                Logger.e("processPurchases", e)
-                App.context.toast(e.message)
-                allProcessedSuccessfully = false
+            }
+            val params =
+                ConsumeParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build()
+            val result = billingClient.consumePurchase(params).billingResult
+            Logger.i("consumeAsync finished with code ${result.responseCode} and message: ${result.debugMessage}")
+            if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+                processedPurchases.add(orderId)
+            } else {
+                Logger.e("Consumption failed for $orderId", Warning(result.debugMessage))
             }
         }
         billingClient.endConnection()
