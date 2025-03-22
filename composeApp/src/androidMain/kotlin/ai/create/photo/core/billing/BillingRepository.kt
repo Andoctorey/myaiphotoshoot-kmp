@@ -28,7 +28,6 @@ import com.android.billingclient.api.queryPurchasesAsync
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.getString
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.billing_service_disconnected
@@ -279,59 +278,49 @@ object BillingRepository : PurchasesUpdatedListener {
 
     private suspend fun processPurchases(purchasesResult: List<Purchase>): Boolean {
         Logger.i("process purchases: $purchasesResult")
-        val validPurchases = HashSet<Purchase>(purchasesResult.size)
-        purchasesResult.forEach { purchase ->
-            if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
-                if (isSignatureValid(purchase)) {
-                    validPurchases.add(purchase)
-                }
-            } else if (purchase.purchaseState == Purchase.PurchaseState.PENDING) {
-                Logger.i("Received a pending purchase: ${Json.encodeToString(purchase)}")
-            } else {
-                Logger.i("Received an invalid purchase: ${Json.encodeToString(purchase)}")
-            }
-        }
+        val validPurchases = purchasesResult.filter {
+            it.purchaseState == Purchase.PurchaseState.PURCHASED && isSignatureValid(it)
+        }.toHashSet()
 
         Logger.i("valid purchases: $validPurchases")
-        var processingIapPurchase = false
+        var allProcessedSuccessfully = true
         for (purchase in validPurchases) {
             val orderId = purchase.orderId ?: continue
             if (orderId in processedPurchases) continue
             try {
-                processingIapPurchase = true
-                Logger.i("consumeAsync")
-                val params =
-                    ConsumeParams.newBuilder().setPurchaseToken(purchase.purchaseToken)
-                        .build()
+                purchaseInProgress = true
                 for (product in purchase.products) {
                     val verified = SupabaseFunction.verifyAndroidPurchase(
                         productId = product,
                         purchaseToken = purchase.purchaseToken,
                     )
                     if (!verified) {
-                        Logger.e("processPurchases", Warning("Failed to verify purchase"))
+                        Logger.e("processPurchases", Warning("Failed to verify purchase: $product"))
                         App.context.toast(getString(Res.string.billing_service_internal_error))
-                        return false
+                        allProcessedSuccessfully = false
+                        continue // Skip this purchase, process others
                     }
                 }
+                val params =
+                    ConsumeParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build()
                 val result = billingClient.consumePurchase(params).billingResult
                 Logger.i("consumeAsync finished with code ${result.responseCode} and message: ${result.debugMessage}")
                 if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                    processedPurchases.remove(orderId)
+                    processedPurchases.add(orderId) // Only mark as processed if consumption succeeds
+                } else {
+                    Logger.e("Consumption failed for $orderId", Warning(result.debugMessage))
+                    allProcessedSuccessfully = false
                 }
-                purchaseInProgress = false
-                if (processedPurchases.isEmpty()) {
-                    billingClient.endConnection()
-                }
-                processedPurchases.add(orderId)
             } catch (e: Exception) {
                 Logger.e("processPurchases", e)
                 App.context.toast(e.message)
-                return false
+                allProcessedSuccessfully = false
+            } finally {
+                purchaseInProgress = false
             }
         }
         endConnection()
-        return true
+        return allProcessedSuccessfully
     }
 
     private fun isSignatureValid(purchase: Purchase): Boolean {
