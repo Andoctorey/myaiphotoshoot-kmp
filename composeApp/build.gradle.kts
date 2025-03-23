@@ -234,25 +234,14 @@ val updateHtmlTimestamp by tasks.registering {
     inputs.file(indexHtml)
     outputs.file(indexHtml)
 
-    doLast {
+    doFirst {
         val updatedContent = indexHtml.readText()
-            .replace(
-                Regex("""composeApp\.js\?v=\d+|composeApp\.js\?v=timestamp"""),
-                "composeApp.js?v=$gitVersionCode"
-            )
+            .replace(Regex("""composeApp\.js\?v=\d+"""), "composeApp.js?v=$gitVersionCode")
         indexHtml.writeText(updatedContent)
     }
 }
 
 tasks.named("wasmJsProcessResources") {
-    dependsOn(updateHtmlTimestamp)
-}
-
-tasks.named("wasmJsBrowserProductionWebpack") {
-    dependsOn(updateHtmlTimestamp)
-}
-
-tasks.named("wasmJsBrowserDevelopmentWebpack") {
     dependsOn(updateHtmlTimestamp)
 }
 
