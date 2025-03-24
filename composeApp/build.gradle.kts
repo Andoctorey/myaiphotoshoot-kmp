@@ -51,7 +51,7 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "composeApp"
+        outputModuleName = project.name + "-wasm"
         browser {
             val rootDirPath = project.rootDir.path
             val projectDirPath = project.projectDir.path
