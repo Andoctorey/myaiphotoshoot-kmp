@@ -5,9 +5,14 @@ import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
+import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.StringResource
-import photocreateai.composeapp.generated.resources.*
+import photocreateai.composeapp.generated.resources.Res
+import photocreateai.composeapp.generated.resources.tab_gallery
+import photocreateai.composeapp.generated.resources.tab_generate
+import photocreateai.composeapp.generated.resources.tab_settings
 
+@Serializable
 enum class AppNavigationRoutes(
     val label: StringResource,
     val icon: ImageVector,

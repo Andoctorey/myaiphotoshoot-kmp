@@ -13,13 +13,12 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Preview
 fun App(
     navController: NavHostController = rememberNavController(),
-    onExitApp: () -> Unit = {},
 ) {
     LaunchedEffect(Unit) {
         LoggerInitializer.initLogger()
     }
 
     AppTheme {
-        MainScreen(navController = navController, onExitApp = onExitApp)
+        MainScreen(navController = navController)
     }
 }

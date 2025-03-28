@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import co.touchlab.kermit.Logger
 import io.github.vinceglb.filekit.core.FileKit
 
 class MainActivity : ComponentActivity() {
@@ -15,10 +14,7 @@ class MainActivity : ComponentActivity() {
         FileKit.init(this)
         enableEdgeToEdge()
         setContent {
-            App(onExitApp = {
-                Logger.i("Exiting app")
-                finish()
-            })
+            App()
         }
     }
 }
