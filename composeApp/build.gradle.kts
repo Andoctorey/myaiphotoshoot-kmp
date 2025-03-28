@@ -53,10 +53,11 @@ kotlin {
     wasmJs {
         outputModuleName = project.name + "-wasm"
         browser {
+            val versionCode = gitVersionCode
             val rootDirPath = project.rootDir.path
             val projectDirPath = project.projectDir.path
             commonWebpackConfig {
-                outputFileName = "composeApp.js?v=$gitVersionCode"
+                outputFileName = "composeApp.js?v=$versionCode"
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
                     static = (static ?: mutableListOf()).apply {
                         // Serve sources to debug inside browser
@@ -233,10 +234,11 @@ val updateHtmlTimestamp by tasks.registering {
     val indexHtml = file("src/wasmJsMain/resources/index.html")
     inputs.file(indexHtml)
     outputs.file(indexHtml)
+    val versionCode = gitVersionCode
 
     doFirst {
         val updatedContent = indexHtml.readText()
-            .replace(Regex("""composeApp\.js\?v=\d+"""), "composeApp.js?v=$gitVersionCode")
+            .replace(Regex("""composeApp\.js\?v=\d+"""), "composeApp.js?v=$versionCode")
         indexHtml.writeText(updatedContent)
     }
 }
