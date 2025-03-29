@@ -5,6 +5,10 @@ import ai.create.photo.ui.compose.GenerationIcon
 import ai.create.photo.ui.gallery.GalleryScreen
 import ai.create.photo.ui.generate.GenerateScreen
 import ai.create.photo.ui.settings.SettingsScreen
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Brush
@@ -130,6 +134,22 @@ fun MainScreen(
         NavHost(
             navController = navController,
             startDestination = GalleryTab,
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(
+                        durationMillis = 100,
+                        easing = LinearEasing
+                    )
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(
+                        durationMillis = 100,
+                        easing = LinearEasing
+                    )
+                )
+            },
         ) {
             composable<GalleryTab> {
                 GalleryScreen(
