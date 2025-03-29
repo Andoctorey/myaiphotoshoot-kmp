@@ -5,8 +5,6 @@ import ai.create.photo.ui.compose.GenerationIcon
 import ai.create.photo.ui.gallery.GalleryScreen
 import ai.create.photo.ui.generate.GenerateScreen
 import ai.create.photo.ui.settings.SettingsScreen
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Brush
@@ -132,8 +130,6 @@ fun MainScreen(
         NavHost(
             navController = navController,
             startDestination = GalleryTab,
-            enterTransition = { EnterTransition.None },
-            exitTransition = { ExitTransition.None },
         ) {
             composable<GalleryTab> {
                 GalleryScreen(
