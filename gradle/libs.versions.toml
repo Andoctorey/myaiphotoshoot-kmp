@@ -10,8 +10,12 @@ billingKtx = "7.1.1"
 coil = "3.1.0"
 # https://github.com/JetBrains/compose-multiplatform/releases
 compose-multiplatform = "1.8.0-beta01"
+crashlytics = "3.0.3"
+deps = "0.52.0"
 filekitCompose = "0.8.8"
 firebase-bom = "33.11.0"
+firebasePerf = "1.4.2"
+googleServices = "4.4.2"
 kermit = "2.0.5"
 kotlin = "2.1.20"
 kotlinx-coroutines = "1.10.1"
@@ -55,11 +59,10 @@ androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.3" }
-googleServices = { id = "com.google.gms.google-services", version = "4.4.2" }
+crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlytics" }
+googleServices = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
-perf = { id = "com.google.firebase.firebase-perf", version = "1.4.2" }
+perf = { id = "com.google.firebase.firebase-perf", version.ref = "firebasePerf" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-# ./gradlew dependencyUpdates -Drevision=release
-versions = { id = "com.github.ben-manes.versions", version = "0.52.0" }
+versions = { id = "com.github.ben-manes.versions", version.ref = "deps" }
