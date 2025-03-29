@@ -111,13 +111,7 @@ fun MainScreen(
                     selected = tab.route == currentDestination,
                     onClick = {
                         if (tab.route != currentDestination) {
-                            navController.navigate(tab) {
-                                popUpTo(GalleryTab) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
+                            navController.navigate(tab)
                         } else if (tab == SettingsTab) {
                             viewModel.toggleResetSettingTab(true)
                         }
