@@ -14,7 +14,7 @@ import photocreateai.composeapp.generated.resources.tab_gallery
 import photocreateai.composeapp.generated.resources.tab_generate
 import photocreateai.composeapp.generated.resources.tab_settings
 
-object WebRoutes {
+object MainRoutes {
     const val GALLERY = "gallery"
     const val GENERATE = "generate"
     const val SETTINGS = "settings"
@@ -27,9 +27,9 @@ sealed class TabScreen {
 }
 
 @Serializable
-@SerialName(WebRoutes.GALLERY)
+@SerialName(MainRoutes.GALLERY)
 data object GalleryTab : TabScreen() {
-    override val route = WebRoutes.GALLERY
+    override val route = MainRoutes.GALLERY
 
     @Contextual
     override val label = Res.string.tab_gallery
@@ -39,11 +39,11 @@ data object GalleryTab : TabScreen() {
 }
 
 @Serializable
-@SerialName(WebRoutes.GENERATE)
+@SerialName(MainRoutes.GENERATE)
 data class GenerateTab(
     @SerialName("prompt") val prompt: String? = null,
 ) : TabScreen() {
-    override val route = WebRoutes.GENERATE
+    override val route = MainRoutes.GENERATE
 
     @Contextual
     override val label = Res.string.tab_generate
@@ -53,9 +53,9 @@ data class GenerateTab(
 }
 
 @Serializable
-@SerialName(WebRoutes.SETTINGS)
+@SerialName(MainRoutes.SETTINGS)
 data object SettingsTab : TabScreen() {
-    override val route = WebRoutes.SETTINGS
+    override val route = MainRoutes.SETTINGS
 
     @Contextual
     override val label = Res.string.tab_settings

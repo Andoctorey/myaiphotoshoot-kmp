@@ -108,7 +108,7 @@ fun MainScreen(
                     generationsInProgress = state.generationsInProgress,
                     openGenerateTab = { prompt ->
                         val promptJson = Json.encodeToString(prompt)
-                        navController.navigate("generate?prompt=$promptJson")
+                        navController.navigate("${MainRoutes.GENERATE}?prompt=$promptJson")
                     },
                     openTopUpTab = {
                         navController.navigate(SettingsTab)
@@ -118,7 +118,7 @@ fun MainScreen(
                 )
             }
             composable(
-                route = "${WebRoutes.GENERATE}?prompt={prompt}",
+                route = "${MainRoutes.GENERATE}?prompt={prompt}",
                 arguments = listOf(
                     navArgument("prompt") {
                         type = NavType.StringType
@@ -127,12 +127,8 @@ fun MainScreen(
                     }
                 )
             ) { backStackEntry: NavBackStackEntry ->
-//                val route = backStackEntry.destination.route
-
                 val generateTab = backStackEntry.toRoute<GenerateTab>()
                 val prompt = generateTab.prompt?.let { Json.decodeFromString<Prompt>(it) }
-//                val promptJson = backStackEntry.arguments?.getString("prompt")
-//                val promptObj = if (promptJson != null) Json.decodeFromString<Prompt>(promptJson
                 GenerateScreen(
                     trainAiModel = trainAiModel,
                     generationsInProgress = state.generationsInProgress,
