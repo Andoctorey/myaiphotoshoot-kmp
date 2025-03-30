@@ -1,5 +1,8 @@
 package ai.create.photo.ui.main
 
+import ai.create.photo.data.model.Base64String
+import ai.create.photo.data.model.parse
+import ai.create.photo.data.model.toBase64String
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.GenerationIcon
 import ai.create.photo.ui.gallery.GalleryScreen
@@ -32,7 +35,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import androidx.navigation.toRoute
 import co.touchlab.kermit.Logger
-import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -108,8 +110,9 @@ fun MainScreen(
                 GalleryScreen(
                     generationsInProgress = state.generationsInProgress,
                     openGenerateTab = { prompt ->
-                        val promptJson = Json.encodeToString(prompt)
-                        navController.navigateSingleTopTo("${MainRoutes.GENERATE}?prompt=$promptJson")
+                        navController.navigateSingleTopTo(
+                            MainRoutes.GENERATE + "?prompt=${prompt?.toBase64String()?.value}"
+                        )
                     },
                     openTopUpTab = { navController.navigateSingleTopTo(MainRoutes.SETTINGS) },
                     openUploads = state.openUploads,
@@ -127,7 +130,6 @@ fun MainScreen(
                 )
             ) { backStackEntry: NavBackStackEntry ->
                 val generateTab = backStackEntry.toRoute<GenerateTab>()
-                val prompt = generateTab.prompt?.let { Json.decodeFromString<Prompt>(it) }
                 GenerateScreen(
                     trainAiModel = trainAiModel,
                     generationsInProgress = state.generationsInProgress,
@@ -143,7 +145,7 @@ fun MainScreen(
                         viewModel.toggleOpenCreations(true)
                         navController.navigateSingleTopTo(MainRoutes.GALLERY)
                     },
-                    prompt = prompt,
+                    prompt = generateTab.promptBase64?.let { Base64String(it).parse<Prompt>() },
                 )
             }
             composable<SettingsTab> {

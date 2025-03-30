@@ -41,7 +41,7 @@ data object GalleryTab : TabScreen() {
 @Serializable
 @SerialName(MainRoutes.GENERATE)
 data class GenerateTab(
-    @SerialName("prompt") val prompt: String? = null,
+    @SerialName("prompt") val promptBase64: String? = null,
 ) : TabScreen() {
     override val route = MainRoutes.GENERATE
 
