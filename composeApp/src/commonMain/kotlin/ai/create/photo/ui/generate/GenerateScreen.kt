@@ -116,10 +116,8 @@ fun GenerateScreen(
     openCreations: () -> Unit,
     generationsInProgress: Int,
     onGenerate: (String, String, String?, Int) -> Unit,
-    generationId: String? = null,
+    prompt: Prompt? = null,
 ) {
-    Logger.i("GenerateScreen clear prompt $generationId")
-
     val state = viewModel.uiState
 
     LaunchedEffect(Unit) {
@@ -341,12 +339,12 @@ fun GenerateScreen(
             }
         }
 
-//        LaunchedEffect(prompt?.text) {
-//            Logger.i("prompt: ${prompt?.text}")
-//            if (prompt != null) {
-//                viewModel.setPredefinedPrompt(prompt)
-//            }
-//        }
+        LaunchedEffect(prompt?.text) {
+            Logger.i("prompt: ${prompt?.text}")
+            if (prompt != null) {
+                viewModel.setPredefinedPrompt(prompt)
+            }
+        }
     }
 }
 

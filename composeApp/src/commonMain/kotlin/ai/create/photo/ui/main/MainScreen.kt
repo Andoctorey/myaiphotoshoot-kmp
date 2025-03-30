@@ -4,6 +4,7 @@ import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.GenerationIcon
 import ai.create.photo.ui.gallery.GalleryScreen
 import ai.create.photo.ui.generate.GenerateScreen
+import ai.create.photo.ui.generate.Prompt
 import ai.create.photo.ui.settings.SettingsScreen
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -38,6 +39,7 @@ import co.touchlab.kermit.Logger
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import photocreateai.composeapp.generated.resources.Res
@@ -72,7 +74,7 @@ data object GalleryTab : TabScreen() {
 @Serializable
 @SerialName(WebRoutes.GENERATE)
 data class GenerateTab(
-    @SerialName("generation_id") val generationId: String? = null,
+    @SerialName("prompt") val prompt: String? = null,
 ) : TabScreen() {
     override val route = WebRoutes.GENERATE
 
@@ -168,7 +170,8 @@ fun MainScreen(
                 GalleryScreen(
                     generationsInProgress = state.generationsInProgress,
                     openGenerateTab = { prompt ->
-                        navController.navigate("generate?generation_id=${prompt?.generationId}")
+                        val promptJson = Json.encodeToString(prompt)
+                        navController.navigate("generate?prompt=$promptJson")
                     },
                     openTopUpTab = {
                         navController.navigate(SettingsTab)
@@ -178,16 +181,21 @@ fun MainScreen(
                 )
             }
             composable(
-                route = "${WebRoutes.GENERATE}?generation_id={generation_id}",
+                route = "${WebRoutes.GENERATE}?prompt={prompt}",
                 arguments = listOf(
-                    navArgument("generation_id") {
+                    navArgument("prompt") {
                         type = NavType.StringType
                         nullable = true
                         defaultValue = null
                     }
                 )
             ) { backStackEntry: NavBackStackEntry ->
+//                val route = backStackEntry.destination.route
+
                 val generateTab = backStackEntry.toRoute<GenerateTab>()
+                val prompt = generateTab.prompt?.let { Json.decodeFromString<Prompt>(it) }
+//                val promptJson = backStackEntry.arguments?.getString("prompt")
+//                val promptObj = if (promptJson != null) Json.decodeFromString<Prompt>(promptJson
                 GenerateScreen(
                     trainAiModel = trainAiModel,
                     generationsInProgress = state.generationsInProgress,
@@ -203,7 +211,7 @@ fun MainScreen(
                         viewModel.toggleOpenCreations(true)
                         navController.navigate(GalleryTab)
                     },
-                    generationId = generateTab.generationId
+                    prompt = prompt,
                 )
             }
             composable<SettingsTab> {
