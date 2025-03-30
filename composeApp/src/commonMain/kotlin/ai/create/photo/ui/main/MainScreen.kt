@@ -26,11 +26,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import co.touchlab.kermit.Logger
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.StringResource
@@ -46,33 +51,47 @@ object WebRoutes {
     const val SETTINGS = "settings"
 }
 
-interface TabScreen {
-    val route: String
-    val label: StringResource
-    val icon: ImageVector
+sealed class TabScreen {
+    abstract val route: String
+    abstract val label: StringResource
+    abstract val icon: ImageVector
 }
 
 @Serializable
 @SerialName(WebRoutes.GALLERY)
-data object GalleryTab : TabScreen {
+data object GalleryTab : TabScreen() {
     override val route = WebRoutes.GALLERY
+
+    @Contextual
     override val label = Res.string.tab_gallery
+
+    @Contextual
     override val icon = Icons.Default.PhotoLibrary
 }
 
 @Serializable
 @SerialName(WebRoutes.GENERATE)
-data object GenerateTab : TabScreen {
+data class GenerateTab(
+    @SerialName("generation_id") val generationId: String? = null,
+) : TabScreen() {
     override val route = WebRoutes.GENERATE
+
+    @Contextual
     override val label = Res.string.tab_generate
+
+    @Contextual
     override val icon = Icons.Default.Brush
 }
 
 @Serializable
 @SerialName(WebRoutes.SETTINGS)
-data object SettingsTab : TabScreen {
+data object SettingsTab : TabScreen() {
     override val route = WebRoutes.SETTINGS
+
+    @Contextual
     override val label = Res.string.tab_settings
+
+    @Contextual
     override val icon = Icons.Default.Settings
 }
 
@@ -87,7 +106,7 @@ fun MainScreen(
     val currentDestination = navBackStackEntry?.destination?.route
     Logger.i("currentDestination: $currentDestination")
 
-    val tabs = listOf(GalleryTab, GenerateTab, SettingsTab)
+    val tabs = listOf(GalleryTab, GenerateTab(), SettingsTab)
 
     NavigationSuiteScaffold(
         modifier = Modifier.widthIn(min = 200.dp),
@@ -108,10 +127,10 @@ fun MainScreen(
                         }
                     },
                     label = { Text(stringResource(tab.label)) },
-                    selected = tab.route == currentDestination,
+                    selected = currentDestination?.startsWith(tab.route) == true,
                     onClick = {
                         if (tab.route != currentDestination) {
-                            navController.navigate(tab)
+                            navController.navigate(tab.route)
                         } else if (tab == SettingsTab) {
                             viewModel.toggleResetSettingTab(true)
                         }
@@ -121,8 +140,8 @@ fun MainScreen(
         }
     ) {
         val trainAiModel = {
-            navController.navigate(GenerateTab)
             viewModel.toggleOpenUploads(true)
+            navController.navigate(GenerateTab)
         }
 
         NavHost(
@@ -149,8 +168,7 @@ fun MainScreen(
                 GalleryScreen(
                     generationsInProgress = state.generationsInProgress,
                     openGenerateTab = { prompt ->
-                        navController.navigate(GenerateTab)
-                        if (prompt != null) viewModel.putPrompt(prompt)
+                        navController.navigate("generate?generation_id=${prompt?.generationId}")
                     },
                     openTopUpTab = {
                         navController.navigate(SettingsTab)
@@ -159,7 +177,17 @@ fun MainScreen(
                     openCreations = state.openCreations,
                 )
             }
-            composable<GenerateTab> {
+            composable(
+                route = "${WebRoutes.GENERATE}?generation_id={generation_id}",
+                arguments = listOf(
+                    navArgument("generation_id") {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    }
+                )
+            ) { backStackEntry: NavBackStackEntry ->
+                val generateTab = backStackEntry.toRoute<GenerateTab>()
                 GenerateScreen(
                     trainAiModel = trainAiModel,
                     generationsInProgress = state.generationsInProgress,
@@ -172,10 +200,10 @@ fun MainScreen(
                         )
                     },
                     openCreations = {
-                        navController.navigate(GalleryTab)
                         viewModel.toggleOpenCreations(true)
+                        navController.navigate(GalleryTab)
                     },
-                    prompt = state.putPrompt
+                    generationId = generateTab.generationId
                 )
             }
             composable<SettingsTab> {
