@@ -11,10 +11,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Brush
-import androidx.compose.material.icons.filled.PhotoLibrary
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
@@ -36,66 +31,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import androidx.navigation.toRoute
 import co.touchlab.kermit.Logger
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
-import photocreateai.composeapp.generated.resources.Res
-import photocreateai.composeapp.generated.resources.tab_gallery
-import photocreateai.composeapp.generated.resources.tab_generate
-import photocreateai.composeapp.generated.resources.tab_settings
-
-object WebRoutes {
-    const val GALLERY = "gallery"
-    const val GENERATE = "generate"
-    const val SETTINGS = "settings"
-}
-
-sealed class TabScreen {
-    abstract val route: String
-    abstract val label: StringResource
-    abstract val icon: ImageVector
-}
-
-@Serializable
-@SerialName(WebRoutes.GALLERY)
-data object GalleryTab : TabScreen() {
-    override val route = WebRoutes.GALLERY
-
-    @Contextual
-    override val label = Res.string.tab_gallery
-
-    @Contextual
-    override val icon = Icons.Default.PhotoLibrary
-}
-
-@Serializable
-@SerialName(WebRoutes.GENERATE)
-data class GenerateTab(
-    @SerialName("prompt") val prompt: String? = null,
-) : TabScreen() {
-    override val route = WebRoutes.GENERATE
-
-    @Contextual
-    override val label = Res.string.tab_generate
-
-    @Contextual
-    override val icon = Icons.Default.Brush
-}
-
-@Serializable
-@SerialName(WebRoutes.SETTINGS)
-data object SettingsTab : TabScreen() {
-    override val route = WebRoutes.SETTINGS
-
-    @Contextual
-    override val label = Res.string.tab_settings
-
-    @Contextual
-    override val icon = Icons.Default.Settings
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
