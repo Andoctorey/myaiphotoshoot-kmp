@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -69,7 +70,7 @@ fun MainScreen(
                     selected = currentDestination?.startsWith(tab.route) == true,
                     onClick = {
                         if (tab.route != currentDestination) {
-                            navController.navigate(tab.route)
+                            navController.navigateSingleTopTo(tab.route)
                         } else if (tab == SettingsTab) {
                             viewModel.toggleResetSettingTab(true)
                         }
@@ -80,7 +81,7 @@ fun MainScreen(
     ) {
         val trainAiModel = {
             viewModel.toggleOpenUploads(true)
-            navController.navigate(GenerateTab)
+            navController.navigateSingleTopTo(MainRoutes.GENERATE)
         }
 
         NavHost(
@@ -108,11 +109,9 @@ fun MainScreen(
                     generationsInProgress = state.generationsInProgress,
                     openGenerateTab = { prompt ->
                         val promptJson = Json.encodeToString(prompt)
-                        navController.navigate("${MainRoutes.GENERATE}?prompt=$promptJson")
+                        navController.navigateSingleTopTo("${MainRoutes.GENERATE}?prompt=$promptJson")
                     },
-                    openTopUpTab = {
-                        navController.navigate(SettingsTab)
-                    },
+                    openTopUpTab = { navController.navigateSingleTopTo(MainRoutes.SETTINGS) },
                     openUploads = state.openUploads,
                     openCreations = state.openCreations,
                 )
@@ -142,7 +141,7 @@ fun MainScreen(
                     },
                     openCreations = {
                         viewModel.toggleOpenCreations(true)
-                        navController.navigate(GalleryTab)
+                        navController.navigateSingleTopTo(MainRoutes.GALLERY)
                     },
                     prompt = prompt,
                 )
@@ -150,9 +149,7 @@ fun MainScreen(
             composable<SettingsTab> {
                 SettingsScreen(
                     trainAiModel = trainAiModel,
-                    openGenerateTab = {
-                        navController.navigate(GenerateTab)
-                    },
+                    openGenerateTab = { navController.navigateSingleTopTo(MainRoutes.GENERATE) },
                     goToRootScreen = state.resetSettingTab
                 )
             }
@@ -182,4 +179,19 @@ fun MainScreen(
             viewModel.toggleResetSettingTab(false)
         }
     }
+}
+
+
+fun NavHostController.navigateSingleTopTo(route: String) = navigate(route) {
+    // Pop up to the start destination of the graph to
+    // avoid building up a large stack of destinations
+    // on the back stack as users select items
+    popUpTo(graph.findStartDestination().route!!) {
+        saveState = true
+    }
+    // Avoid multiple copies of the same destination when
+    // re-selecting the same item
+    launchSingleTop = true
+    // Restore state when re-selecting a previously selected item
+    restoreState = true
 }
