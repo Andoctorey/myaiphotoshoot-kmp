@@ -177,12 +177,6 @@ fun MainScreen(
         }
     }
 
-    LaunchedEffect(state.putPrompt) {
-        if (state.putPrompt != null) {
-            viewModel.putPrompt(null)
-        }
-    }
-
     LaunchedEffect(state.resetSettingTab) {
         if (state.resetSettingTab) {
             viewModel.toggleResetSettingTab(false)
