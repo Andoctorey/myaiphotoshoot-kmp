@@ -5,7 +5,6 @@ import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.StringResource
@@ -30,25 +29,15 @@ sealed class TabScreen {
 @SerialName(MainRoutes.GALLERY)
 data object GalleryTab : TabScreen() {
     override val route = MainRoutes.GALLERY
-
-    @Contextual
     override val label = Res.string.tab_gallery
-
-    @Contextual
     override val icon = Icons.Default.PhotoLibrary
 }
 
 @Serializable
 @SerialName(MainRoutes.GENERATE)
-data class GenerateTab(
-    @SerialName("prompt") val promptBase64: String? = null,
-) : TabScreen() {
+data object GenerateTab : TabScreen() {
     override val route = MainRoutes.GENERATE
-
-    @Contextual
     override val label = Res.string.tab_generate
-
-    @Contextual
     override val icon = Icons.Default.Brush
 }
 
@@ -56,10 +45,6 @@ data class GenerateTab(
 @SerialName(MainRoutes.SETTINGS)
 data object SettingsTab : TabScreen() {
     override val route = MainRoutes.SETTINGS
-
-    @Contextual
     override val label = Res.string.tab_settings
-
-    @Contextual
     override val icon = Icons.Default.Settings
 }

@@ -83,7 +83,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import co.touchlab.kermit.Logger
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
@@ -340,7 +339,6 @@ fun GenerateScreen(
         }
 
         LaunchedEffect(prompt?.text) {
-            Logger.i("prompt: ${prompt?.text}")
             if (prompt != null) {
                 viewModel.setPredefinedPrompt(prompt)
             }

@@ -1,13 +1,9 @@
 package ai.create.photo.ui.main
 
-import ai.create.photo.data.model.Base64String
-import ai.create.photo.data.model.parse
-import ai.create.photo.data.model.toBase64String
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.GenerationIcon
 import ai.create.photo.ui.gallery.GalleryScreen
 import ai.create.photo.ui.generate.GenerateScreen
-import ai.create.photo.ui.generate.Prompt
 import ai.create.photo.ui.settings.SettingsScreen
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -25,15 +21,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.navArgument
-import androidx.navigation.toRoute
 import co.touchlab.kermit.Logger
 import org.jetbrains.compose.resources.stringResource
 
@@ -48,7 +40,7 @@ fun MainScreen(
     val currentDestination = navBackStackEntry?.destination?.route
     Logger.i("currentDestination: $currentDestination")
 
-    val tabs = listOf(GalleryTab, GenerateTab(), SettingsTab)
+    val tabs = listOf(GalleryTab, GenerateTab, SettingsTab)
 
     NavigationSuiteScaffold(
         modifier = Modifier.widthIn(min = 200.dp),
@@ -71,10 +63,28 @@ fun MainScreen(
                     label = { Text(stringResource(tab.label)) },
                     selected = currentDestination?.startsWith(tab.route) == true,
                     onClick = {
-                        if (tab.route != currentDestination) {
-                            navController.navigateSingleTopTo(tab.route)
-                        } else if (tab == SettingsTab) {
-                            viewModel.toggleResetSettingTab(true)
+                        when (tab) {
+                            is GenerateTab -> {
+                                val currentRoute =
+                                    navController.currentBackStackEntry?.destination?.route
+                                if (currentRoute != MainRoutes.GENERATE) {
+                                    navController.navigateSingleTopTo(MainRoutes.GENERATE)
+                                }
+                            }
+
+                            is SettingsTab -> {
+                                if (currentDestination?.startsWith(tab.route) != true) {
+                                    navController.navigateSingleTopTo(tab.route)
+                                } else {
+                                    viewModel.toggleResetSettingTab(true)
+                                }
+                            }
+
+                            is GalleryTab -> {
+                                if (currentDestination?.startsWith(tab.route) != true) {
+                                    navController.navigateSingleTopTo(tab.route)
+                                }
+                            }
                         }
                     }
                 )
@@ -110,26 +120,27 @@ fun MainScreen(
                 GalleryScreen(
                     generationsInProgress = state.generationsInProgress,
                     openGenerateTab = { prompt ->
-                        navController.navigateSingleTopTo(
-                            MainRoutes.GENERATE + "?prompt=${prompt?.toBase64String()?.value}"
-                        )
+                        navController.navigateSingleTopTo(MainRoutes.GENERATE)
+                        if (prompt != null) viewModel.putPrompt(prompt)
                     },
                     openTopUpTab = { navController.navigateSingleTopTo(MainRoutes.SETTINGS) },
                     openUploads = state.openUploads,
                     openCreations = state.openCreations,
                 )
-            }
-            composable(
-                route = "${MainRoutes.GENERATE}?prompt={prompt}",
-                arguments = listOf(
-                    navArgument("prompt") {
-                        type = NavType.StringType
-                        nullable = true
-                        defaultValue = null
+
+                LaunchedEffect(state.openUploads) {
+                    if (state.openUploads) {
+                        viewModel.toggleOpenUploads(false)
                     }
-                )
-            ) { backStackEntry: NavBackStackEntry ->
-                val generateTab = backStackEntry.toRoute<GenerateTab>()
+                }
+
+                LaunchedEffect(state.openCreations) {
+                    if (state.openCreations) {
+                        viewModel.toggleOpenCreations(false)
+                    }
+                }
+            }
+            composable<GenerateTab> {
                 GenerateScreen(
                     trainAiModel = trainAiModel,
                     generationsInProgress = state.generationsInProgress,
@@ -142,11 +153,17 @@ fun MainScreen(
                         )
                     },
                     openCreations = {
-                        viewModel.toggleOpenCreations(true)
                         navController.navigateSingleTopTo(MainRoutes.GALLERY)
+                        viewModel.toggleOpenCreations(true)
                     },
-                    prompt = generateTab.promptBase64?.let { Base64String(it).parse<Prompt>() },
+                    prompt = state.putPrompt,
                 )
+                LaunchedEffect(state.putPrompt) {
+                    if (state.putPrompt != null) {
+                        Logger.i("reset prompt: ${state.putPrompt}")
+                        viewModel.putPrompt(null)
+                    }
+                }
             }
             composable<SettingsTab> {
                 SettingsScreen(
@@ -164,18 +181,6 @@ fun MainScreen(
         }
     }
 
-    LaunchedEffect(state.openUploads) {
-        if (state.openUploads) {
-            viewModel.toggleOpenUploads(false)
-        }
-    }
-
-    LaunchedEffect(state.openCreations) {
-        if (state.openCreations) {
-            viewModel.toggleOpenCreations(false)
-        }
-    }
-
     LaunchedEffect(state.resetSettingTab) {
         if (state.resetSettingTab) {
             viewModel.toggleResetSettingTab(false)
@@ -185,6 +190,7 @@ fun MainScreen(
 
 
 fun NavHostController.navigateSingleTopTo(route: String) = navigate(route) {
+    Logger.i("Navigating to $route")
     // Pop up to the start destination of the graph to
     // avoid building up a large stack of destinations
     // on the back stack as users select items
