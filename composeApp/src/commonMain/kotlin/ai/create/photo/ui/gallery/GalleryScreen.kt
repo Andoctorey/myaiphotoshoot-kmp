@@ -21,10 +21,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import photocreateai.composeapp.generated.resources.Res
-import photocreateai.composeapp.generated.resources.gallery_creations_tab
-import photocreateai.composeapp.generated.resources.gallery_public_tab
-import photocreateai.composeapp.generated.resources.gallery_uploads_tab
 
 
 @Preview
@@ -44,7 +40,7 @@ fun GalleryScreen(
     ) {
 
         when (state.selectedTab) {
-            0 -> PublicScreen(
+            Tab.PUBLIC -> PublicScreen(
                 generate = { openGenerateTab(it) },
                 addPhotosToPublicGallery = state.addPhotosToPublicGallery,
                 onAddedPhotosToPublicGallery = viewModel::onAddedPhotoToPublicGallery,
@@ -52,14 +48,14 @@ fun GalleryScreen(
                 onRemovedPhotosFromPublicGallery = viewModel::onRemovedPhotoFromPublicGallery,
             )
 
-            1 -> CreationsScreen(
+            Tab.CREATIONS -> CreationsScreen(
                 generate = { openGenerateTab(it) },
                 generationsInProgress = generationsInProgress,
                 addPhotoToPublicGallery = { viewModel.addPhotoToPublicGallery(it) },
                 removePhotoFromPublicGallery = { viewModel.removePhotoFromPublicGallery(it) },
             )
 
-            2 -> UploadScreen(
+            Tab.UPLOADS -> UploadScreen(
                 openGenerateTab = { openGenerateTab(null) },
                 openTopUpTab = openTopUpTab,
             )
@@ -67,7 +63,8 @@ fun GalleryScreen(
 
         Tabs(
             modifier = Modifier.align(Alignment.BottomCenter).padding(24.dp).safeDrawingPadding(),
-            selectedTab = state.selectedTab
+            selectedTab = state.selectedTab,
+            publicTabFirst = state.firstTrainingCompleted == true,
         ) {
             viewModel.selectTab(it)
         }
@@ -75,33 +72,39 @@ fun GalleryScreen(
 
     LaunchedEffect(openUploads) {
         if (openUploads) {
-            viewModel.selectTab(2)
+            viewModel.selectTab(Tab.UPLOADS)
         }
     }
 
     LaunchedEffect(openCreations) {
         if (openCreations) {
-            viewModel.selectTab(1)
+            viewModel.selectTab(Tab.CREATIONS)
         }
     }
 }
 
 @Composable
-private fun Tabs(modifier: Modifier, selectedTab: Int, onClick: (Int) -> Unit) {
-    val options = listOf(
-        stringResource(Res.string.gallery_public_tab),
-        stringResource(Res.string.gallery_creations_tab),
-        stringResource(Res.string.gallery_uploads_tab),
-    )
+private fun Tabs(
+    modifier: Modifier,
+    selectedTab: Tab,
+    publicTabFirst: Boolean,
+    onClick: (Tab) -> Unit,
+) {
+    val tabs = if (publicTabFirst) {
+        listOf(Tab.PUBLIC, Tab.CREATIONS, Tab.UPLOADS)
+    } else {
+        listOf(Tab.UPLOADS, Tab.CREATIONS, Tab.PUBLIC)
+    }
+    val options = tabs.map { stringResource(it.label) }.toTypedArray()
     SingleChoiceSegmentedButtonRow(modifier = modifier) {
-        options.forEachIndexed { index, label ->
+        tabs.forEachIndexed { index, tab ->
             SegmentedButton(
                 shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
-                onClick = { onClick(index) },
-                selected = index == selectedTab
+                onClick = { onClick(tab) },
+                selected = tab == selectedTab
             ) {
                 Text(
-                    text = label,
+                    text = stringResource(tab.label),
                     maxLines = 1,
                     fontSize = 12.sp,
                 )

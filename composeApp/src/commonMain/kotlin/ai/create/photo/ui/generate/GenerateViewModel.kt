@@ -250,7 +250,10 @@ class GenerateViewModel : AuthViewModel() {
                 try {
                     val profile = ProfilesRepository.loadProfile(userId)
                     var preferences = profile?.preferences ?: return@launch
-                    preferences = preferences.copy(selectedTrainingId = training.id)
+                    preferences = preferences.copy(
+                        selectedTrainingId = training.id,
+                        firstTrainingCompleted = true,
+                    )
                     ProfilesRepository.updateProfilePreference(userId, preferences)
                 } catch (e: Exception) {
                     currentCoroutineContext().ensureActive()
@@ -272,7 +275,10 @@ class GenerateViewModel : AuthViewModel() {
             try {
                 val profile = ProfilesRepository.loadProfile(userId)
                 var preferences = profile?.preferences ?: return@launch
-                preferences = preferences.copy(photosToGenerate = photosToGenerate)
+                preferences = preferences.copy(
+                    photosToGenerate = photosToGenerate,
+                    firstTrainingCompleted = true,
+                )
                 ProfilesRepository.updateProfilePreference(userId, preferences)
             } catch (e: Exception) {
                 currentCoroutineContext().ensureActive()
@@ -349,6 +355,7 @@ class GenerateViewModel : AuthViewModel() {
             uiState = uiState.copy(errorPopup = e)
         }
     }
+
 
     fun hideOpenCreations() {
         uiState = uiState.copy(showOpenCreations = false)
