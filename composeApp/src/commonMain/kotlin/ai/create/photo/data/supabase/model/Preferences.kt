@@ -8,4 +8,5 @@ data class Preferences(
     @SerialName("photos_to_generate") val photosToGenerate: Int? = null,
     @SerialName("selected_training_id") val selectedTrainingId: String? = null,
     @SerialName("public_tooltip_shown") val publicTooltipShown: Boolean? = null,
+    @SerialName("first_training_completed") val firstTrainingCompleted: Boolean? = null,
 )
