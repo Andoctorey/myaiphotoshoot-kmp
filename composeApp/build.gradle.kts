@@ -89,6 +89,9 @@ kotlin {
 
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
+
+            // third-party
+            implementation(libs.kermit.crashlytics)
         }
 
         // ./gradlew kotlinUpgradeYarnLock
