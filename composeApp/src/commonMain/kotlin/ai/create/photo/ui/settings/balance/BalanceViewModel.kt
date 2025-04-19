@@ -68,7 +68,11 @@ class BalanceViewModel : AuthViewModel() {
 
     fun topUp(pricing: Pricing) = viewModelScope.launch {
         val userId = user?.id ?: return@launch
-        topUpPlatform(userId, pricing)
+        topUpPlatform(userId, pricing) {
+            viewModelScope.launch {
+                ProfilesRepository.loadProfile(userId)
+            }
+        }
     }
 
     fun enterPromoCode() {

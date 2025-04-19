@@ -38,6 +38,7 @@ import kotlin.coroutines.suspendCoroutine
 object BillingRepository : PurchasesUpdatedListener {
 
     private lateinit var billingClient: BillingClient
+    private var onBalanceUpdated: (() -> Unit)? = null
 
     private const val API_KEY =
         "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxVu6XM9IEajbV+MzAB7XtAuBK4iZoyk24ZBUNsWPhYS8yZlbxTUtbFpE7AAp7JQU/9tQeXF+n+VTgRil9qZDn7yPZsX6XJsd2yG1/SQRhNKOd2YAur8DICZj+XIABp0bqZWJbTeHHS1KbPc3rEowTKvpNqye2fAN25jzLqsu/E/yd3nZj2MENcvTDLvZ04qTItlPaEaxJaBNYUYVCYmHd2xG3Cl5lvNj8dMHZVH+nEIqGTPR3ZzLKM084oL2NvHbobpvkpGu8c4YUr5cOXIGhuBl7UoaRgit9QcsvY6hUcBYEAypLtoPcn+unTMkEHH0K678URXhdcpQGrHoCVqkmQIDAQAB"
@@ -57,22 +58,24 @@ object BillingRepository : PurchasesUpdatedListener {
         }
     }
 
-    suspend fun purchase(activity: Activity, pricing: Pricing) = runCatching {
-        initBillingClient(activity.applicationContext)
-        val billingResult = billingClient.connect()
-        queryProductDetails()
-        queryPurchases()
-        Logger.i("billingClient.connect() result: code ${billingResult.responseCode}, message: ${billingResult.debugMessage}")
-        if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
-            val error =
-                "debugMessage: ${billingResult.debugMessage}, code: ${billingResult.responseCode}"
-            Logger.e("billingResultOk failed", Warning(error))
-            throw Exception(getString(Res.string.billing_service_unavailable))
-        }
+    suspend fun purchase(activity: Activity, pricing: Pricing, onBalanceUpdated: () -> Unit) =
+        runCatching {
+            this.onBalanceUpdated = onBalanceUpdated
+            initBillingClient(activity.applicationContext)
+            val billingResult = billingClient.connect()
+            queryProductDetails()
+            queryPurchases()
+            Logger.i("billingClient.connect() result: code ${billingResult.responseCode}, message: ${billingResult.debugMessage}")
+            if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
+                val error =
+                    "debugMessage: ${billingResult.debugMessage}, code: ${billingResult.responseCode}"
+                Logger.e("billingResultOk failed", Warning(error))
+                throw Exception(getString(Res.string.billing_service_unavailable))
+            }
 
-        Logger.i("startBillingFlow for $pricing, productDetailsList size: ${productDetailsList.size}")
-        openBillingPopup(activity, pricing)
-    }
+            Logger.i("startBillingFlow for $pricing, productDetailsList size: ${productDetailsList.size}")
+            openBillingPopup(activity, pricing)
+        }
 
     private suspend fun queryProductDetails() {
         val inApps = Pricing.entries.map {
@@ -192,7 +195,9 @@ object BillingRepository : PurchasesUpdatedListener {
                     productId = product,
                     purchaseToken = purchase.purchaseToken,
                 )
-                if (!verified) {
+                if (verified) {
+                    onBalanceUpdated?.invoke()
+                } else {
                     Logger.e("processPurchases", Warning("Failed to verify purchase: $product"))
                 }
             }
