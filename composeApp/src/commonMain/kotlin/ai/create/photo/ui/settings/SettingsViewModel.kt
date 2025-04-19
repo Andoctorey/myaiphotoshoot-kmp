@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
+import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
@@ -44,6 +45,7 @@ class SettingsViewModel : AuthViewModel() {
 
     fun loadProfile() = viewModelScope.launch {
         val userId = user?.id ?: return@launch
+        if (auth.sessionStatus.value !is SessionStatus.Authenticated) return@launch
         val loadingJob = launch {
             delay(2000)
             uiState = uiState.copy(isBalanceLoading = true)
