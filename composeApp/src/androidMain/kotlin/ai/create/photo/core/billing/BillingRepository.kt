@@ -206,7 +206,6 @@ object BillingRepository : PurchasesUpdatedListener {
                 Logger.e("Consumption failed for $orderId", Warning(result.debugMessage))
             }
         }
-        billingClient.endConnection()
     }
 
     private fun isSignatureValid(purchase: Purchase) =
