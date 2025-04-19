@@ -9,6 +9,6 @@ actual suspend fun topUpPlatform(userId: String, pricing: Pricing) {
     val activity = App.currentActivity ?: return
     BillingRepository.purchase(activity, pricing).onFailure {
         activity.toast(it.message)
-//        openUrl("${pricing.paymentLink}?client_reference_id=$userId")
+        openUrl("${pricing.paymentLink}?client_reference_id=$userId")
     }
 }
