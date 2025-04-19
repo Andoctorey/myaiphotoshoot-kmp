@@ -3,9 +3,12 @@ package ai.create.photo.ui.settings
 import ai.create.photo.platform.IgnoredOnParcel
 import ai.create.photo.platform.Parcelable
 import ai.create.photo.platform.Parcelize
+import ai.create.photo.platform.Platforms
+import ai.create.photo.platform.platform
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Android
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -13,6 +16,7 @@ import org.jetbrains.compose.resources.StringResource
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.account
 import photocreateai.composeapp.generated.resources.contact
+import photocreateai.composeapp.generated.resources.download_android_app
 import photocreateai.composeapp.generated.resources.top_up_pricing
 
 
@@ -27,11 +31,14 @@ data class SettingsUiState(
     val balance: String = "0",
     val isBalanceLoading: Boolean = false,
 
-    val items: List<Item> = listOf(
-        LoginItem(),
-        BalanceItem(),
-        ContactItem(),
-    ),
+    val items: List<Item> = buildList {
+        add(LoginItem())
+        add(BalanceItem())
+        if (platform().platform != Platforms.ANDROID) {
+            add(AndroidAppItem())
+        }
+        add(ContactItem())
+    },
 
     ) {
 
@@ -62,5 +69,10 @@ data class SettingsUiState(
     @Immutable
     @Parcelize
     class ContactItem() : DetailedItem(Res.string.contact, Icons.AutoMirrored.Filled.Help),
+        Parcelable
+
+    @Immutable
+    @Parcelize
+    class AndroidAppItem() : DetailedItem(Res.string.download_android_app, Icons.Default.Android),
         Parcelable
 }

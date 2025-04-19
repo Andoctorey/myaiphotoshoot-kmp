@@ -78,4 +78,5 @@
     <string name="upload_tooltip_popup_title">Welcome to the Public Gallery!</string>
     <string name="upload_tooltip_popup_message">Explore stunning photos made by our community.\n\nTap any photo to use its prompt and make your own.\n\nDon’t forget to share your creations!</string>
     <string name="billing_service_unavailable">Google Play Billing Service is unavailable</string>
+    <string name="download_android_app">Download for Android</string>
 </resources>

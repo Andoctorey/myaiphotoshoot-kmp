@@ -106,6 +106,7 @@ fun SettingsScreen(
                     onSaveDestination = viewModel::saveDestination,
                     goToRootScreen = goToRootScreen,
                     contact = viewModel::contact,
+                    downloadAndroidApp = viewModel::downloadAndroidApp,
                     trainAiModel = trainAiModel,
                     openGenerateTab = openGenerateTab,
                 )
@@ -131,6 +132,7 @@ private fun Screen(
     onSaveDestination: (Item?) -> Unit,
     goToRootScreen: Boolean,
     contact: () -> Unit,
+    downloadAndroidApp: () -> Unit,
     trainAiModel: () -> Unit,
     openGenerateTab: () -> Unit,
 ) {
@@ -176,6 +178,9 @@ private fun Screen(
                     onItemClick = { item ->
                         if (item is SettingsUiState.ContactItem) {
                             contact()
+                            return@SettingsItems
+                        } else if (item is SettingsUiState.AndroidAppItem) {
+                            downloadAndroidApp()
                             return@SettingsItems
                         }
                         Logger.i("Navigate to: $item")
@@ -321,6 +326,7 @@ fun SettingsDetails(
                     )
 
                     is SettingsUiState.ContactItem -> {}
+                    is SettingsUiState.AndroidAppItem -> {}
                 }
             }
         }
