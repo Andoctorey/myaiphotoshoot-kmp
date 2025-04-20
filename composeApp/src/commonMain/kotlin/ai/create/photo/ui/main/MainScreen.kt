@@ -93,7 +93,7 @@ fun MainScreen(
     ) {
         val trainAiModel = {
             viewModel.toggleOpenUploads(true)
-            navController.navigateSingleTopTo(MainRoutes.GENERATE)
+            navController.navigateSingleTopTo(MainRoutes.GALLERY)
         }
 
         NavHost(
