@@ -34,7 +34,7 @@ data class SettingsUiState(
     val items: List<Item> = buildList {
         add(LoginItem())
         add(BalanceItem())
-        if (platform().platform != Platforms.ANDROID) {
+        if (platform().platform !in listOf(Platforms.ANDROID, Platforms.IOS)) {
             add(AndroidAppItem())
         }
         add(ContactItem())
