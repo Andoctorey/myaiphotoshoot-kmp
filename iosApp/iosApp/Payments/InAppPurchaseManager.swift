@@ -4,7 +4,6 @@ import ComposeApp
 class InAppPurchaseManager: NSObject, SKProductsRequestDelegate, SKPaymentTransactionObserver {
     static let shared = InAppPurchaseManager()
     
-    private var productRequest: SKProductsRequest?
     private var products: [String: SKProduct] = [:]
     private var purchaseCompletion: ((Bool, String?, Error?) -> Void)?
     private var completionHandlers: [String: (SKProduct?) -> Void] = [:]
@@ -28,26 +27,29 @@ class InAppPurchaseManager: NSObject, SKProductsRequestDelegate, SKPaymentTransa
         }
         let request = SKProductsRequest(productIdentifiers: Set([productId]))
         request.delegate = self
-        productRequest = request
         completionHandlers[productId] = completion
         request.start()
     }
     
     func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
         LoggerKt.log(message: "Received product response. Products: \(response.products.count), Invalid IDs: \(response.invalidProductIdentifiers)")
+        
         for product in response.products {
             LoggerKt.log(message: "Found product: \(product.productIdentifier)")
             products[product.productIdentifier] = product
+            if let handler = completionHandlers[product.productIdentifier] {
+                handler(product)
+                completionHandlers.removeValue(forKey: product.productIdentifier)
+            }
         }
-        if let product = response.products.first, let handler = completionHandlers[product.productIdentifier] {
-            handler(product)
-            completionHandlers.removeValue(forKey: product.productIdentifier)
-        } else if let productId = completionHandlers.keys.first {
-            LoggerKt.log(message: "No product found for \(productId)")
-            completionHandlers[productId]?(nil)
-            completionHandlers.removeValue(forKey: productId)
+        
+        for invalidId in response.invalidProductIdentifiers {
+            LoggerKt.log(message: "Invalid product ID: \(invalidId)")
+            if let handler = completionHandlers[invalidId] {
+                handler(nil)
+                completionHandlers.removeValue(forKey: invalidId)
+            }
         }
-        productRequest = nil
     }
     
     func purchaseProduct(_ product: SKProduct, completion: @escaping (Bool, String?, Error?) -> Void) {
@@ -95,7 +97,6 @@ class InAppPurchaseManager: NSObject, SKProductsRequestDelegate, SKPaymentTransa
     
     private func failTransaction(_ transaction: SKPaymentTransaction) {
         LoggerKt.error(message: "Purchase failed with error: \(transaction.error?.localizedDescription ?? "Unknown")")
-        
         purchaseCompletion?(false, nil, transaction.error)
         purchaseCompletion = nil
         SKPaymentQueue.default().finishTransaction(transaction)
