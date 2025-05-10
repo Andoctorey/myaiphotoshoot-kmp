@@ -1,4 +1,5 @@
 import StoreKit
+import ComposeApp
 
 class InAppPurchaseManager: NSObject, SKProductsRequestDelegate, SKPaymentTransactionObserver {
     static let shared = InAppPurchaseManager()
@@ -11,13 +12,17 @@ class InAppPurchaseManager: NSObject, SKProductsRequestDelegate, SKPaymentTransa
     private override init() {
         super.init()
         SKPaymentQueue.default().add(self)
-        print("InAppPurchaseManager initialized")
+        LoggerKt.log(message: "InAppPurchaseManager initialized")
+    }
+    
+    static func setup() {
+        _ = shared
     }
     
     func requestProduct(productId: String, completion: @escaping (SKProduct?) -> Void) {
-        print("Requesting product: \(productId)")
+        LoggerKt.log(message: "Requesting product: \(productId)")
         if let product = products[productId] {
-            print("Product \(productId) found in cache")
+            LoggerKt.log(message: "Product \(productId) found in cache")
             completion(product)
             return
         }
@@ -29,16 +34,16 @@ class InAppPurchaseManager: NSObject, SKProductsRequestDelegate, SKPaymentTransa
     }
     
     func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
-        print("Received product response. Products: \(response.products.count), Invalid IDs: \(response.invalidProductIdentifiers)")
+        LoggerKt.log(message: "Received product response. Products: \(response.products.count), Invalid IDs: \(response.invalidProductIdentifiers)")
         for product in response.products {
-            print("Found product: \(product.productIdentifier)")
+            LoggerKt.log(message: "Found product: \(product.productIdentifier)")
             products[product.productIdentifier] = product
         }
         if let product = response.products.first, let handler = completionHandlers[product.productIdentifier] {
             handler(product)
             completionHandlers.removeValue(forKey: product.productIdentifier)
         } else if let productId = completionHandlers.keys.first {
-            print("No product found for \(productId)")
+            LoggerKt.log(message: "No product found for \(productId)")
             completionHandlers[productId]?(nil)
             completionHandlers.removeValue(forKey: productId)
         }
@@ -46,7 +51,7 @@ class InAppPurchaseManager: NSObject, SKProductsRequestDelegate, SKPaymentTransa
     }
     
     func purchaseProduct(_ product: SKProduct, completion: @escaping (Bool, String?, Error?) -> Void) {
-        print("Purchasing product: \(product.productIdentifier)")
+        LoggerKt.log(message: "Purchasing product: \(product.productIdentifier)")
         purchaseCompletion = completion
         let payment = SKPayment(product: product)
         SKPaymentQueue.default().add(payment)
@@ -56,20 +61,20 @@ class InAppPurchaseManager: NSObject, SKProductsRequestDelegate, SKPaymentTransa
         for transaction in transactions {
             switch transaction.transactionState {
             case .purchased:
-                print("Transaction purchased: \(transaction.payment.productIdentifier)")
+                LoggerKt.log(message: "Transaction purchased: \(transaction.payment.productIdentifier)")
                 completeTransaction(transaction)
             case .failed:
-                print("Transaction failed: \(transaction.payment.productIdentifier), Error: \(transaction.error?.localizedDescription ?? "Unknown")")
+                LoggerKt.log(message: "Transaction failed: \(transaction.payment.productIdentifier), Error: \(transaction.error?.localizedDescription ?? "Unknown")")
                 failTransaction(transaction)
             case .restored:
-                print("Transaction restored: \(transaction.payment.productIdentifier)")
+                LoggerKt.log(message: "Transaction restored: \(transaction.payment.productIdentifier)")
                 SKPaymentQueue.default().finishTransaction(transaction)
             case .deferred:
-                print("Transaction deferred: \(transaction.payment.productIdentifier)")
+                LoggerKt.log(message: "Transaction deferred: \(transaction.payment.productIdentifier)")
             case .purchasing:
-                print("Transaction purchasing: \(transaction.payment.productIdentifier)")
+                LoggerKt.log(message: "Transaction purchasing: \(transaction.payment.productIdentifier)")
             @unknown default:
-                print("Unknown transaction state: \(transaction.payment.productIdentifier)")
+                LoggerKt.log(message: "Unknown transaction state: \(transaction.payment.productIdentifier)")
             }
         }
     }
@@ -78,10 +83,10 @@ class InAppPurchaseManager: NSObject, SKProductsRequestDelegate, SKPaymentTransa
         if let receiptURL = Bundle.main.appStoreReceiptURL,
            let receiptData = try? Data(contentsOf: receiptURL) {
             let receiptString = receiptData.base64EncodedString()
-            print("Purchase completed with receipt")
+            LoggerKt.log(message: "Purchase completed with receipt")
             purchaseCompletion?(true, receiptString, nil)
         } else {
-            print("Failed to retrieve receipt")
+            LoggerKt.log(message: "Failed to retrieve receipt")
             purchaseCompletion?(false, nil, nil)
         }
         purchaseCompletion = nil
@@ -89,7 +94,8 @@ class InAppPurchaseManager: NSObject, SKProductsRequestDelegate, SKPaymentTransa
     }
     
     private func failTransaction(_ transaction: SKPaymentTransaction) {
-        print("Purchase failed with error: \(transaction.error?.localizedDescription ?? "Unknown")")
+        LoggerKt.error(message: "Purchase failed with error: \(transaction.error?.localizedDescription ?? "Unknown")")
+        
         purchaseCompletion?(false, nil, transaction.error)
         purchaseCompletion = nil
         SKPaymentQueue.default().finishTransaction(transaction)
