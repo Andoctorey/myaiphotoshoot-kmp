@@ -12,6 +12,21 @@ actual suspend fun topUpPlatform(userId: String, pricing: Pricing, onBalanceUpda
     topUpProvider?.topUp(userId, pricing, onBalanceUpdated)
         ?: throw IllegalStateException("TopUpProvider not set")
 
+fun handlePurchaseCompletion(
+    userId: String,
+    pricing: Pricing,
+    receipt: String,
+    onSuccess: () -> Unit,
+    onFailure: (Throwable) -> Unit
+) {
+    // TODO: Implement server communication to validate receipt and update balance
+    // For example, use a coroutine to send receipt to server
+    // On success, call onSuccess()
+    // On failure, call onFailure(exception)
+    // Placeholder: assuming success for now
+    onSuccess()
+}
+
 
 
 

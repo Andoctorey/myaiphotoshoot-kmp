@@ -1,0 +1,125 @@
+{
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : ""
+      }
+    ]
+  },
+  "identifier" : "6F1ABCC1",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "19.99",
+      "familyShareable" : false,
+      "internalID" : "6744860486",
+      "localizations" : [
+        {
+          "description" : "Add $19.99 to your account balance",
+          "displayName" : "Top Up $19.99",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "top_up_20",
+      "referenceName" : "Top Up $19.99",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "4.99",
+      "familyShareable" : false,
+      "internalID" : "6744860375",
+      "localizations" : [
+        {
+          "description" : "Add $9.99 to your account balance ",
+          "displayName" : "Top Up $9.99",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "top_up_5",
+      "referenceName" : "Top Up $4.99",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "9.99",
+      "familyShareable" : false,
+      "internalID" : "6744860297",
+      "localizations" : [
+        {
+          "description" : "Add $9.99 to your account balance",
+          "displayName" : "Top Up $9.99",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "top_up_10",
+      "referenceName" : "Top Up $9.99",
+      "type" : "Consumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "6744860178",
+    "_developerTeamID" : "V2PLAZ9ZF5",
+    "_failTransactionsEnabled" : false,
+    "_lastSynchronizedDate" : 768576830.48391998,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Load Products"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Purchase"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Verification"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Store Sync"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Subscription Status"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Transaction"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Manage Subscriptions Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Refund Request Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Offer Code Redeem Sheet"
+      }
+    ]
+  },
+  "subscriptionGroups" : [
+
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}
