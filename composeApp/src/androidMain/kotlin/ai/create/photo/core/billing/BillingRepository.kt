@@ -190,25 +190,38 @@ object BillingRepository : PurchasesUpdatedListener {
         for (purchase in validPurchases) {
             val orderId = purchase.orderId ?: continue
             if (orderId in processedPurchases) continue
+            var hasFailure = false
+            val successfulProducts = mutableListOf<String>()
             for (product in purchase.products) {
-                val verified = SupabaseFunction.verifyAndroidPurchase(
-                    productId = product,
-                    purchaseToken = purchase.purchaseToken,
-                )
-                if (verified) {
-                    onBalanceUpdated?.invoke()
-                } else {
-                    Logger.e("processPurchases", Warning("Failed to verify purchase: $product"))
+                try {
+                    val verified = SupabaseFunction.verifyAndroidPurchase(
+                        productId = product,
+                        purchaseToken = purchase.purchaseToken,
+                    )
+                    if (verified) {
+                        successfulProducts.add(product)
+                    } else {
+                        Logger.e("processPurchases", Warning("Failed to verify purchase: $product"))
+                    }
+                } catch (e: Exception) {
+                    Logger.e("processPurchases", e)
+                    hasFailure = true
                 }
             }
-            val params =
-                ConsumeParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build()
-            val result = billingClient.consumePurchase(params).billingResult
-            Logger.i("consumeAsync finished with code ${result.responseCode} and message: ${result.debugMessage}")
-            if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                processedPurchases.add(orderId)
+            if (!hasFailure) {
+                if (successfulProducts.isNotEmpty()) onBalanceUpdated?.invoke()
+                val params = ConsumeParams.newBuilder()
+                    .setPurchaseToken(purchase.purchaseToken)
+                    .build()
+                val result = billingClient.consumePurchase(params).billingResult
+                Logger.i("consumeAsync finished with code ${result.responseCode} and message: ${result.debugMessage}")
+                if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+                    processedPurchases.add(orderId)
+                } else {
+                    Logger.e("Consumption failed for $orderId", Warning(result.debugMessage))
+                }
             } else {
-                Logger.e("Consumption failed for $orderId", Warning(result.debugMessage))
+                Logger.i("Skipping consumption due to verification failure for purchase: $orderId")
             }
         }
     }
