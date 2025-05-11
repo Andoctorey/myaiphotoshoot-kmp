@@ -17,6 +17,7 @@ actual suspend fun topUpPlatform(userId: String, pricing: Pricing, onBalanceUpda
     topUpProvider?.topUp(userId, pricing, onBalanceUpdated)
         ?: throw IllegalStateException("TopUpProvider not set")
 
+@Suppress("unused")
 fun handlePurchaseCompletion(
     pricing: Pricing,
     receipt: String,

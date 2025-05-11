@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package ai.create.photo.platform
 
 import co.touchlab.kermit.Logger
