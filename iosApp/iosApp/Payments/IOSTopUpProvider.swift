@@ -2,7 +2,7 @@ import ComposeApp
 import StoreKit
 
 class IOSTopUpProvider: TopUpProvider {
-    func topUp(userId: String, pricing: Pricing, onBalanceUpdated: @escaping (Bool, String?) -> Void) {
+    func topUp(userId: String, pricing: Pricing, onBalanceUpdated: @escaping () -> Void) {
         LoggerKt.log(message: "Starting top-up for user: \(userId), product: \(pricing.productId)")
         
         InAppPurchaseManager.shared.requestProduct(productId: pricing.productId) { product in
@@ -14,13 +14,13 @@ class IOSTopUpProvider: TopUpProvider {
             }
             
             LoggerKt.log(message: "Initiating purchase for product: \(product.productIdentifier)")
-            InAppPurchaseManager.shared.purchaseProduct(product) { success, receipt, error in
-                if success, let receipt = receipt {
-                    LoggerKt.log(message: "Purchase succeeded. Receipt: \(receipt.prefix(50))...")
+            InAppPurchaseManager.shared.purchaseProduct(product) { success, receipt, transactionId, error in
+                if success, let receipt = receipt, let transactionId = transactionId {
+                    LoggerKt.log(message: "Purchase succeeded. Receipt: \(receipt.prefix(50))..., TransactionId: \(transactionId)")
                     TopUpKt.handlePurchaseCompletion(
-                        userId: userId,
                         pricing: pricing,
                         receipt: receipt,
+                        transactionId: transactionId,
                         onSuccess: {
                             LoggerKt.log(message: "Server validation succeeded")
                             onBalanceUpdated()

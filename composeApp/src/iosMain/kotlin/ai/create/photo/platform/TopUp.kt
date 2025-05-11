@@ -1,6 +1,11 @@
 package ai.create.photo.platform
 
+import ai.create.photo.data.supabase.SupabaseFunction
 import ai.create.photo.ui.settings.balance.Pricing
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.launch
 
 interface TopUpProvider {
     fun topUp(userId: String, pricing: Pricing, onBalanceUpdated: () -> Unit)
@@ -13,18 +18,26 @@ actual suspend fun topUpPlatform(userId: String, pricing: Pricing, onBalanceUpda
         ?: throw IllegalStateException("TopUpProvider not set")
 
 fun handlePurchaseCompletion(
-    userId: String,
     pricing: Pricing,
     receipt: String,
+    transactionId: String,
     onSuccess: () -> Unit,
     onFailure: (Throwable) -> Unit
-) {
-    // TODO: Implement server communication to validate receipt and update balance
-    // For example, use a coroutine to send receipt to server
-    // On success, call onSuccess()
-    // On failure, call onFailure(exception)
-    // Placeholder: assuming success for now
-    onSuccess()
+) = CoroutineScope(Dispatchers.IO).launch {
+    try {
+        val result = SupabaseFunction.verifyIosPurchase(
+            productId = pricing.productId,
+            receipt = receipt,
+            transactionId = transactionId,
+        )
+        if (result) {
+            onSuccess()
+        } else {
+            onFailure(Exception("Purchase verification failed"))
+        }
+    } catch (e: Exception) {
+        onFailure(e)
+    }
 }
 
 

@@ -5,7 +5,7 @@ class InAppPurchaseManager: NSObject, SKProductsRequestDelegate, SKPaymentTransa
     static let shared = InAppPurchaseManager()
     
     private var products: [String: SKProduct] = [:]
-    private var purchaseCompletion: ((Bool, String?, Error?) -> Void)?
+    private var purchaseCompletion: ((Bool, String?, String?, Error?) -> Void)?
     private var completionHandlers: [String: (SKProduct?) -> Void] = [:]
     
     private override init() {
@@ -52,7 +52,7 @@ class InAppPurchaseManager: NSObject, SKProductsRequestDelegate, SKPaymentTransa
         }
     }
     
-    func purchaseProduct(_ product: SKProduct, completion: @escaping (Bool, String?, Error?) -> Void) {
+    func purchaseProduct(_ product: SKProduct, completion: @escaping (Bool, String?, String?, Error?) -> Void) {
         LoggerKt.log(message: "Purchasing product: \(product.productIdentifier)")
         purchaseCompletion = completion
         let payment = SKPayment(product: product)
@@ -85,11 +85,12 @@ class InAppPurchaseManager: NSObject, SKProductsRequestDelegate, SKPaymentTransa
         if let receiptURL = Bundle.main.appStoreReceiptURL,
            let receiptData = try? Data(contentsOf: receiptURL) {
             let receiptString = receiptData.base64EncodedString()
-            LoggerKt.log(message: "Purchase completed with receipt")
-            purchaseCompletion?(true, receiptString, nil)
+            let transactionId = transaction.transactionIdentifier ?? ""
+            LoggerKt.log(message: "Purchase completed with receipt and transactionId: \(transactionId)")
+            purchaseCompletion?(true, receiptString, transactionId, nil)
         } else {
             LoggerKt.log(message: "Failed to retrieve receipt")
-            purchaseCompletion?(false, nil, nil)
+            purchaseCompletion?(false, nil, nil, nil)
         }
         purchaseCompletion = nil
         SKPaymentQueue.default().finishTransaction(transaction)
@@ -97,7 +98,7 @@ class InAppPurchaseManager: NSObject, SKProductsRequestDelegate, SKPaymentTransa
     
     private func failTransaction(_ transaction: SKPaymentTransaction) {
         LoggerKt.error(message: "Purchase failed with error: \(transaction.error?.localizedDescription ?? "Unknown")")
-        purchaseCompletion?(false, nil, transaction.error)
+        purchaseCompletion?(false, nil, nil, transaction.error)
         purchaseCompletion = nil
         SKPaymentQueue.default().finishTransaction(transaction)
     }

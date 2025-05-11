@@ -105,4 +105,21 @@ object SupabaseFunction {
         )
         return response.body<Boolean>()
     }
+
+    suspend fun verifyIosPurchase(
+        productId: String,
+        receipt: String,
+        transactionId: String
+    ): Boolean {
+        Logger.i("verifyIosPurchase: $productId, $receipt")
+        val response = Supabase.supabase.functions.invoke(
+            function = "verify-ios-purchase",
+            body = mapOf(
+                "product_id" to productId,
+                "receipt" to receipt,
+                "transaction_id" to transactionId
+            )
+        )
+        return response.body<Boolean>()
+    }
 }
