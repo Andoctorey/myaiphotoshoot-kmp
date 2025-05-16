@@ -1,7 +1,5 @@
 # My AI Photo Shoot
 
-![My AI Photo Shoot](https://play-lh.googleusercontent.com/Yapa2TZBF9MnbEbioep05d6vDAwmjjWI8LceZLXXg5LYCdLjEQJ712ZqA43PGhkXX0Q=w480-h960-rw)
-
 **Turn Your Selfies Into Stunning AI-Generated Photos!**
 
 My AI Photo Shoot is a cross-platform mobile and web application built
