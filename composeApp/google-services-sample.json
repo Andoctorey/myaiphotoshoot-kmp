@@ -1,0 +1,22 @@
+{
+  "project_info": {
+    "project_number": "YOUR_PROJECT_NUMBER",
+    "firebase_url": "YOUR_FIREBASE_URL",
+    "project_id": "YOUR_PROJECT_ID",
+    "storage_bucket": "YOUR_STORAGE_BUCKET"
+  },
+  "client": [
+    {
+      "api_key": [
+        {
+          "current_key": "YOUR_API_KEY"
+        }
+      ],
+      "client_info": {
+        "android_client_info": {
+          "package_name": "YOUR_PACKAGE_NAME"
+        }
+      }
+    }
+  ]
+}
