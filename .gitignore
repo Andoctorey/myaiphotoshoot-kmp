@@ -20,3 +20,4 @@ captures
 composeApp/settings.preferences_pb
 *.podspec
 signing.properties
+google-services.json
