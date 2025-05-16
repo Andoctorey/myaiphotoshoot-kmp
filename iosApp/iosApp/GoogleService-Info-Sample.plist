@@ -30,3 +30,7 @@
 	<string>https://your-project-id-default-rtdb.firebaseio.com</string>
 </dict>
 </plist>
+
+git filter-branch --force --index-filter \
+  "git rm --cached --ignore-unmatch iosApp/iosApp/GoogleService-Info.plist" \
+  --prune-empty --tag-name-filter cat -- --all
