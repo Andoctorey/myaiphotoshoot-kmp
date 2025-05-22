@@ -2,4 +2,4 @@
 ./gradlew clean
 rm -rf composeApp/build/dist/wasmJs/productionExecutable
 ./gradlew wasmJsBrowserDistribution
-wrangler pages deploy composeApp/build/dist/wasmJs/productionExecutable --project-name myaiphotoshoot --commit-dirty=true
+wrangler pages deploy composeApp/build/dist/wasmJs/productionExecutable --project-name myaiphotoshoot-app --commit-dirty=true
