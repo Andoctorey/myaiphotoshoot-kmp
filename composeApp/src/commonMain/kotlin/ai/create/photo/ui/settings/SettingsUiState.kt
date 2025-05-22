@@ -15,8 +15,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import org.jetbrains.compose.resources.StringResource
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.account
-import photocreateai.composeapp.generated.resources.contact
 import photocreateai.composeapp.generated.resources.download_android_app
+import photocreateai.composeapp.generated.resources.social
+import photocreateai.composeapp.generated.resources.support
 import photocreateai.composeapp.generated.resources.top_up_pricing
 
 
@@ -37,7 +38,8 @@ data class SettingsUiState(
         if (platform().platform !in listOf(Platforms.ANDROID, Platforms.IOS)) {
             add(AndroidAppItem())
         }
-        add(ContactItem())
+        add(SocialItem())
+        add(SupportItem())
     },
 
     ) {
@@ -68,7 +70,12 @@ data class SettingsUiState(
 
     @Immutable
     @Parcelize
-    class ContactItem() : DetailedItem(Res.string.contact, Icons.AutoMirrored.Filled.Help),
+    class SocialItem() : DetailedItem(Res.string.social, Icons.AutoMirrored.Filled.Help),
+        Parcelable
+
+    @Immutable
+    @Parcelize
+    class SupportItem() : DetailedItem(Res.string.support, Icons.AutoMirrored.Filled.Help),
         Parcelable
 
     @Immutable

@@ -79,7 +79,11 @@ class SettingsViewModel : AuthViewModel() {
         uiState = uiState.copy(currentDestination = currentDestination)
     }
 
-    fun contact() = viewModelScope.launch {
+    fun support() = viewModelScope.launch {
+        openUrl("https://myaiphotoshoot.com/en/support/")
+    }
+
+    fun social() = viewModelScope.launch {
         openUrl("https://x.com/andoctorey")
     }
 

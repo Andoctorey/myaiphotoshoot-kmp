@@ -105,7 +105,8 @@ fun SettingsScreen(
                     savedDestination = state.currentDestination,
                     onSaveDestination = viewModel::saveDestination,
                     goToRootScreen = goToRootScreen,
-                    contact = viewModel::contact,
+                    social = viewModel::social,
+                    support = viewModel::support,
                     downloadAndroidApp = viewModel::downloadAndroidApp,
                     trainAiModel = trainAiModel,
                     openGenerateTab = openGenerateTab,
@@ -131,7 +132,8 @@ private fun Screen(
     savedDestination: Item?,
     onSaveDestination: (Item?) -> Unit,
     goToRootScreen: Boolean,
-    contact: () -> Unit,
+    social: () -> Unit,
+    support: () -> Unit,
     downloadAndroidApp: () -> Unit,
     trainAiModel: () -> Unit,
     openGenerateTab: () -> Unit,
@@ -176,8 +178,11 @@ private fun Screen(
                     expanded = expanded,
                     items = items,
                     onItemClick = { item ->
-                        if (item is SettingsUiState.ContactItem) {
-                            contact()
+                        if (item is SettingsUiState.SocialItem) {
+                            social()
+                            return@SettingsItems
+                        } else if (item is SettingsUiState.SupportItem) {
+                            support()
                             return@SettingsItems
                         } else if (item is SettingsUiState.AndroidAppItem) {
                             downloadAndroidApp()
@@ -325,7 +330,8 @@ fun SettingsDetails(
                         openGenerateTab = openGenerateTab,
                     )
 
-                    is SettingsUiState.ContactItem -> {}
+                    is SettingsUiState.SocialItem -> {}
+                    is SettingsUiState.SupportItem -> {}
                     is SettingsUiState.AndroidAppItem -> {}
                 }
             }
