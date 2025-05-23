@@ -33,6 +33,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		557BF2132DE0344C0040A51A /* Utils */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Utils; sourceTree = "<group>"; };
 		557E9CE12DB4EBFD002D15D0 /* Payments */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Payments; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -88,6 +89,7 @@
 		7555FF7D242A565900829871 /* iosApp */ = {
 			isa = PBXGroup;
 			children = (
+				557BF2132DE0344C0040A51A /* Utils */,
 				557E9CE12DB4EBFD002D15D0 /* Payments */,
 				5585FB172DA24CE2002F005E /* GoogleService-Info.plist */,
 				058557BA273AAA24004C7B11 /* Assets.xcassets */,
@@ -125,6 +127,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				557BF2132DE0344C0040A51A /* Utils */,
 				557E9CE12DB4EBFD002D15D0 /* Payments */,
 			);
 			name = iosApp;
