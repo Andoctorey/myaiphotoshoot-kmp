@@ -1,6 +1,8 @@
 package ai.create.photo.ui.settings.balance
 
 import ai.create.photo.platform.BackHandler
+import ai.create.photo.platform.Platforms
+import ai.create.photo.platform.platform
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.InfoPopup
@@ -190,7 +192,8 @@ fun ApplyPromoCodeButton(isLoading: Boolean, onClick: () -> Unit) {
 
 @Composable
 fun TopUpButton(pricing: Pricing, onClick: (String) -> Unit) {
-    Button(modifier = Modifier.padding(4.dp),
+    Button(
+        modifier = Modifier.padding(4.dp),
         onClick = { onClick(pricing.paymentLink) }) {
         Text(
             text = pricing.price,
@@ -233,27 +236,30 @@ private fun TopUp(
             TopUpButton(Pricing.FAMILY) { topUp(Pricing.FAMILY) }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
 
-        Crossfade(showEnterPromoCode) {
-            if (showEnterPromoCode) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    EnterPromoCode(
-                        promoCode = promoCode,
-                        isIncorrectCode = isIncorrectPromoCode,
-                        onCodeChanged = onPromoCodeChanged,
-                    )
-                    ApplyPromoCodeButton(
-                        isLoading = isApplyingPromoCode,
-                        onClick = applyPromoCode,
-                    )
-                }
-            } else {
-                TextButton(onClick = { enterPromoCode() }) {
-                    Text(
-                        text = stringResource(Res.string.enter_promo_code),
-                        fontSize = 16.sp,
-                    )
+        if (platform().platform != Platforms.IOS) {
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Crossfade(showEnterPromoCode) {
+                if (showEnterPromoCode) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        EnterPromoCode(
+                            promoCode = promoCode,
+                            isIncorrectCode = isIncorrectPromoCode,
+                            onCodeChanged = onPromoCodeChanged,
+                        )
+                        ApplyPromoCodeButton(
+                            isLoading = isApplyingPromoCode,
+                            onClick = applyPromoCode,
+                        )
+                    }
+                } else {
+                    TextButton(onClick = { enterPromoCode() }) {
+                        Text(
+                            text = stringResource(Res.string.enter_promo_code),
+                            fontSize = 16.sp,
+                        )
+                    }
                 }
             }
         }
