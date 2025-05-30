@@ -133,12 +133,14 @@ relevant tests.
 
 ## 🐞 Reporting Issues
 
-Encounter a bug or have a suggestion? Use the app’s "Report a Problem" feature or create an issue on
+Encounter a bug or have a suggestion? Use the app's "Report a Problem" feature or create an issue on
 the [GitHub Issues page](https://github.com/yourusername/my-ai-photo-shoot/issues).
 
 ## 🔗 Follow Us
 
 - 🌐 [myaiphotoshoot.com](https://myaiphotoshoot.com)
+- 📱 [Download on the App Store](https://apps.apple.com/app/id6744860178)
+- 📱 [Get it on Google Play](https://play.google.com/store/apps/details?id=com.myaiphotoshoot)
 - 📱 Join our community on social media and share your AI-generated photos!
 
 ## 📜 License
