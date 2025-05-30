@@ -79,5 +79,4 @@
     <string name="upload_tooltip_popup_title">Bienvenue dans la galerie publique !</string>
     <string name="upload_tooltip_popup_message">Explorez de superbes photos créées par notre communauté.\n\nTouchez n\'importe quelle photo pour utiliser sa description et créer la vôtre.\n\nN\'oubliez pas de partager vos créations !</string>
     <string name="billing_service_unavailable">Le service de facturation Google Play n\'est pas disponible</string>
-    <string name="download_android_app">Télécharger pour Android</string>
-</resources> 
+</resources>

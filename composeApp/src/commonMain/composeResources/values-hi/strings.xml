@@ -79,5 +79,4 @@
     <string name="upload_tooltip_popup_title">सार्वजनिक गैलरी में आपका स्वागत है!</string>
     <string name="upload_tooltip_popup_message">हमारे समुदाय द्वारा बनाई गई शानदार तस्वीरें देखें।\n\nअपनी खुद की बनाने के लिए किसी भी तस्वीर पर टैप करें।\n\nअपनी रचनाएं साझा करना न भूलें!</string>
     <string name="billing_service_unavailable">Google Play बिलिंग सेवा उपलब्ध नहीं है</string>
-    <string name="download_android_app">Android के लिए डाउनलोड करें</string>
-</resources> 
+</resources>

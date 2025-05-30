@@ -79,5 +79,4 @@
     <string name="upload_tooltip_popup_title">パブリックギャラリーへようこそ！</string>
     <string name="upload_tooltip_popup_message">コミュニティが作成した素晴らしい写真を探索してください。\n\n任意の写真をタップしてそのプロンプトを使用し、自分だけの写真を作成してください。\n\n作品をシェアすることを忘れずに！</string>
     <string name="billing_service_unavailable">Google Play請求サービスが利用できません</string>
-    <string name="download_android_app">Android版をダウンロード</string>
-</resources> 
+</resources>

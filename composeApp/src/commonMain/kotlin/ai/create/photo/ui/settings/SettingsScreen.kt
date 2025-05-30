@@ -107,7 +107,8 @@ fun SettingsScreen(
                     goToRootScreen = goToRootScreen,
                     social = viewModel::social,
                     support = viewModel::support,
-                    downloadAndroidApp = viewModel::downloadAndroidApp,
+                    googlePlay = viewModel::googlePlay,
+                    appStore = viewModel::appStore,
                     trainAiModel = trainAiModel,
                     openGenerateTab = openGenerateTab,
                 )
@@ -134,7 +135,8 @@ private fun Screen(
     goToRootScreen: Boolean,
     social: () -> Unit,
     support: () -> Unit,
-    downloadAndroidApp: () -> Unit,
+    googlePlay: () -> Unit,
+    appStore: () -> Unit,
     trainAiModel: () -> Unit,
     openGenerateTab: () -> Unit,
 ) {
@@ -184,8 +186,11 @@ private fun Screen(
                         } else if (item is SettingsUiState.SupportItem) {
                             support()
                             return@SettingsItems
-                        } else if (item is SettingsUiState.AndroidAppItem) {
-                            downloadAndroidApp()
+                        } else if (item is SettingsUiState.GooglePlayItem) {
+                            googlePlay()
+                            return@SettingsItems
+                        } else if (item is SettingsUiState.AppStoreItem) {
+                            appStore()
                             return@SettingsItems
                         }
                         Logger.i("Navigate to: $item")
@@ -332,7 +337,8 @@ fun SettingsDetails(
 
                     is SettingsUiState.SocialItem -> {}
                     is SettingsUiState.SupportItem -> {}
-                    is SettingsUiState.AndroidAppItem -> {}
+                    is SettingsUiState.GooglePlayItem -> {}
+                    is SettingsUiState.AppStoreItem -> {}
                 }
             }
         }

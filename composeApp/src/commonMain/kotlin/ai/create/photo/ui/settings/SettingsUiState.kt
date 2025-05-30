@@ -8,14 +8,15 @@ import ai.create.photo.platform.platform
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Android
 import androidx.compose.material.icons.filled.CreditCard
+import androidx.compose.material.icons.filled.InstallMobile
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.vector.ImageVector
 import org.jetbrains.compose.resources.StringResource
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.account
-import photocreateai.composeapp.generated.resources.download_android_app
+import photocreateai.composeapp.generated.resources.app_store
+import photocreateai.composeapp.generated.resources.google_play
 import photocreateai.composeapp.generated.resources.social
 import photocreateai.composeapp.generated.resources.support
 import photocreateai.composeapp.generated.resources.top_up_pricing
@@ -35,11 +36,12 @@ data class SettingsUiState(
     val items: List<Item> = buildList {
         add(LoginItem())
         add(BalanceItem())
-        if (platform().platform !in listOf(Platforms.ANDROID, Platforms.IOS)) {
-            add(AndroidAppItem())
-        }
         add(SocialItem())
         add(SupportItem())
+        if (platform().platform !in listOf(Platforms.ANDROID, Platforms.IOS)) {
+            add(GooglePlayItem())
+            add(AppStoreItem())
+        }
     },
 
     ) {
@@ -80,6 +82,11 @@ data class SettingsUiState(
 
     @Immutable
     @Parcelize
-    class AndroidAppItem() : DetailedItem(Res.string.download_android_app, Icons.Default.Android),
+    class GooglePlayItem() : DetailedItem(Res.string.google_play, Icons.Default.InstallMobile),
+        Parcelable
+
+    @Immutable
+    @Parcelize
+    class AppStoreItem() : DetailedItem(Res.string.app_store, Icons.Default.InstallMobile),
         Parcelable
 }

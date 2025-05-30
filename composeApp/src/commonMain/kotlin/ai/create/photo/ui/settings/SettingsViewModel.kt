@@ -87,7 +87,11 @@ class SettingsViewModel : AuthViewModel() {
         openUrl("https://x.com/andoctorey")
     }
 
-    fun downloadAndroidApp() = viewModelScope.launch {
+    fun googlePlay() = viewModelScope.launch {
         openUrl("https://play.google.com/store/apps/details?id=com.myaiphotoshoot")
+    }
+
+    fun appStore() = viewModelScope.launch {
+        openUrl("https://apps.apple.com/app/id6744860178")
     }
 }

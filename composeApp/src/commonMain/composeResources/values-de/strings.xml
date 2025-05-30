@@ -79,5 +79,4 @@
     <string name="upload_tooltip_popup_title">Willkommen in der öffentlichen Galerie!</string>
     <string name="upload_tooltip_popup_message">Entdecke atemberaubende Fotos unserer Community.\n\nTippe auf ein beliebiges Foto, um seine Beschreibung zu verwenden und dein eigenes zu erstellen.\n\nVergiss nicht, deine Kreationen zu teilen!</string>
     <string name="billing_service_unavailable">Google Play Billing Service ist nicht verfügbar</string>
-    <string name="download_android_app">Für Android herunterladen</string>
-</resources> 
+</resources>

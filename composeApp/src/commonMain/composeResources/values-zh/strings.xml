@@ -79,5 +79,4 @@
     <string name="upload_tooltip_popup_title">欢迎来到公开画廊！</string>
     <string name="upload_tooltip_popup_message">探索我们社区创作的精美照片。\n\n点击任意照片使用其描述制作您自己的照片。\n\n别忘了分享您的创作！</string>
     <string name="billing_service_unavailable">Google Play计费服务不可用</string>
-    <string name="download_android_app">下载安卓版</string>
 </resources> 
