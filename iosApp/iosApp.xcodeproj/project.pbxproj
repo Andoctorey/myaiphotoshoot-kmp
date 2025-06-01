@@ -10,7 +10,7 @@
 		058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557BA273AAA24004C7B11 /* Assets.xcassets */; };
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
-		557E9CE02DB4CD73002D15D0 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 557E9CDF2DB4CD73002D15D0 /* StoreKit.framework */; };
+		5574C35F2DEC2096008633F6 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5574C35E2DEC2096008633F6 /* StoreKit.framework */; };
 		5585FB122DA24AAE002F005E /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 5585FB112DA24AAE002F005E /* FirebaseAnalyticsWithoutAdIdSupport */; };
 		5585FB142DA24AAE002F005E /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 5585FB132DA24AAE002F005E /* FirebaseCrashlytics */; };
 		5585FB162DA24AAE002F005E /* FirebasePerformance in Frameworks */ = {isa = PBXBuildFile; productRef = 5585FB152DA24AAE002F005E /* FirebasePerformance */; };
@@ -23,7 +23,7 @@
 		058557BA273AAA24004C7B11 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		2152FB032600AC8F00CF470E /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
-		557E9CDF2DB4CD73002D15D0 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		5574C35E2DEC2096008633F6 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		5585FB172DA24CE2002F005E /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		55B4F2F02DCF8D1000BB66FD /* StoreKitConfig.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = StoreKitConfig.storekit; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* My AI Photo Shoot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "My AI Photo Shoot.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -45,7 +45,7 @@
 				5585FB122DA24AAE002F005E /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
 				5585FB142DA24AAE002F005E /* FirebaseCrashlytics in Frameworks */,
 				5585FB162DA24AAE002F005E /* FirebasePerformance in Frameworks */,
-				557E9CE02DB4CD73002D15D0 /* StoreKit.framework in Frameworks */,
+				5574C35F2DEC2096008633F6 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -63,7 +63,7 @@
 		42799AB246E5F90AF97AA0EF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				557E9CDF2DB4CD73002D15D0 /* StoreKit.framework */,
+				5574C35E2DEC2096008633F6 /* StoreKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -352,7 +352,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
 				DEVELOPMENT_TEAM = V2PLAZ9ZF5;
@@ -386,7 +386,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
 				DEVELOPMENT_TEAM = V2PLAZ9ZF5;
