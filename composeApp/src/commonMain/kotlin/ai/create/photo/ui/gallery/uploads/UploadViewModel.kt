@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlin.math.max
+import kotlin.math.pow
 
 class UploadViewModel : AuthViewModel() {
 
@@ -143,16 +144,14 @@ class UploadViewModel : AuthViewModel() {
         try {
             if (Supabase.LOCAL) {
                 notAnalyzedPhotos.forEach { photo ->
-                    SupabaseFunction.analyzePhoto(photo.id)
+                    analyzePhotoWithRetry(photo.id, photo.name)
                     uiState = uiState.copy(analyzingPhotos = uiState.analyzingPhotos + 1)
                 }
             } else {
                 val analysisJobs = notAnalyzedPhotos.map { photo ->
                     async {
                         try {
-                            SupabaseFunction.analyzePhoto(photo.id)
-                        } catch (_: Exception) {
-
+                            analyzePhotoWithRetry(photo.id, photo.name)
                         } finally {
                             uiState = uiState.copy(analyzingPhotos = uiState.analyzingPhotos + 1)
                         }
@@ -167,6 +166,45 @@ class UploadViewModel : AuthViewModel() {
             Logger.e("analyzePhotos failed", e)
             uiState = uiState.copy(analyzingPhotos = 0, errorPopup = e)
         }
+    }
+
+    private suspend fun analyzePhotoWithRetry(
+        photoId: String,
+        photoName: String,
+        maxRetries: Int = 2
+    ) {
+        var attempt = 0
+        var lastException: Exception? = null
+
+        while (attempt <= maxRetries) {
+            try {
+                SupabaseFunction.analyzePhoto(photoId)
+                if (attempt > 0) {
+                    Logger.i("Photo analysis succeeded on attempt ${attempt + 1} for: $photoName")
+                }
+                return
+            } catch (e: Exception) {
+                attempt++
+
+                if (attempt <= maxRetries) {
+                    val delayMs = (1000 * 2.0.pow(attempt - 1)).toLong()
+                    Logger.w("Photo analysis failed (attempt $attempt/${maxRetries + 1}) for: $photoName. Retrying in ${delayMs}ms. Error: ${e.message}")
+                    delay(delayMs)
+                    currentCoroutineContext().ensureActive()
+                } else {
+                    lastException = e
+                    Logger.e(
+                        "Photo analysis failed after ${maxRetries + 1} attempts for: $photoName. Final error: ${e.message}",
+                        e
+                    )
+                }
+            }
+        }
+        lastException?.let {  // If we reach here, it means all attempts failed
+            Logger.e("All attempts to analyze photo failed for: $photoName", it)
+            throw lastException
+        }
+
     }
 
     fun deleteUnsuitablePhotos() = viewModelScope.launch {
