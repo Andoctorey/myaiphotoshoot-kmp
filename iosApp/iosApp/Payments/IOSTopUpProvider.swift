@@ -2,7 +2,11 @@ import ComposeApp
 import StoreKit
 
 class IOSTopUpProvider: TopUpProvider {
-    func topUp(userId: String, pricing: Pricing, onBalanceUpdated: @escaping () -> Void) {
+    func topUp(userId: String,
+               pricing: Pricing,
+               onSuccess: @escaping () -> Void,
+               onFailure: @escaping (KotlinThrowable) -> Void
+    ) {
         LoggerKt.log(message: "Starting top-up for user: \(userId), product: \(pricing.productId)")
         
         InAppPurchaseManager.shared.requestProduct(productId: pricing.productId) { product in
@@ -23,10 +27,11 @@ class IOSTopUpProvider: TopUpProvider {
                         transactionId: transactionId,
                         onSuccess: {
                             LoggerKt.log(message: "Server validation succeeded")
-                            onBalanceUpdated()
+                            onSuccess()
                         },
-                        onFailure: { error in
-                            LoggerKt.error(message: "Server validation failed: \(error.description())")
+                        onFailure: { throwable in
+                            onFailure(KotlinThrowable(message: throwable.message))
+                            LoggerKt.error(message: "Server validation failed: \(throwable.description())")
                         }
                     )
                 } else {

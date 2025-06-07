@@ -57,6 +57,7 @@ import photocreateai.composeapp.generated.resources.photo_creation
 import photocreateai.composeapp.generated.resources.powered_by_flux
 import photocreateai.composeapp.generated.resources.pricing
 import photocreateai.composeapp.generated.resources.promo_code_applied
+import photocreateai.composeapp.generated.resources.thank_you_for_purchase
 import photocreateai.composeapp.generated.resources.top_up
 import photocreateai.composeapp.generated.resources.wrong_code
 
@@ -137,6 +138,13 @@ fun BalanceScreen(
         if (state.showPromoCodeAppliedPopup) {
             InfoPopup(stringResource(Res.string.promo_code_applied, state.balance)) {
                 viewModel.hidePromoCodeAppliedPopup()
+                onBackClick()
+            }
+        }
+
+        if (state.showBalanceUpdatedPopup) {
+            InfoPopup(stringResource(Res.string.thank_you_for_purchase, state.balance)) {
+                viewModel.hideBalanceUpdatedPopup()
                 onBackClick()
             }
         }

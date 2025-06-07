@@ -10,6 +10,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 
@@ -66,16 +67,31 @@ class BalanceViewModel : AuthViewModel() {
         uiState = uiState.copy(showPromoCodeAppliedPopup = false)
     }
 
-    fun topUp(pricing: Pricing) = viewModelScope.launch {
-        val userId = user?.id ?: return@launch
-        topUpPlatform(userId, pricing) {
-            viewModelScope.launch {
-                ProfilesRepository.loadProfile(userId)
-            }
-        }
+    fun enterPromoCode() {
+        uiState = uiState.copy(showBalanceUpdatedPopup = true)
     }
 
-    fun enterPromoCode() {
-        uiState = uiState.copy(showEnterPromoCode = true)
+    fun topUp(pricing: Pricing) = viewModelScope.launch {
+        val userId = user?.id ?: return@launch
+        topUpPlatform(
+            userId = userId,
+            pricing = pricing,
+            onFailure = {
+                uiState = uiState.copy(errorPopup = it)
+            },
+            onSuccess = {
+                uiState = uiState.copy(showBalanceUpdatedPopup = true)
+                viewModelScope.launch {
+                    (1..10).forEach {
+                        ProfilesRepository.loadProfile(userId)
+                        delay(5000L) // Wait for profile to update
+                    }
+                }
+            },
+        )
+    }
+
+    fun hideBalanceUpdatedPopup() {
+        uiState = uiState.copy(showBalanceUpdatedPopup = false)
     }
 }

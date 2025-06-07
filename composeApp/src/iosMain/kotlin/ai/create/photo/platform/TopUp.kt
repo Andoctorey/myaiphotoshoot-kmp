@@ -8,14 +8,25 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 
 interface TopUpProvider {
-    fun topUp(userId: String, pricing: Pricing, onBalanceUpdated: () -> Unit)
+    fun topUp(
+        userId: String,
+        pricing: Pricing,
+        onSuccess: () -> Unit,
+        onFailure: (e: Throwable) -> Unit
+    )
 }
 
 var topUpProvider: TopUpProvider? = null
 
-actual suspend fun topUpPlatform(userId: String, pricing: Pricing, onBalanceUpdated: () -> Unit) =
-    topUpProvider?.topUp(userId, pricing, onBalanceUpdated)
-        ?: throw IllegalStateException("TopUpProvider not set")
+actual suspend fun topUpPlatform(
+    userId: String,
+    pricing: Pricing,
+    onSuccess: () -> Unit,
+    onFailure: (e: Throwable) -> Unit
+) {
+    topUpProvider?.topUp(userId, pricing, onSuccess, onFailure)
+        ?: onFailure(IllegalStateException("TopUpProvider not set"))
+}
 
 @Suppress("unused")
 fun handlePurchaseCompletion(
