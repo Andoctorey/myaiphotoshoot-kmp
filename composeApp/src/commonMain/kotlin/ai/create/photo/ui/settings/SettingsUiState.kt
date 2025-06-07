@@ -40,8 +40,8 @@ data class SettingsUiState(
         add(SocialItem())
         add(SupportItem())
         if (platform().platform !in listOf(Platforms.ANDROID, Platforms.IOS)) {
-            add(GooglePlayItem())
             add(AppStoreItem())
+            add(GooglePlayItem())
         }
     },
 
