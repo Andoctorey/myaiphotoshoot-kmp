@@ -8,6 +8,7 @@ import ai.create.photo.platform.platform
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.InstallMobile
 import androidx.compose.runtime.Immutable
@@ -72,7 +73,7 @@ data class SettingsUiState(
 
     @Immutable
     @Parcelize
-    class SocialItem() : DetailedItem(Res.string.social, Icons.AutoMirrored.Filled.Help),
+    class SocialItem() : DetailedItem(Res.string.social, Icons.Default.Close),
         Parcelable
 
     @Immutable
