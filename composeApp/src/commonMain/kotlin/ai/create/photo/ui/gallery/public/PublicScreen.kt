@@ -82,8 +82,12 @@ fun PublicScreen(
     removePhotosFromPublicGallery: List<String>,
     onRemovedPhotosFromPublicGallery: () -> Unit,
 ) {
-    LaunchedEffect(Unit) {
-        viewModel.refreshPublicGallery(silent = true)
+    val state = viewModel.uiState
+
+    if (state.sort == GenerationsSort.NEW) {
+        LaunchedEffect(Unit) {
+            viewModel.loadLatestPublicGallerySortedByNew(silent = true)
+        }
     }
 
     if (addPhotosToPublicGallery.isNotEmpty()) {
@@ -96,7 +100,6 @@ fun PublicScreen(
         onRemovedPhotosFromPublicGallery()
     }
 
-    val state = viewModel.uiState
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
@@ -113,7 +116,7 @@ fun PublicScreen(
                 isLoadingNextPage = state.isLoadingNextPage,
                 loadNextPage = viewModel::loadPublicGallery,
                 isRefreshing = state.isRefreshing,
-                onRefresh = viewModel::refreshPublicGallery,
+                onRefresh = viewModel::onRefreshPublicGallery,
                 pagingLimitReach = state.pagingLimitReach,
                 onClick = { generate(Prompt(generationId = it.id, text = it.prompt, url = it.url)) }
             )

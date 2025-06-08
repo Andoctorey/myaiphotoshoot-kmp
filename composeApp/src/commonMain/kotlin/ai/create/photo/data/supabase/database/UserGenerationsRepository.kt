@@ -69,7 +69,7 @@ object UserGenerationsRepository {
         pageSize: Int,
         sortOrder: GenerationsSort,
     ): Result<List<UserGeneration>> = runCatching {
-        Logger.i("getPublicGallery, page: $page, pageSize: $pageSize")
+        Logger.i("getPublicGallery, sort: $sortOrder, page: $page, pageSize: $pageSize")
         val from = ((page - 1) * pageSize).toLong()
         val to = (from + pageSize - 1).toLong()
         Supabase.supabase

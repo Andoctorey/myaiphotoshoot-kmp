@@ -37,10 +37,52 @@ class PublicViewModel : AuthViewModel() {
         uiState = uiState.copy(loadingError = error)
     }
 
-    fun refreshPublicGallery(silent: Boolean = false) = viewModelScope.launch {
+    fun loadPublicGallery() = viewModelScope.launch {
+        if (uiState.isLoadingNextPage) return@launch
+        Logger.i("loadPublicGallery")
+        uiState = uiState.copy(isLoadingNextPage = true)
+        try {
+            val generations =
+                UserGenerationsRepository.getPublicGallery(
+                    page = uiState.page, pageSize = 100, sortOrder = uiState.sort,
+                ).getOrThrow()
+            val newPhotos = generations.map { PublicUiState.Photo(it) }
+            uiState = uiState.copy(
+                loadingError = null,
+                photos = (uiState.photos + newPhotos).distinctBy { photo -> photo.id },
+                isLoadingNextPage = false,
+                isLoading = false,
+                page = uiState.page + 1,
+                pagingLimitReach = newPhotos.isEmpty(),
+                isRefreshing = false,
+            )
+        } catch (e: Exception) {
+            uiState = uiState.copy(isLoadingNextPage = false)
+            currentCoroutineContext().ensureActive()
+            Logger.e("loadPublicGallery failed", e)
+            uiState = uiState.copy(loadingError = e)
+        }
+    }
+
+    fun onRefreshPublicGallery() = viewModelScope.launch {
         if (uiState.isRefreshing) return@launch
+        Logger.i("refreshPublicGallery, sort: ${uiState.sort}")
+        when (uiState.sort) {
+            GenerationsSort.NEW -> loadLatestPublicGallerySortedByNew()
+            GenerationsSort.POPULAR -> {
+                uiState = uiState.copy(
+                    page = 1,
+                    isRefreshing = true,
+                    isLoadingNextPage = false,
+                )
+                loadPublicGallery()
+            }
+        }
+    }
+
+    fun loadLatestPublicGallerySortedByNew(silent: Boolean = false) = viewModelScope.launch {
         val latestCreatedAt = uiState.photos.firstOrNull()?.createdAt ?: return@launch
-        Logger.i("refreshPublicGallery, silent=$silent")
+        Logger.i("loadLatestPublicGallerySortedByNew, silent=$silent")
         if (!silent) uiState = uiState.copy(isRefreshing = true)
 
         try {
@@ -62,31 +104,6 @@ class PublicViewModel : AuthViewModel() {
         }
     }
 
-    fun loadPublicGallery() = viewModelScope.launch {
-        if (uiState.isLoadingNextPage) return@launch
-        Logger.i("loadPublicGallery")
-        uiState = uiState.copy(isLoadingNextPage = true)
-        try {
-            val generations =
-                UserGenerationsRepository.getPublicGallery(
-                    page = uiState.page, pageSize = 100, sortOrder = uiState.sort,
-                ).getOrThrow()
-            val newPhotos = generations.map { PublicUiState.Photo(it) }
-            uiState = uiState.copy(
-                loadingError = null,
-                photos = (uiState.photos + newPhotos).distinctBy { photo -> photo.id },
-                isLoadingNextPage = false,
-                isLoading = false,
-                page = uiState.page + 1,
-                pagingLimitReach = newPhotos.isEmpty(),
-            )
-        } catch (e: Exception) {
-            uiState = uiState.copy(isLoadingNextPage = false)
-            currentCoroutineContext().ensureActive()
-            Logger.e("loadPublicGallery failed", e)
-            uiState = uiState.copy(loadingError = e)
-        }
-    }
 
     fun hideErrorPopup() {
         uiState = uiState.copy(errorPopup = null)
