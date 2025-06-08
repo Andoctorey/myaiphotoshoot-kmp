@@ -20,3 +20,7 @@ data class UserGeneration(
         val columns = serializer().descriptor.elementNames.toList()
     }
 }
+
+enum class GenerationsSort {
+    NEW, POPULAR
+}

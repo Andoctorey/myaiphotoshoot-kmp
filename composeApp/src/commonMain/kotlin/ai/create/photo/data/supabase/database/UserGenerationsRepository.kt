@@ -1,15 +1,16 @@
 package ai.create.photo.data.supabase.database
 
 import ai.create.photo.data.supabase.Supabase
+import ai.create.photo.data.supabase.model.GenerationsSort
 import ai.create.photo.data.supabase.model.UserGeneration
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Order
 import io.github.vinceglb.filekit.core.FileKit
-import io.ktor.client.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.statement.readRawBytes
 import kotlinx.datetime.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
 
@@ -65,7 +66,8 @@ object UserGenerationsRepository {
     @OptIn(ExperimentalSerializationApi::class)
     suspend fun getPublicGallery(
         page: Int,
-        pageSize: Int
+        pageSize: Int,
+        sortOrder: GenerationsSort,
     ): Result<List<UserGeneration>> = runCatching {
         Logger.i("getPublicGallery, page: $page, pageSize: $pageSize")
         val from = ((page - 1) * pageSize).toLong()
@@ -76,6 +78,13 @@ object UserGenerationsRepository {
                 filter {
                     eq("status", "succeeded")
                     eq("is_public", true)
+                }
+                when (sortOrder) {
+                    GenerationsSort.NEW -> order(column = "created_at", order = Order.DESCENDING)
+                    GenerationsSort.POPULAR -> order(
+                        column = "popularity",
+                        order = Order.DESCENDING
+                    )
                 }
                 order(column = "created_at", order = Order.DESCENDING)
                 range(from, to)

@@ -67,7 +67,9 @@ class PublicViewModel : AuthViewModel() {
         uiState = uiState.copy(isLoadingNextPage = true)
         try {
             val generations =
-                UserGenerationsRepository.getPublicGallery(uiState.page, 100).getOrThrow()
+                UserGenerationsRepository.getPublicGallery(
+                    page = uiState.page, pageSize = 100, sortOrder = uiState.sort,
+                ).getOrThrow()
             val newPhotos = generations.map { PublicUiState.Photo(it) }
             uiState = uiState.copy(
                 loadingError = null,

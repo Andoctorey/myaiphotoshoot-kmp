@@ -1,5 +1,6 @@
 package ai.create.photo.ui.gallery.public
 
+import ai.create.photo.data.supabase.model.GenerationsSort
 import ai.create.photo.data.supabase.model.UserGeneration
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Immutable
@@ -10,6 +11,7 @@ data class PublicUiState(
     val isLoading: Boolean = true,
     val loadingError: Throwable? = null,
 
+    val sort: GenerationsSort = GenerationsSort.POPULAR,
     val photos: List<Photo> = emptyList(),
     val page: Int = 1,
     val isRefreshing: Boolean = false,
