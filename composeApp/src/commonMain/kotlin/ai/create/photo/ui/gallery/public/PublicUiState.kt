@@ -21,6 +21,7 @@ data class PublicUiState(
     val listState: LazyGridState = LazyGridState(),
 
     val showTooltipPopup: Boolean = false,
+    val showSortDropDownMenu: Boolean = false,
     val errorPopup: Throwable? = null,
 ) {
     @Immutable

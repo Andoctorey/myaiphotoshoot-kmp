@@ -1,5 +1,6 @@
 package ai.create.photo.ui.gallery.public
 
+import ai.create.photo.data.supabase.model.GenerationsSort
 import ai.create.photo.data.supabase.model.UserGeneration
 import ai.create.photo.platform.Platforms
 import ai.create.photo.platform.platform
@@ -14,12 +15,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.windowInsetsTopHeight
@@ -28,9 +32,17 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Stars
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SmallFloatingActionButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -42,6 +54,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import co.touchlab.kermit.Logger
@@ -53,6 +66,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
+import photocreateai.composeapp.generated.resources.newest_sort_order
+import photocreateai.composeapp.generated.resources.popular_sort_order
 import photocreateai.composeapp.generated.resources.upload_tooltip_popup_message
 import photocreateai.composeapp.generated.resources.upload_tooltip_popup_title
 
@@ -102,6 +117,19 @@ fun PublicScreen(
                 pagingLimitReach = state.pagingLimitReach,
                 onClick = { generate(Prompt(generationId = it.id, text = it.prompt, url = it.url)) }
             )
+
+            Box(
+                modifier = Modifier.align(Alignment.BottomEnd)
+                    .padding(bottom = 80.dp, end = 24.dp)
+                    .safeDrawingPadding(),
+            ) {
+                SortButton(
+                    showDropDown = state.showSortDropDownMenu,
+                    onToggleMenu = { viewModel.toggleSortDropDownMenu(it) },
+                    sort = state.sort,
+                    onSort = { viewModel.sort(it) },
+                )
+            }
         }
     }
 
@@ -236,4 +264,79 @@ private fun Photo(
             error = it.result.throwable
         },
     )
+}
+
+@Composable
+fun SortButton(
+    showDropDown: Boolean,
+    onToggleMenu: (Boolean) -> Unit,
+    sort: GenerationsSort,
+    onSort: (GenerationsSort) -> Unit,
+) {
+    SmallFloatingActionButton(
+        onClick = { onToggleMenu(true) },
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Default.Sort,
+            contentDescription = Icons.Default.AddAPhoto.name,
+        )
+    }
+
+    DropdownMenu(
+        expanded = showDropDown,
+        onDismissRequest = { onToggleMenu(false) },
+    ) {
+        DropdownMenuItem(
+            text = {
+                val name = stringResource(Res.string.popular_sort_order)
+                val color = if (sort == GenerationsSort.POPULAR)
+                    MaterialTheme.colorScheme.onPrimaryContainer
+                else MaterialTheme.colorScheme.onSecondaryContainer
+                Row {
+                    Icon(
+                        imageVector = Icons.Default.Stars,
+                        contentDescription = name,
+                        modifier = Modifier.padding(end = 8.dp),
+                        tint = color,
+                    )
+                    Text(
+                        text = name,
+                        color = color,
+                        fontWeight = if (sort == GenerationsSort.POPULAR)
+                            FontWeight.Bold else FontWeight.Normal,
+                    )
+                }
+            },
+            onClick = {
+                onSort(GenerationsSort.POPULAR)
+                onToggleMenu(false)
+            },
+        )
+        DropdownMenuItem(
+            text = {
+                val name = stringResource(Res.string.newest_sort_order)
+                val color = if (sort == GenerationsSort.NEW)
+                    MaterialTheme.colorScheme.onPrimaryContainer
+                else MaterialTheme.colorScheme.onSecondaryContainer
+                Row {
+                    Icon(
+                        imageVector = Icons.Default.AccessTime,
+                        contentDescription = name,
+                        modifier = Modifier.padding(end = 8.dp),
+                        tint = color,
+                    )
+                    Text(
+                        text = name,
+                        color = color,
+                        fontWeight = if (sort == GenerationsSort.NEW)
+                            FontWeight.Bold else FontWeight.Normal,
+                    )
+                }
+            },
+            onClick = {
+                onSort(GenerationsSort.NEW)
+                onToggleMenu(false)
+            },
+        )
+    }
 }

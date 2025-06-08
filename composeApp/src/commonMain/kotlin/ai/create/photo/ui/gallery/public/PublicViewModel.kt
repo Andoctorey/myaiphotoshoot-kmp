@@ -2,6 +2,7 @@ package ai.create.photo.ui.gallery.public
 
 import ai.create.photo.data.supabase.database.ProfilesRepository
 import ai.create.photo.data.supabase.database.UserGenerationsRepository
+import ai.create.photo.data.supabase.model.GenerationsSort
 import ai.create.photo.data.supabase.model.UserGeneration
 import ai.create.photo.ui.auth.AuthViewModel
 import androidx.compose.runtime.getValue
@@ -140,5 +141,16 @@ class PublicViewModel : AuthViewModel() {
             Logger.e("loadProfile failed", e)
             uiState = uiState.copy(errorPopup = e)
         }
+    }
+
+    fun toggleSortDropDownMenu(show: Boolean) {
+        uiState = uiState.copy(showSortDropDownMenu = show)
+    }
+
+    fun sort(sort: GenerationsSort) {
+        if (uiState.sort == sort) return
+        uiState =
+            uiState.copy(sort = sort, page = 1, photos = emptyList(), isLoadingNextPage = false)
+        loadPublicGallery()
     }
 }
