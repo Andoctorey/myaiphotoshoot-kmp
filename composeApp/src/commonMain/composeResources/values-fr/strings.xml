@@ -4,8 +4,6 @@
     <string name="tab_settings">Paramètres</string>
     <string name="back_button">Retour</string>
     <string name="add_your_photos">Télécharger des selfies (%1$s/20)</string>
-    <string name="upload_guidelines_title">Téléchargez vos selfies</string>
-    <string name="upload_guidelines_message">Utilisez votre appareil photo pour prendre 10 à 20 selfies en mode portrait. Ensuite, sélectionnez vos meilleures photos à télécharger pour une expérience IA personnalisée. Pour de meilleurs résultats, variez vos angles et expressions à chaque prise, ou ajoutez quelques-unes de vos photos préférées que vous partagez déjà sur les réseaux sociaux.</string>
     <string name="creations_placeholder">Créez des milliers de photos époustouflantes de vous-même à partager sur les réseaux sociaux !</string>
     <string name="connection_error">Nous avons des problèmes de connexion. Veuillez vérifier votre connexion internet et réessayer.</string>
     <string name="upload_more_photos">Oups ! Veuillez ajouter au moins 10 selfies pour que nous puissions commencer à entraîner votre modèle IA.</string>

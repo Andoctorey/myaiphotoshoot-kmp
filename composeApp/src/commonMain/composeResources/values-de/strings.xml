@@ -4,8 +4,6 @@
     <string name="tab_settings">Einstellungen</string>
     <string name="back_button">Zurück</string>
     <string name="add_your_photos">Selfies hochladen (%1$s/20)</string>
-    <string name="upload_guidelines_title">Lade deine Selfies hoch</string>
-    <string name="upload_guidelines_message">Verwende deine Kamera-App, um 10-20 Selfies im Hochformat aufzunehmen. Wähle dann deine besten Aufnahmen aus und lade sie für ein personalisiertes KI-Erlebnis hoch. Für beste Ergebnisse variiere deine Winkel und Gesichtsausdrücke bei jeder Aufnahme oder füge einige deiner Lieblingsfotos hinzu, die du bereits in sozialen Medien teilst.</string>
     <string name="creations_placeholder">Erstelle tausende atemberaubende Fotos von dir selbst zum Teilen in sozialen Medien!</string>
     <string name="connection_error">Wir haben Verbindungsprobleme. Bitte überprüfe deine Internetverbindung und versuche es erneut.</string>
     <string name="upload_more_photos">Ups! Bitte füge mindestens 10 Selfies hinzu, damit wir dein KI-Modell trainieren können.</string>

@@ -4,8 +4,6 @@
     <string name="tab_settings">設定</string>
     <string name="back_button">戻る</string>
     <string name="add_your_photos">セルフィーをアップロード (%1$s/20)</string>
-    <string name="upload_guidelines_title">セルフィーをアップロード</string>
-    <string name="upload_guidelines_message">カメラアプリを使ってポートレートモードで10〜20枚のセルフィーを撮影してください。その後、パーソナライズされたAI体験のために最高の写真を選んでアップロードしてください。最良の結果を得るために、ショットごとに角度や表情を変えたり、既にソーシャルメディアでシェアしているお気に入りの写真を追加してください。</string>
     <string name="creations_placeholder">ソーシャルメディアでシェアするための何千もの素晴らしい写真を作成しましょう！</string>
     <string name="connection_error">接続に問題があります。インターネット接続を確認して、もう一度お試しください。</string>
     <string name="upload_more_photos">おっと！AIモデルのトレーニングを開始するために、少なくとも10枚のセルフィーを追加してください。</string>

@@ -4,8 +4,6 @@
     <string name="tab_settings">सेटिंग्स</string>
     <string name="back_button">वापस</string>
     <string name="add_your_photos">सेल्फी अपलोड करें (%1$s/20)</string>
-    <string name="upload_guidelines_title">अपनी सेल्फी अपलोड करें</string>
-    <string name="upload_guidelines_message">पोर्ट्रेट मोड में 10-20 सेल्फी लेने के लिए अपने कैमरा ऐप का उपयोग करें। फिर, व्यक्तिगत AI अनुभव के लिए अपनी बेहतरीन तस्वीरें अपलोड करें। बेहतर परिणामों के लिए, हर शॉट के साथ अपने कोण और भावनाओं को बदलें, या अपनी पसंदीदा तस्वीरें जोड़ें जो आप पहले से ही सोशल मीडिया पर साझा करते हैं।</string>
     <string name="creations_placeholder">सोशल मीडिया पर साझा करने के लिए अपनी हजारों शानदार तस्वीरें बनाएं!</string>
     <string name="connection_error">हमें कनेक्ट करने में समस्या हो रही है। कृपया अपना इंटरनेट कनेक्शन जांचें और फिर से कोशिश करें।</string>
     <string name="upload_more_photos">ओह! कृपया कम से कम 10 सेल्फी जोड़ें ताकि हम आपके AI मॉडल को प्रशिक्षित करना शुरू कर सकें।</string>

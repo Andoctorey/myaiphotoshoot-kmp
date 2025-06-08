@@ -4,8 +4,7 @@
     <string name="tab_settings">Settings</string>
     <string name="back_button">Back</string>
     <string name="add_your_photos">Upload Selfies (%1$s/20)</string>
-    <string name="upload_guidelines_title">Upload Your Selfies</string>
-    <string name="upload_guidelines_message">Use your camera app to snap 10-20 selfies in portrait mode. Then, select your best shots to upload for a personalized AI experience. For best results, vary your angles and expressions with each shot, or mix in some of your favorite photos you already share on social media.</string>
+    <string name="upload_guidelines">Upload 10-20 varied selfies\n(portrait mode recommended)\nor favorite existing photos.</string>
     <string name="creations_placeholder">Create thousands of stunning photos of yourself to share in socials!</string>
     <string name="connection_error">We're having trouble connecting. Please check your internet connection and try again.</string>
     <string name="upload_more_photos">Oops! Please add at least 10 selfies so we can start training your AI model.</string>

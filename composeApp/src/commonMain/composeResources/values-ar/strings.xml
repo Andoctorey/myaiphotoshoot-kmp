@@ -4,8 +4,6 @@
     <string name="tab_settings">الإعدادات</string>
     <string name="back_button">رجوع</string>
     <string name="add_your_photos">رفع السيلفي (%1$s/20)</string>
-    <string name="upload_guidelines_title">ارفع صور السيلفي الخاصة بك</string>
-    <string name="upload_guidelines_message">استخدم تطبيق الكاميرا لالتقاط 10-20 صورة سيلفي في الوضع العمودي. ثم اختر أفضل لقطاتك لرفعها للحصول على تجربة ذكاء اصطناعي مخصصة. للحصول على أفضل النتائج، نوّع زواياك وتعبيراتك مع كل لقطة، أو أضف بعضاً من صورك المفضلة التي تشاركها بالفعل على وسائل التواصل الاجتماعي.</string>
     <string name="creations_placeholder">أنشئ آلاف الصور المذهلة لنفسك للمشاركة على وسائل التواصل الاجتماعي!</string>
     <string name="connection_error">نواجه مشكلة في الاتصال. يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى.</string>
     <string name="upload_more_photos">عذراً! يرجى إضافة 10 صور سيلفي على الأقل حتى نتمكن من بدء تدريب نموذج الذكاء الاصطناعي الخاص بك.</string>

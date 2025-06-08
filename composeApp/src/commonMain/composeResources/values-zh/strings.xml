@@ -4,8 +4,6 @@
     <string name="tab_settings">设置</string>
     <string name="back_button">返回</string>
     <string name="add_your_photos">上传自拍 (%1$s/20)</string>
-    <string name="upload_guidelines_title">上传您的自拍照</string>
-    <string name="upload_guidelines_message">使用相机应用在竖屏模式下拍摄10-20张自拍照。然后选择最佳照片上传，享受个性化AI体验。为获得最佳效果，请在每次拍摄时变换角度和表情，或添加一些您已经在社交媒体上分享的喜爱照片。</string>
     <string name="creations_placeholder">创建数千张精美的个人照片，在社交媒体上分享！</string>
     <string name="connection_error">连接遇到问题。请检查网络连接后重试。</string>
     <string name="upload_more_photos">抱歉！请至少添加10张自拍照，这样我们才能开始训练您的AI模型。</string>

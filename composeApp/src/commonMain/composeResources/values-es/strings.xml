@@ -4,8 +4,6 @@
     <string name="tab_settings">Configuración</string>
     <string name="back_button">Atrás</string>
     <string name="add_your_photos">Subir Selfies (%1$s/20)</string>
-    <string name="upload_guidelines_title">Sube tus Selfies</string>
-    <string name="upload_guidelines_message">Usa tu aplicación de cámara para tomar 10-20 selfies en modo retrato. Luego, selecciona tus mejores fotos para subirlas y disfrutar de una experiencia personalizada con IA. Para mejores resultados, varía tus ángulos y expresiones en cada toma, o agrega algunas de tus fotos favoritas que ya compartes en redes sociales.</string>
     <string name="creations_placeholder">¡Crea miles de fotos impresionantes de ti mismo para compartir en redes sociales!</string>
     <string name="connection_error">Tenemos problemas para conectar. Por favor revisa tu conexión a internet e inténtalo de nuevo.</string>
     <string name="upload_more_photos">¡Ups! Por favor agrega al menos 10 selfies para que podamos empezar a entrenar tu modelo de IA.</string>
