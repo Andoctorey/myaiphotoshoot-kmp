@@ -24,3 +24,7 @@ data class UserGeneration(
 enum class GenerationsSort {
     NEW, POPULAR
 }
+
+enum class GenerationsFilter {
+    ALL, PUBLIC
+}

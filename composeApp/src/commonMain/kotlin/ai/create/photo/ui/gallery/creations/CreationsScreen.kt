@@ -1,5 +1,6 @@
 package ai.create.photo.ui.gallery.creations
 
+import ai.create.photo.data.supabase.model.GenerationsFilter
 import ai.create.photo.data.supabase.model.UserGeneration
 import ai.create.photo.platform.Platforms
 import ai.create.photo.platform.platform
@@ -16,6 +17,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
@@ -36,12 +38,16 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.DownloadDone
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -51,6 +57,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -63,6 +70,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -78,6 +86,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
+import photocreateai.composeapp.generated.resources.all_filter
 import photocreateai.composeapp.generated.resources.cancel
 import photocreateai.composeapp.generated.resources.copy_link
 import photocreateai.composeapp.generated.resources.creations_placeholder
@@ -88,6 +97,7 @@ import photocreateai.composeapp.generated.resources.link_copied
 import photocreateai.composeapp.generated.resources.make_private
 import photocreateai.composeapp.generated.resources.make_public
 import photocreateai.composeapp.generated.resources.prompt
+import photocreateai.composeapp.generated.resources.public_filter
 import photocreateai.composeapp.generated.resources.share
 
 
@@ -154,6 +164,19 @@ fun CreationsScreen(
                 onDelete = viewModel::delete,
                 onPrompt = generate,
             )
+
+            Box(
+                modifier = Modifier.align(Alignment.BottomEnd)
+                    .padding(bottom = 80.dp, end = 24.dp)
+                    .safeDrawingPadding(),
+            ) {
+                Filter(
+                    showDropDown = state.showFilterDropDownMenu,
+                    onToggleMenu = { viewModel.toggleFilterDropDownMenu(it) },
+                    filter = state.filter,
+                    onFilter = { viewModel.filter(it) },
+                )
+            }
         }
     }
 
@@ -486,5 +509,80 @@ private fun PhotoDropMenu(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun Filter(
+    showDropDown: Boolean,
+    onToggleMenu: (Boolean) -> Unit,
+    filter: GenerationsFilter,
+    onFilter: (GenerationsFilter) -> Unit,
+) {
+    SmallFloatingActionButton(
+        onClick = { onToggleMenu(true) },
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Default.Sort,
+            contentDescription = Icons.Default.AddAPhoto.name,
+        )
+    }
+
+    DropdownMenu(
+        expanded = showDropDown,
+        onDismissRequest = { onToggleMenu(false) },
+    ) {
+        DropdownMenuItem(
+            text = {
+                val name = stringResource(Res.string.all_filter)
+                val color = if (filter == GenerationsFilter.ALL)
+                    MaterialTheme.colorScheme.onPrimaryContainer
+                else MaterialTheme.colorScheme.onSecondaryContainer
+                Row {
+                    Icon(
+                        imageVector = Icons.Default.PhotoLibrary,
+                        contentDescription = name,
+                        modifier = Modifier.padding(end = 8.dp),
+                        tint = color,
+                    )
+                    Text(
+                        text = name,
+                        color = color,
+                        fontWeight = if (filter == GenerationsFilter.ALL)
+                            FontWeight.Bold else FontWeight.Normal,
+                    )
+                }
+            },
+            onClick = {
+                onFilter(GenerationsFilter.ALL)
+                onToggleMenu(false)
+            },
+        )
+        DropdownMenuItem(
+            text = {
+                val name = stringResource(Res.string.public_filter)
+                val color = if (filter == GenerationsFilter.PUBLIC)
+                    MaterialTheme.colorScheme.onPrimaryContainer
+                else MaterialTheme.colorScheme.onSecondaryContainer
+                Row {
+                    Icon(
+                        imageVector = Icons.Default.Public,
+                        contentDescription = name,
+                        modifier = Modifier.padding(end = 8.dp),
+                        tint = color,
+                    )
+                    Text(
+                        text = name,
+                        color = color,
+                        fontWeight = if (filter == GenerationsFilter.PUBLIC)
+                            FontWeight.Bold else FontWeight.Normal,
+                    )
+                }
+            },
+            onClick = {
+                onFilter(GenerationsFilter.PUBLIC)
+                onToggleMenu(false)
+            },
+        )
     }
 }

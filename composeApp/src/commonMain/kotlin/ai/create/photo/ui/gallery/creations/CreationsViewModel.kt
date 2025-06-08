@@ -3,6 +3,7 @@ package ai.create.photo.ui.gallery.creations
 import ai.create.photo.data.supabase.SupabaseStorage
 import ai.create.photo.data.supabase.database.UserFilesRepository
 import ai.create.photo.data.supabase.database.UserGenerationsRepository
+import ai.create.photo.data.supabase.model.GenerationsFilter
 import ai.create.photo.platform.openUrl
 import ai.create.photo.ui.auth.AuthViewModel
 import androidx.compose.runtime.getValue
@@ -50,7 +51,7 @@ class CreationsViewModel : AuthViewModel() {
 
         try {
             val generations = UserGenerationsRepository
-                .getCreationsAfter(userId, latestCreatedAt)
+                .getCreationsAfter(userId, latestCreatedAt, uiState.filter)
                 .getOrThrow()
 
             val newPhotos = generations.map { CreationsUiState.Photo(it) }
@@ -74,7 +75,12 @@ class CreationsViewModel : AuthViewModel() {
         uiState = uiState.copy(isLoadingNextPage = true)
         try {
             val generations =
-                UserGenerationsRepository.getCreations(userId, uiState.page, 15).getOrThrow()
+                UserGenerationsRepository.getCreations(
+                    userId = userId,
+                    page = uiState.page,
+                    pageSize = 15,
+                    filter = uiState.filter
+                ).getOrThrow()
             val newPhotos = generations.map { CreationsUiState.Photo(it) }
 
             uiState = uiState.copy(
@@ -159,4 +165,17 @@ class CreationsViewModel : AuthViewModel() {
         uiState = uiState.copy(errorPopup = null)
     }
 
+    fun toggleFilterDropDownMenu(show: Boolean) {
+        uiState = uiState.copy(showFilterDropDownMenu = show)
+    }
+
+    fun filter(filter: GenerationsFilter) {
+        if (uiState.filter == filter) return
+        uiState =
+            uiState.copy(
+                filter = filter, page = 1, photos = emptyList(),
+                isLoading = true, isLoadingNextPage = false
+            )
+        loadCreations()
+    }
 }

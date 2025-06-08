@@ -1,6 +1,7 @@
 package ai.create.photo.data.supabase.database
 
 import ai.create.photo.data.supabase.Supabase
+import ai.create.photo.data.supabase.model.GenerationsFilter
 import ai.create.photo.data.supabase.model.GenerationsSort
 import ai.create.photo.data.supabase.model.UserGeneration
 import co.touchlab.kermit.Logger
@@ -22,7 +23,8 @@ object UserGenerationsRepository {
     suspend fun getCreations(
         userId: String,
         page: Int,
-        pageSize: Int
+        pageSize: Int,
+        filter: GenerationsFilter,
     ): Result<List<UserGeneration>> = runCatching {
         Logger.i("getCreations, page: $page, pageSize: $pageSize")
         val from = ((page - 1) * pageSize).toLong()
@@ -33,6 +35,10 @@ object UserGenerationsRepository {
                 filter {
                     eq("user_id", userId)
                     eq("status", "succeeded")
+                    when (filter) {
+                        GenerationsFilter.ALL -> {}
+                        GenerationsFilter.PUBLIC -> eq("is_public", true)
+                    }
                 }
                 order(column = "created_at", order = Order.DESCENDING)
                 range(from, to)
@@ -44,6 +50,7 @@ object UserGenerationsRepository {
     suspend fun getCreationsAfter(
         userId: String,
         latestCreatedAt: Instant?,
+        filter: GenerationsFilter,
     ): Result<List<UserGeneration>> = runCatching {
         Logger.i("getCreationsAfter $latestCreatedAt")
         Supabase.supabase
@@ -52,6 +59,10 @@ object UserGenerationsRepository {
                 filter {
                     eq("user_id", userId)
                     eq("status", "succeeded")
+                    when (filter) {
+                        GenerationsFilter.ALL -> {}
+                        GenerationsFilter.PUBLIC -> eq("is_public", true)
+                    }
                     if (latestCreatedAt != null) {
                         gt("created_at", latestCreatedAt)
                     }

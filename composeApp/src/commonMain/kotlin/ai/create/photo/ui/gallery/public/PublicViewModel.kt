@@ -167,7 +167,10 @@ class PublicViewModel : AuthViewModel() {
     fun sort(sort: GenerationsSort) {
         if (uiState.sort == sort) return
         uiState =
-            uiState.copy(sort = sort, page = 1, photos = emptyList(), isLoadingNextPage = false)
+            uiState.copy(
+                sort = sort, page = 1, photos = emptyList(),
+                isLoadingNextPage = false, isLoading = true,
+            )
         loadPublicGallery()
     }
 }

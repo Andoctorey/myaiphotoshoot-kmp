@@ -1,5 +1,6 @@
 package ai.create.photo.ui.gallery.creations
 
+import ai.create.photo.data.supabase.model.GenerationsFilter
 import ai.create.photo.data.supabase.model.UserGeneration
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Immutable
@@ -10,6 +11,7 @@ data class CreationsUiState(
     val isLoading: Boolean = true,
     val loadingError: Throwable? = null,
 
+    val filter: GenerationsFilter = GenerationsFilter.ALL,
     val photos: List<Photo> = emptyList(),
     val isRefreshing: Boolean = false,
     val isLoadingNextPage: Boolean = false,
@@ -19,9 +21,8 @@ data class CreationsUiState(
     val listState: LazyGridState = LazyGridState(),
     val scrollToTop: Boolean = false,
 
+    val showFilterDropDownMenu: Boolean = false,
     val errorPopup: Throwable? = null,
-
-
 ) {
     @Immutable
     data class Photo(

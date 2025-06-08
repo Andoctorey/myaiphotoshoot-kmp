@@ -82,4 +82,6 @@
     <string name="thank_you_for_purchase">Thank you for your purchase! Your balance will be updated shortly.</string>
     <string name="popular_sort_order">Popular</string>
     <string name="newest_sort_order">Newest</string>
+    <string name="all_filter">All</string>
+    <string name="public_filter">Public</string>
 </resources>
