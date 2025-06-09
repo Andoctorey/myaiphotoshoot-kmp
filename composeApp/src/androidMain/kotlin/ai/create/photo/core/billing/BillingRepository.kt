@@ -232,12 +232,20 @@ object BillingRepository : PurchasesUpdatedListener {
 
 suspend fun BillingClient.connect(): BillingResult = suspendCoroutine { continuation ->
     startConnection(object : BillingClientStateListener {
+        var isResumed = false
+
         override fun onBillingSetupFinished(billingResult: BillingResult) {
-            continuation.resume(billingResult)
+            if (!isResumed) {
+                isResumed = true
+                continuation.resume(billingResult)
+            }
         }
 
         override fun onBillingServiceDisconnected() {
-            continuation.resumeWithException(Exception("Service disconnected"))
+            if (!isResumed) {
+                isResumed = true
+                continuation.resumeWithException(Exception("Service disconnected"))
+            }
         }
     })
 }
