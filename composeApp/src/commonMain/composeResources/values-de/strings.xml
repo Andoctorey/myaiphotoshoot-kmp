@@ -4,7 +4,6 @@
     <string name="tab_settings">Einstellungen</string>
     <string name="back_button">Zurück</string>
     <string name="add_your_photos">Selfies hochladen (%1$s/20)</string>
-    <string name="creations_placeholder">Erstelle tausende atemberaubende Fotos von dir selbst zum Teilen in sozialen Medien!</string>
     <string name="connection_error">Wir haben Verbindungsprobleme. Bitte überprüfe deine Internetverbindung und versuche es erneut.</string>
     <string name="upload_more_photos">Ups! Bitte füge mindestens 10 Selfies hinzu, damit wir dein KI-Modell trainieren können.</string>
     <string name="delete_some_photos">Zu viele Selfies! Für beste Ergebnisse behalte nicht mehr als 20 Fotos.</string>

@@ -12,6 +12,7 @@ import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.compose.PullToRefreshBoxNoDesktop
 import ai.create.photo.ui.generate.Prompt
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +28,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -71,7 +73,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -83,6 +84,7 @@ import coil3.request.crossfade
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
@@ -193,14 +195,23 @@ private fun Placeholder(modifier: Modifier = Modifier, onClick: () -> Unit) {
         modifier = modifier
             .verticalScroll(rememberScrollState())
             .safeDrawingPadding()
+            .widthIn(max = 600.dp)
             .padding(start = 24.dp, end = 24.dp, top = 48.dp, bottom = 160.dp)
             .clickable(onClick = onClick),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+
         Text(
             text = stringResource(Res.string.creations_placeholder),
-            fontSize = 18.sp,
-            textAlign = TextAlign.Center,
+            fontSize = 16.sp,
+        )
+
+        Image(
+            modifier = Modifier.fillMaxWidth(),
+            painter = painterResource(resource = Res.drawable.creations_placeholder),
+            contentDescription = stringResource(Res.string.creations_placeholder),
+            contentScale = ContentScale.Fit,
         )
     }
 }

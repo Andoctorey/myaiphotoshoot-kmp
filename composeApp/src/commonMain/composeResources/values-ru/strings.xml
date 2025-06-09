@@ -4,7 +4,6 @@
     <string name="tab_settings">Настройки</string>
     <string name="back_button">Назад</string>
     <string name="add_your_photos">Загрузить селфи (%1$s/20)</string>
-    <string name="creations_placeholder">Создавайте тысячи потрясающих фотографий себя для публикации в социальных сетях!</string>
     <string name="connection_error">У нас проблемы с подключением. Пожалуйста, проверьте интернет-соединение и попробуйте снова.</string>
     <string name="upload_more_photos">Упс! Пожалуйста, добавьте минимум 10 селфи, чтобы мы смогли начать обучение вашей ИИ модели.</string>
     <string name="delete_some_photos">Слишком много селфи! Для лучших результатов оставьте не более 20 фотографий.</string>
