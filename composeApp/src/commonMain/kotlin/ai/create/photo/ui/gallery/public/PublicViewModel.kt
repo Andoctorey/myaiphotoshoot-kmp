@@ -111,6 +111,7 @@ class PublicViewModel : AuthViewModel() {
 
     fun addPhotoToPublicGallery(generations: List<UserGeneration>) {
         if (generations.isEmpty()) return
+        if (uiState.sort != GenerationsSort.NEW) return
         val newPhotos = generations.map { generation ->
             PublicUiState.Photo(generation)
         }
