@@ -9,7 +9,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
@@ -53,7 +52,8 @@ class BalanceViewModel : AuthViewModel() {
             )
         } catch (e: Exception) {
             uiState = uiState.copy(isApplyingPromoCode = false)
-            currentCoroutineContext().ensureActive()
+            ensureActive()
+            if (isAuthenticated) return@launch
             Logger.e("applyPromoCode failed", e)
             uiState = uiState.copy(errorPopup = e)
         }

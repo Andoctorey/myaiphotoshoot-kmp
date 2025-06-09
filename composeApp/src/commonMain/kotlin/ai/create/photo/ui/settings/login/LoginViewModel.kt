@@ -12,7 +12,6 @@ import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.exception.AuthRestException
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 
@@ -67,7 +66,8 @@ class LoginViewModel : AuthViewModel() {
             uiState = uiState.copy(isSendingOtp = false, enterOtp = true)
         } catch (e: Exception) {
             uiState = uiState.copy(isSendingOtp = false)
-            currentCoroutineContext().ensureActive()
+            ensureActive()
+            if (!isAuthenticated) return@launch
             Logger.e("sendOtp failed", e)
             uiState = uiState.copy(errorPopup = e)
         }
@@ -94,7 +94,8 @@ class LoginViewModel : AuthViewModel() {
                 return@launch
             }
             uiState = uiState.copy(isVerifyingOtp = false)
-            currentCoroutineContext().ensureActive()
+            ensureActive()
+            if (!isAuthenticated) return@launch
             Logger.e("verifyOtp failed", e)
             uiState = uiState.copy(errorPopup = e)
         }
@@ -132,7 +133,8 @@ class LoginViewModel : AuthViewModel() {
             uiState = uiState.copy(dataDeletedPopup = true)
         } catch (e: Exception) {
             uiState = uiState.copy(isLoading = false)
-            currentCoroutineContext().ensureActive()
+            ensureActive()
+            if (!isAuthenticated) return@launch
             Logger.e("deleteAllData failed", e)
             uiState = uiState.copy(errorPopup = e)
         }

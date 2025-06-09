@@ -13,7 +13,6 @@ import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import io.github.vinceglb.filekit.core.PlatformFile
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
@@ -69,7 +68,8 @@ class GenerateViewModel : AuthViewModel() {
             selectTraining(training)
         } catch (e: Exception) {
             uiState = uiState.copy(isLoading = false)
-            currentCoroutineContext().ensureActive()
+            ensureActive()
+            if (!isAuthenticated) return@launch
             Logger.e("Load training failed", e)
             uiState = uiState.copy(loadingError = e)
         }
@@ -155,9 +155,11 @@ class GenerateViewModel : AuthViewModel() {
                         uiState.parentGenerationId, uiState.photosToGenerateX100 / 100
                     )
                 } catch (e: Exception) {
-                    currentCoroutineContext().ensureActive()
-                    Logger.e("Update description failed", e)
-                    uiState = uiState.copy(errorPopup = e)
+                    ensureActive()
+                    if (isAuthenticated) {
+                        Logger.e("Update description failed", e)
+                        uiState = uiState.copy(errorPopup = e)
+                    }
                 }
             }
             uiState = uiState.copy(showOpenCreations = true, userPrompt = "", promptBgUrl = null)
@@ -179,7 +181,8 @@ class GenerateViewModel : AuthViewModel() {
 
         } catch (e: Exception) {
             uiState = uiState.copy(isLoadingPersonDescription = false)
-            currentCoroutineContext().ensureActive()
+            ensureActive()
+            if (!isAuthenticated) return@launch
             Logger.e("onRefreshAiVisionPrompt failed", e)
             uiState = uiState.copy(errorPopup = e)
         }
@@ -202,7 +205,8 @@ class GenerateViewModel : AuthViewModel() {
             val training = uiState.trainings?.find { it.id == trainingId }
             selectTraining(training)
         } catch (e: Exception) {
-            currentCoroutineContext().ensureActive()
+            ensureActive()
+            if (!isAuthenticated) return@launch
             Logger.e("loadProfile failed", e)
             uiState = uiState.copy(errorPopup = e)
         }
@@ -223,7 +227,8 @@ class GenerateViewModel : AuthViewModel() {
             )
         } catch (e: Exception) {
             uiState = uiState.copy(isLoadingSurpriseMe = false)
-            currentCoroutineContext().ensureActive()
+            ensureActive()
+            if (!isAuthenticated) return@launch
             Logger.e("surpriseMe failed", e)
             uiState = uiState.copy(errorPopup = e)
         }
@@ -256,7 +261,8 @@ class GenerateViewModel : AuthViewModel() {
                     )
                     ProfilesRepository.updateProfilePreference(userId, preferences)
                 } catch (e: Exception) {
-                    currentCoroutineContext().ensureActive()
+                    ensureActive()
+                    if (!isAuthenticated) return@launch
                     Logger.e("selectTraining failed", e)
                     uiState = uiState.copy(errorPopup = e)
                 }
@@ -281,10 +287,11 @@ class GenerateViewModel : AuthViewModel() {
                 )
                 ProfilesRepository.updateProfilePreference(userId, preferences)
             } catch (e: Exception) {
-                currentCoroutineContext().ensureActive()
+                uiState = uiState.copy(photosToGenerateX100 = originalPhotosToGenerate)
+                ensureActive()
+                if (!isAuthenticated) return@launch
                 Logger.e("onPhotosToGenerateChanged failed", e)
-                uiState =
-                    uiState.copy(photosToGenerateX100 = originalPhotosToGenerate, errorPopup = e)
+                uiState = uiState.copy(errorPopup = e)
             }
         }
     }
@@ -303,7 +310,8 @@ class GenerateViewModel : AuthViewModel() {
                 uiState.copy(userPrompt = prompt, promptBgUrl = null, isEnhancingPrompt = false)
         } catch (e: Exception) {
             uiState = uiState.copy(isEnhancingPrompt = false)
-            currentCoroutineContext().ensureActive()
+            ensureActive()
+            if (!isAuthenticated) return@launch
             Logger.e("enhancePrompt failed", e)
             uiState = uiState.copy(errorPopup = e)
         }
@@ -325,7 +333,8 @@ class GenerateViewModel : AuthViewModel() {
             uiState = uiState.copy(userPrompt = prompt, isLoadingPictureToPrompt = false)
         } catch (e: Exception) {
             uiState = uiState.copy(isLoadingPictureToPrompt = false)
-            currentCoroutineContext().ensureActive()
+            ensureActive()
+            if (!isAuthenticated) return@launch
             Logger.e("pictureToPrompt failed", e)
             uiState = uiState.copy(errorPopup = e)
         }
@@ -350,7 +359,8 @@ class GenerateViewModel : AuthViewModel() {
             uiState = uiState.copy(userPrompt = translated, isTranslating = false)
         } catch (e: Exception) {
             uiState = uiState.copy(isTranslating = false)
-            currentCoroutineContext().ensureActive()
+            ensureActive()
+            if (!isAuthenticated) return@launch
             Logger.e("translate failed", e)
             uiState = uiState.copy(errorPopup = e)
         }

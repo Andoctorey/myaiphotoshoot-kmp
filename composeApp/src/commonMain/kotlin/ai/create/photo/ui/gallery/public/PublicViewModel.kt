@@ -10,7 +10,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 
@@ -58,7 +57,8 @@ class PublicViewModel : AuthViewModel() {
             )
         } catch (e: Exception) {
             uiState = uiState.copy(isLoadingNextPage = false)
-            currentCoroutineContext().ensureActive()
+            ensureActive()
+            if (!isAuthenticated) return@launch
             Logger.e("loadPublicGallery failed", e)
             uiState = uiState.copy(loadingError = e)
         }
@@ -98,7 +98,8 @@ class PublicViewModel : AuthViewModel() {
             )
         } catch (e: Exception) {
             uiState = uiState.copy(isRefreshing = false)
-            currentCoroutineContext().ensureActive()
+            ensureActive()
+            if (!isAuthenticated) return@launch
             Logger.e("refreshPublicGallery failed", e)
             uiState = uiState.copy(errorPopup = e)
         }
@@ -139,7 +140,8 @@ class PublicViewModel : AuthViewModel() {
                     preferences = preferences.copy(publicTooltipShown = true)
                     ProfilesRepository.updateProfilePreference(userId, preferences)
                 } catch (e: Exception) {
-                    currentCoroutineContext().ensureActive()
+                    ensureActive()
+                    if (!isAuthenticated) return@launch
                     Logger.e("toggleTooltipPopup failed", e)
                 }
             }
@@ -155,7 +157,8 @@ class PublicViewModel : AuthViewModel() {
             val publicTooltipShown = preferences?.publicTooltipShown != true
             if (publicTooltipShown) toggleTooltipPopup(true)
         } catch (e: Exception) {
-            currentCoroutineContext().ensureActive()
+            ensureActive()
+            if (!isAuthenticated) return@launch
             Logger.e("loadProfile failed", e)
             uiState = uiState.copy(errorPopup = e)
         }

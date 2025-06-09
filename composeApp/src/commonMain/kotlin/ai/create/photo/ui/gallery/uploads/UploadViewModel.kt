@@ -76,7 +76,8 @@ class UploadViewModel : AuthViewModel() {
             loadTraining()
         } catch (e: Exception) {
             uiState = uiState.copy(isLoadingPhotos = false)
-            currentCoroutineContext().ensureActive()
+            ensureActive()
+            if (!isAuthenticated) return@launch
             Logger.e("loadPhotos failed", e)
             uiState = uiState.copy(loadingError = e)
         }
@@ -126,9 +127,11 @@ class UploadViewModel : AuthViewModel() {
             SupabaseStorage.deleteFile("${user?.id}/$UPLOADS/${photo.name}")
             UserFilesRepository.deleteFile(photo.id)
         } catch (e: Exception) {
-            currentCoroutineContext().ensureActive()
+            uiState = uiState.copy(photos = photos)
+            ensureActive()
+            if (!isAuthenticated) return@launch
             Logger.e("deletePhoto failed, $photo", e)
-            uiState = uiState.copy(photos = photos, errorPopup = e)
+            uiState = uiState.copy(errorPopup = e)
         }
     }
 
@@ -162,9 +165,11 @@ class UploadViewModel : AuthViewModel() {
             uiState = uiState.copy(analyzingPhotos = 0, showAnalysisForAll = true)
             loadPhotos()
         } catch (e: Exception) {
-            currentCoroutineContext().ensureActive()
+            uiState = uiState.copy(analyzingPhotos = 0)
+            ensureActive()
+            if (!isAuthenticated) return@launch
             Logger.e("analyzePhotos failed", e)
-            uiState = uiState.copy(analyzingPhotos = 0, errorPopup = e)
+            uiState = uiState.copy(errorPopup = e)
         }
     }
 
@@ -219,9 +224,11 @@ class UploadViewModel : AuthViewModel() {
             SupabaseStorage.deleteFiles(badPhotos.map { "${user?.id}/$UPLOADS/${it.name}" })
             loadPhotos()
         } catch (e: Exception) {
-            currentCoroutineContext().ensureActive()
+            uiState = uiState.copy(photos = photos)
+            ensureActive()
+            if (!isAuthenticated) return@launch
             Logger.e("Delete unsuitable photos failed", e)
-            uiState = uiState.copy(errorPopup = e, photos = photos)
+            uiState = uiState.copy(photos = photos)
         }
     }
 
@@ -244,12 +251,14 @@ class UploadViewModel : AuthViewModel() {
             SupabaseFunction.trainAiModel(steps)
             loadTraining()
         } catch (e: Exception) {
-            currentCoroutineContext().ensureActive()
+            uiState = uiState.copy(trainingStatus = null)
+            ensureActive()
+            if (!isAuthenticated) return@launch
             Logger.e("trainAiModel failed", e)
-            if (e.message?.contains("Insufficient funds") == true) {
-                uiState = uiState.copy(trainingStatus = null, topUpErrorPopup = e)
+            uiState = if (e.message?.contains("Insufficient funds") == true) {
+                uiState.copy(topUpErrorPopup = e)
             } else {
-                uiState = uiState.copy(trainingStatus = null, errorPopup = e)
+                uiState.copy(errorPopup = e)
             }
         }
     }
@@ -283,14 +292,17 @@ class UploadViewModel : AuthViewModel() {
             )
         } catch (e: Exception) {
             uiState = uiState.copy(isLoadingTraining = false)
-            currentCoroutineContext().ensureActive()
-            Logger.e("loadTraining failed", e)
-            uiState = uiState.copy(errorPopup = e)
+            ensureActive()
+            if (isAuthenticated) {
+                Logger.e("loadTraining failed", e)
+                uiState = uiState.copy(errorPopup = e)
+            }
         }
 
         if (uiState.trainingStatus == TrainingStatus.PROCESSING) {
             delay(100 * 1000)
             ensureActive()
+            if (!isAuthenticated) return@launch
             if (uiState.isLoadingPhotos) return@launch
             loadTraining()
         }

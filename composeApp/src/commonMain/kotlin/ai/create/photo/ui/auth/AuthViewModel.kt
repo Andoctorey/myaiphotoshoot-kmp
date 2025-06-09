@@ -11,7 +11,6 @@ import co.touchlab.kermit.Logger
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.RefreshFailureCause
 import io.github.jan.supabase.auth.status.SessionStatus
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
@@ -20,6 +19,8 @@ abstract class AuthViewModel : ViewModel() {
 
     val auth = supabase.auth
     var user: User? = null
+    val isAuthenticated
+        get() = auth.sessionStatus.value is SessionStatus.Authenticated
 
     init {
         loadSession()
@@ -59,7 +60,7 @@ abstract class AuthViewModel : ViewModel() {
                 }
             }
         } catch (e: Exception) {
-            currentCoroutineContext().ensureActive()
+            ensureActive()
             Logger.e("Sign in failed", e)
             if (e.message?.contains("JWT expired") == true && refreshToken != null) {
                 try {

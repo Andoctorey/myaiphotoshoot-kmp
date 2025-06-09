@@ -8,7 +8,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 
@@ -43,7 +42,8 @@ class GalleryViewModel : AuthViewModel() {
                 selectedTab = if (firstTrainingCompleted) Tab.PUBLIC else Tab.UPLOADS,
             )
         } catch (e: Exception) {
-            currentCoroutineContext().ensureActive()
+            ensureActive()
+            if (isAuthenticated) return@launch
             Logger.e("loadProfile failed", e)
             // can ignore on this screen
         }

@@ -10,7 +10,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.auth.status.SessionStatus
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
@@ -61,7 +60,8 @@ class SettingsViewModel : AuthViewModel() {
         } catch (e: Exception) {
             loadingJob.cancel()
             uiState = uiState.copy(isBalanceLoading = false)
-            currentCoroutineContext().ensureActive()
+            ensureActive()
+            if (!isAuthenticated) return@launch
             Logger.e("loadProfile failed", e)
             uiState = uiState.copy(errorPopup = e)
         }

@@ -11,7 +11,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 
@@ -62,7 +61,8 @@ class CreationsViewModel : AuthViewModel() {
             )
         } catch (e: Exception) {
             uiState = uiState.copy(isRefreshing = false)
-            currentCoroutineContext().ensureActive()
+            ensureActive()
+            if (!isAuthenticated) return@launch
             Logger.e("refreshCreations failed", e)
             uiState = uiState.copy(errorPopup = e)
         }
@@ -94,7 +94,8 @@ class CreationsViewModel : AuthViewModel() {
             )
         } catch (e: Exception) {
             uiState = uiState.copy(isLoadingNextPage = false)
-            currentCoroutineContext().ensureActive()
+            ensureActive()
+            if (!isAuthenticated) return@launch
             Logger.e("loadCreations failed", e)
             uiState = uiState.copy(loadingError = e)
         }
@@ -119,9 +120,11 @@ class CreationsViewModel : AuthViewModel() {
                 UserGenerationsRepository.deleteGeneratedPhoto(photo.id)
             }
         } catch (e: Exception) {
-            currentCoroutineContext().ensureActive()
+            uiState = uiState.copy(photos = photos)
+            ensureActive()
+            if (!isAuthenticated) return@launch
             Logger.e("deleteGeneratedPhoto failed, $photo", e)
-            uiState = uiState.copy(photos = photos, errorPopup = e)
+            uiState = uiState.copy(errorPopup = e)
         }
     }
 
@@ -141,9 +144,11 @@ class CreationsViewModel : AuthViewModel() {
             UserGenerationsRepository.setPublic(photo.id, public)
             onSuccess()
         } catch (e: Exception) {
-            currentCoroutineContext().ensureActive()
+            uiState = uiState.copy(photos = photos)
+            ensureActive()
+            if (!isAuthenticated) return@launch
             Logger.e("makePublic failed, $photo", e)
-            uiState = uiState.copy(photos = photos, errorPopup = e)
+            uiState = uiState.copy(errorPopup = e)
         }
 
     }
@@ -152,7 +157,8 @@ class CreationsViewModel : AuthViewModel() {
         try {
             UserGenerationsRepository.downloadGeneratedPhoto(photo.id, photo.url)
         } catch (e: Exception) {
-            currentCoroutineContext().ensureActive()
+            ensureActive()
+            if (!isAuthenticated) return@launch
             Logger.e("downloadGeneratedPhoto failed", e)
         }
     }
