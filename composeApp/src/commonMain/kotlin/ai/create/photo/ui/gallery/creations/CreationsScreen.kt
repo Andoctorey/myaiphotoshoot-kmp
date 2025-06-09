@@ -12,7 +12,6 @@ import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.compose.PullToRefreshBoxNoDesktop
 import ai.create.photo.ui.generate.Prompt
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +26,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
@@ -42,6 +42,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
@@ -53,12 +54,14 @@ import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -73,6 +76,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -84,7 +88,6 @@ import coil3.request.crossfade
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
@@ -95,6 +98,7 @@ import photocreateai.composeapp.generated.resources.creations_placeholder
 import photocreateai.composeapp.generated.resources.delete
 import photocreateai.composeapp.generated.resources.delete_photo_confirmation
 import photocreateai.composeapp.generated.resources.download
+import photocreateai.composeapp.generated.resources.generate_photo
 import photocreateai.composeapp.generated.resources.link_copied
 import photocreateai.composeapp.generated.resources.make_private
 import photocreateai.composeapp.generated.resources.make_public
@@ -196,8 +200,7 @@ private fun Placeholder(modifier: Modifier = Modifier, onClick: () -> Unit) {
             .verticalScroll(rememberScrollState())
             .safeDrawingPadding()
             .widthIn(max = 600.dp)
-            .padding(start = 24.dp, end = 24.dp, top = 48.dp, bottom = 160.dp)
-            .clickable(onClick = onClick),
+            .padding(start = 24.dp, end = 24.dp, top = 48.dp, bottom = 160.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -205,14 +208,23 @@ private fun Placeholder(modifier: Modifier = Modifier, onClick: () -> Unit) {
         Text(
             text = stringResource(Res.string.creations_placeholder),
             fontSize = 16.sp,
+            textAlign = TextAlign.Center,
         )
 
-        Image(
-            modifier = Modifier.fillMaxWidth(),
-            painter = painterResource(resource = Res.drawable.creations_placeholder),
-            contentDescription = stringResource(Res.string.creations_placeholder),
-            contentScale = ContentScale.Fit,
-        )
+        OutlinedButton(modifier = modifier, onClick = onClick) {
+            val icon = Icons.Default.Brush
+            Icon(
+                imageVector = icon,
+                contentDescription = icon.name,
+                modifier = Modifier.size(28.dp),
+            )
+            Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
+            Text(
+                text = stringResource(Res.string.generate_photo),
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+            )
+        }
     }
 }
 

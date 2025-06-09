@@ -296,6 +296,7 @@ private fun Placeholder(modifier: Modifier = Modifier) {
         Text(
             text = stringResource(Res.string.upload_guidelines),
             fontSize = 16.sp,
+            textAlign = TextAlign.Center,
         )
 
         Image(
