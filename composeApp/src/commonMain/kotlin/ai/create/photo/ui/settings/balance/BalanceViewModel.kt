@@ -68,7 +68,11 @@ class BalanceViewModel : AuthViewModel() {
     }
 
     fun enterPromoCode() {
-        uiState = uiState.copy(showBalanceUpdatedPopup = true)
+        uiState = uiState.copy(showEnterPromoCode = true)
+    }
+
+    fun hideBalanceUpdatedPopup() {
+        uiState = uiState.copy(showEnterPromoCode = false)
     }
 
     fun topUp(pricing: Pricing) = viewModelScope.launch {
@@ -89,9 +93,5 @@ class BalanceViewModel : AuthViewModel() {
                 }
             },
         )
-    }
-
-    fun hideBalanceUpdatedPopup() {
-        uiState = uiState.copy(showBalanceUpdatedPopup = false)
     }
 }
