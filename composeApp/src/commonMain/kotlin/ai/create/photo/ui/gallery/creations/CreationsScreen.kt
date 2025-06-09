@@ -156,7 +156,15 @@ fun CreationsScreen(
                 loadNextPage = viewModel::loadCreations,
                 isRefreshing = state.isRefreshing,
                 onRefresh = viewModel::refreshCreations,
-                onPhotoClick = viewModel::onPhotoClick,
+                onPhotoClick = {
+                    generate(
+                        Prompt(
+                            generationId = it.id,
+                            text = it.prompt,
+                            url = it.url,
+                        )
+                    )
+                },
                 onTogglePublic = {
                     viewModel.togglePublic(it) {
                         if (it.isPublic) {
