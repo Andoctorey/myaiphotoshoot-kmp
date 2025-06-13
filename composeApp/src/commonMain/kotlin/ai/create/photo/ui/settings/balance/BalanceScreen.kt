@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -58,7 +57,7 @@ import photocreateai.composeapp.generated.resources.powered_by_flux
 import photocreateai.composeapp.generated.resources.pricing
 import photocreateai.composeapp.generated.resources.promo_code_applied
 import photocreateai.composeapp.generated.resources.thank_you_for_purchase
-import photocreateai.composeapp.generated.resources.top_up
+import photocreateai.composeapp.generated.resources.top_up_4
 import photocreateai.composeapp.generated.resources.wrong_code
 
 @Composable
@@ -204,7 +203,7 @@ fun TopUpButton(pricing: Pricing, onClick: (String) -> Unit) {
         modifier = Modifier.padding(4.dp),
         onClick = { onClick(pricing.paymentLink) }) {
         Text(
-            text = pricing.price,
+            text = stringResource(Res.string.top_up_4),
             fontSize = 24.sp,
         )
     }
@@ -226,24 +225,7 @@ private fun TopUp(
         modifier = Modifier.fillMaxWidth().padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            text = stringResource(Res.string.top_up),
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Medium,
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        FlowRow(
-            modifier = Modifier.fillMaxWidth().animateContentSize(),
-            horizontalArrangement = Arrangement.Center,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            TopUpButton(Pricing.STARTER) { topUp(Pricing.STARTER) }
-            TopUpButton(Pricing.CREATIVE) { topUp(Pricing.CREATIVE) }
-            TopUpButton(Pricing.FAMILY) { topUp(Pricing.FAMILY) }
-        }
-
+        TopUpButton(Pricing.MAIN) { topUp(Pricing.MAIN) }
 
         if (platform().platform != Platforms.IOS) {
             Spacer(modifier = Modifier.height(8.dp))
@@ -300,7 +282,7 @@ private fun Pricing(trainAiModel: () -> Unit, openGenerateTab: () -> Unit) {
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                     Text(
-                        text = "$3.99+",
+                        text = "$2.99",
                         fontWeight = FontWeight.Medium,
                         fontSize = 20.sp,
                         color = MaterialTheme.colorScheme.primary,

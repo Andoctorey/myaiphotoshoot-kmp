@@ -11,7 +11,6 @@ import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.InfoPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.compose.TopUpErrorPopup
-import ai.create.photo.ui.training.TrainAiModelPopup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -207,16 +206,6 @@ fun UploadScreen(
                     uploaded = state.photos.size,
                     onClick = { launcher.launch() },
                 )
-                SmallFloatingActionButton(
-                    modifier = Modifier.align(Alignment.BottomEnd)
-                        .padding(bottom = buttonsBottomPadding, end = 24.dp).safeDrawingPadding(),
-                    onClick = { viewModel.checkBadPhotosAndToggleTrainAiModelPopup(true) },
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Memory,
-                        contentDescription = Icons.Default.Memory.name,
-                    )
-                }
             }
         }
 
@@ -254,17 +243,6 @@ fun UploadScreen(
                 })
         }
 
-        if (state.showTrainAiModelPopup) {
-            TrainAiModelPopup(
-                photosCount = state.photos?.size ?: 0,
-                onDismiss = { viewModel.toggleTrainAiModelPopup(false) },
-                onConfirm = { steps ->
-                    viewModel.toggleTrainAiModelPopup(false)
-                    viewModel.trainAiModel(steps)
-                },
-            )
-        }
-
         if (state.deleteUnsuitablePhotosPopup) {
             ConfirmationPopup(
                 icon = Icons.Default.Delete,
@@ -274,7 +252,6 @@ fun UploadScreen(
                 onConfirm = viewModel::deleteUnsuitablePhotos,
                 onDismiss = {
                     viewModel.toggleDeleteUnsuitablePhotosPopup(false)
-                    viewModel.toggleTrainAiModelPopup(true)
                 },
             )
         }
@@ -417,7 +394,7 @@ private fun TrainModelFab(
             when (trainingStatus) {
                 TrainingStatus.SUCCEEDED -> generatePhotos()
                 TrainingStatus.PROCESSING -> onCreatingModelClick()
-                null -> createModel()
+                TrainingStatus.FAILED, null -> createModel()
             }
         },
     ) {
@@ -458,7 +435,7 @@ private fun TrainModelFab(
                 }
             }
 
-            null -> {
+            TrainingStatus.FAILED, null -> {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Default.Memory,

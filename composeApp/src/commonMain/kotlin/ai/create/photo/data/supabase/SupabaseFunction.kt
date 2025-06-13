@@ -6,11 +6,10 @@ import io.ktor.client.call.body
 
 object SupabaseFunction {
 
-    suspend fun trainAiModel(steps: Int) {
-        Logger.i("trainAiModel, steps: $steps")
+    suspend fun trainAiModel() {
+        Logger.i("trainAiModel")
         Supabase.supabase.functions.invoke(
             function = "training",
-            body = mapOf("steps" to steps)
         )
     }
 

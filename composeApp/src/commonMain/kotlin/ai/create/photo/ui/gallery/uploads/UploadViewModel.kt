@@ -232,7 +232,7 @@ class UploadViewModel : AuthViewModel() {
         }
     }
 
-    fun trainAiModel(steps: Int) = viewModelScope.launch {
+    fun trainAiModel() = viewModelScope.launch {
         val photos = uiState.photos
         if (photos.isNullOrEmpty() || photos.size < 10) {
             uiState = uiState.copy(showUploadMorePhotosPopup = true)
@@ -244,11 +244,11 @@ class UploadViewModel : AuthViewModel() {
             return@launch
         }
 
-        Logger.i("trainAiModel steps: $steps, photos: ${photos.size}")
+        Logger.i("trainAiModel photos: ${photos.size}")
 
         uiState = uiState.copy(trainingStatus = TrainingStatus.PROCESSING)
         try {
-            SupabaseFunction.trainAiModel(steps)
+            SupabaseFunction.trainAiModel()
             loadTraining()
         } catch (e: Exception) {
             uiState = uiState.copy(trainingStatus = null)
@@ -341,12 +341,9 @@ class UploadViewModel : AuthViewModel() {
                 return
             }
         }
-        toggleTrainAiModelPopup(show)
+        trainAiModel()
     }
 
-    fun toggleTrainAiModelPopup(show: Boolean) {
-        uiState = uiState.copy(showTrainAiModelPopup = show)
-    }
 
     fun toggleDeleteUnsuitablePhotosPopup(show: Boolean) {
         uiState = uiState.copy(deleteUnsuitablePhotosPopup = show)
