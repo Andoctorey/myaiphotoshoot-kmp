@@ -9,6 +9,7 @@ import ai.create.photo.ui.compose.LoadingPlaceholder
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -90,6 +91,7 @@ import coil3.request.crossfade
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
@@ -103,6 +105,7 @@ import photocreateai.composeapp.generated.resources.photos_to_generate
 import photocreateai.composeapp.generated.resources.picture_to_prompt
 import photocreateai.composeapp.generated.resources.surprise_me
 import photocreateai.composeapp.generated.resources.train_ai_model
+import photocreateai.composeapp.generated.resources.train_placeholder
 import photocreateai.composeapp.generated.resources.translate
 
 
@@ -256,11 +259,26 @@ fun GenerateScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     if (state.trainings.isNullOrEmpty()) {
-                        CreateAiModelButton(
-                            modifier = Modifier.padding(horizontal = 4.dp),
-                            bgImageShown = state.promptBgUrl != null,
-                            onClick = trainAiModel,
-                        )
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+
+                            if (state.promptBgUrl == null) {
+                                Image(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    painter = painterResource(resource = Res.drawable.train_placeholder),
+                                    contentDescription = stringResource(Res.string.train_ai_model),
+                                    contentScale = ContentScale.Fit,
+                                )
+                            }
+
+                            CreateAiModelButton(
+                                modifier = Modifier.padding(horizontal = 4.dp),
+                                bgImageShown = state.promptBgUrl != null,
+                                onClick = trainAiModel,
+                            )
+                        }
                     }
 
                     if (!state.trainings.isNullOrEmpty()) {
