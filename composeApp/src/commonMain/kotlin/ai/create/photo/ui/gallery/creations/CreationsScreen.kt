@@ -12,6 +12,7 @@ import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.compose.PullToRefreshBoxNoDesktop
 import ai.create.photo.ui.generate.Prompt
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -88,6 +89,7 @@ import coil3.request.crossfade
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
@@ -213,10 +215,11 @@ private fun Placeholder(modifier: Modifier = Modifier, onClick: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
-        Text(
-            text = stringResource(Res.string.creations_placeholder),
-            fontSize = 16.sp,
-            textAlign = TextAlign.Center,
+        Image(
+            modifier = Modifier.fillMaxWidth(),
+            painter = painterResource(resource = Res.drawable.creations_placeholder),
+            contentDescription = stringResource(Res.string.generate_photo),
+            contentScale = ContentScale.Fit,
         )
 
         OutlinedButton(modifier = modifier, onClick = onClick) {

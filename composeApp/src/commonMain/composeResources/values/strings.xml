@@ -5,7 +5,6 @@
     <string name="back_button">Back</string>
     <string name="add_your_photos">Upload Selfies (%1$s/20)</string>
     <string name="upload_guidelines">Upload 10-20 varied selfies\n(portrait mode recommended)\nor favorite existing photos.</string>
-    <string name="creations_placeholder">Ready to create?\nGenerate your first AI photo now!</string>
     <string name="connection_error">We're having trouble connecting. Please check your internet connection and try again.</string>
     <string name="upload_more_photos">Oops! Please add at least 10 selfies so we can start training your AI model.</string>
     <string name="delete_some_photos">Too many selfies! For the best results, keep no more than 20 photos.</string>
@@ -57,8 +56,6 @@
     <string name="picture_to_prompt">Make a Similar Photo</string>
     <string name="translate">Translate</string>
     <string name="cancel_popup">Cancel</string>
-    <string name="steps">steps</string>
-    <string name="minutes">minutes</string>
     <string name="photos_required">You have uploaded %1$s photos. Please add %2$s more to meet the requirement.</string>
     <string name="cost_per_photo">then $0.03 per photo</string>
     <string name="gallery_public_tab">Public</string>
