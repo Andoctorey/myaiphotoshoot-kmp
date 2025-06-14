@@ -202,7 +202,8 @@ class GenerateViewModel : AuthViewModel() {
                 else uiState.photosToGenerateX100,
                 selectedTrainingId = trainingId,
             )
-            val training = uiState.trainings?.find { it.id == trainingId }
+            val training =
+                uiState.trainings?.find { it.id == trainingId } ?: uiState.trainings?.firstOrNull()
             selectTraining(training)
         } catch (e: Exception) {
             ensureActive()
@@ -246,6 +247,7 @@ class GenerateViewModel : AuthViewModel() {
                 originalPersonDescription = training.personDescription ?: "",
                 personDescription = training.personDescription ?: ""
             )
+            Logger.i("selectTraining: ${training.id}, saveInDb: $saveInDb")
 
             if (!saveInDb) return@launch
             updateSelectedTrainingJob?.cancel()
