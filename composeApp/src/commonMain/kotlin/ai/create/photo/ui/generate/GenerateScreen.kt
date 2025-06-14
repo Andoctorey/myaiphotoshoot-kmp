@@ -265,7 +265,8 @@ fun GenerateScreen(
                                 AsyncImage(
                                     modifier = Modifier.fillMaxWidth(),
                                     model = ImageRequest.Builder(LocalPlatformContext.current)
-                                        .data("https://myaiphotoshoot.b-cdn.net/train_placeholder.png")
+                                        .data("https://system-images.b-cdn.net/train_placeholder.png")
+                                        .crossfade(true)
                                         .build(),
                                     contentDescription = stringResource(Res.string.train_ai_model),
                                     contentScale = ContentScale.FillWidth,

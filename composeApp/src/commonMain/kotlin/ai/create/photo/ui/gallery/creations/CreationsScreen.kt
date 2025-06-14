@@ -217,7 +217,8 @@ private fun Placeholder(modifier: Modifier = Modifier, onClick: () -> Unit) {
         AsyncImage(
             modifier = Modifier.fillMaxWidth(),
             model = ImageRequest.Builder(LocalPlatformContext.current)
-                .data("https://myaiphotoshoot.b-cdn.net/creations_placeholder.png")
+                .data("https://system-images.b-cdn.net/creations_placeholder.png")
+                .crossfade(true)
                 .build(),
             contentDescription = stringResource(Res.string.generate_photo),
             contentScale = ContentScale.FillWidth,
