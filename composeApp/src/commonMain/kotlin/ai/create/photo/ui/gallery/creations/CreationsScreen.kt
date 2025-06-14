@@ -12,7 +12,7 @@ import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.compose.PullToRefreshBoxNoDesktop
 import ai.create.photo.ui.generate.Prompt
-import androidx.compose.foundation.Image
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -89,14 +89,12 @@ import coil3.request.crossfade
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.all_filter
 import photocreateai.composeapp.generated.resources.cancel
 import photocreateai.composeapp.generated.resources.copy_link
-import photocreateai.composeapp.generated.resources.creations_placeholder
 import photocreateai.composeapp.generated.resources.delete
 import photocreateai.composeapp.generated.resources.delete_photo_confirmation
 import photocreateai.composeapp.generated.resources.download
@@ -210,14 +208,17 @@ private fun Placeholder(modifier: Modifier = Modifier, onClick: () -> Unit) {
             .verticalScroll(rememberScrollState())
             .safeDrawingPadding()
             .widthIn(max = 600.dp)
-            .padding(start = 24.dp, end = 24.dp, top = 48.dp, bottom = 160.dp),
+            .padding(start = 24.dp, end = 24.dp, top = 48.dp, bottom = 160.dp)
+            .animateContentSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
-        Image(
+        AsyncImage(
             modifier = Modifier.fillMaxWidth(),
-            painter = painterResource(resource = Res.drawable.creations_placeholder),
+            model = ImageRequest.Builder(LocalPlatformContext.current)
+                .data("https://myaiphotoshoot.b-cdn.net/creations_placeholder.png")
+                .build(),
             contentDescription = stringResource(Res.string.generate_photo),
             contentScale = ContentScale.FillWidth,
         )

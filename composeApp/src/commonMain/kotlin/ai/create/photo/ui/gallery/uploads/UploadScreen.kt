@@ -11,7 +11,7 @@ import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.InfoPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.compose.TopUpErrorPopup
-import androidx.compose.foundation.Image
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -81,7 +81,6 @@ import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
 import kotlinx.coroutines.delay
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
@@ -101,7 +100,6 @@ import photocreateai.composeapp.generated.resources.train_ai_model
 import photocreateai.composeapp.generated.resources.training_ai_model
 import photocreateai.composeapp.generated.resources.upload_guidelines
 import photocreateai.composeapp.generated.resources.upload_more_photos
-import photocreateai.composeapp.generated.resources.upload_placeholder
 
 
 @Preview
@@ -286,7 +284,8 @@ private fun Placeholder(modifier: Modifier = Modifier) {
             .verticalScroll(rememberScrollState())
             .safeDrawingPadding()
             .widthIn(max = 600.dp)
-            .padding(start = 24.dp, end = 24.dp, top = 48.dp, bottom = 160.dp),
+            .padding(start = 24.dp, end = 24.dp, top = 48.dp, bottom = 160.dp)
+            .animateContentSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -297,9 +296,11 @@ private fun Placeholder(modifier: Modifier = Modifier) {
             textAlign = TextAlign.Center,
         )
 
-        Image(
+        AsyncImage(
             modifier = Modifier.fillMaxWidth(),
-            painter = painterResource(resource = Res.drawable.upload_placeholder),
+            model = ImageRequest.Builder(LocalPlatformContext.current)
+                .data("https://myaiphotoshoot.b-cdn.net/upload_placeholder.png")
+                .build(),
             contentDescription = stringResource(Res.string.upload_guidelines),
             contentScale = ContentScale.FillWidth,
         )

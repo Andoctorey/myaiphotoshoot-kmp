@@ -20,7 +20,7 @@ object Supabase {
     val supabase = createSupabaseClient(
         supabaseUrl = if (LOCAL) (if (platform().platform in listOf(
                 Platforms.DESKTOP, Platforms.WEB_DESKTOP,
-                Platforms.WEB_MOBILE
+                Platforms.WEB_MOBILE, Platforms.IOS
             )
         ) "http://127.0.0.1:54321" else "http://192.168.1.101:54321")
         else "https://trzgfajvyjpvbqedyxug.supabase.co",
