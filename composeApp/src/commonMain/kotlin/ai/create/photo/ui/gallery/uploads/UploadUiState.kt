@@ -14,6 +14,7 @@ data class UploadUiState(
     val photos: List<Photo>? = null,
     val listState: LazyStaggeredGridState = LazyStaggeredGridState(),
     val scrollToTop: Boolean = false,
+    val scrollToPosition: Int? = null,
 
     val uploadProgress: Int = 0,
 

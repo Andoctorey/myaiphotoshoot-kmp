@@ -135,8 +135,18 @@ fun UploadScreen(
             LaunchedEffect(state.scrollToTop) {
                 if (state.scrollToTop && state.listState.firstVisibleItemIndex > 1) {
                     state.listState.animateScrollToItem(0)
+                    Logger.i("scrolling to top")
                 }
                 viewModel.resetScrollToTop()
+            }
+            LaunchedEffect(state.scrollToPosition) {
+                if (state.scrollToPosition != null) {
+                    if (state.scrollToPosition != 0) {
+                        Logger.i("scrolling to position: ${state.scrollToPosition}")
+                        state.listState.animateScrollToItem(state.scrollToPosition)
+                    }
+                    viewModel.resetScrollToPosition()
+                }
             }
             val hideDeletePhotoButton = state.trainingStatus == TrainingStatus.PROCESSING
             Photos(

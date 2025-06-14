@@ -230,6 +230,10 @@ class UploadViewModel : AuthViewModel() {
                         }
                     }
                 )
+                uiState = uiState.copy(
+                    scrollToPosition = uiState.photos?.indexOfFirst { it.id == photoId },
+                    scrollToTop = false
+                )
                 updateAnalysisStatus()
                 if (attempt > 0) {
                     Logger.i("Photo analysis succeeded on attempt ${attempt + 1} for: $photoId")
@@ -391,6 +395,10 @@ class UploadViewModel : AuthViewModel() {
 
     fun resetScrollToTop() {
         uiState = uiState.copy(scrollToTop = false)
+    }
+
+    fun resetScrollToPosition() {
+        uiState = uiState.copy(scrollToPosition = null)
     }
 
     fun hideErrorPopup() {
