@@ -299,7 +299,6 @@ class UploadViewModel : AuthViewModel() {
 
         uiState = uiState.copy(
             trainingStatus = TrainingStatus.PROCESSING,
-            trainingTimeLeft = 150 * 1000L, // 2.5 minutes)
         )
 
         val userId = user?.id ?: return@launch
@@ -311,10 +310,15 @@ class UploadViewModel : AuthViewModel() {
             return@launch
         }
 
+        uiState = uiState.copy(
+            trainingStatus = TrainingStatus.PROCESSING,
+            trainingTimeLeft = 150 * 1000L, // 2.5 minutes)
+        )
+
         try {
             SupabaseFunction.trainAiModel()
-            loadTraining()
             runTimer()
+            loadTraining()
         } catch (e: Exception) {
             uiState = uiState.copy(trainingStatus = null)
             ensureActive()
@@ -445,6 +449,9 @@ class UploadViewModel : AuthViewModel() {
                 viewModelScope.launch {
                     (1..10).forEach {
                         ProfilesRepository.loadProfile(userId)
+                        if ((ProfilesRepository.profile?.balance ?: 0f) >= 3f) {
+                            return@launch
+                        }
                         delay(5000L) // Wait for profile to update
                     }
                 }

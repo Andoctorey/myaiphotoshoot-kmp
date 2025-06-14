@@ -14,7 +14,6 @@
     <string name="analyzing_photos">Analizando fotos (%1$s/%2$s)</string>
     <string name="delete_unsuitable_photos">Para mejores resultados, elimina todas las fotos inadecuadas. ¿Continuar?</string>
     <string name="generate_photo">Generar Fotos</string>
-    <string name="creating_model_hint">Esto usualmente toma cerca de una hora - puedes cerrar la aplicación y volver más tarde.</string>
     <string name="enhance_photo_accuracy">Mejorar Precisión de Fotos</string>
     <string name="photo_prompt">Descripción de la foto</string>
     <string name="account">Cuenta</string>

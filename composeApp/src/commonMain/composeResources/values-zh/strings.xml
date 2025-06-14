@@ -14,7 +14,6 @@
     <string name="analyzing_photos">正在分析照片 (%1$s/%2$s)</string>
     <string name="delete_unsuitable_photos">为获得最佳效果，删除所有不合适的照片。继续？</string>
     <string name="generate_photo">生成照片</string>
-    <string name="creating_model_hint">这通常需要大约一小时 - 您可以关闭应用稍后再回来。</string>
     <string name="enhance_photo_accuracy">提高照片准确性</string>
     <string name="photo_prompt">照片描述</string>
     <string name="account">账户</string>

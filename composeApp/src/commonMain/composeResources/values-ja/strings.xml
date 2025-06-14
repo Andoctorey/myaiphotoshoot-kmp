@@ -14,7 +14,6 @@
     <string name="analyzing_photos">写真を分析中 (%1$s/%2$s)</string>
     <string name="delete_unsuitable_photos">最良の結果を得るために、不適切な写真をすべて削除してください。続行しますか？</string>
     <string name="generate_photo">写真を生成</string>
-    <string name="creating_model_hint">これは通常約1時間かかります。アプリを閉じて後で戻ってくることができます。</string>
     <string name="enhance_photo_accuracy">写真の精度を向上</string>
     <string name="photo_prompt">写真のプロンプト</string>
     <string name="account">アカウント</string>

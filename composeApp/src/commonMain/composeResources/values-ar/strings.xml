@@ -14,7 +14,6 @@
     <string name="analyzing_photos">تحليل الصور (%1$s/%2$s)</string>
     <string name="delete_unsuitable_photos">للحصول على أفضل النتائج، احذف جميع الصور غير المناسبة. متابعة؟</string>
     <string name="generate_photo">إنشاء الصور</string>
-    <string name="creating_model_hint">هذا يستغرق عادة حوالي ساعة - يمكنك إغلاق التطبيق والعودة لاحقاً.</string>
     <string name="enhance_photo_accuracy">تحسين دقة الصور</string>
     <string name="photo_prompt">وصف الصورة</string>
     <string name="account">الحساب</string>

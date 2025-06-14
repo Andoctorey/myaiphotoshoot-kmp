@@ -14,7 +14,6 @@
     <string name="analyzing_photos">तस्वीरों का विश्लेषण (%1$s/%2$s)</string>
     <string name="delete_unsuitable_photos">बेहतर परिणामों के लिए, सभी अनुपयुक्त तस्वीरें हटाएं। जारी रखें?</string>
     <string name="generate_photo">तस्वीरें जेनरेट करें</string>
-    <string name="creating_model_hint">इसमें आमतौर पर लगभग एक घंटा लगता है - आप ऐप बंद करके बाद में वापस आ सकते हैं।</string>
     <string name="enhance_photo_accuracy">फोटो सटीकता बढ़ाएं</string>
     <string name="photo_prompt">फोटो प्रॉम्प्ट</string>
     <string name="account">खाता</string>
