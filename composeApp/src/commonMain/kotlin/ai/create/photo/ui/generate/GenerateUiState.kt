@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 
 @Immutable
 data class GenerateUiState(
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val loadingError: Throwable? = null,
     val errorPopup: Throwable? = null,
 
