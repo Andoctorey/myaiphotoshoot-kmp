@@ -301,6 +301,16 @@ class UploadViewModel : AuthViewModel() {
             trainingStatus = TrainingStatus.PROCESSING,
             trainingTimeLeft = 150 * 1000L, // 2.5 minutes)
         )
+
+        val userId = user?.id ?: return@launch
+        ProfilesRepository.loadProfile(userId)
+        val profile = ProfilesRepository.profile
+        if (profile != null && profile.balance < 3) {
+            uiState = uiState.copy(trainingStatus = null)
+            topUp()
+            return@launch
+        }
+
         try {
             SupabaseFunction.trainAiModel()
             loadTraining()
