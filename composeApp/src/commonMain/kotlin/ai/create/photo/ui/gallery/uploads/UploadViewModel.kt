@@ -110,9 +110,9 @@ class UploadViewModel : AuthViewModel() {
                     is UploadStatus.Success -> {
                         completedFiles++
                         loadPhotos()
-                        val overallProgress =
-                            ((completedFiles.toFloat() / totalFiles) * 100).toInt()
-                        uiState = uiState.copy(uploadProgress = overallProgress)
+                        if (completedFiles == totalFiles) {
+                            uiState = uiState.copy(uploadProgress = 100)
+                        }
                     }
                 }
             }

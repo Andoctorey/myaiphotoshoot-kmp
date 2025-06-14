@@ -86,6 +86,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.add_your_photos
+import photocreateai.composeapp.generated.resources.add_your_photos_progress
 import photocreateai.composeapp.generated.resources.analyze_photos
 import photocreateai.composeapp.generated.resources.analyzing_photos
 import photocreateai.composeapp.generated.resources.continue_
@@ -317,9 +318,8 @@ private fun AddPhotosFab(
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
-                    text = stringResource(Res.string.add_your_photos, uploaded),
+                    text = stringResource(Res.string.add_your_photos_progress, uploaded),
                     textAlign = TextAlign.Center,
-                    maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     fontSize = 14.sp,
                 )

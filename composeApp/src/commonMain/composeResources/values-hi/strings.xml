@@ -3,7 +3,6 @@
     <string name="tab_generate">जेनरेट</string>
     <string name="tab_settings">सेटिंग्स</string>
     <string name="back_button">वापस</string>
-    <string name="add_your_photos">सेल्फी अपलोड करें (%1$s/20)</string>
     <string name="connection_error">हमें कनेक्ट करने में समस्या हो रही है। कृपया अपना इंटरनेट कनेक्शन जांचें और फिर से कोशिश करें।</string>
     <string name="upload_more_photos">ओह! कृपया कम से कम 10 सेल्फी जोड़ें ताकि हम आपके AI मॉडल को प्रशिक्षित करना शुरू कर सकें।</string>
     <string name="delete_some_photos">बहुत सारी सेल्फी! बेहतर परिणामों के लिए, 20 से अधिक तस्वीरें न रखें।</string>

@@ -3,7 +3,6 @@
     <string name="tab_generate">Generar</string>
     <string name="tab_settings">Configuración</string>
     <string name="back_button">Atrás</string>
-    <string name="add_your_photos">Subir Selfies (%1$s/20)</string>
     <string name="connection_error">Tenemos problemas para conectar. Por favor revisa tu conexión a internet e inténtalo de nuevo.</string>
     <string name="upload_more_photos">¡Ups! Por favor agrega al menos 10 selfies para que podamos empezar a entrenar tu modelo de IA.</string>
     <string name="delete_some_photos">¡Demasiados selfies! Para mejores resultados, mantén no más de 20 fotos.</string>
