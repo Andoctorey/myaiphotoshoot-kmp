@@ -18,6 +18,7 @@ struct iOSApp: App {
     init() {
         TopUpKt.topUpProvider = IOSTopUpProvider()
         OpenUrlKt.openUrlProvider = IOSOpenUrlProvider()
+        AnalyticsKt.crashlyticsProvider = IOSCrashlyticsProvider()
     }
     
     var body: some Scene {

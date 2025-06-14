@@ -1,11 +1,11 @@
 package ai.create.photo.platform
 
-import co.touchlab.crashkios.crashlytics.CrashlyticsKotlin
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 actual fun logUserEmail(email: String) {
-    CrashlyticsKotlin.setCustomValue("email", email)
+    FirebaseCrashlytics.getInstance().setCustomKey("email", email)
 }
 
 actual fun logUserId(id: String) {
-    CrashlyticsKotlin.setUserId(id)
+    FirebaseCrashlytics.getInstance().setUserId(id)
 }
