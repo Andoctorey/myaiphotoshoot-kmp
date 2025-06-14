@@ -6,5 +6,5 @@ expect suspend fun topUpPlatform(
     userId: String,
     pricing: Pricing,
     onSuccess: () -> Unit,
-    onFailure: (e: Throwable) -> Unit
+    onFailure: (e: Throwable?) -> Unit
 )

@@ -96,6 +96,7 @@ import photocreateai.composeapp.generated.resources.delete_some_photos
 import photocreateai.composeapp.generated.resources.delete_unsuitable_photos
 import photocreateai.composeapp.generated.resources.generate_photo
 import photocreateai.composeapp.generated.resources.thank_you_for_purchase
+import photocreateai.composeapp.generated.resources.topping_up
 import photocreateai.composeapp.generated.resources.train_ai_model
 import photocreateai.composeapp.generated.resources.training_ai_model
 import photocreateai.composeapp.generated.resources.upload_guidelines
@@ -180,6 +181,7 @@ fun UploadScreen(
                         createModel = { viewModel.checkBadPhotosAndToggleTrainAiModelPopup(true) },
                         onCreatingModelClick = viewModel::onCreatingModelClick,
                         generatePhotos = openGenerateTab,
+                        isToppingUp = state.toppingUp,
                     )
                 }
                 if (state.photos.size < 20 && state.trainingStatus != TrainingStatus.PROCESSING) {
@@ -406,10 +408,12 @@ private fun TrainModelFab(
     createModel: () -> Unit,
     onCreatingModelClick: () -> Unit,
     generatePhotos: () -> Unit,
+    isToppingUp: Boolean,
 ) {
     ExtendedFloatingActionButton(
         modifier = modifier,
         onClick = {
+            if (isToppingUp) return@ExtendedFloatingActionButton
             when (trainingStatus) {
                 TrainingStatus.SUCCEEDED -> generatePhotos()
                 TrainingStatus.PROCESSING -> onCreatingModelClick()
@@ -417,66 +421,83 @@ private fun TrainModelFab(
             }
         },
     ) {
-        when (trainingStatus) {
+        if (isToppingUp) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                    strokeWidth = 2.dp,
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = stringResource(Res.string.topping_up),
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 14.sp,
+                )
+            }
+        } else {
+            when (trainingStatus) {
 
-            TrainingStatus.SUCCEEDED -> {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.Brush,
-                        contentDescription = stringResource(Res.string.train_ai_model),
-                        tint = MaterialTheme.colorScheme.onSurface,
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Text(
-                        text = stringResource(Res.string.generate_photo),
-                        textAlign = TextAlign.Center,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        fontSize = 14.sp,
-                    )
+                TrainingStatus.SUCCEEDED -> {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Brush,
+                            contentDescription = stringResource(Res.string.train_ai_model),
+                            tint = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(
+                            text = stringResource(Res.string.generate_photo),
+                            textAlign = TextAlign.Center,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontSize = 14.sp,
+                        )
+                    }
+                }
+
+                TrainingStatus.PROCESSING -> {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = MaterialTheme.colorScheme.primary,
+                            strokeWidth = 2.dp,
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(
+                            text = stringResource(Res.string.training_ai_model) + " " +
+                                    if (trainingTimeLeft > 0) {
+                                        "(${(trainingTimeLeft / 1000).toInt()}s)"
+                                    } else {
+                                        ""
+                                    },
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontSize = 14.sp,
+                        )
+                    }
+                }
+
+                TrainingStatus.FAILED, null -> {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Memory,
+                            contentDescription = stringResource(Res.string.train_ai_model),
+                            tint = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(
+                            text = stringResource(Res.string.train_ai_model),
+                            textAlign = TextAlign.Center,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontSize = 14.sp,
+                        )
+                    }
                 }
             }
-
-            TrainingStatus.PROCESSING -> {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = MaterialTheme.colorScheme.primary,
-                        strokeWidth = 2.dp,
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Text(
-                        text = stringResource(Res.string.training_ai_model) + " " +
-                                if (trainingTimeLeft > 0) {
-                                    "(${(trainingTimeLeft / 1000).toInt()}s)"
-                                } else {
-                                    ""
-                                },
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        fontSize = 14.sp,
-                    )
-                }
-            }
-
-            TrainingStatus.FAILED, null -> {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.Memory,
-                        contentDescription = stringResource(Res.string.train_ai_model),
-                        tint = MaterialTheme.colorScheme.onSurface,
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Text(
-                        text = stringResource(Res.string.train_ai_model),
-                        textAlign = TextAlign.Center,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        fontSize = 14.sp,
-                    )
-                }
-            }
-
         }
     }
 }

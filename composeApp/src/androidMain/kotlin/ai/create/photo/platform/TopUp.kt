@@ -8,11 +8,18 @@ actual suspend fun topUpPlatform(
     userId: String,
     pricing: Pricing,
     onSuccess: () -> Unit,
-    onFailure: (e: Throwable) -> Unit
+    onFailure: (e: Throwable?) -> Unit,
 ) {
     val activity = App.currentActivity ?: return
-    BillingRepository.purchase(activity, pricing, onSuccess).onFailure {
-        onFailure(it)
-        openUrl("${pricing.paymentLink}?client_reference_id=$userId")
-    }
+    BillingRepository.purchase(
+        activity = activity,
+        pricing = pricing,
+        onSuccess = onSuccess,
+        onFailure = {
+            if (it != null) {
+                openUrl("${pricing.paymentLink}?client_reference_id=$userId")
+            }
+            onFailure(it)
+        }
+    )
 }

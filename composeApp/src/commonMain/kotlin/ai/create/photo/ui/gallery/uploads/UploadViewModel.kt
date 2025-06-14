@@ -283,7 +283,7 @@ class UploadViewModel : AuthViewModel() {
         }
     }
 
-    fun trainAiModel() = viewModelScope.launch {
+    fun trainAiModel(): Job = viewModelScope.launch {
         val photos = uiState.photos
         if (photos.isNullOrEmpty() || photos.size < 10) {
             uiState = uiState.copy(showUploadMorePhotosPopup = true)
@@ -316,8 +316,8 @@ class UploadViewModel : AuthViewModel() {
         )
 
         try {
-            SupabaseFunction.trainAiModel()
             runTimer()
+            SupabaseFunction.trainAiModel()
             loadTraining()
         } catch (e: Exception) {
             uiState = uiState.copy(trainingStatus = null)
@@ -382,13 +382,15 @@ class UploadViewModel : AuthViewModel() {
         }
     }
 
-    fun runTimer() = viewModelScope.launch {
-        while (uiState.trainingStatus == TrainingStatus.PROCESSING && uiState.trainingTimeLeft > 0) {
-            delay(1000L)
-            uiState = uiState.copy(
-                trainingTimeLeft = max(uiState.trainingTimeLeft - 1000L, 0L)
-            )
+    fun runTimer(): Job = viewModelScope.launch {
+        if (uiState.trainingStatus != TrainingStatus.PROCESSING) return@launch
+        if (uiState.trainingTimeLeft <= 0L) {
+            uiState = uiState.copy(trainingTimeLeft = 0L)
+            return@launch
         }
+        delay(1000L)
+        uiState = uiState.copy(trainingTimeLeft = uiState.trainingTimeLeft - 1000L)
+        runTimer()
     }
 
     fun onCreatingModelClick() {
@@ -438,18 +440,21 @@ class UploadViewModel : AuthViewModel() {
 
     fun topUp() = viewModelScope.launch {
         val userId = user?.id ?: return@launch
+        uiState = uiState.copy(toppingUp = true)
         topUpPlatform(
             userId = userId,
             pricing = Pricing.MAIN,
             onFailure = {
-                uiState = uiState.copy(errorPopup = it)
+                uiState = uiState.copy(toppingUp = false, errorPopup = it)
             },
             onSuccess = {
-                uiState = uiState.copy(showBalanceUpdatedPopup = true)
                 viewModelScope.launch {
                     (1..10).forEach {
                         ProfilesRepository.loadProfile(userId)
                         if ((ProfilesRepository.profile?.balance ?: 0f) >= 3f) {
+                            trainAiModel()
+                            uiState =
+                                uiState.copy(toppingUp = false, showBalanceUpdatedPopup = true)
                             return@launch
                         }
                         delay(5000L) // Wait for profile to update

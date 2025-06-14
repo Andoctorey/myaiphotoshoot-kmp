@@ -38,7 +38,8 @@ import kotlin.coroutines.suspendCoroutine
 object BillingRepository : PurchasesUpdatedListener {
 
     private lateinit var billingClient: BillingClient
-    private var onBalanceUpdated: (() -> Unit)? = null
+    private var onSuccess: (() -> Unit)? = null
+    private var onFailure: ((e: Throwable?) -> Unit)? = null
 
     private const val API_KEY =
         "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxVu6XM9IEajbV+MzAB7XtAuBK4iZoyk24ZBUNsWPhYS8yZlbxTUtbFpE7AAp7JQU/9tQeXF+n+VTgRil9qZDn7yPZsX6XJsd2yG1/SQRhNKOd2YAur8DICZj+XIABp0bqZWJbTeHHS1KbPc3rEowTKvpNqye2fAN25jzLqsu/E/yd3nZj2MENcvTDLvZ04qTItlPaEaxJaBNYUYVCYmHd2xG3Cl5lvNj8dMHZVH+nEIqGTPR3ZzLKM084oL2NvHbobpvkpGu8c4YUr5cOXIGhuBl7UoaRgit9QcsvY6hUcBYEAypLtoPcn+unTMkEHH0K678URXhdcpQGrHoCVqkmQIDAQAB"
@@ -58,9 +59,13 @@ object BillingRepository : PurchasesUpdatedListener {
         }
     }
 
-    suspend fun purchase(activity: Activity, pricing: Pricing, onBalanceUpdated: () -> Unit) =
+    suspend fun purchase(
+        activity: Activity, pricing: Pricing,
+        onSuccess: () -> Unit, onFailure: (e: Throwable?) -> Unit
+    ) =
         runCatching {
-            this.onBalanceUpdated = onBalanceUpdated
+            this.onSuccess = onSuccess
+            this.onFailure = onFailure
             initBillingClient(activity.applicationContext)
             val billingResult = billingClient.connect()
             queryProductDetails()
@@ -75,6 +80,8 @@ object BillingRepository : PurchasesUpdatedListener {
 
             Logger.i("startBillingFlow for $pricing, productDetailsList size: ${productDetailsList.size}")
             openBillingPopup(activity, pricing)
+        }.onFailure {
+            onFailure(it)
         }
 
     private suspend fun queryProductDetails() {
@@ -121,6 +128,7 @@ object BillingRepository : PurchasesUpdatedListener {
                             processPurchases(this@apply)
                         } catch (e: Exception) {
                             Logger.e("onPurchasesUpdated", e)
+                            onFailure?.invoke(e)
                             withContext(Dispatchers.Main) {
                                 App.context.toast(getString(Res.string.billing_service_unavailable))
                             }
@@ -136,6 +144,7 @@ object BillingRepository : PurchasesUpdatedListener {
                         queryPurchases() // try to consume again
                     } catch (e: Exception) {
                         Logger.e("onPurchasesUpdated", e)
+                        onFailure?.invoke(e)
                         withContext(Dispatchers.Main) {
                             App.context.toast(getString(Res.string.billing_service_unavailable))
                         }
@@ -145,22 +154,27 @@ object BillingRepository : PurchasesUpdatedListener {
 
             BillingClient.BillingResponseCode.SERVICE_DISCONNECTED -> {
                 Logger.i("onPurchasesUpdated: SERVICE_DISCONNECTED")
+                onFailure?.invoke(Exception(billingResult.debugMessage))
             }
 
             BillingClient.BillingResponseCode.USER_CANCELED -> {
                 Logger.i("onPurchasesUpdated() - user cancelled the purchase flow - skipping")
+                onFailure?.invoke(null)
             }
 
             BillingClient.BillingResponseCode.SERVICE_UNAVAILABLE -> {
                 Logger.i("onPurchasesUpdated() - SERVICE_UNAVAILABLE")
+                onFailure?.invoke(Exception(billingResult.debugMessage))
             }
 
             BillingClient.BillingResponseCode.NETWORK_ERROR -> {
                 Logger.i("onPurchasesUpdated(): NETWORK_ERROR")
+                onFailure?.invoke(Exception(billingResult.debugMessage))
             }
 
             else -> {
                 Logger.i("onPurchasesUpdated() got unknown resultCode: ${billingResult.responseCode}, debugMessage: ${billingResult.debugMessage}")
+                onFailure?.invoke(Exception(billingResult.debugMessage))
             }
         }
     }
@@ -209,7 +223,7 @@ object BillingRepository : PurchasesUpdatedListener {
                 }
             }
             if (!hasFailure) {
-                if (successfulProducts.isNotEmpty()) onBalanceUpdated?.invoke()
+                if (successfulProducts.isNotEmpty()) onSuccess?.invoke()
                 val params = ConsumeParams.newBuilder()
                     .setPurchaseToken(purchase.purchaseToken)
                     .build()

@@ -82,4 +82,5 @@
     <string name="newest_sort_order">Newest</string>
     <string name="all_filter">All</string>
     <string name="public_filter">Public</string>
+    <string name="topping_up">Topping Up</string>
 </resources>

@@ -20,6 +20,8 @@ data class UploadUiState(
 
     val analyzingPhotos: Int = 0,
 
+    val toppingUp: Boolean = false,
+
     val isLoadingTraining: Boolean = false,
     val trainingStatus: TrainingStatus? = null,
     val trainingTimeLeft: Long = 0L,
