@@ -22,6 +22,7 @@ data class UploadUiState(
 
     val isLoadingTraining: Boolean = false,
     val trainingStatus: TrainingStatus? = null,
+    val trainingTimeLeft: Long = 0L,
 
     val errorPopup: Throwable? = null,
     val showUploadMorePhotosPopup: Boolean = false,

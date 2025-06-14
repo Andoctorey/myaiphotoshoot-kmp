@@ -269,7 +269,7 @@ fun GenerateScreen(
                                     modifier = Modifier.fillMaxWidth(),
                                     painter = painterResource(resource = Res.drawable.train_placeholder),
                                     contentDescription = stringResource(Res.string.train_ai_model),
-                                    contentScale = ContentScale.Fit,
+                                    contentScale = ContentScale.FillWidth,
                                 )
                             }
 

@@ -219,7 +219,7 @@ private fun Placeholder(modifier: Modifier = Modifier, onClick: () -> Unit) {
             modifier = Modifier.fillMaxWidth(),
             painter = painterResource(resource = Res.drawable.creations_placeholder),
             contentDescription = stringResource(Res.string.generate_photo),
-            contentScale = ContentScale.Fit,
+            contentScale = ContentScale.FillWidth,
         )
 
         OutlinedButton(modifier = modifier, onClick = onClick) {

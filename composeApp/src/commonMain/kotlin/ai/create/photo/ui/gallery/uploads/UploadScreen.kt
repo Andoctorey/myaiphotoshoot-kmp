@@ -167,6 +167,7 @@ fun UploadScreen(
                         modifier = Modifier.align(Alignment.BottomCenter)
                             .padding(bottom = buttonsBottomPadding).safeDrawingPadding(),
                         trainingStatus = state.trainingStatus,
+                        trainingTimeLeft = state.trainingTimeLeft,
                         createModel = { viewModel.checkBadPhotosAndToggleTrainAiModelPopup(true) },
                         onCreatingModelClick = viewModel::onCreatingModelClick,
                         generatePhotos = openGenerateTab,
@@ -288,7 +289,7 @@ private fun Placeholder(modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxWidth(),
             painter = painterResource(resource = Res.drawable.upload_placeholder),
             contentDescription = stringResource(Res.string.upload_guidelines),
-            contentScale = ContentScale.Fit,
+            contentScale = ContentScale.FillWidth,
         )
     }
 }
@@ -391,6 +392,7 @@ private fun AnalyzePhotosFab(
 private fun TrainModelFab(
     modifier: Modifier = Modifier,
     trainingStatus: TrainingStatus?,
+    trainingTimeLeft: Long,
     createModel: () -> Unit,
     onCreatingModelClick: () -> Unit,
     generatePhotos: () -> Unit,
@@ -434,7 +436,12 @@ private fun TrainModelFab(
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                     Text(
-                        text = stringResource(Res.string.training_ai_model),
+                        text = stringResource(Res.string.training_ai_model) + " " +
+                                if (trainingTimeLeft > 0) {
+                                    "(${(trainingTimeLeft / 1000).toInt()}s)"
+                                } else {
+                                    ""
+                                },
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         fontSize = 14.sp,

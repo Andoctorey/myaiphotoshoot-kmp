@@ -249,10 +249,14 @@ class UploadViewModel : AuthViewModel() {
 
         Logger.i("trainAiModel photos: ${photos.size}")
 
-        uiState = uiState.copy(trainingStatus = TrainingStatus.PROCESSING)
+        uiState = uiState.copy(
+            trainingStatus = TrainingStatus.PROCESSING,
+            trainingTimeLeft = 150 * 1000L, // 2.5 minutes)
+        )
         try {
             SupabaseFunction.trainAiModel()
             loadTraining()
+            runTimer()
         } catch (e: Exception) {
             uiState = uiState.copy(trainingStatus = null)
             ensureActive()
@@ -302,12 +306,26 @@ class UploadViewModel : AuthViewModel() {
             }
         }
 
+        val timeToStartApiRequests = 30 * 1000L // 30 seconds
         if (uiState.trainingStatus == TrainingStatus.PROCESSING) {
-            delay(100 * 1000)
+            if (uiState.trainingTimeLeft > timeToStartApiRequests) {
+                delay(uiState.trainingTimeLeft - timeToStartApiRequests)
+            } else {
+                delay(5 * 1000)
+            }
             ensureActive()
             if (!isAuthenticated) return@launch
             if (uiState.isLoadingPhotos) return@launch
             loadTraining()
+        }
+    }
+
+    fun runTimer() = viewModelScope.launch {
+        while (uiState.trainingStatus == TrainingStatus.PROCESSING && uiState.trainingTimeLeft > 0) {
+            delay(1000L)
+            uiState = uiState.copy(
+                trainingTimeLeft = max(uiState.trainingTimeLeft - 1000L, 0L)
+            )
         }
     }
 
