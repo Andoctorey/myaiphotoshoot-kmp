@@ -142,7 +142,7 @@ fun BalanceScreen(
         }
 
         if (state.showBalanceUpdatedPopup) {
-            InfoPopup(stringResource(Res.string.thank_you_for_purchase, state.balance)) {
+            InfoPopup(stringResource(Res.string.thank_you_for_purchase)) {
                 viewModel.hideBalanceUpdatedPopup()
                 onBackClick()
             }

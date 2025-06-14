@@ -6,6 +6,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Paid
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -42,7 +43,7 @@ fun ErrorPopup(e: Throwable, onDismiss: () -> Unit) {
 @Composable
 fun TopUpErrorPopup(e: Throwable, onDismiss: () -> Unit, onTopUp: () -> Unit) {
     AlertDialog(
-        icon = { Icon(Icons.Default.Error, contentDescription = "error") },
+        icon = { Icon(Icons.Default.Paid, contentDescription = "error") },
         onDismissRequest = onDismiss,
         text = {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {

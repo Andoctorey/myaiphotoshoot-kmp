@@ -4,11 +4,14 @@ import ai.create.photo.data.supabase.Supabase
 import ai.create.photo.data.supabase.SupabaseFunction
 import ai.create.photo.data.supabase.SupabaseStorage
 import ai.create.photo.data.supabase.SupabaseStorage.UPLOADS
+import ai.create.photo.data.supabase.database.ProfilesRepository
 import ai.create.photo.data.supabase.database.UserFilesRepository
 import ai.create.photo.data.supabase.database.UserTrainingsRepository
 import ai.create.photo.data.supabase.model.AnalysisStatus
 import ai.create.photo.data.supabase.model.TrainingStatus
+import ai.create.photo.platform.topUpPlatform
 import ai.create.photo.ui.auth.AuthViewModel
+import ai.create.photo.ui.settings.balance.Pricing
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -347,5 +350,29 @@ class UploadViewModel : AuthViewModel() {
 
     fun toggleDeleteUnsuitablePhotosPopup(show: Boolean) {
         uiState = uiState.copy(deleteUnsuitablePhotosPopup = show)
+    }
+
+    fun topUp() = viewModelScope.launch {
+        val userId = user?.id ?: return@launch
+        topUpPlatform(
+            userId = userId,
+            pricing = Pricing.MAIN,
+            onFailure = {
+                uiState = uiState.copy(errorPopup = it)
+            },
+            onSuccess = {
+                uiState = uiState.copy(showBalanceUpdatedPopup = true)
+                viewModelScope.launch {
+                    (1..10).forEach {
+                        ProfilesRepository.loadProfile(userId)
+                        delay(5000L) // Wait for profile to update
+                    }
+                }
+            },
+        )
+    }
+
+    fun hideBalanceUpdatedPopup() {
+        uiState = uiState.copy(showBalanceUpdatedPopup = false)
     }
 }

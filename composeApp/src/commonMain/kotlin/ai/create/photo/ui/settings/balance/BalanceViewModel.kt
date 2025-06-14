@@ -72,7 +72,7 @@ class BalanceViewModel : AuthViewModel() {
     }
 
     fun hideBalanceUpdatedPopup() {
-        uiState = uiState.copy(showEnterPromoCode = false)
+        uiState = uiState.copy(showBalanceUpdatedPopup = false)
     }
 
     fun topUp(pricing: Pricing) = viewModelScope.launch {

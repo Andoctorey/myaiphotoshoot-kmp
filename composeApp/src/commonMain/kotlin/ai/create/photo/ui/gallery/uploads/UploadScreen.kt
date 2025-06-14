@@ -95,6 +95,7 @@ import photocreateai.composeapp.generated.resources.delete
 import photocreateai.composeapp.generated.resources.delete_some_photos
 import photocreateai.composeapp.generated.resources.delete_unsuitable_photos
 import photocreateai.composeapp.generated.resources.generate_photo
+import photocreateai.composeapp.generated.resources.thank_you_for_purchase
 import photocreateai.composeapp.generated.resources.train_ai_model
 import photocreateai.composeapp.generated.resources.training_ai_model
 import photocreateai.composeapp.generated.resources.upload_guidelines
@@ -240,7 +241,7 @@ fun UploadScreen(
                 onDismiss = { viewModel.hideErrorPopup() },
                 onTopUp = {
                     viewModel.hideErrorPopup()
-                    openTopUpTab()
+                    viewModel.topUp()
                 })
         }
 
@@ -255,6 +256,12 @@ fun UploadScreen(
                     viewModel.toggleDeleteUnsuitablePhotosPopup(false)
                 },
             )
+        }
+
+        if (state.showBalanceUpdatedPopup) {
+            InfoPopup(stringResource(Res.string.thank_you_for_purchase)) {
+                viewModel.hideBalanceUpdatedPopup()
+            }
         }
     }
 }
