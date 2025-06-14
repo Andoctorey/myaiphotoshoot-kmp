@@ -7,7 +7,6 @@ import co.touchlab.kermit.Logger
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Order
-import io.github.jan.supabase.postgrest.result.PostgrestResult
 
 object UserFilesRepository {
 
@@ -16,7 +15,7 @@ object UserFilesRepository {
     suspend fun saveFile(
         userId: String,
         fileName: String
-    ): Result<PostgrestResult> = runCatching {
+    ): Result<UserFile> = runCatching {
         val photoData = mapOf(
             "user_id" to userId,
             "file_name" to fileName,
@@ -24,9 +23,12 @@ object UserFilesRepository {
             "signed_url" to SupabaseStorage.createSignedUrl(userId, fileName),
         )
         Logger.i("save file to db $fileName")
-        supabase.from(USER_FILES_TABLE).upsert(photoData) {
-            onConflict = "user_id, file_name, type"
-        }
+        supabase.from(USER_FILES_TABLE)
+            .upsert(photoData) {
+                onConflict = "user_id, file_name, type"
+                select(columns = Columns.list(UserFile.columns))
+            }
+            .decodeSingle<UserFile>()
     }
 
 

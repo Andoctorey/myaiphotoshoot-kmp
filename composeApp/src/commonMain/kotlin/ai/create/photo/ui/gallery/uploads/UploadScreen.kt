@@ -143,7 +143,6 @@ fun UploadScreen(
             Photos(
                 photos = state.photos,
                 listState = state.listState,
-                showAnalysisForAll = state.showAnalysisForAll,
                 hideDeletePhotoButton = hideDeletePhotoButton,
                 onDelete = viewModel::deletePhoto,
             )
@@ -152,8 +151,9 @@ fun UploadScreen(
         val buttonsBottomPadding = 94.dp
         if (!state.isLoadingPhotos && state.photos != null) {
             val isUploading = state.uploadProgress in 1 until 100
-            if (state.photos.size >= 10 && !isUploading) {
-                val shouldAnalyzePhotos = state.photos.any { it.analysisStatus == null }
+            val shouldAnalyzePhotos =
+                state.photos.any { it.analysisStatus == null || it.analysisStatus == AnalysisStatus.PROCESSING }
+            if (!isUploading && (shouldAnalyzePhotos || state.photos.size >= 10)) {
                 if (shouldAnalyzePhotos) {
                     AnalyzePhotosFab(
                         modifier = Modifier.align(Alignment.BottomCenter)
@@ -255,6 +255,7 @@ fun UploadScreen(
                 onConfirm = viewModel::deleteUnsuitablePhotos,
                 onDismiss = {
                     viewModel.toggleDeleteUnsuitablePhotosPopup(false)
+                    viewModel.trainAiModel()
                 },
             )
         }
@@ -358,7 +359,7 @@ private fun AnalyzePhotosFab(
                 Text(
                     text = stringResource(
                         Res.string.analyzing_photos,
-                        analyzingPhotos,
+                        totalPhotos - analyzingPhotos,
                         totalPhotos
                     ),
                     maxLines = 1,
@@ -475,7 +476,6 @@ private fun TrainModelFab(
 private fun Photos(
     photos: List<UploadUiState.Photo>,
     listState: LazyStaggeredGridState,
-    showAnalysisForAll: Boolean,
     hideDeletePhotoButton: Boolean,
     onDelete: (UploadUiState.Photo) -> Unit,
 ) {
@@ -508,7 +508,6 @@ private fun Photos(
                 Photo(
                     photo = photos[item],
                     optimizedVersion = optimizedVersion,
-                    showAnalysisForAll = showAnalysisForAll,
                     hideDeletePhotoButton = hideDeletePhotoButton,
                     onDelete = onDelete,
                 )
@@ -525,7 +524,6 @@ private fun Photos(
 private fun Photo(
     photo: UploadUiState.Photo,
     optimizedVersion: Boolean,
-    showAnalysisForAll: Boolean,
     hideDeletePhotoButton: Boolean,
     onDelete: (UploadUiState.Photo) -> Unit,
 ) {
@@ -545,10 +543,7 @@ private fun Photo(
         showImage = true
     }
 
-    var showAnalysis by remember { mutableStateOf(false) }
-    LaunchedEffect(showAnalysisForAll) {
-        showAnalysis = showAnalysisForAll
-    }
+    var showAnalysis by remember { mutableStateOf(true) }
 
     Box(
         modifier = Modifier.fillMaxWidth().then(if (loaded) Modifier else Modifier.aspectRatio(1f))

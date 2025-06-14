@@ -1,5 +1,6 @@
 package ai.create.photo.data.supabase
 
+import ai.create.photo.data.supabase.model.UserFile
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.functions.functions
 import io.ktor.client.call.body
@@ -30,12 +31,13 @@ object SupabaseFunction {
         Supabase.supabase.functions.invoke(function = "delete-user")
     }
 
-    suspend fun analyzePhoto(fileId: String) {
+    suspend fun analyzePhoto(fileId: String): UserFile {
         Logger.i("analyzePhoto fileId: $fileId")
-        Supabase.supabase.functions.invoke(
+        val response = Supabase.supabase.functions.invoke(
             function = "analyze-selfie",
             body = mapOf("file_id" to fileId)
         )
+        return response.body<UserFile>()
     }
 
     suspend fun generatePersonDescription(trainingId: String) {

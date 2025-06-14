@@ -100,7 +100,22 @@ class UploadViewModel : AuthViewModel() {
             uploadPhotoUseCase.invoke(userId, file).catch {
                 Logger.e("uploadPhotos failed", it)
                 uiState = uiState.copy(uploadProgress = 0, errorPopup = it)
-            }.collect { status ->
+            }.collect {
+                val (file, status) = it
+                if (file != null) {
+                    uiState = uiState.copy(
+                        photos = (uiState.photos ?: emptyList()) + UploadUiState.Photo(
+                            id = file.id,
+                            name = file.fileName,
+                            url = file.signedUrl,
+                            createdAt = file.createdAt,
+                            analysis = file.analysis,
+                            analysisStatus = file.analysisStatus,
+                        )
+                    )
+                    viewModelScope.launch { analyzePhoto(file.id) }
+                }
+
                 when (status) {
                     is UploadStatus.Progress -> {
                         val currentFileProgress =
@@ -112,7 +127,6 @@ class UploadViewModel : AuthViewModel() {
 
                     is UploadStatus.Success -> {
                         completedFiles++
-                        loadPhotos()
                         if (completedFiles == totalFiles) {
                             uiState = uiState.copy(uploadProgress = 100)
                         }
@@ -138,57 +152,87 @@ class UploadViewModel : AuthViewModel() {
         }
     }
 
-    fun analyzePhotos() = viewModelScope.launch {
-        if (uiState.analyzingPhotos != 0) return@launch
-        val notAnalyzedPhotos = uiState.photos?.filter { it.analysis == null }
+    fun analyzePhotos(): Job = viewModelScope.launch {
+        updateAnalysisStatus()
+        val notAnalyzedPhotos = uiState.photos?.filter { it.analysisStatus == null }
         if (notAnalyzedPhotos.isNullOrEmpty()) return@launch
-
-        Logger.i("analyzePhotos: ${notAnalyzedPhotos.size}")
-
-        uiState =
-            uiState.copy(analyzingPhotos = (uiState.photos?.size ?: 0) - notAnalyzedPhotos.size + 1)
         try {
             if (Supabase.LOCAL) {
                 notAnalyzedPhotos.forEach { photo ->
-                    analyzePhotoWithRetry(photo.id, photo.name)
-                    uiState = uiState.copy(analyzingPhotos = uiState.analyzingPhotos + 1)
+                    analyzePhoto(photo.id)
+                    updateAnalysisStatus()
                 }
             } else {
                 val analysisJobs = notAnalyzedPhotos.map { photo ->
                     async {
                         try {
-                            analyzePhotoWithRetry(photo.id, photo.name)
+                            analyzePhoto(photo.id)
                         } finally {
-                            uiState = uiState.copy(analyzingPhotos = uiState.analyzingPhotos + 1)
+                            updateAnalysisStatus()
                         }
                     }
                 }
                 analysisJobs.awaitAll()
             }
-            uiState = uiState.copy(analyzingPhotos = 0, showAnalysisForAll = true)
             loadPhotos()
         } catch (e: Exception) {
-            uiState = uiState.copy(analyzingPhotos = 0)
             ensureActive()
             if (!isAuthenticated) return@launch
+            loadPhotos()
             Logger.e("analyzePhotos failed", e)
             uiState = uiState.copy(errorPopup = e)
         }
     }
 
-    private suspend fun analyzePhotoWithRetry(
-        photoId: String,
-        photoName: String,
-        maxRetries: Int = 2
-    ) {
+    private fun updateAnalysisStatus() {
+        val photos = uiState.photos ?: return
+        val totalPhotos = photos.size
+        val analyzedPhotos =
+            photos.count { it.analysisStatus != null && it.analysisStatus != AnalysisStatus.PROCESSING }
+        val analyzingPhotos = photos.count { it.analysisStatus == AnalysisStatus.PROCESSING }
+        uiState = if (analyzedPhotos == totalPhotos) {
+            uiState.copy(analyzingPhotos = 0)
+        } else {
+            uiState.copy(analyzingPhotos = analyzingPhotos)
+        }
+    }
+
+    private suspend fun analyzePhoto(photoId: String, maxRetries: Int = 2) {
+        uiState = uiState.copy(
+            photos = uiState.photos?.map { photo ->
+                if (photo.id == photoId) {
+                    photo.copy(
+                        analysisStatus = AnalysisStatus.PROCESSING,
+                    )
+                } else {
+                    photo
+                }
+            }
+        )
+        Logger.i(uiState.toString())
+        updateAnalysisStatus()
+
         var attempt = 0
         var lastException: Exception? = null
 
         while (attempt <= maxRetries) {
             try {
-                SupabaseFunction.analyzePhoto(photoId)
+                val file = SupabaseFunction.analyzePhoto(photoId)
+                uiState = uiState.copy(
+                    photos = uiState.photos?.map { photo ->
+                        if (photo.id == file.id) {
+                            photo.copy(
+                                analysis = file.analysis,
+                                analysisStatus = file.analysisStatus,
+                            )
+                        } else {
+                            photo
+                        }
+                    }
+                )
+                updateAnalysisStatus()
                 if (attempt > 0) {
-                    Logger.i("Photo analysis succeeded on attempt ${attempt + 1} for: $photoName")
+                    Logger.i("Photo analysis succeeded on attempt ${attempt + 1} for: $photoId")
                 }
                 return
             } catch (e: Exception) {
@@ -196,20 +240,20 @@ class UploadViewModel : AuthViewModel() {
 
                 if (attempt <= maxRetries) {
                     val delayMs = (1000 * 2.0.pow(attempt - 1)).toLong()
-                    Logger.w("Photo analysis failed (attempt $attempt/${maxRetries + 1}) for: $photoName. Retrying in ${delayMs}ms. Error: ${e.message}")
+                    Logger.w("Photo analysis failed (attempt $attempt/${maxRetries + 1}) for: $photoId. Retrying in ${delayMs}ms. Error: ${e.message}")
                     delay(delayMs)
                     currentCoroutineContext().ensureActive()
                 } else {
                     lastException = e
                     Logger.e(
-                        "Photo analysis failed after ${maxRetries + 1} attempts for: $photoName. Final error: ${e.message}",
+                        "Photo analysis failed after ${maxRetries + 1} attempts for: $photoId. Final error: ${e.message}",
                         e
                     )
                 }
             }
         }
-        lastException?.let {  // If we reach here, it means all attempts failed
-            Logger.e("All attempts to analyze photo failed for: $photoName", it)
+        lastException?.let {
+            Logger.e("All attempts to analyze photo failed for: $photoId", it)
             throw lastException
         }
 

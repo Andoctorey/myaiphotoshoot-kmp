@@ -2,6 +2,7 @@ package ai.create.photo.ui.gallery.uploads
 
 import ai.create.photo.data.supabase.SupabaseStorage
 import ai.create.photo.data.supabase.database.UserFilesRepository
+import ai.create.photo.data.supabase.model.UserFile
 import ai.create.photo.platform.resizeToWidth
 import io.github.jan.supabase.storage.UploadStatus
 import io.github.vinceglb.filekit.core.PlatformFile
@@ -13,26 +14,31 @@ class UploadPhotoUseCase(
     private val database: UserFilesRepository
 ) {
 
-    fun invoke(userId: String, file: PlatformFile): Flow<UploadStatus> =
+    fun invoke(userId: String, file: PlatformFile): Flow<UploadResponse> =
         flow {
             val resized = resizeToWidth(file.readBytes()).getOrThrow()
 
-            var successfulResponse: UploadStatus? = null
+            var successfulStatus: UploadStatus? = null
             storage.uploadPhoto(userId, file.name, resized)
-                .collect { response ->
-                    if (response is UploadStatus.Success) {
-                        successfulResponse = response
+                .collect { status ->
+                    if (status is UploadStatus.Success) {
+                        successfulStatus = status
                     } else {
-                        emit(response)
+                        emit(UploadResponse(uploadStatus = status))
                     }
                 }
 
-            val fileName = (successfulResponse as? UploadStatus.Success)?.response?.path
+            val fileName = (successfulStatus as? UploadStatus.Success)?.response?.path
                 ?: throw Exception("File path is null after upload")
-            database.saveFile(userId, fileName).onFailure {
+            val file = database.saveFile(userId, fileName).onFailure {
                 throw it
-            }
+            }.getOrThrow()
 
-            emit(successfulResponse)
+            emit(UploadResponse(file, successfulStatus))
         }
 }
+
+data class UploadResponse(
+    val file: UserFile? = null,
+    val uploadStatus: UploadStatus
+)
