@@ -29,7 +29,6 @@ fun GalleryScreen(
     viewModel: GalleryViewModel = viewModel { GalleryViewModel() },
     generationsInProgress: Int,
     openGenerateTab: (Prompt?) -> Unit,
-    openTopUpTab: () -> Unit,
     openUploads: Boolean = false,
     openCreations: Boolean = false,
 ) {
@@ -57,7 +56,6 @@ fun GalleryScreen(
 
             Tab.UPLOADS -> UploadScreen(
                 openGenerateTab = { openGenerateTab(null) },
-                openTopUpTab = openTopUpTab,
             )
         }
 

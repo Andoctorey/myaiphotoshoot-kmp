@@ -108,7 +108,6 @@ import photocreateai.composeapp.generated.resources.upload_placeholder
 fun UploadScreen(
     viewModel: UploadViewModel = viewModel { UploadViewModel() },
     openGenerateTab: () -> Unit,
-    openTopUpTab: () -> Unit,
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),

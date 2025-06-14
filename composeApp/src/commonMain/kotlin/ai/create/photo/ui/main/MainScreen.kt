@@ -123,7 +123,6 @@ fun MainScreen(
                         navController.navigateSingleTopTo(MainRoutes.GENERATE)
                         if (prompt != null) viewModel.putPrompt(prompt)
                     },
-                    openTopUpTab = { navController.navigateSingleTopTo(MainRoutes.SETTINGS) },
                     openUploads = state.openUploads,
                     openCreations = state.openCreations,
                 )
