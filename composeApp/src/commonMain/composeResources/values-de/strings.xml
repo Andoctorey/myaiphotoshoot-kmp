@@ -71,5 +71,16 @@
     <string name="generate_your_photo">Erstelle dein eigenes ähnliches Foto</string>
     <string name="upload_tooltip_popup_title">Willkommen in der öffentlichen Galerie!</string>
     <string name="upload_tooltip_popup_message">Entdecke atemberaubende Fotos unserer Community.\n\nTippe auf ein beliebiges Foto, um seine Beschreibung zu verwenden und dein eigenes zu erstellen.\n\nVergiss nicht, deine Kreationen zu teilen!</string>
+    <string name="add_your_photos_progress">Selfies hochladen (%1$s/20)</string>
+    <string name="add_your_photos">Selfies hochladen</string>
+    <string name="upload_guidelines">Lade 10-20 verschiedene Selfies hoch\n(Hochformat empfohlen)\noder deine Lieblingsfotos.</string>
+    <string name="delete_unsuitable_photos">Einige deiner ausgewählten Fotos könnten nicht ideal für das Feintuning des KI-Modells sein. Für optimale Ergebnisse solltest du diese weniger geeigneten Bilder entfernen.</string>
+    <string name="creating_model_hint">Das dauert normalerweise ein paar Minuten - du kannst die App schließen und später zurückkommen.</string>
+    <string name="top_up_4">Aufladen 3,99€</string>
+    <string name="proceed">Trotzdem fortfahren</string>
+    <string name="thank_you_for_purchase">Vielen Dank für deinen Kauf! Dein Guthaben wird in Kürze aktualisiert.</string>
+    <string name="popular_sort_order">Beliebt</string>
+    <string name="newest_sort_order">Neueste</string>
+    <string name="topping_up">Wird aufgeladen</string>
     <string name="billing_service_unavailable">Google Play Billing Service ist nicht verfügbar</string>
 </resources>

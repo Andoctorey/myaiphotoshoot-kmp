@@ -71,5 +71,16 @@
     <string name="generate_your_photo">अपनी समान तस्वीर बनाएं</string>
     <string name="upload_tooltip_popup_title">सार्वजनिक गैलरी में आपका स्वागत है!</string>
     <string name="upload_tooltip_popup_message">हमारे समुदाय द्वारा बनाई गई शानदार तस्वीरें देखें।\n\nअपनी खुद की बनाने के लिए किसी भी तस्वीर पर टैप करें।\n\nअपनी रचनाएं साझा करना न भूलें!</string>
+    <string name="add_your_photos_progress">सेल्फी अपलोड करें (%1$s/20)</string>
+    <string name="add_your_photos">सेल्फी अपलोड करें</string>
+    <string name="upload_guidelines">10-20 विभिन्न सेल्फी अपलोड करें\n(पोर्ट्रेट मोड की सिफारिश)\nया पसंदीदा मौजूदा तस्वीरें।</string>
+    <string name="delete_unsuitable_photos">आपकी चुनी गई कुछ तस्वीरें AI मॉडल के फाइन-ट्यूनिंग के लिए आदर्श नहीं हो सकतीं। बेहतर परिणामों के लिए, इन कम उपयुक्त छवियों को हटाने पर विचार करें।</string>
+    <string name="creating_model_hint">आमतौर पर इसमें कुछ मिनट लगते हैं - आप ऐप बंद कर सकते हैं और बाद में वापस आ सकते हैं।</string>
+    <string name="top_up_4">टॉप अप $3.99</string>
+    <string name="proceed">वैसे भी आगे बढ़ें</string>
+    <string name="thank_you_for_purchase">आपकी खरीदारी के लिए धन्यवाद! आपका बैलेंस जल्द ही अपडेट हो जाएगा।</string>
+    <string name="popular_sort_order">लोकप्रिय</string>
+    <string name="newest_sort_order">नवीनतम</string>
+    <string name="topping_up">टॉप अप हो रहा है</string>
     <string name="billing_service_unavailable">Google Play बिलिंग सेवा उपलब्ध नहीं है</string>
 </resources>

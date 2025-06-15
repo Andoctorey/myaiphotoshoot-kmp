@@ -71,5 +71,16 @@
     <string name="generate_your_photo">Создать свое похожее фото</string>
     <string name="upload_tooltip_popup_title">Добро пожаловать в публичную галерею!</string>
     <string name="upload_tooltip_popup_message">Исследуйте потрясающие фотографии, созданные нашим сообществом.\n\nНажмите на любое фото, чтобы использовать его запрос и создать свое.\n\nНе забудьте поделиться своими творениями!</string>
+    <string name="add_your_photos_progress">Загрузить селфи (%1$s/20)</string>
+    <string name="add_your_photos">Загрузить селфи</string>
+    <string name="upload_guidelines">Загрузите 10-20 различных селфи\n(рекомендуется портретный режим)\nили любимые существующие фотографии.</string>
+    <string name="delete_unsuitable_photos">Некоторые из ваших выбранных фотографий могут не подходить для тонкой настройки ИИ модели. Для оптимальных результатов рассмотрите удаление этих менее подходящих изображений.</string>
+    <string name="creating_model_hint">Обычно это занимает несколько минут - вы можете закрыть приложение и вернуться позже.</string>
+    <string name="top_up_4">Пополнить $3.99</string>
+    <string name="proceed">Продолжить в любом случае</string>
+    <string name="thank_you_for_purchase">Спасибо за покупку! Ваш баланс будет обновлен в ближайшее время.</string>
+    <string name="popular_sort_order">Популярные</string>
+    <string name="newest_sort_order">Новые</string>
+    <string name="topping_up">Пополнение</string>
     <string name="billing_service_unavailable">Сервис оплаты Google Play недоступен</string>
 </resources>

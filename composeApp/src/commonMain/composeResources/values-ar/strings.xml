@@ -71,5 +71,16 @@
     <string name="generate_your_photo">أنشئ صورتك المشابهة الخاصة</string>
     <string name="upload_tooltip_popup_title">مرحباً بك في المعرض العام!</string>
     <string name="upload_tooltip_popup_message">استكشف الصور المذهلة التي أنشأها مجتمعنا.\n\nانقر على أي صورة لاستخدام وصفها وإنشاء صورتك الخاصة.\n\nلا تنس مشاركة إبداعاتك!</string>
+    <string name="add_your_photos_progress">رفع الصور الشخصية (%1$s/20)</string>
+    <string name="add_your_photos">رفع الصور الشخصية</string>
+    <string name="upload_guidelines">ارفع 10-20 صورة شخصية متنوعة\n(يُنصح بالوضع العمودي)\nأو الصور المفضلة الموجودة.</string>
+    <string name="delete_unsuitable_photos">قد لا تكون بعض الصور المختارة مثالية لضبط نموذج الذكاء الاصطناعي. للحصول على أفضل النتائج، فكر في إزالة هذه الصور الأقل ملاءمة.</string>
+    <string name="creating_model_hint">عادة ما يستغرق هذا بضع دقائق - يمكنك إغلاق التطبيق والعودة لاحقاً.</string>
+    <string name="top_up_4">شحن الرصيد $3.99</string>
+    <string name="proceed">المتابعة على أي حال</string>
+    <string name="thank_you_for_purchase">شكراً لك على شرائك! سيتم تحديث رصيدك قريباً.</string>
+    <string name="popular_sort_order">شائع</string>
+    <string name="newest_sort_order">الأحدث</string>
+    <string name="topping_up">جاري الشحن</string>
     <string name="billing_service_unavailable">خدمة فوترة Google Play غير متاحة</string>
 </resources>

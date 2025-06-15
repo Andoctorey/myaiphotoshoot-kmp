@@ -71,5 +71,16 @@
     <string name="generate_your_photo">Haz tu propia foto similar</string>
     <string name="upload_tooltip_popup_title">¡Bienvenido a la Galería Pública!</string>
     <string name="upload_tooltip_popup_message">Explora fotos increíbles hechas por nuestra comunidad.\n\nToca cualquier foto para usar su descripción y hacer la tuya propia.\n\n¡No olvides compartir tus creaciones!</string>
+    <string name="add_your_photos_progress">Subir Selfies (%1$s/20)</string>
+    <string name="add_your_photos">Subir Selfies</string>
+    <string name="upload_guidelines">Sube 10-20 selfies variados\n(modo retrato recomendado)\no tus fotos favoritas existentes.</string>
+    <string name="delete_unsuitable_photos">Algunas de tus fotos seleccionadas podrían no ser ideales para el ajuste fino del modelo de IA. Para obtener resultados óptimos, considera eliminar estas imágenes menos adecuadas.</string>
+    <string name="creating_model_hint">Esto normalmente toma unos minutos - puedes cerrar la app y volver más tarde.</string>
+    <string name="top_up_4">Recargar $3.99</string>
+    <string name="proceed">Continuar de Todos Modos</string>
+    <string name="thank_you_for_purchase">¡Gracias por tu compra! Tu saldo se actualizará en breve.</string>
+    <string name="popular_sort_order">Popular</string>
+    <string name="newest_sort_order">Más Reciente</string>
+    <string name="topping_up">Recargando</string>
     <string name="billing_service_unavailable">El Servicio de Facturación de Google Play no está disponible</string>
 </resources>
