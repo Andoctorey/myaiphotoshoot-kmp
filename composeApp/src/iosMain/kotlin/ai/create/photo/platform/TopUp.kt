@@ -12,7 +12,7 @@ interface TopUpProvider {
         userId: String,
         pricing: Pricing,
         onSuccess: () -> Unit,
-        onFailure: (e: Throwable) -> Unit
+        onFailure: (e: Throwable?) -> Unit
     )
 }
 
@@ -34,7 +34,7 @@ fun handlePurchaseCompletion(
     receipt: String,
     transactionId: String,
     onSuccess: () -> Unit,
-    onFailure: (Throwable) -> Unit
+    onFailure: (Throwable?) -> Unit
 ) = CoroutineScope(Dispatchers.IO).launch {
     try {
         val result = SupabaseFunction.verifyIosPurchase(

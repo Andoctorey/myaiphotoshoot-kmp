@@ -15,6 +15,7 @@
 		5585FB142DA24AAE002F005E /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 5585FB132DA24AAE002F005E /* FirebaseCrashlytics */; };
 		5585FB162DA24AAE002F005E /* FirebasePerformance in Frameworks */ = {isa = PBXBuildFile; productRef = 5585FB152DA24AAE002F005E /* FirebasePerformance */; };
 		5585FB182DA24CE2002F005E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5585FB172DA24CE2002F005E /* GoogleService-Info.plist */; };
+		55874A0D2DFE5CA700A06EAF /* LocalStoreKit.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 55874A0C2DFE5CA700A06EAF /* LocalStoreKit.storekit */; };
 		55B4F2F12DCF8D1000BB66FD /* StoreKitConfig.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 55B4F2F02DCF8D1000BB66FD /* StoreKitConfig.storekit */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 /* End PBXBuildFile section */
@@ -25,6 +26,7 @@
 		2152FB032600AC8F00CF470E /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
 		5574C35E2DEC2096008633F6 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		5585FB172DA24CE2002F005E /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		55874A0C2DFE5CA700A06EAF /* LocalStoreKit.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = LocalStoreKit.storekit; sourceTree = "<group>"; };
 		55B4F2F02DCF8D1000BB66FD /* StoreKitConfig.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = StoreKitConfig.storekit; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* My AI Photo Shoot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "My AI Photo Shoot.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -98,6 +100,7 @@
 				2152FB032600AC8F00CF470E /* iOSApp.swift */,
 				058557D7273AAEEB004C7B11 /* Preview Content */,
 				55B4F2F02DCF8D1000BB66FD /* StoreKitConfig.storekit */,
+				55874A0C2DFE5CA700A06EAF /* LocalStoreKit.storekit */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -185,6 +188,7 @@
 				058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */,
 				55B4F2F12DCF8D1000BB66FD /* StoreKitConfig.storekit in Resources */,
 				058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */,
+				55874A0D2DFE5CA700A06EAF /* LocalStoreKit.storekit in Resources */,
 				5585FB182DA24CE2002F005E /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

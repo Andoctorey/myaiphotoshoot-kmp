@@ -5,7 +5,7 @@ class IOSTopUpProvider: TopUpProvider {
     func topUp(userId: String,
                pricing: Pricing,
                onSuccess: @escaping () -> Void,
-               onFailure: @escaping (KotlinThrowable) -> Void
+               onFailure: @escaping (KotlinThrowable?) -> Void
     ) {
         LoggerKt.log(message: "Starting top-up for user: \(userId), product: \(pricing.productId)")
         
@@ -14,6 +14,7 @@ class IOSTopUpProvider: TopUpProvider {
             
             guard let product = product else {
                 LoggerKt.log(message: "Failed to fetch product with ID: \(pricing.productId)")
+                onFailure(KotlinRuntimeException(message: "Failed to fetch product with ID: \(pricing.productId)"))
                 return
             }
             
@@ -30,13 +31,23 @@ class IOSTopUpProvider: TopUpProvider {
                             onSuccess()
                         },
                         onFailure: { throwable in
-                            onFailure(KotlinThrowable(message: throwable.message))
-                            LoggerKt.error(message: "Server validation failed: \(throwable.description())")
+                            onFailure(KotlinThrowable(message: throwable?.message))
+                            LoggerKt.error(message: "Server validation failed: \(throwable?.description() ?? "")")
                         }
                     )
                 } else {
                     let errorMessage = error?.localizedDescription ?? "Purchase canceled"
                     LoggerKt.log(message: "Purchase failed or canceled. Error: \(errorMessage)")
+                    
+                    // Check if user canceled the purchase
+                    if let error = error as? SKError, error.code == .paymentCancelled {
+                        LoggerKt.log(message: "User canceled the purchase")
+                        onFailure(nil)
+                    } else {
+                        // Other purchase failures
+                        let failureMessage = error?.localizedDescription ?? "Purchase failed"
+                        onFailure(KotlinRuntimeException(message: failureMessage))
+                    }
                 }
             }
         }
