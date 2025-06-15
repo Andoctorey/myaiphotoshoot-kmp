@@ -15,8 +15,9 @@
     <string name="ai_model">Model</string>
     <string name="analyze_photos">Analyze photos</string>
     <string name="analyzing_photos">Analyzing photos (%1$s/%2$s)</string>
-    <string name="delete_unsuitable_photos">For best results, delete all unsuitable photos. Continue?</string>
+    <string name="delete_unsuitable_photos">Some of your selected photos may not be ideal for fine-tuning the AI model. For optimal results, consider removing these less suitable images.</string>
     <string name="generate_photo">Generate Photos</string>
+    <string name="creating_model_hint">This usually takes few minutes - you can close the app and come back later.</string>
     <string name="enhance_photo_accuracy">Enhance Photo Accuracy</string>
     <string name="photo_prompt">Photo prompt</string>
     <string name="account">Account</string>
@@ -71,7 +72,7 @@
     <string name="photo_creation">Photo Creation</string>
     <string name="promo_code_applied">Success! Promo code applied. Your new balance: $%1$s.</string>
     <string name="open_creations">Open Creations</string>
-    <string name="continue_">Continue</string>
+    <string name="proceed">Proceed Anyway</string>
     <string name="generate_your_photo">Make your own similar photo</string>
     <string name="upload_tooltip_popup_title">Welcome to the Public Gallery!</string>
     <string name="upload_tooltip_popup_message">Explore stunning photos made by our community.\n\nTap any photo to use its prompt and make your own.\n\nDon’t forget to share your creations!</string>
@@ -81,4 +82,5 @@
     <string name="newest_sort_order">Newest</string>
     <string name="all_filter">All</string>
     <string name="public_filter">Public</string>
+    <string name="topping_up">Topping Up</string>
 </resources>

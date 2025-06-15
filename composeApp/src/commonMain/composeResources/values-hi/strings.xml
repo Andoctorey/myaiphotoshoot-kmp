@@ -12,7 +12,6 @@
     <string name="ai_model">मॉडल</string>
     <string name="analyze_photos">तस्वीरों का विश्लेषण</string>
     <string name="analyzing_photos">तस्वीरों का विश्लेषण (%1$s/%2$s)</string>
-    <string name="delete_unsuitable_photos">बेहतर परिणामों के लिए, सभी अनुपयुक्त तस्वीरें हटाएं। जारी रखें?</string>
     <string name="generate_photo">तस्वीरें जेनरेट करें</string>
     <string name="enhance_photo_accuracy">फोटो सटीकता बढ़ाएं</string>
     <string name="photo_prompt">फोटो प्रॉम्प्ट</string>
@@ -69,7 +68,6 @@
     <string name="photo_creation">तस्वीर निर्माण</string>
     <string name="promo_code_applied">सफलता! प्रोमो कोड लागू हो गया। आपका नया बैलेंस: $%1$s।</string>
     <string name="open_creations">रचनाएं खोलें</string>
-    <string name="continue_">जारी रखें</string>
     <string name="generate_your_photo">अपनी समान तस्वीर बनाएं</string>
     <string name="upload_tooltip_popup_title">सार्वजनिक गैलरी में आपका स्वागत है!</string>
     <string name="upload_tooltip_popup_message">हमारे समुदाय द्वारा बनाई गई शानदार तस्वीरें देखें।\n\nअपनी खुद की बनाने के लिए किसी भी तस्वीर पर टैप करें।\n\nअपनी रचनाएं साझा करना न भूलें!</string>

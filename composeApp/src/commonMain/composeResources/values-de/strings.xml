@@ -12,7 +12,6 @@
     <string name="ai_model">Modell</string>
     <string name="analyze_photos">Fotos analysieren</string>
     <string name="analyzing_photos">Fotos werden analysiert (%1$s/%2$s)</string>
-    <string name="delete_unsuitable_photos">Für beste Ergebnisse lösche alle ungeeigneten Fotos. Fortfahren?</string>
     <string name="generate_photo">Fotos erstellen</string>
     <string name="enhance_photo_accuracy">Foto-Genauigkeit verbessern</string>
     <string name="photo_prompt">Foto-Beschreibung</string>
@@ -69,7 +68,6 @@
     <string name="photo_creation">Foto-Erstellung</string>
     <string name="promo_code_applied">Erfolg! Promo-Code angewendet. Dein neues Guthaben: $%1$s.</string>
     <string name="open_creations">Kreationen öffnen</string>
-    <string name="continue_">Fortfahren</string>
     <string name="generate_your_photo">Erstelle dein eigenes ähnliches Foto</string>
     <string name="upload_tooltip_popup_title">Willkommen in der öffentlichen Galerie!</string>
     <string name="upload_tooltip_popup_message">Entdecke atemberaubende Fotos unserer Community.\n\nTippe auf ein beliebiges Foto, um seine Beschreibung zu verwenden und dein eigenes zu erstellen.\n\nVergiss nicht, deine Kreationen zu teilen!</string>

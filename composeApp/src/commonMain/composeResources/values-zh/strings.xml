@@ -12,7 +12,6 @@
     <string name="ai_model">模型</string>
     <string name="analyze_photos">分析照片</string>
     <string name="analyzing_photos">正在分析照片 (%1$s/%2$s)</string>
-    <string name="delete_unsuitable_photos">为获得最佳效果，删除所有不合适的照片。继续？</string>
     <string name="generate_photo">生成照片</string>
     <string name="enhance_photo_accuracy">提高照片准确性</string>
     <string name="photo_prompt">照片描述</string>
@@ -69,7 +68,6 @@
     <string name="photo_creation">照片创作</string>
     <string name="promo_code_applied">成功！优惠码已应用。您的新余额：$%1$s。</string>
     <string name="open_creations">打开作品</string>
-    <string name="continue_">继续</string>
     <string name="generate_your_photo">制作您自己的相似照片</string>
     <string name="upload_tooltip_popup_title">欢迎来到公开画廊！</string>
     <string name="upload_tooltip_popup_message">探索我们社区创作的精美照片。\n\n点击任意照片使用其描述制作您自己的照片。\n\n别忘了分享您的创作！</string>

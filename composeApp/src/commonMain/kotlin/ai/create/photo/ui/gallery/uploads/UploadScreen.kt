@@ -88,12 +88,12 @@ import photocreateai.composeapp.generated.resources.add_your_photos
 import photocreateai.composeapp.generated.resources.add_your_photos_progress
 import photocreateai.composeapp.generated.resources.analyze_photos
 import photocreateai.composeapp.generated.resources.analyzing_photos
-import photocreateai.composeapp.generated.resources.continue_
 import photocreateai.composeapp.generated.resources.creating_model_hint
 import photocreateai.composeapp.generated.resources.delete
 import photocreateai.composeapp.generated.resources.delete_some_photos
 import photocreateai.composeapp.generated.resources.delete_unsuitable_photos
 import photocreateai.composeapp.generated.resources.generate_photo
+import photocreateai.composeapp.generated.resources.proceed
 import photocreateai.composeapp.generated.resources.thank_you_for_purchase
 import photocreateai.composeapp.generated.resources.topping_up
 import photocreateai.composeapp.generated.resources.train_ai_model
@@ -260,7 +260,7 @@ fun UploadScreen(
                 icon = Icons.Default.Delete,
                 message = stringResource(Res.string.delete_unsuitable_photos),
                 confirmButton = stringResource(Res.string.delete),
-                dismissButton = stringResource(Res.string.continue_),
+                dismissButton = stringResource(Res.string.proceed),
                 onConfirm = viewModel::deleteUnsuitablePhotos,
                 onDismiss = {
                     viewModel.toggleDeleteUnsuitablePhotosPopup(false)
