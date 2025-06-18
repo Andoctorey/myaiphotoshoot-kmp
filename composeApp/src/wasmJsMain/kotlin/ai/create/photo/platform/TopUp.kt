@@ -9,6 +9,5 @@ actual suspend fun topUpPlatform(
     onFailure: (e: Throwable?) -> Unit
 ) {
     openUrl("${pricing.paymentLink}?client_reference_id=$userId")
-    onSuccess()
 }
 
