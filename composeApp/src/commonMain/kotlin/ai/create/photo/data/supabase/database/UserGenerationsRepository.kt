@@ -4,6 +4,7 @@ import ai.create.photo.data.supabase.Supabase
 import ai.create.photo.data.supabase.model.GenerationsFilter
 import ai.create.photo.data.supabase.model.GenerationsSort
 import ai.create.photo.data.supabase.model.UserGeneration
+import ai.create.photo.data.supabase.retryWithBackoff
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
@@ -26,24 +27,26 @@ object UserGenerationsRepository {
         pageSize: Int,
         filter: GenerationsFilter,
     ): Result<List<UserGeneration>> = runCatching {
-        Logger.i("getCreations, page: $page, pageSize: $pageSize")
-        val from = ((page - 1) * pageSize).toLong()
-        val to = (from + pageSize - 1).toLong()
-        Supabase.supabase
-            .from(USER_GENERATIONS_TABLE)
-            .select(columns = Columns.list(UserGeneration.columns)) {
-                filter {
-                    eq("user_id", userId)
-                    eq("status", "succeeded")
-                    when (filter) {
-                        GenerationsFilter.ALL -> {}
-                        GenerationsFilter.PUBLIC -> eq("is_public", true)
+        retryWithBackoff {
+            Logger.i("getCreations, page: $page, pageSize: $pageSize")
+            val from = ((page - 1) * pageSize).toLong()
+            val to = (from + pageSize - 1).toLong()
+            Supabase.supabase
+                .from(USER_GENERATIONS_TABLE)
+                .select(columns = Columns.list(UserGeneration.columns)) {
+                    filter {
+                        eq("user_id", userId)
+                        eq("status", "succeeded")
+                        when (filter) {
+                            GenerationsFilter.ALL -> {}
+                            GenerationsFilter.PUBLIC -> eq("is_public", true)
+                        }
                     }
+                    order(column = "created_at", order = Order.DESCENDING)
+                    range(from, to)
                 }
-                order(column = "created_at", order = Order.DESCENDING)
-                range(from, to)
-            }
-            .decodeList<UserGeneration>()
+                .decodeList<UserGeneration>()
+        }
     }
 
     @OptIn(ExperimentalSerializationApi::class)
@@ -52,26 +55,28 @@ object UserGenerationsRepository {
         latestCreatedAt: Instant?,
         filter: GenerationsFilter,
     ): Result<List<UserGeneration>> = runCatching {
-        Logger.i("getCreationsAfter $latestCreatedAt")
-        Supabase.supabase
-            .from(USER_GENERATIONS_TABLE)
-            .select(columns = Columns.list(UserGeneration.columns)) {
-                filter {
-                    eq("user_id", userId)
-                    eq("status", "succeeded")
-                    when (filter) {
-                        GenerationsFilter.ALL -> {}
-                        GenerationsFilter.PUBLIC -> eq("is_public", true)
+        retryWithBackoff {
+            Logger.i("getCreationsAfter $latestCreatedAt")
+            Supabase.supabase
+                .from(USER_GENERATIONS_TABLE)
+                .select(columns = Columns.list(UserGeneration.columns)) {
+                    filter {
+                        eq("user_id", userId)
+                        eq("status", "succeeded")
+                        when (filter) {
+                            GenerationsFilter.ALL -> {}
+                            GenerationsFilter.PUBLIC -> eq("is_public", true)
+                        }
+                        if (latestCreatedAt != null) {
+                            gt("created_at", latestCreatedAt)
+                        }
                     }
-                    if (latestCreatedAt != null) {
-                        gt("created_at", latestCreatedAt)
-                    }
+                    order(column = "created_at", order = Order.DESCENDING)
                 }
-                order(column = "created_at", order = Order.DESCENDING)
-            }
-            .decodeList<UserGeneration>().also {
-                Logger.i("getCreationsAfter, count: ${it.size}")
-            }
+                .decodeList<UserGeneration>().also {
+                    Logger.i("getCreationsAfter, count: ${it.size}")
+                }
+        }
     }
 
     @OptIn(ExperimentalSerializationApi::class)
@@ -80,58 +85,68 @@ object UserGenerationsRepository {
         pageSize: Int,
         sortOrder: GenerationsSort,
     ): Result<List<UserGeneration>> = runCatching {
-        Logger.i("getPublicGallery, sort: $sortOrder, page: $page, pageSize: $pageSize")
-        val from = ((page - 1) * pageSize).toLong()
-        val to = (from + pageSize - 1).toLong()
-        Supabase.supabase
-            .from(USER_GENERATIONS_TABLE)
-            .select(columns = Columns.list(UserGeneration.columns)) {
-                filter {
-                    eq("status", "succeeded")
-                    eq("is_public", true)
-                }
-                when (sortOrder) {
-                    GenerationsSort.NEW -> order(column = "created_at", order = Order.DESCENDING)
-                    GenerationsSort.POPULAR -> order(
-                        column = "popularity",
-                        order = Order.DESCENDING
-                    )
-                }
-                order(column = "created_at", order = Order.DESCENDING)
-                range(from, to)
-            }
-            .decodeList<UserGeneration>()
-    }
-
-    @OptIn(ExperimentalSerializationApi::class)
-    suspend fun getPublicGalleryAfter(latestCreatedAt: Instant): Result<List<UserGeneration>> =
-        runCatching {
-            Logger.i("getPublicGalleryAfter $latestCreatedAt")
+        retryWithBackoff {
+            Logger.i("getPublicGallery, sort: $sortOrder, page: $page, pageSize: $pageSize")
+            val from = ((page - 1) * pageSize).toLong()
+            val to = (from + pageSize - 1).toLong()
             Supabase.supabase
                 .from(USER_GENERATIONS_TABLE)
                 .select(columns = Columns.list(UserGeneration.columns)) {
                     filter {
                         eq("status", "succeeded")
                         eq("is_public", true)
-                        gt("created_at", latestCreatedAt)
                     }
-                    limit(100)
+                    when (sortOrder) {
+                        GenerationsSort.NEW -> order(
+                            column = "created_at",
+                            order = Order.DESCENDING
+                        )
+
+                        GenerationsSort.POPULAR -> order(
+                            column = "popularity",
+                            order = Order.DESCENDING
+                        )
+                    }
                     order(column = "created_at", order = Order.DESCENDING)
+                    range(from, to)
                 }
-                .decodeList<UserGeneration>().also {
-                    Logger.i("getCreationsAfter, count: ${it.size}")
-                }
+                .decodeList<UserGeneration>()
+        }
+    }
+
+    @OptIn(ExperimentalSerializationApi::class)
+    suspend fun getPublicGalleryAfter(latestCreatedAt: Instant): Result<List<UserGeneration>> =
+        runCatching {
+            retryWithBackoff {
+                Logger.i("getPublicGalleryAfter $latestCreatedAt")
+                Supabase.supabase
+                    .from(USER_GENERATIONS_TABLE)
+                    .select(columns = Columns.list(UserGeneration.columns)) {
+                        filter {
+                            eq("status", "succeeded")
+                            eq("is_public", true)
+                            gt("created_at", latestCreatedAt)
+                        }
+                        limit(100)
+                        order(column = "created_at", order = Order.DESCENDING)
+                    }
+                    .decodeList<UserGeneration>().also {
+                        Logger.i("getCreationsAfter, count: ${it.size}")
+                    }
+            }
         }
 
     suspend fun deleteGeneratedPhoto(photoId: String) {
-        Supabase.supabase
-            .from(USER_GENERATIONS_TABLE)
-            .delete {
-                filter {
-                    eq("id", photoId)
+        retryWithBackoff {
+            Supabase.supabase
+                .from(USER_GENERATIONS_TABLE)
+                .delete {
+                    filter {
+                        eq("id", photoId)
+                    }
                 }
-            }
-            .also { Logger.i("deleteGeneratedPhotoId: $photoId") }
+                .also { Logger.i("deleteGeneratedPhotoId: $photoId") }
+        }
     }
 
     suspend fun downloadGeneratedPhoto(id: String, photoUrl: String) {
@@ -140,13 +155,15 @@ object UserGenerationsRepository {
     }
 
     suspend fun setPublic(photoId: String, public: Boolean) {
-        Supabase.supabase
-            .from(USER_GENERATIONS_TABLE)
-            .update(mapOf("is_public" to public)) {
-                filter {
-                    eq("id", photoId)
+        retryWithBackoff {
+            Supabase.supabase
+                .from(USER_GENERATIONS_TABLE)
+                .update(mapOf("is_public" to public)) {
+                    filter {
+                        eq("id", photoId)
+                    }
                 }
-            }
-            .also { Logger.i("makePublic: $photoId") }
+                .also { Logger.i("makePublic: $photoId") }
+        }
     }
 }

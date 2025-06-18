@@ -3,6 +3,7 @@ package ai.create.photo.data.supabase.database
 import ai.create.photo.data.supabase.Supabase.supabase
 import ai.create.photo.data.supabase.model.Preferences
 import ai.create.photo.data.supabase.model.Profile
+import ai.create.photo.data.supabase.retryWithBackoff
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
@@ -18,29 +19,32 @@ object ProfilesRepository {
     val profile: Profile?
         get() = profileFlow.value
 
-    suspend fun loadProfile(userId: String) = supabase
-        .from(PROFILES_TABLE)
-        .select(columns = Columns.list(Profile.columns)) {
-            filter {
-                eq("id", userId)
-            }
-            limit(1)
-        }
-        .decodeSingleOrNull<Profile>()
-        .also {
-            _profileFlow.value = it
-            Logger.i("getProfile: $it")
-        }
-
-    suspend fun updateProfilePreference(userId: String, preferences: Preferences) {
+    suspend fun loadProfile(userId: String) = retryWithBackoff {
         supabase
             .from(PROFILES_TABLE)
-            .update(mapOf("preferences" to preferences)) {
+            .select(columns = Columns.list(Profile.columns)) {
                 filter {
                     eq("id", userId)
                 }
-            }.also {
-                Logger.i("updateProfilePreference: $preferences")
+                limit(1)
+            }
+            .decodeSingleOrNull<Profile>()
+            .also {
+                _profileFlow.value = it
+                Logger.i("getProfile: $it")
             }
     }
+
+    suspend fun updateProfilePreference(userId: String, preferences: Preferences) =
+        retryWithBackoff {
+            supabase
+                .from(PROFILES_TABLE)
+                .update(mapOf("preferences" to preferences)) {
+                    filter {
+                        eq("id", userId)
+                    }
+                }.also {
+                    Logger.i("updateProfilePreference: $preferences")
+                }
+        }
 }
