@@ -103,17 +103,21 @@ class UploadViewModel : AuthViewModel() {
             }.collect {
                 val (file, status) = it
                 if (file != null) {
-                    uiState = uiState.copy(
-                        photos = (uiState.photos ?: emptyList()) + UploadUiState.Photo(
-                            id = file.id,
-                            name = file.fileName,
-                            url = file.signedUrl,
-                            createdAt = file.createdAt,
-                            analysis = file.analysis,
-                            analysisStatus = file.analysisStatus,
+                    val currentPhotos = uiState.photos ?: emptyList()
+                    val photoExists = currentPhotos.any { it.id == file.id }
+                    if (!photoExists) {
+                        uiState = uiState.copy(
+                            photos = (uiState.photos ?: emptyList()) + UploadUiState.Photo(
+                                id = file.id,
+                                name = file.fileName,
+                                url = file.signedUrl,
+                                createdAt = file.createdAt,
+                                analysis = file.analysis,
+                                analysisStatus = file.analysisStatus,
+                            )
                         )
-                    )
-                    viewModelScope.launch { analyzePhoto(file.id) }
+                        viewModelScope.launch { analyzePhoto(file.id) }
+                    }
                 }
 
                 when (status) {
