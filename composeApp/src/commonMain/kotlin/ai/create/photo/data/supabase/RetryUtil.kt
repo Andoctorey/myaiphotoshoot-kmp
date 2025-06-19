@@ -8,6 +8,7 @@ import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import kotlinx.io.EOFException
 import kotlinx.io.IOException
 import kotlin.math.pow
 import kotlin.reflect.KClass
@@ -27,6 +28,7 @@ data class RetryConfig(
         UnresolvedAddressException::class,
         RestException::class,
         HttpException::class,
+        EOFException::class,
     )
 )
 
