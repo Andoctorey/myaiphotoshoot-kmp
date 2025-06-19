@@ -140,7 +140,7 @@ fun UploadScreen(
             }
             LaunchedEffect(state.scrollToPosition) {
                 if (state.scrollToPosition != null) {
-                    if (state.scrollToPosition != 0) {
+                    if (state.scrollToPosition >= 0) {
                         Logger.i("scrolling to position: ${state.scrollToPosition}")
                         state.listState.animateScrollToItem(state.scrollToPosition)
                     }
