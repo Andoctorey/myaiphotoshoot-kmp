@@ -9,18 +9,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -68,7 +68,6 @@ fun ErrorMessagePlaceHolder(errorMessage: Throwable) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
             .padding(horizontal = 24.dp)
             .safeDrawingPadding(),
         verticalArrangement = Arrangement.Center,
@@ -81,11 +80,17 @@ fun ErrorMessagePlaceHolder(errorMessage: Throwable) {
             tint = MaterialTheme.colorScheme.error,
         )
         Spacer(modifier = Modifier.height(24.dp))
-        Text(
+        BasicText(
             text = errorMessage.getFriendlyError(),
-            color = MaterialTheme.colorScheme.error,
-            fontSize = 24.sp,
-            textAlign = TextAlign.Center,
+            autoSize = TextAutoSize.StepBased(
+                minFontSize = 10.sp,
+                maxFontSize = 24.sp,
+                stepSize = 1.sp
+            ),
+            style = TextStyle(
+                color = MaterialTheme.colorScheme.error,
+                textAlign = TextAlign.Center
+            )
         )
     }
 }
@@ -95,7 +100,6 @@ fun ErrorMessagePlaceHolderSmall(errorMessage: Throwable) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
             .padding(horizontal = 4.dp)
             .safeDrawingPadding(),
         verticalArrangement = Arrangement.Center,
@@ -108,11 +112,18 @@ fun ErrorMessagePlaceHolderSmall(errorMessage: Throwable) {
             tint = MaterialTheme.colorScheme.error,
         )
         Spacer(modifier = Modifier.height(4.dp))
-        Text(
+
+        BasicText(
             text = errorMessage.getFriendlyError(),
-            color = MaterialTheme.colorScheme.error,
-            fontSize = 10.sp,
-            textAlign = TextAlign.Center,
+            autoSize = TextAutoSize.StepBased(
+                minFontSize = 6.sp,
+                maxFontSize = 14.sp,
+                stepSize = 1.sp
+            ),
+            style = TextStyle(
+                color = MaterialTheme.colorScheme.error,
+                textAlign = TextAlign.Center
+            )
         )
     }
 }
