@@ -256,7 +256,7 @@ private fun Photo(
     AsyncImage(
         modifier = Modifier.fillMaxSize().clickable { onClick(photo) },
         model = ImageRequest.Builder(LocalPlatformContext.current)
-            .data(photo.url + if (photo.url.contains("b-cdn.net")) "?width=$width" else "")
+            .data(photo.url + if (photo.url.contains("b-cdn.net") || photo.url.contains("cdn.myaiphotoshoot.com")) "?width=$width" else "")
             .crossfade(true)
             .build(),
         contentDescription = photo.prompt,
