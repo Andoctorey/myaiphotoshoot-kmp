@@ -18,8 +18,15 @@ class UploadPhotoUseCase(
         flow {
             val resized = resizeToWidth(file.readBytes()).getOrThrow()
 
+            // Convert WebP filename to JPEG if needed
+            val finalFileName = if (file.name.lowercase().endsWith(".webp")) {
+                file.name.dropLast(5) + ".jpg"
+            } else {
+                file.name
+            }
+
             var successfulStatus: UploadStatus? = null
-            storage.uploadPhoto(userId, file.name, resized)
+            storage.uploadPhoto(userId, finalFileName, resized)
                 .collect { status ->
                     if (status is UploadStatus.Success) {
                         successfulStatus = status
@@ -30,11 +37,11 @@ class UploadPhotoUseCase(
 
             val fileName = (successfulStatus as? UploadStatus.Success)?.response?.path
                 ?: throw Exception("File path is null after upload")
-            val file = database.saveFile(userId, fileName).onFailure {
+            val userFile = database.saveFile(userId, fileName).onFailure {
                 throw it
             }.getOrThrow()
 
-            emit(UploadResponse(file, successfulStatus))
+            emit(UploadResponse(userFile, successfulStatus))
         }
 }
 

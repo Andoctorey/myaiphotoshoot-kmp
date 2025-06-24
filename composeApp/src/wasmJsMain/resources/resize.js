@@ -39,8 +39,8 @@ export async function resizeImageToWidth(
   ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(img, 0, 0, targetWidth, scaledHeight);
 
-  // 5) Extract as data URL (still hard-coded to JPG, but could adjust)
-  const dataUrl = canvas.toDataURL('image/jpeg',  1.0);
+  // 5) Extract as data URL (always convert to JPEG for consistency)
+  const dataUrl = canvas.toDataURL('image/jpeg', 1.0);
   const base64 = dataUrl.split(',')[1];
 
   // 6) Convert Base64 -> Uint8Array
