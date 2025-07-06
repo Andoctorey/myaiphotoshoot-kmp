@@ -1,5 +1,6 @@
 package ai.create.photo.ui.main
 
+import ai.create.photo.platform.getUrlHashManager
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.GenerationIcon
 import ai.create.photo.ui.gallery.GalleryScreen
@@ -35,16 +36,24 @@ fun MainScreen(
     viewModel: MainViewModel = viewModel { MainViewModel() },
     navController: NavHostController,
     initialPrompt: Prompt? = null,
+    pendingPromptState: PromptState = PromptState(),
 ) {
     val state = viewModel.uiState
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route
-    Logger.i("currentDestination: $currentDestination")
 
     // Set initial prompt if provided
     LaunchedEffect(initialPrompt) {
         if (initialPrompt != null) {
             viewModel.putPrompt(initialPrompt)
+        }
+    }
+
+    // Handle pending prompts from URL navigation
+    LaunchedEffect(pendingPromptState.version) {
+        if (pendingPromptState.prompt != null) {
+            Logger.i("Applying pending prompt: ${pendingPromptState.prompt.text}")
+            viewModel.putPrompt(pendingPromptState.prompt)
         }
     }
 
@@ -73,15 +82,13 @@ fun MainScreen(
                     onClick = {
                         when (tab) {
                             is GenerateTab -> {
-                                val currentRoute =
-                                    navController.currentBackStackEntry?.destination?.route
-                                if (currentRoute != MainRoutes.GENERATE) {
-                                    navController.navigateSingleTopTo(MainRoutes.GENERATE)
-                                }
+                                getUrlHashManager().setHash("#${MainRoutes.GENERATE}")
+                                navController.navigateSingleTopTo(MainRoutes.GENERATE)
                             }
 
                             is SettingsTab -> {
                                 if (currentDestination?.startsWith(tab.route) != true) {
+                                    getUrlHashManager().setHash("#${MainRoutes.SETTINGS}")
                                     navController.navigateSingleTopTo(tab.route)
                                 } else {
                                     viewModel.toggleResetSettingTab(true)
@@ -90,6 +97,7 @@ fun MainScreen(
 
                             is GalleryTab -> {
                                 if (currentDestination?.startsWith(tab.route) != true) {
+                                    getUrlHashManager().setHash("#${MainRoutes.GALLERY}")
                                     navController.navigateSingleTopTo(tab.route)
                                 }
                             }
@@ -100,6 +108,7 @@ fun MainScreen(
         }
     ) {
         val trainAiModel = {
+            getUrlHashManager().setHash("#${MainRoutes.GALLERY}")
             viewModel.toggleOpenUploads(true)
             navController.navigateSingleTopTo(MainRoutes.GALLERY)
         }
@@ -128,6 +137,7 @@ fun MainScreen(
                 GalleryScreen(
                     generationsInProgress = state.generationsInProgress,
                     openGenerateTab = { prompt ->
+                        getUrlHashManager().setHash("#${MainRoutes.GENERATE}")
                         navController.navigateSingleTopTo(MainRoutes.GENERATE)
                         if (prompt != null) viewModel.putPrompt(prompt)
                     },
@@ -160,6 +170,7 @@ fun MainScreen(
                         )
                     },
                     openCreations = {
+                        getUrlHashManager().setHash("#${MainRoutes.GALLERY}")
                         navController.navigateSingleTopTo(MainRoutes.GALLERY)
                         viewModel.toggleOpenCreations(true)
                     },
@@ -167,7 +178,6 @@ fun MainScreen(
                 )
                 LaunchedEffect(state.putPrompt) {
                     if (state.putPrompt != null) {
-                        Logger.i("reset prompt: ${state.putPrompt}")
                         viewModel.putPrompt(null)
                     }
                 }
@@ -175,7 +185,10 @@ fun MainScreen(
             composable<SettingsTab> {
                 SettingsScreen(
                     trainAiModel = trainAiModel,
-                    openGenerateTab = { navController.navigateSingleTopTo(MainRoutes.GENERATE) },
+                    openGenerateTab = {
+                        getUrlHashManager().setHash("#${MainRoutes.GENERATE}")
+                        navController.navigateSingleTopTo(MainRoutes.GENERATE)
+                    },
                     goToRootScreen = state.resetSettingTab
                 )
             }

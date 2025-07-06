@@ -3,6 +3,7 @@ package ai.create.photo
 import ai.create.photo.data.logger.LoggerInitializer
 import ai.create.photo.ui.generate.Prompt
 import ai.create.photo.ui.main.MainScreen
+import ai.create.photo.ui.main.PromptState
 import ai.create.photo.ui.theme.AppTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -15,12 +16,17 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun App(
     navController: NavHostController = rememberNavController(),
     initialPrompt: Prompt? = null,
+    pendingPromptState: PromptState = PromptState(),
 ) {
     LaunchedEffect(Unit) {
         LoggerInitializer.initLogger()
     }
 
     AppTheme {
-        MainScreen(navController = navController, initialPrompt = initialPrompt)
+        MainScreen(
+            navController = navController,
+            initialPrompt = initialPrompt,
+            pendingPromptState = pendingPromptState
+        )
     }
 }
