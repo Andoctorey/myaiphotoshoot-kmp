@@ -1,6 +1,13 @@
 package ai.create.photo
 
+import ai.create.photo.data.supabase.SupabaseFunction
+import ai.create.photo.ui.generate.Prompt
+import ai.create.photo.ui.main.MainRoutes
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
 import androidx.navigation.ExperimentalBrowserHistoryApi
@@ -9,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import co.touchlab.kermit.Logger
 import kotlinx.browser.document
 import kotlinx.browser.window
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalBrowserHistoryApi::class)
 fun main() {
@@ -16,16 +24,38 @@ fun main() {
 
     ComposeViewport(body) {
         val navController = rememberNavController()
-        App(navController)
+        var initialPrompt by remember { mutableStateOf<Prompt?>(null) }
+
+        App(navController = navController, initialPrompt = initialPrompt)
 
         LaunchedEffect(Unit) {
-            val initRoute = window.location.hash.substringAfter('#', "")
+            val rawHash = window.location.hash
+            val initRoute = rawHash.substringAfter('#', "")
             val params = parseParamsFromRoute(initRoute)
             val id = params["id"]
+            Logger.i("Extracted id from URL: $id")
+
             if (!id.isNullOrBlank()) {
-                Logger.i("id: $id")
-                // doesn't work for now
-//                navController.navigate(SettingsTab)
+                Logger.i("Fetching generation for id: $id")
+                launch {
+                    try {
+                        val generation = SupabaseFunction.getGeneration(id)
+                        if (generation != null) {
+                            Logger.i("Generation found, navigating to generate tab")
+                            val prompt = Prompt(
+                                generationId = generation.id,
+                                text = generation.prompt,
+                                url = generation.imageUrl,
+                            )
+                            initialPrompt = prompt
+                            navController.navigate(MainRoutes.GENERATE)
+                        } else {
+                            Logger.w("Generation not found for id: $id")
+                        }
+                    } catch (e: Exception) {
+                        Logger.e("Failed to fetch generation", e)
+                    }
+                }
             }
 
             window.bindToNavigation(navController)

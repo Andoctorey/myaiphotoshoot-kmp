@@ -4,6 +4,7 @@ import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.GenerationIcon
 import ai.create.photo.ui.gallery.GalleryScreen
 import ai.create.photo.ui.generate.GenerateScreen
+import ai.create.photo.ui.generate.Prompt
 import ai.create.photo.ui.settings.SettingsScreen
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -34,11 +35,19 @@ import org.jetbrains.compose.resources.stringResource
 fun MainScreen(
     viewModel: MainViewModel = viewModel { MainViewModel() },
     navController: NavHostController,
+    initialPrompt: Prompt? = null,
 ) {
     val state = viewModel.uiState
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route
     Logger.i("currentDestination: $currentDestination")
+
+    // Set initial prompt if provided
+    LaunchedEffect(initialPrompt) {
+        if (initialPrompt != null) {
+            viewModel.putPrompt(initialPrompt)
+        }
+    }
 
     val tabs = listOf(GalleryTab, GenerateTab, SettingsTab)
 

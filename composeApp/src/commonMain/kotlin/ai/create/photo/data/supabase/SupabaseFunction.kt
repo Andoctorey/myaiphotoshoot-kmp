@@ -1,6 +1,7 @@
 package ai.create.photo.data.supabase
 
 import ai.create.photo.data.supabase.model.UserFile
+import ai.create.photo.data.supabase.model.UserGeneration
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.functions.functions
 import io.ktor.client.call.body
@@ -124,5 +125,13 @@ object SupabaseFunction {
             )
         )
         return@retryWithBackoff response.body<Boolean>()
+    }
+
+    suspend fun getGeneration(id: String): UserGeneration? = retryWithBackoff {
+        Logger.i("getGeneration by id: $id")
+        val response = Supabase.supabase.functions.invoke(
+            function = "get-generation?id=$id"
+        )
+        return@retryWithBackoff response.body<UserGeneration?>()
     }
 }
