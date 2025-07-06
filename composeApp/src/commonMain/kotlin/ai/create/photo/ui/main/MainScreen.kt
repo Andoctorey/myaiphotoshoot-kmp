@@ -27,7 +27,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import co.touchlab.kermit.Logger
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,6 +36,8 @@ fun MainScreen(
     navController: NavHostController,
     initialPrompt: Prompt? = null,
     pendingPromptState: PromptState = PromptState(),
+    currentGenerationId: String? = null,
+    onPromptCleared: () -> Unit = {},
 ) {
     val state = viewModel.uiState
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -52,7 +53,6 @@ fun MainScreen(
     // Handle pending prompts from URL navigation
     LaunchedEffect(pendingPromptState.version) {
         if (pendingPromptState.prompt != null) {
-            Logger.i("Applying pending prompt: ${pendingPromptState.prompt.text}")
             viewModel.putPrompt(pendingPromptState.prompt)
         }
     }
@@ -82,7 +82,21 @@ fun MainScreen(
                     onClick = {
                         when (tab) {
                             is GenerateTab -> {
-                                getUrlHashManager().setHash("#${MainRoutes.GENERATE}")
+                                // Use stored generation ID if available, otherwise preserve existing query parameters
+                                val newHash = if (currentGenerationId != null) {
+                                    "#${MainRoutes.GENERATE}?id=$currentGenerationId"
+                                } else {
+                                    val currentHash = getUrlHashManager().getHash()
+                                    val currentParams = if (currentHash.contains("?")) {
+                                        currentHash.substringAfter("?")
+                                    } else ""
+                                    if (currentParams.isNotEmpty()) {
+                                        "#${MainRoutes.GENERATE}?$currentParams"
+                                    } else {
+                                        "#${MainRoutes.GENERATE}"
+                                    }
+                                }
+                                getUrlHashManager().setHash(newHash)
                                 navController.navigateSingleTopTo(MainRoutes.GENERATE)
                             }
 
@@ -175,6 +189,7 @@ fun MainScreen(
                         viewModel.toggleOpenCreations(true)
                     },
                     prompt = state.putPrompt,
+                    onPromptCleared = onPromptCleared,
                 )
                 LaunchedEffect(state.putPrompt) {
                     if (state.putPrompt != null) {

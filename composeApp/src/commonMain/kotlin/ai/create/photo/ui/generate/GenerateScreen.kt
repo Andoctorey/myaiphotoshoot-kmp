@@ -116,6 +116,7 @@ fun GenerateScreen(
     generationsInProgress: Int,
     onGenerate: (String, String, String?, Int) -> Unit,
     prompt: Prompt? = null,
+    onPromptCleared: () -> Unit = {},
 ) {
     val state = viewModel.uiState
 
@@ -344,7 +345,13 @@ fun GenerateScreen(
 
                 PhotoPrompt(
                     prompt = state.userPrompt,
-                    onPromptChanged = viewModel::onUserPromptChanged,
+                    onPromptChanged = { newPrompt ->
+                        viewModel.onUserPromptChanged(newPrompt)
+                        // If prompt is cleared manually, clear the cache
+                        if (newPrompt.isEmpty() && state.userPrompt.isNotEmpty()) {
+                            onPromptCleared()
+                        }
+                    },
                     onHistoryClicked = viewModel::onHistoryClicked,
                     onGenerate = { viewModel.prepareToGenerate(onGenerate, trainAiModel) })
             }

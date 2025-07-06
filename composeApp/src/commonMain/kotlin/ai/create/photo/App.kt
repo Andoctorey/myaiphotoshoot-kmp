@@ -17,6 +17,8 @@ fun App(
     navController: NavHostController = rememberNavController(),
     initialPrompt: Prompt? = null,
     pendingPromptState: PromptState = PromptState(),
+    currentGenerationId: String? = null,
+    onPromptCleared: () -> Unit = {},
 ) {
     LaunchedEffect(Unit) {
         LoggerInitializer.initLogger()
@@ -26,7 +28,9 @@ fun App(
         MainScreen(
             navController = navController,
             initialPrompt = initialPrompt,
-            pendingPromptState = pendingPromptState
+            pendingPromptState = pendingPromptState,
+            currentGenerationId = currentGenerationId,
+            onPromptCleared = onPromptCleared
         )
     }
 }

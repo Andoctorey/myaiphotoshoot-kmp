@@ -15,7 +15,6 @@ import androidx.compose.ui.window.ComposeViewport
 import androidx.navigation.ExperimentalBrowserHistoryApi
 import androidx.navigation.bindToNavigation
 import androidx.navigation.compose.rememberNavController
-import co.touchlab.kermit.Logger
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.launch
@@ -28,11 +27,15 @@ fun main() {
         val navController = rememberNavController()
         var initialPrompt by remember { mutableStateOf<Prompt?>(null) }
         var pendingPromptState by remember { mutableStateOf(ai.create.photo.ui.main.PromptState()) }
+        var currentGenerationId by remember { mutableStateOf<String?>(null) }
+        var cachedPrompt by remember { mutableStateOf<Prompt?>(null) }
 
         App(
             navController = navController,
             initialPrompt = initialPrompt,
-            pendingPromptState = pendingPromptState
+            pendingPromptState = pendingPromptState,
+            currentGenerationId = currentGenerationId,
+            onPromptCleared = { cachedPrompt = null }
         )
 
         LaunchedEffect(Unit) {
@@ -53,21 +56,28 @@ fun main() {
 
                 if (baseRoute == MainRoutes.GENERATE) {
                     if (!id.isNullOrBlank()) {
-                        launch {
-                            try {
-                                val generation = SupabaseFunction.getGeneration(id)
-                                if (generation != null) {
-                                    val prompt = Prompt(
-                                        generationId = generation.id,
-                                        text = generation.prompt,
-                                        url = generation.imageUrl
-                                    )
-                                    pendingPromptState = pendingPromptState.update(prompt)
+                        // Check if we have cached prompt data for this ID
+                        if (cachedPrompt != null && cachedPrompt!!.generationId == id) {
+                            pendingPromptState = pendingPromptState.update(cachedPrompt)
+                            navController.navigateSingleTopTo(MainRoutes.GENERATE)
+                        } else {
+                            currentGenerationId = id  // Store the generation ID
+                            launch {
+                                try {
+                                    val generation = SupabaseFunction.getGeneration(id)
+                                    if (generation != null) {
+                                        val prompt = Prompt(
+                                            generationId = generation.id,
+                                            text = generation.prompt,
+                                            url = generation.imageUrl
+                                        )
+                                        pendingPromptState = pendingPromptState.update(prompt)
+                                        cachedPrompt = prompt
+                                    }
+                                    navController.navigateSingleTopTo(MainRoutes.GENERATE)
+                                } catch (e: Exception) {
+                                    navController.navigateSingleTopTo(MainRoutes.GENERATE)
                                 }
-                                navController.navigateSingleTopTo(MainRoutes.GENERATE)
-                            } catch (e: Exception) {
-                                Logger.e("Failed to fetch generation", e)
-                                navController.navigateSingleTopTo(MainRoutes.GENERATE)
                             }
                         }
                     } else {
@@ -78,11 +88,9 @@ fun main() {
 
             // Initial navigation
             handleNavigation()
-            val isInitialNavigation = false
 
             // Hash change listener
             urlHashManager.addHashChangeListener { rawHash ->
-                if (isInitialNavigation) return@addHashChangeListener
                 val initRoute = rawHash.substringAfter('#', "")
                 val urlParams = parseParamsFromRoute(rawHash.substringAfter('#', ""))
                 val urlId = urlParams["id"]
@@ -91,6 +99,7 @@ fun main() {
                 } else {
                     initRoute
                 }
+
                 if (baseRoute == MainRoutes.GENERATE && !urlId.isNullOrBlank()) {
                     handleNavigation()
                 } else if (baseRoute in listOf(
@@ -101,7 +110,14 @@ fun main() {
                 ) {
                     when (baseRoute) {
                         MainRoutes.GALLERY -> navController.navigateSingleTopTo(MainRoutes.GALLERY)
-                        MainRoutes.GENERATE -> navController.navigateSingleTopTo(MainRoutes.GENERATE)
+                        MainRoutes.GENERATE -> {
+                            // Check if there's an ID in the URL when navigating to generate
+                            if (!urlId.isNullOrBlank()) {
+                                handleNavigation()
+                            } else {
+                                navController.navigateSingleTopTo(MainRoutes.GENERATE)
+                            }
+                        }
                         MainRoutes.SETTINGS -> navController.navigateSingleTopTo(MainRoutes.SETTINGS)
                     }
                 }
