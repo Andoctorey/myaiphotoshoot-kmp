@@ -22,7 +22,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -194,20 +193,4 @@ fun MainScreen(
             viewModel.toggleResetSettingTab(false)
         }
     }
-}
-
-
-fun NavHostController.navigateSingleTopTo(route: String) = navigate(route) {
-    Logger.i("Navigating to $route")
-    // Pop up to the start destination of the graph to
-    // avoid building up a large stack of destinations
-    // on the back stack as users select items
-    popUpTo(graph.findStartDestination().route!!) {
-        saveState = true
-    }
-    // Avoid multiple copies of the same destination when
-    // re-selecting the same item
-    launchSingleTop = true
-    // Restore state when re-selecting a previously selected item
-    restoreState = true
 }
