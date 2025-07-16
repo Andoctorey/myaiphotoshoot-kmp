@@ -1,6 +1,7 @@
 package ai.create.photo.ui.main
 
 import ai.create.photo.platform.getUrlHashManager
+import ai.create.photo.ui.blogs.BlogsScreen
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.GenerationIcon
 import ai.create.photo.ui.gallery.GalleryScreen
@@ -57,7 +58,7 @@ fun MainScreen(
         }
     }
 
-    val tabs = listOf(GalleryTab, GenerateTab, SettingsTab)
+    val tabs = listOf(GalleryTab, GenerateTab, BlogTab, SettingsTab)
 
     NavigationSuiteScaffold(
         modifier = Modifier.widthIn(min = 200.dp),
@@ -100,19 +101,26 @@ fun MainScreen(
                                 navController.navigateSingleTopTo(MainRoutes.GENERATE)
                             }
 
+                            is GalleryTab -> {
+                                if (currentDestination?.startsWith(tab.route) != true) {
+                                    getUrlHashManager().setHash("#${MainRoutes.GALLERY}")
+                                    navController.navigateSingleTopTo(tab.route)
+                                }
+                            }
+
+                            is BlogTab -> {
+                                if (currentDestination?.startsWith(tab.route) != true) {
+                                    getUrlHashManager().setHash("#${MainRoutes.BLOG}")
+                                    navController.navigateSingleTopTo(tab.route)
+                                }
+                            }
+
                             is SettingsTab -> {
                                 if (currentDestination?.startsWith(tab.route) != true) {
                                     getUrlHashManager().setHash("#${MainRoutes.SETTINGS}")
                                     navController.navigateSingleTopTo(tab.route)
                                 } else {
                                     viewModel.toggleResetSettingTab(true)
-                                }
-                            }
-
-                            is GalleryTab -> {
-                                if (currentDestination?.startsWith(tab.route) != true) {
-                                    getUrlHashManager().setHash("#${MainRoutes.GALLERY}")
-                                    navController.navigateSingleTopTo(tab.route)
                                 }
                             }
                         }
@@ -197,6 +205,10 @@ fun MainScreen(
                     }
                 }
             }
+            composable<BlogTab> {
+                BlogsScreen()
+            }
+            
             composable<SettingsTab> {
                 SettingsScreen(
                     trainAiModel = trainAiModel,

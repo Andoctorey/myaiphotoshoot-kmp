@@ -1,6 +1,7 @@
 <resources>
     <string name="tab_gallery">गैलरी</string>
     <string name="tab_generate">जेनरेट</string>
+    <string name="tab_blog">ब्लॉग</string>
     <string name="tab_settings">सेटिंग्स</string>
     <string name="back_button">वापस</string>
     <string name="connection_error">हमें कनेक्ट करने में समस्या हो रही है। कृपया अपना इंटरनेट कनेक्शन जांचें और फिर से कोशिश करें।</string>

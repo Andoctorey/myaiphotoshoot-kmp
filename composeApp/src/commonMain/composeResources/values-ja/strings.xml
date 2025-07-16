@@ -1,6 +1,7 @@
 <resources>
     <string name="tab_gallery">ギャラリー</string>
     <string name="tab_generate">生成</string>
+    <string name="tab_blog">ブログ</string>
     <string name="tab_settings">設定</string>
     <string name="back_button">戻る</string>
     <string name="connection_error">接続に問題があります。インターネット接続を確認して、もう一度お試しください。</string>

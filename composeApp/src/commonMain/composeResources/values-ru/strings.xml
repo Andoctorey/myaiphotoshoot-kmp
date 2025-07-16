@@ -1,6 +1,7 @@
 <resources>
     <string name="tab_gallery">Галерея</string>
     <string name="tab_generate">Создать</string>
+    <string name="tab_blog">Блог</string>
     <string name="tab_settings">Настройки</string>
     <string name="back_button">Назад</string>
     <string name="connection_error">У нас проблемы с подключением. Пожалуйста, проверьте интернет-соединение и попробуйте снова.</string>

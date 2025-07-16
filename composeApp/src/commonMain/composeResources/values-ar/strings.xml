@@ -1,6 +1,7 @@
 <resources>
     <string name="tab_gallery">المعرض</string>
     <string name="tab_generate">إنشاء</string>
+    <string name="tab_blog">المدونة</string>
     <string name="tab_settings">الإعدادات</string>
     <string name="back_button">رجوع</string>
     <string name="connection_error">نواجه مشكلة في الاتصال. يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى.</string>

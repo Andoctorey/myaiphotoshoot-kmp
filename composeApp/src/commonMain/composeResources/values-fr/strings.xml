@@ -1,6 +1,7 @@
 <resources>
     <string name="tab_gallery">Galerie</string>
     <string name="tab_generate">Générer</string>
+    <string name="tab_blog">Blog</string>
     <string name="tab_settings">Paramètres</string>
     <string name="back_button">Retour</string>
     <string name="connection_error">Nous avons des problèmes de connexion. Veuillez vérifier votre connexion internet et réessayer.</string>
