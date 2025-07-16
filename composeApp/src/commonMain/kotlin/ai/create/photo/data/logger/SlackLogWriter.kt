@@ -26,20 +26,21 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock.System
 import kotlinx.io.IOException
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 // Direct Slack webhook URL (for non-browser platforms)
 private const val SLACK_WEBHOOK_URL =
     "https://hooks.slack.com/services/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"
 
 @Serializable
-data class SlackPayload(
+data class SlackPayload @OptIn(ExperimentalTime::class) constructor(
     @SerialName("text") val text: String,
-    @SerialName("timestamp") val timestamp: Long = System.now().toEpochMilliseconds(),
+    @SerialName("timestamp") val timestamp: Long = Clock.System.now().toEpochMilliseconds(),
     @SerialName("severity") val severity: String,
 )
 

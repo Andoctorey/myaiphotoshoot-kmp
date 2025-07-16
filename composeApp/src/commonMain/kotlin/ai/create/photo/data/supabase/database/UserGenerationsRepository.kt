@@ -13,8 +13,9 @@ import io.github.vinceglb.filekit.core.FileKit
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.readRawBytes
-import kotlinx.datetime.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 object UserGenerationsRepository {
 
@@ -49,7 +50,7 @@ object UserGenerationsRepository {
         }
     }
 
-    @OptIn(ExperimentalSerializationApi::class)
+    @OptIn(ExperimentalSerializationApi::class, ExperimentalTime::class)
     suspend fun getCreationsAfter(
         userId: String,
         latestCreatedAt: Instant?,
@@ -114,7 +115,7 @@ object UserGenerationsRepository {
         }
     }
 
-    @OptIn(ExperimentalSerializationApi::class)
+    @OptIn(ExperimentalSerializationApi::class, ExperimentalTime::class)
     suspend fun getPublicGalleryAfter(latestCreatedAt: Instant): Result<List<UserGeneration>> =
         runCatching {
             retryWithBackoff {

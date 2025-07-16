@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
+import kotlin.time.ExperimentalTime
 
 class PublicViewModel : AuthViewModel() {
 
@@ -80,6 +81,7 @@ class PublicViewModel : AuthViewModel() {
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     fun loadLatestPublicGallerySortedByNew(silent: Boolean = false) = viewModelScope.launch {
         val latestCreatedAt = uiState.photos.firstOrNull()?.createdAt ?: return@launch
         Logger.i("loadLatestPublicGallerySortedByNew, silent=$silent")
@@ -110,6 +112,7 @@ class PublicViewModel : AuthViewModel() {
         uiState = uiState.copy(errorPopup = null)
     }
 
+    @OptIn(ExperimentalTime::class)
     fun addPhotoToPublicGallery(generations: List<UserGeneration>) {
         if (generations.isEmpty()) return
         if (uiState.sort != GenerationsSort.NEW) return

@@ -1,15 +1,16 @@
 package ai.create.photo.data.supabase.model
 
-import kotlinx.datetime.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.elementNames
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 @Serializable
-data class UserGeneration(
+data class UserGeneration @OptIn(ExperimentalTime::class) constructor(
     @SerialName("id") val id: String,
-    @SerialName("created_at") val createdAt: Instant,
+    @Serializable(with = InstantSerializer::class) @SerialName("created_at") val createdAt: Instant,
     @SerialName("prompt") val prompt: String,
     @SerialName("public_url") val imageUrl: String,
     @SerialName("file_id") val fileId: String?,

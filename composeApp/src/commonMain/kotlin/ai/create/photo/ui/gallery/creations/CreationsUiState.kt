@@ -4,7 +4,8 @@ import ai.create.photo.data.supabase.model.GenerationsFilter
 import ai.create.photo.data.supabase.model.UserGeneration
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Immutable
-import kotlinx.datetime.Instant
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 @Immutable
 data class CreationsUiState(
@@ -25,7 +26,7 @@ data class CreationsUiState(
     val errorPopup: Throwable? = null,
 ) {
     @Immutable
-    data class Photo(
+    data class Photo @OptIn(ExperimentalTime::class) constructor(
         val id: String,
         val createdAt: Instant,
         val url: String,
@@ -34,6 +35,7 @@ data class CreationsUiState(
         val isPublic: Boolean,
     ) {
 
+        @OptIn(ExperimentalTime::class)
         constructor(it: UserGeneration) : this(
             id = it.id,
             createdAt = it.createdAt,
@@ -45,6 +47,7 @@ data class CreationsUiState(
     }
 }
 
+@OptIn(ExperimentalTime::class)
 fun CreationsUiState.Photo.toUserGeneration() = UserGeneration(
     id = id,
     createdAt = createdAt,

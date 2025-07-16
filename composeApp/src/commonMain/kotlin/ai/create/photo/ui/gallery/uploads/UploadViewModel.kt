@@ -27,9 +27,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
 import kotlin.math.max
 import kotlin.math.pow
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 class UploadViewModel : AuthViewModel() {
 
@@ -56,6 +57,7 @@ class UploadViewModel : AuthViewModel() {
         uiState = uiState.copy(isLoadingPhotos = false, loadingError = error)
     }
 
+    @OptIn(ExperimentalTime::class)
     private fun loadPhotos() = viewModelScope.launch {
         Logger.i("loadPhotos")
         val userId = user?.id ?: return@launch
@@ -87,6 +89,7 @@ class UploadViewModel : AuthViewModel() {
     }
 
 
+    @OptIn(ExperimentalTime::class)
     fun uploadPhotos(files: PlatformFiles) = viewModelScope.launch {
         Logger.i("uploadPhotos: ${files.joinToString { it.name }}")
         val userId = user?.id ?: return@launch
@@ -201,6 +204,7 @@ class UploadViewModel : AuthViewModel() {
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     private suspend fun analyzePhoto(photoId: String, maxRetries: Int = 2) {
         uiState = uiState.copy(
             photos = uiState.photos?.map { photo ->
@@ -336,6 +340,7 @@ class UploadViewModel : AuthViewModel() {
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     private fun loadTraining(): Job = viewModelScope.launch {
         Logger.i("loadTraining, trainingStatus: ${uiState.trainingStatus}")
         val userId = user?.id ?: return@launch
@@ -453,7 +458,7 @@ class UploadViewModel : AuthViewModel() {
             },
             onSuccess = {
                 viewModelScope.launch {
-                    (1..10).forEach {
+                    repeat((1..10).count()) {
                         ProfilesRepository.loadProfile(userId)
                         if ((ProfilesRepository.profile?.balance ?: 0f) >= 3f) {
                             trainAiModel()

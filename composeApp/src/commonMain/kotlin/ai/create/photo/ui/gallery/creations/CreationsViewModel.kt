@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
+import kotlin.time.ExperimentalTime
 
 class CreationsViewModel : AuthViewModel() {
 
@@ -38,6 +39,7 @@ class CreationsViewModel : AuthViewModel() {
         uiState = uiState.copy(loadingError = error)
     }
 
+    @OptIn(ExperimentalTime::class)
     fun refreshCreations(silent: Boolean = false) = viewModelScope.launch {
         val userId = user?.id ?: return@launch
         if (uiState.isRefreshing) return@launch
@@ -123,6 +125,7 @@ class CreationsViewModel : AuthViewModel() {
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     fun togglePublic(photo: CreationsUiState.Photo, onSuccess: () -> Unit) = viewModelScope.launch {
         Logger.i("togglePublic: $photo")
         val photos = uiState.photos

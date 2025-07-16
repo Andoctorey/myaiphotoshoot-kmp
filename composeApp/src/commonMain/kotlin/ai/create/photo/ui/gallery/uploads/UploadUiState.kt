@@ -4,7 +4,8 @@ import ai.create.photo.data.supabase.model.AnalysisStatus
 import ai.create.photo.data.supabase.model.TrainingStatus
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.runtime.Immutable
-import kotlinx.datetime.Instant
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 @Immutable
 data class UploadUiState(
@@ -37,7 +38,7 @@ data class UploadUiState(
 ) {
 
     @Immutable
-    data class Photo(
+    data class Photo @OptIn(ExperimentalTime::class) constructor(
         val id: String,
         val name: String,
         val url: String,

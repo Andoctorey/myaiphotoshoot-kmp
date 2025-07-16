@@ -1,6 +1,6 @@
 [versions]
 adaptive = "1.1.2"
-agp = "8.11.0"
+agp = "8.11.1"
 android-minSdk = "26"
 android-targetSdk = "35"
 androidx-activityCompose = "1.10.1"
@@ -19,10 +19,10 @@ googleServices = "4.4.3"
 kermit = "2.0.6"
 kotlin = "2.2.0"
 kotlinx-coroutines = "1.10.2"
-ktorClientCio = "3.2.1"
+ktorClientCio = "3.2.2"
 materialNavigation = "1.8.0-beta06"
 multidex = "2.0.1"
-supabase = "3.2.0"
+supabase = "3.2.1"
 
 [libraries]
 adaptive-layout = { module = "org.jetbrains.compose.material3.adaptive:adaptive-layout", version.ref = "adaptive" }
