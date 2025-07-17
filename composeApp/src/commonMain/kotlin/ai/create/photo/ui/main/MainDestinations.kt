@@ -1,7 +1,7 @@
 package ai.create.photo.ui.main
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Article
+import androidx.compose.material.icons.filled.AutoStories
 import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Settings
@@ -49,7 +49,7 @@ data object GenerateTab : TabScreen() {
 data object BlogTab : TabScreen() {
     override val route = MainRoutes.BLOG
     override val label = Res.string.tab_blog
-    override val icon = Icons.AutoMirrored.Filled.Article
+    override val icon = Icons.Default.AutoStories
 }
 
 @Serializable

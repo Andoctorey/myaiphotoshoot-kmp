@@ -13,8 +13,8 @@ data class UserGeneration @OptIn(ExperimentalTime::class) constructor(
     @Serializable(with = InstantSerializer::class) @SerialName("created_at") val createdAt: Instant,
     @SerialName("prompt") val prompt: String,
     @SerialName("public_url") val imageUrl: String,
-    @SerialName("file_id") val fileId: String?,
-    @SerialName("is_public") val isPublic: Boolean,
+    @SerialName("file_id") val fileId: String? = null,
+    @SerialName("is_public") val isPublic: Boolean = false,
 ) {
     companion object {
         @OptIn(ExperimentalSerializationApi::class)

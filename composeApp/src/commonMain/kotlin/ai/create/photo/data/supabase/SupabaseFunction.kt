@@ -1,10 +1,12 @@
 package ai.create.photo.data.supabase
 
+import ai.create.photo.data.supabase.model.BlogPostsResponse
 import ai.create.photo.data.supabase.model.UserFile
 import ai.create.photo.data.supabase.model.UserGeneration
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.functions.functions
 import io.ktor.client.call.body
+import io.ktor.http.HttpMethod
 
 object SupabaseFunction {
 
@@ -17,16 +19,16 @@ object SupabaseFunction {
 
     suspend fun generatePhoto(trainingId: String, prompt: String, parentGenerationId: String?) =
         retryWithBackoff {
-        Logger.i("generatePhoto trainingId: $trainingId, parentGenerationId: $parentGenerationId, prompt: $prompt")
-        Supabase.supabase.functions.invoke(
-            function = "generate",
-            body = mapOf(
-                "training_id" to trainingId,
-                "prompt" to prompt,
-                "parent_generation_id" to parentGenerationId,
+            Logger.i("generatePhoto trainingId: $trainingId, parentGenerationId: $parentGenerationId, prompt: $prompt")
+            Supabase.supabase.functions.invoke(
+                function = "generate",
+                body = mapOf(
+                    "training_id" to trainingId,
+                    "prompt" to prompt,
+                    "parent_generation_id" to parentGenerationId,
+                )
             )
-        )
-    }
+        }
 
     suspend fun deleteUser() = retryWithBackoff {
         Logger.i("deleteUser")
@@ -102,13 +104,13 @@ object SupabaseFunction {
 
     suspend fun verifyAndroidPurchase(productId: String, purchaseToken: String): Boolean =
         retryWithBackoff {
-        Logger.i("verifyAndroidPurchase: $productId, $purchaseToken")
-        val response = Supabase.supabase.functions.invoke(
-            function = "verify-android-purchase",
-            body = mapOf("product_id" to productId, "purchase_token" to purchaseToken)
-        )
+            Logger.i("verifyAndroidPurchase: $productId, $purchaseToken")
+            val response = Supabase.supabase.functions.invoke(
+                function = "verify-android-purchase",
+                body = mapOf("product_id" to productId, "purchase_token" to purchaseToken)
+            )
             return@retryWithBackoff response.body<Boolean>()
-    }
+        }
 
     suspend fun verifyIosPurchase(
         productId: String,
@@ -133,5 +135,26 @@ object SupabaseFunction {
             function = "get-generation?id=$id"
         )
         return@retryWithBackoff response.body<UserGeneration?>()
+    }
+
+    suspend fun getBlogPosts(
+        page: Int = 1,
+        limit: Int = 10,
+        locale: String? = null
+    ): BlogPostsResponse = retryWithBackoff {
+        Logger.i("getBlogPosts page: $page, limit: $limit, locale: $locale")
+        val params = buildList {
+            add("page=$page")
+            add("limit=$limit")
+            add("locale=$locale")
+        }
+
+        val queryString = if (params.isNotEmpty()) "?${params.joinToString("&")}" else ""
+        val response = Supabase.supabase.functions.invoke(
+            function = "blog-posts$queryString"
+        ) {
+            method = HttpMethod.Get
+        }
+        return@retryWithBackoff response.body<BlogPostsResponse>()
     }
 }

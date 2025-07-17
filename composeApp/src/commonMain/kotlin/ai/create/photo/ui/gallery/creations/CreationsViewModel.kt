@@ -73,7 +73,7 @@ class CreationsViewModel : AuthViewModel() {
         val userId = user?.id ?: return@launch
         if (uiState.isLoadingNextPage) return@launch
         Logger.i("loadCreations")
-        uiState = uiState.copy(isLoadingNextPage = true)
+        uiState = uiState.copy(isLoadingNextPage = true, loadingError = null)
         try {
             val generations =
                 UserGenerationsRepository.getCreations(
@@ -86,10 +86,9 @@ class CreationsViewModel : AuthViewModel() {
 
             uiState = uiState.copy(
                 isLoading = false,
-                loadingError = null,
+                isLoadingNextPage = false,
                 scrollToTop = newPhotos.size > (uiState.photos.size),
                 photos = (uiState.photos + newPhotos).distinctBy { photo -> photo.id },
-                isLoadingNextPage = false,
                 page = uiState.page + 1,
                 pagingLimitReach = newPhotos.isEmpty(),
             )

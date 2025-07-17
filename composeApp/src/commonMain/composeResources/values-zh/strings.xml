@@ -1,7 +1,7 @@
 <resources>
     <string name="tab_gallery">相册</string>
     <string name="tab_generate">生成</string>
-    <string name="tab_blogs">博客</string>
+    <string name="tab_blog">博客</string>
     <string name="tab_settings">设置</string>
     <string name="back_button">返回</string>
     <string name="connection_error">连接遇到问题。请检查网络连接后重试。</string>

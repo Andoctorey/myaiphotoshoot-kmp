@@ -1,0 +1,186 @@
+package ai.create.photo.ui.blog
+
+import ai.create.photo.data.supabase.model.BlogListItem
+import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
+import ai.create.photo.ui.compose.ErrorPopup
+import ai.create.photo.ui.compose.LoadingPlaceholder
+import ai.create.photo.ui.compose.PullToRefreshBoxNoDesktop
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
+import androidx.compose.foundation.layout.windowInsetsTopHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.flow.distinctUntilChanged
+import org.jetbrains.compose.ui.tooling.preview.Preview
+
+@Preview
+@Composable
+fun BlogScreen(
+    viewModel: BlogsViewModel = viewModel { BlogsViewModel() },
+) {
+    val state = viewModel.uiState
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (state.isLoading) {
+            Spacer(modifier = Modifier.height(20.dp))
+            LoadingPlaceholder()
+        } else if (state.loadingError != null) {
+            ErrorMessagePlaceHolder(state.loadingError)
+        } else {
+            LaunchedEffect(state.scrollToTop) {
+                if (state.scrollToTop && state.listState.firstVisibleItemIndex > 1) {
+                    state.listState.animateScrollToItem(0)
+                }
+                viewModel.resetScrollToTop()
+            }
+
+            Posts(
+                articles = state.posts,
+                listState = state.listState,
+                isLoadingNextPage = state.isLoadingNextPage,
+                pagingLimitReach = state.pagingLimitReach,
+                loadNextPage = viewModel::loadMorePosts,
+                isRefreshing = state.isRefreshing,
+                onRefresh = viewModel::refresh,
+                onClick = {},
+            )
+        }
+    }
+
+    if (state.errorPopup != null) {
+        ErrorPopup(state.errorPopup) {
+            viewModel.hideErrorPopup()
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun Posts(
+    articles: List<BlogListItem>,
+    listState: LazyListState,
+    isLoadingNextPage: Boolean,
+    pagingLimitReach: Boolean,
+    loadNextPage: () -> Unit = {},
+    isRefreshing: Boolean = false,
+    onRefresh: () -> Unit,
+    onClick: (BlogListItem) -> Unit,
+) {
+    PullToRefreshBoxNoDesktop(
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh,
+    ) {
+
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(horizontal = 24.dp)
+        ) {
+            item {
+                Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
+            }
+
+            items(articles.size, key = { articles[it].id }) { item ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .animateItem(),
+                ) {
+                    Post(
+                        post = articles[item],
+                        onClick = onClick,
+                    )
+                }
+            }
+
+            if (isLoadingNextPage && !pagingLimitReach) {
+                item {
+                    Box(
+                        modifier = Modifier.fillMaxWidth().aspectRatio(1f),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        LoadingPlaceholder()
+                    }
+                }
+            }
+
+            item {
+                Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.systemBars))
+            }
+        }
+    }
+
+    val articlesLoaded = articles.size
+    if (!isLoadingNextPage && !pagingLimitReach) {
+        LaunchedEffect(listState, articlesLoaded) {
+            snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
+                .distinctUntilChanged()
+                .collect {
+                    val lastVisibleItemIndex = it ?: return@collect
+                    if (lastVisibleItemIndex >= (articlesLoaded - 3) && !isLoadingNextPage) {
+                        loadNextPage()
+                    }
+                }
+        }
+    }
+}
+
+@Composable
+private fun Post(
+    post: BlogListItem,
+    onClick: (BlogListItem) -> Unit
+) {
+    OutlinedCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = { onClick(post) }),
+        colors = CardDefaults.outlinedCardColors().copy(
+            containerColor = Color.Transparent,
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = post.title,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Text(
+                text = post.metaDescription,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}

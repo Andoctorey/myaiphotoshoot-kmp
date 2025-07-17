@@ -1,7 +1,7 @@
 package ai.create.photo.ui.main
 
 import ai.create.photo.platform.getUrlHashManager
-import ai.create.photo.ui.blogs.BlogsScreen
+import ai.create.photo.ui.blog.BlogScreen
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.GenerationIcon
 import ai.create.photo.ui.gallery.GalleryScreen
@@ -206,7 +206,7 @@ fun MainScreen(
                 }
             }
             composable<BlogTab> {
-                BlogsScreen()
+                BlogScreen()
             }
             
             composable<SettingsTab> {
