@@ -1,10 +1,13 @@
 package ai.create.photo.ui.blog
 
 import ai.create.photo.data.supabase.model.BlogListItem
+import ai.create.photo.data.supabase.model.UserGeneration
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
+import ai.create.photo.ui.compose.ErrorMessagePlaceHolderSmall
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.compose.PullToRefreshBoxNoDesktop
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,11 +20,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -29,12 +34,24 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import co.touchlab.kermit.Logger
+import coil3.compose.AsyncImage
+import coil3.compose.LocalPlatformContext
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import kotlinx.coroutines.flow.distinctUntilChanged
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -168,19 +185,72 @@ private fun Post(
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(
-                text = post.title,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = post.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
 
-            Text(
-                text = post.metaDescription,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+                Text(
+                    text = post.metaDescription,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
+            val photos = post.sectionPhotos.values.toList()
+            if (photos.isNotEmpty()) {
+                val density = LocalDensity.current
+                val size = remember { with(density) { 420.toDp() } }
+
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(horizontal = 4.dp)
+                ) {
+                    items(photos.size, key = { photos[it].id }) {
+                        PhotoItem(photo = photos[it], size = size)
+                    }
+                }
+            }
         }
+    }
+}
+
+@Composable
+private fun PhotoItem(
+    photo: UserGeneration,
+    size: Dp,
+) {
+    var error by remember { mutableStateOf<Throwable?>(null) }
+    error?.let {
+        ErrorMessagePlaceHolderSmall(it)
+    }
+
+    Box(
+        modifier = Modifier
+            .size(size)
+            .aspectRatio(1f)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .clickable {
+            }
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalPlatformContext.current)
+                .data("${photo.imageUrl}?width=$size")
+                .crossfade(true)
+                .build(),
+            contentDescription = photo.prompt,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.FillBounds,
+            onError = {
+                Logger.e("error loading image ${photo.imageUrl}", it.result.throwable)
+                error = it.result.throwable
+            }
+        )
     }
 }
