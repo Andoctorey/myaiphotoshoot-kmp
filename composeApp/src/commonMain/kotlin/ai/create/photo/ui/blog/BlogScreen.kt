@@ -7,6 +7,7 @@ import ai.create.photo.ui.compose.ErrorMessagePlaceHolderSmall
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.compose.PullToRefreshBoxNoDesktop
+import ai.create.photo.ui.generate.Prompt
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -59,6 +60,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun BlogScreen(
     viewModel: BlogsViewModel = viewModel { BlogsViewModel() },
+    openGenerateTab: (Prompt) -> Unit,
 ) {
     val state = viewModel.uiState
     Box(
@@ -87,6 +89,7 @@ fun BlogScreen(
                 isRefreshing = state.isRefreshing,
                 onRefresh = viewModel::refresh,
                 onClick = {},
+                generate = openGenerateTab,
             )
         }
     }
@@ -109,6 +112,7 @@ private fun Posts(
     isRefreshing: Boolean = false,
     onRefresh: () -> Unit,
     onClick: (BlogListItem) -> Unit,
+    generate: (Prompt) -> Unit,
 ) {
     PullToRefreshBoxNoDesktop(
         isRefreshing = isRefreshing,
@@ -134,6 +138,7 @@ private fun Posts(
                     Post(
                         post = articles[item],
                         onClick = onClick,
+                        generate = generate,
                     )
                 }
             }
@@ -173,7 +178,8 @@ private fun Posts(
 @Composable
 private fun Post(
     post: BlogListItem,
-    onClick: (BlogListItem) -> Unit
+    onClick: (BlogListItem) -> Unit,
+    generate: (Prompt) -> Unit,
 ) {
     OutlinedCard(
         modifier = Modifier
@@ -213,7 +219,7 @@ private fun Post(
                     contentPadding = PaddingValues(horizontal = 4.dp)
                 ) {
                     items(photos.size, key = { photos[it].id }) {
-                        PhotoItem(photo = photos[it], size = size)
+                        PhotoItem(photo = photos[it], size = size, generate = generate)
                     }
                 }
             }
@@ -225,6 +231,7 @@ private fun Post(
 private fun PhotoItem(
     photo: UserGeneration,
     size: Dp,
+    generate: (Prompt) -> Unit,
 ) {
     var error by remember { mutableStateOf<Throwable?>(null) }
     error?.let {
@@ -237,6 +244,7 @@ private fun PhotoItem(
             .aspectRatio(1f)
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .clickable {
+                generate(Prompt(photo.id, photo.prompt, photo.imageUrl))
             }
     ) {
         AsyncImage(

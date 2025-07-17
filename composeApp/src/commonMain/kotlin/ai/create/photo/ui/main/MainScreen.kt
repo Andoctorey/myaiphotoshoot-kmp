@@ -206,7 +206,13 @@ fun MainScreen(
                 }
             }
             composable<BlogTab> {
-                BlogScreen()
+                BlogScreen(
+                    openGenerateTab = { prompt ->
+                        getUrlHashManager().setHash("#${MainRoutes.GENERATE}")
+                        navController.navigateSingleTopTo(MainRoutes.GENERATE)
+                        viewModel.putPrompt(prompt)
+                    }
+                )
             }
             
             composable<SettingsTab> {
