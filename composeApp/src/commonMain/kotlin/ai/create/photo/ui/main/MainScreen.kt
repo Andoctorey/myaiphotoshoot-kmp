@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -40,6 +41,19 @@ fun MainScreen(
     viewModel: MainViewModel = viewModel { MainViewModel() },
     navController: NavHostController,
 ) {
+    // Helper function for tab navigation with state preservation
+    fun navigateToTab(route: String) {
+        navController.navigate(route) {
+            // Pop up to the start destination but save state
+            popUpTo(navController.graph.findStartDestination().route!!) {
+                saveState = true
+            }
+            // Avoid multiple copies of the same destination
+            launchSingleTop = true
+            // Restore state when re-selecting a previously selected item
+            restoreState = true
+        }
+    }
     val state = viewModel.uiState
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route
@@ -78,24 +92,18 @@ fun MainScreen(
                             }
 
                             is GalleryTab -> {
-                                // If we're on a parameterized route, pop back to the main route first
-                                if (currentDestination?.contains("/") == true) {
-                                    navController.popBackStack()
-                                    navController.navigateSingleTopTo(tab.route)
-                                } else {
-                                    navController.navigateSingleTopTo(tab.route)
-                                }
+                                navigateToTab(tab.route)
                             }
 
                             is BlogTab -> {
-                                navController.navigateSingleTopTo(tab.route)
+                                navigateToTab(tab.route)
                             }
 
                             is SettingsTab -> {
                                 if (currentDestination?.startsWith(tab.route) == true) {
                                     viewModel.toggleResetSettingTab(true)
                                 } else {
-                                    navController.navigateSingleTopTo(tab.route)
+                                    navigateToTab(tab.route)
                                 }
                             }
                         }
