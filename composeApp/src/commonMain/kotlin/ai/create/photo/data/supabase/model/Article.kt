@@ -24,6 +24,7 @@ data class ArticleTranslation(
     @SerialName("title") val title: String,
     @SerialName("content") val content: String,
     @SerialName("meta_description") val metaDescription: String,
+    @SerialName("photo_topics") val photoTopics: String? = null,
 )
 
 @Serializable

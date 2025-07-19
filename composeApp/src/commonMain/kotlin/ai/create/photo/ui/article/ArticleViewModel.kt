@@ -32,8 +32,16 @@ class ArticleViewModel : ViewModel() {
             val locale = getLocale()
             val post = SupabaseFunction.getBlogPost(id = postId, locale = locale)
 
-            // Parse topics and match with photos
-            val topics = parsePhotoTopics(post.photoTopics, post.sectionPhotos)
+            // Use original photo topics for matching, translated for display
+            val originalPhotoTopics = post.photoTopics // Original English content (for matching)
+            val translatedPhotoTopics =
+                post.translations?.get(locale)?.photoTopics // Translated content (for display)
+
+            val topics = parsePhotoTopics(
+                displayTopics = translatedPhotoTopics ?: originalPhotoTopics,
+                matchTopics = originalPhotoTopics,
+                sectionPhotos = post.sectionPhotos
+            )
 
             currentPostId = postId
             uiState = uiState.copy(
@@ -51,14 +59,17 @@ class ArticleViewModel : ViewModel() {
     }
 
     private fun parsePhotoTopics(
-        photoTopics: String?,
+        displayTopics: String?,
+        matchTopics: String?,
         sectionPhotos: Map<String, ai.create.photo.data.supabase.model.UserGeneration>?
     ): List<PhotoTopic> {
-        if (photoTopics.isNullOrBlank()) return emptyList()
-        
-        return photoTopics.split('\n')
-            .filter { it.trim().isNotEmpty() }
-            .mapNotNull { line ->
+        if (displayTopics.isNullOrBlank()) return emptyList()
+
+        // Parse display topics for titles and descriptions
+        val displayLines = displayTopics.split('\n').filter { it.trim().isNotEmpty() }
+        val matchLines = matchTopics?.split('\n')?.filter { it.trim().isNotEmpty() } ?: displayLines
+
+        return displayLines.mapIndexedNotNull { index, line ->
                 // Parse format: "1. **Section Name** - Brief explanation"
                 val regex = Regex("""^\d+\.\s*\*\*(.*?)\*\*\s*-\s*(.*)""")
                 val match = regex.find(line.trim())
@@ -66,7 +77,16 @@ class ArticleViewModel : ViewModel() {
                 if (match != null) {
                     val title = match.groupValues[1].trim()
                     val description = match.groupValues[2].trim()
-                    val photos = getPhotosForTopic(title, sectionPhotos ?: emptyMap())
+                    // Get matching title from original topics
+                    val matchLine = matchLines.getOrNull(index)
+                    val matchTitle = if (matchLine != null) {
+                        val matchRegex = Regex("""^\d+\.\s*\*\*(.*?)\*\*\s*-\s*(.*)""")
+                        val matchResult = matchRegex.find(matchLine.trim())
+                        matchResult?.groupValues?.get(1)?.trim() ?: title
+                    } else {
+                        title
+                    }
+                    val photos = getPhotosForTopic(matchTitle, sectionPhotos ?: emptyMap())
                     PhotoTopic(title = title, description = description, photos = photos)
                 } else {
                     // Fallback parsing for different formats
@@ -74,7 +94,16 @@ class ArticleViewModel : ViewModel() {
                     if (parts.size >= 2) {
                         val title = parts[0].replace(Regex("""^\*\*|\*\*$"""), "").trim()
                         val description = parts[1].trim()
-                        val photos = getPhotosForTopic(title, sectionPhotos ?: emptyMap())
+                        // Get matching title from original topics
+                        val matchLine = matchLines.getOrNull(index)
+                        val matchTitle = if (matchLine != null) {
+                            val matchRegex = Regex("""^\d+\.\s*\*\*(.*?)\*\*\s*-\s*(.*)""")
+                            val matchResult = matchRegex.find(matchLine.trim())
+                            matchResult?.groupValues?.get(1)?.trim() ?: title
+                        } else {
+                            title
+                        }
+                        val photos = getPhotosForTopic(matchTitle, sectionPhotos ?: emptyMap())
                         PhotoTopic(title = title, description = description, photos = photos)
                     } else {
                         null
