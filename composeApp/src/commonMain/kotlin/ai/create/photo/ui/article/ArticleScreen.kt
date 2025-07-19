@@ -160,6 +160,10 @@ private fun ArticleContent(
                     )
                 }
             }
+
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Spacer(Modifier.height(24.dp))
+            }
         }
 
         item(span = { GridItemSpan(maxLineSpan) }) {
@@ -176,8 +180,6 @@ private fun TopicHeader(topic: PhotoTopic) {
             .padding(vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
-        
         Text(
             text = topic.title,
             style = MaterialTheme.typography.headlineSmall,
