@@ -10,12 +10,12 @@ data class Article @OptIn(ExperimentalTime::class) constructor(
     @SerialName("id") val id: String,
     @SerialName("title") val title: String,
     @SerialName("content") val content: String,
-    @SerialName("photo_topics") val photoTopics: String? = null,
+    @SerialName("photo_topics") val photoTopics: String,
     @Serializable(with = InstantSerializer::class) @SerialName("created_at") val createdAt: Instant,
     @SerialName("meta_description") val metaDescription: String,
     @SerialName("featured_image_url") val featuredImageUrl: String? = null,
     @SerialName("slug") val slug: String? = null,
-    @SerialName("section_photos") val sectionPhotos: Map<String, UserGeneration>? = null,
+    @SerialName("section_photos") val sectionPhotos: Map<String, UserGeneration>,
     @SerialName("translations") val translations: Map<String, ArticleTranslation>? = null
 )
 

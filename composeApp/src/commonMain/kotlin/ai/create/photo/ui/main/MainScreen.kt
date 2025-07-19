@@ -228,6 +228,11 @@ fun MainScreen(
                     postId = postId,
                     onBackClick = {
                         navController.popBackStack()
+                    },
+                    openGenerateTab = { prompt ->
+                        getUrlHashManager().setHash("#${MainRoutes.GENERATE}")
+                        navController.navigateSingleTopTo(MainRoutes.GENERATE)
+                        viewModel.putPrompt(prompt)
                     }
                 )
             }
