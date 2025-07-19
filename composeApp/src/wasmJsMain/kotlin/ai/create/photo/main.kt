@@ -44,27 +44,20 @@ fun main() {
             fun handleNavigation() {
                 val rawHash = urlHashManager.getHash()
                 val initRoute = rawHash.substringAfter('#', "")
-                val params = parseParamsFromRoute(initRoute)
-                val id = params["id"]
 
-                // Extract the base route without query parameters
-                val baseRoute = if (initRoute.contains("?")) {
-                    initRoute.substringBefore("?")
-                } else {
-                    initRoute
-                }
-
-                if (baseRoute == MainRoutes.GENERATE) {
-                    if (!id.isNullOrBlank()) {
+                // Check if this is a generate route with generation ID
+                if (initRoute.startsWith("${MainRoutes.GENERATE}/")) {
+                    val generationId = initRoute.substringAfter("${MainRoutes.GENERATE}/")
+                    if (generationId.isNotEmpty()) {
                         // Check if we have cached prompt data for this ID
-                        if (cachedPrompt != null && cachedPrompt!!.generationId == id) {
+                        if (cachedPrompt != null && cachedPrompt!!.generationId == generationId) {
                             pendingPromptState = pendingPromptState.update(cachedPrompt)
-                            navController.navigateSingleTopTo(MainRoutes.GENERATE)
+                            navController.navigate("${MainRoutes.GENERATE}/$generationId")
                         } else {
-                            currentGenerationId = id  // Store the generation ID
+                            currentGenerationId = generationId  // Store the generation ID
                             launch {
                                 try {
-                                    val generation = SupabaseFunction.getGeneration(id)
+                                    val generation = SupabaseFunction.getGeneration(generationId)
                                     if (generation != null) {
                                         val prompt = Prompt(
                                             generationId = generation.id,
@@ -74,15 +67,17 @@ fun main() {
                                         pendingPromptState = pendingPromptState.update(prompt)
                                         cachedPrompt = prompt
                                     }
-                                    navController.navigateSingleTopTo(MainRoutes.GENERATE)
+                                    navController.navigate("${MainRoutes.GENERATE}/$generationId")
                                 } catch (e: Exception) {
-                                    navController.navigateSingleTopTo(MainRoutes.GENERATE)
+                                    navController.navigate("${MainRoutes.GENERATE}/$generationId")
                                 }
                             }
                         }
                     } else {
                         navController.navigateSingleTopTo(MainRoutes.GENERATE)
                     }
+                } else if (initRoute == MainRoutes.GENERATE) {
+                    navController.navigateSingleTopTo(MainRoutes.GENERATE)
                 }
             }
 
@@ -92,32 +87,19 @@ fun main() {
             // Hash change listener
             urlHashManager.addHashChangeListener { rawHash ->
                 val initRoute = rawHash.substringAfter('#', "")
-                val urlParams = parseParamsFromRoute(rawHash.substringAfter('#', ""))
-                val urlId = urlParams["id"]
-                val baseRoute = if (initRoute.contains("?")) {
-                    initRoute.substringBefore("?")
-                } else {
-                    initRoute
-                }
 
-                if (baseRoute == MainRoutes.GENERATE && !urlId.isNullOrBlank()) {
+                // Check if this is a generate route with generation ID
+                if (initRoute.startsWith("${MainRoutes.GENERATE}/")) {
                     handleNavigation()
-                } else if (baseRoute in listOf(
+                } else if (initRoute in listOf(
                         MainRoutes.GALLERY,
                         MainRoutes.GENERATE,
                         MainRoutes.SETTINGS
                     )
                 ) {
-                    when (baseRoute) {
+                    when (initRoute) {
                         MainRoutes.GALLERY -> navController.navigateSingleTopTo(MainRoutes.GALLERY)
-                        MainRoutes.GENERATE -> {
-                            // Check if there's an ID in the URL when navigating to generate
-                            if (!urlId.isNullOrBlank()) {
-                                handleNavigation()
-                            } else {
-                                navController.navigateSingleTopTo(MainRoutes.GENERATE)
-                            }
-                        }
+                        MainRoutes.GENERATE -> navController.navigateSingleTopTo(MainRoutes.GENERATE)
                         MainRoutes.SETTINGS -> navController.navigateSingleTopTo(MainRoutes.SETTINGS)
                     }
                 }
@@ -126,11 +108,8 @@ fun main() {
             // Popstate event for browser navigation
             window.addEventListener("popstate") {
                 val currentHash = urlHashManager.getHash()
-                val urlParams = parseParamsFromRoute(currentHash.substringAfter('#', ""))
-                val urlId = urlParams["id"]
-                val baseRoute =
-                    if (currentHash.contains("#${MainRoutes.GENERATE}")) MainRoutes.GENERATE else ""
-                if (baseRoute == MainRoutes.GENERATE && !urlId.isNullOrBlank()) {
+                val initRoute = currentHash.substringAfter('#', "")
+                if (initRoute.startsWith("${MainRoutes.GENERATE}/")) {
                     handleNavigation()
                 }
             }
@@ -138,11 +117,8 @@ fun main() {
             // Focus event for tab refocus
             window.addEventListener("focus") {
                 val currentHash = urlHashManager.getHash()
-                val urlParams = parseParamsFromRoute(currentHash.substringAfter('#', ""))
-                val urlId = urlParams["id"]
-                val baseRoute =
-                    if (currentHash.contains("#${MainRoutes.GENERATE}")) MainRoutes.GENERATE else ""
-                if (baseRoute == MainRoutes.GENERATE && !urlId.isNullOrBlank()) {
+                val initRoute = currentHash.substringAfter('#', "")
+                if (initRoute.startsWith("${MainRoutes.GENERATE}/")) {
                     handleNavigation()
                 }
             }
@@ -155,20 +131,3 @@ fun main() {
     document.getElementById("loading")?.remove()
 }
 
-fun parseParamsFromRoute(route: String): Map<String, String> {
-    val queryStart = route.indexOf('?')
-    if (queryStart == -1) return emptyMap()
-    val query = route.substring(queryStart + 1)
-    return query.split('&')
-        .filter { it.isNotEmpty() }.mapNotNull { param ->
-            val parts = param.split('=', limit = 2)
-            if (parts.size == 2 && parts[0].isNotEmpty()) {
-                parts[0] to parts[1]
-            } else if (parts.size == 1 && parts[0].isNotEmpty()) {
-                parts[0] to ""
-            } else {
-                null
-            }
-        }
-        .toMap()
-}

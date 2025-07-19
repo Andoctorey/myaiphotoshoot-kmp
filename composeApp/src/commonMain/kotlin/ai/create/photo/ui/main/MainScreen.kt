@@ -90,22 +90,14 @@ fun MainScreen(
                     onClick = {
                         when (tab) {
                             is GenerateTab -> {
-                                // Use stored generation ID if available, otherwise preserve existing query parameters
-                                val newHash = if (currentGenerationId != null) {
-                                    "#${MainRoutes.GENERATE}?id=$currentGenerationId"
+                                // Use stored generation ID if available, otherwise navigate to main generate screen
+                                if (currentGenerationId != null) {
+                                    getUrlHashManager().setHash("#${MainRoutes.GENERATE}/$currentGenerationId")
+                                    navController.navigate("${MainRoutes.GENERATE}/$currentGenerationId")
                                 } else {
-                                    val currentHash = getUrlHashManager().getHash()
-                                    val currentParams = if (currentHash.contains("?")) {
-                                        currentHash.substringAfter("?")
-                                    } else ""
-                                    if (currentParams.isNotEmpty()) {
-                                        "#${MainRoutes.GENERATE}?$currentParams"
-                                    } else {
-                                        "#${MainRoutes.GENERATE}"
-                                    }
+                                    getUrlHashManager().setHash("#${MainRoutes.GENERATE}")
+                                    navController.navigateSingleTopTo(MainRoutes.GENERATE)
                                 }
-                                getUrlHashManager().setHash(newHash)
-                                navController.navigateSingleTopTo(MainRoutes.GENERATE)
                             }
 
                             is GalleryTab -> {
@@ -166,8 +158,13 @@ fun MainScreen(
                 GalleryScreen(
                     generationsInProgress = state.generationsInProgress,
                     openGenerateTab = { prompt ->
-                        getUrlHashManager().setHash("#${MainRoutes.GENERATE}")
-                        navController.navigateSingleTopTo(MainRoutes.GENERATE)
+                        if (prompt?.generationId != null) {
+                            getUrlHashManager().setHash("#${MainRoutes.GENERATE}/${prompt.generationId}")
+                            navController.navigate("${MainRoutes.GENERATE}/${prompt.generationId}")
+                        } else {
+                            getUrlHashManager().setHash("#${MainRoutes.GENERATE}")
+                            navController.navigateSingleTopTo(MainRoutes.GENERATE)
+                        }
                         if (prompt != null) viewModel.putPrompt(prompt)
                     },
                     openUploads = state.openUploads,
@@ -212,11 +209,46 @@ fun MainScreen(
                     }
                 }
             }
+
+            composable(
+                route = "${MainRoutes.GENERATE}/{generationId}",
+            ) { backStackEntry ->
+                val generationId = backStackEntry.arguments!!.read { getString("generationId") }
+                GenerateScreen(
+                    trainAiModel = trainAiModel,
+                    generationsInProgress = state.generationsInProgress,
+                    onGenerate = { trainingId, prompt, parentGenerationId, photosToGenerate ->
+                        viewModel.generatePhoto(
+                            trainingId,
+                            prompt,
+                            parentGenerationId,
+                            photosToGenerate
+                        )
+                    },
+                    openCreations = {
+                        getUrlHashManager().setHash("#${MainRoutes.GALLERY}")
+                        navController.navigateSingleTopTo(MainRoutes.GALLERY)
+                        viewModel.toggleOpenCreations(true)
+                    },
+                    prompt = state.putPrompt,
+                    onPromptCleared = onPromptCleared,
+                )
+                LaunchedEffect(state.putPrompt) {
+                    if (state.putPrompt != null) {
+                        viewModel.putPrompt(null)
+                    }
+                }
+            }
             composable<BlogTab> {
                 BlogScreen(
                     openGenerateTab = { prompt ->
-                        getUrlHashManager().setHash("#${MainRoutes.GENERATE}")
-                        navController.navigateSingleTopTo(MainRoutes.GENERATE)
+                        if (prompt.generationId.isNotEmpty()) {
+                            getUrlHashManager().setHash("#${MainRoutes.GENERATE}/${prompt.generationId}")
+                            navController.navigate("${MainRoutes.GENERATE}/${prompt.generationId}")
+                        } else {
+                            getUrlHashManager().setHash("#${MainRoutes.GENERATE}")
+                            navController.navigateSingleTopTo(MainRoutes.GENERATE)
+                        }
                         viewModel.putPrompt(prompt)
                     },
                     onArticleClick = { postId ->
@@ -236,13 +268,18 @@ fun MainScreen(
                         navController.popBackStack()
                     },
                     openGenerateTab = { prompt ->
-                        getUrlHashManager().setHash("#${MainRoutes.GENERATE}")
-                        navController.navigateSingleTopTo(MainRoutes.GENERATE)
+                        if (prompt.generationId.isNotEmpty()) {
+                            getUrlHashManager().setHash("#${MainRoutes.GENERATE}/${prompt.generationId}")
+                            navController.navigate("${MainRoutes.GENERATE}/${prompt.generationId}")
+                        } else {
+                            getUrlHashManager().setHash("#${MainRoutes.GENERATE}")
+                            navController.navigateSingleTopTo(MainRoutes.GENERATE)
+                        }
                         viewModel.putPrompt(prompt)
                     }
                 )
             }
-            
+
             composable<SettingsTab> {
                 SettingsScreen(
                     trainAiModel = trainAiModel,
