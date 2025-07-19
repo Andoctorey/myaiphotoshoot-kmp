@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
-import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -143,10 +142,6 @@ private fun ArticleContent(
         horizontalArrangement = Arrangement.spacedBy(1.dp),
         contentPadding = PaddingValues(horizontal = 24.dp)
     ) {
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
-        }
-
         topics.forEach { topic ->
             item(span = { GridItemSpan(maxLineSpan) }) {
                 TopicHeader(topic = topic)
