@@ -187,6 +187,9 @@ fun MainScreen(
                         viewModel.toggleOpenCreations(true)
                     },
                     prompt = state.putPrompt,
+                    onPromptCleared = {
+                        viewModel.putPrompt(null)
+                    }
                 )
             }
 
@@ -210,6 +213,9 @@ fun MainScreen(
                         viewModel.toggleOpenCreations(true)
                     },
                     prompt = state.putPrompt,
+                    onPromptCleared = {
+                        viewModel.putPrompt(null)
+                    }
                 )
                 LaunchedEffect(generationId) {
                     if (generationId.isNotEmpty() && state.putPrompt?.generationId != generationId) {
