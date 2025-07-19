@@ -78,8 +78,12 @@ fun MainScreen(
                             }
 
                             is GalleryTab -> {
-                                navController.navigate(tab.route) {
-                                    popUpTo(0) { inclusive = true }
+                                // If we're on a parameterized route, pop back to the main route first
+                                if (currentDestination?.contains("/") == true) {
+                                    navController.popBackStack()
+                                    navController.navigateSingleTopTo(tab.route)
+                                } else {
+                                    navController.navigateSingleTopTo(tab.route)
                                 }
                             }
 
