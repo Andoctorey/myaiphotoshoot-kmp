@@ -26,7 +26,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -41,28 +40,20 @@ fun MainScreen(
     viewModel: MainViewModel = viewModel { MainViewModel() },
     navController: NavHostController,
 ) {
-    // Helper function for tab navigation with state preservation
-    fun navigateToTab(route: String, currentDest: String?) {
-        // If we're on a parameterized route, pop back first then navigate
-        if (currentDest?.contains("/") == true) {
-            navController.popBackStack()
-            navController.navigateSingleTopTo(route)
-        } else {
-            navController.navigate(route) {
-                // Pop up to the start destination but save state
-                popUpTo(navController.graph.findStartDestination().route!!) {
-                    saveState = true
-                }
-                // Avoid multiple copies of the same destination
-                launchSingleTop = true
-                // Restore state when re-selecting a previously selected item
-                restoreState = true
-            }
-        }
-    }
     val state = viewModel.uiState
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route
+
+    // Helper function for tab navigation with parameterized route handling
+    fun navigateToTab(route: String) {
+        // If we're on a parameterized route, pop back first then navigate
+        if (currentDestination?.contains("/") == true) {
+            navController.popBackStack()
+            navController.navigateSingleTopTo(route)
+        } else {
+            navController.navigateSingleTopTo(route)
+        }
+    }
 
     val tabs = listOf(GalleryTab, GenerateTab, BlogTab, SettingsTab)
 
@@ -86,9 +77,9 @@ fun MainScreen(
                     },
                     label = { Text(stringResource(tab.label)) },
                     selected = when (tab) {
+                        is GenerateTab -> currentDestination?.startsWith(tab.route) == true
                         is BlogTab -> currentDestination?.startsWith(tab.route) == true ||
                                 currentDestination?.startsWith(MainRoutes.ARTICLE) == true
-
                         else -> currentDestination?.startsWith(tab.route) == true
                     },
                     onClick = {
@@ -98,18 +89,18 @@ fun MainScreen(
                             }
 
                             is GalleryTab -> {
-                                navigateToTab(tab.route, currentDestination)
+                                navigateToTab(tab.route)
                             }
 
                             is BlogTab -> {
-                                navigateToTab(tab.route, currentDestination)
+                                navigateToTab(tab.route)
                             }
 
                             is SettingsTab -> {
                                 if (currentDestination?.startsWith(tab.route) == true) {
                                     viewModel.toggleResetSettingTab(true)
                                 } else {
-                                    navigateToTab(tab.route, currentDestination)
+                                    navigateToTab(tab.route)
                                 }
                             }
                         }
