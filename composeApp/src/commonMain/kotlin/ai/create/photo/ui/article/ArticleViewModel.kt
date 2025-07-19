@@ -19,7 +19,7 @@ class ArticleViewModel : ViewModel() {
 
     fun loadArticle(postId: String) = viewModelScope.launch {
         // Don't reload if we already have this article loaded
-        if (currentPostId == postId && uiState.post != null) {
+        if (currentPostId == postId && uiState.topics.isNotEmpty()) {
             return@launch
         }
 
@@ -38,20 +38,16 @@ class ArticleViewModel : ViewModel() {
             currentPostId = postId
             uiState = uiState.copy(
                 isLoading = false,
-                post = post,
+                title = post.title,
                 topics = topics
             )
         } catch (e: Exception) {
-            Logger.e("loadBlogPost failed for postId: $postId", e)
+            Logger.e("loadArticle failed for postId: $postId", e)
             uiState = uiState.copy(
                 isLoading = false,
                 loadingError = e
             )
         }
-    }
-
-    fun hideErrorPopup() {
-        uiState = uiState.copy(errorPopup = null)
     }
 
     private fun parsePhotoTopics(

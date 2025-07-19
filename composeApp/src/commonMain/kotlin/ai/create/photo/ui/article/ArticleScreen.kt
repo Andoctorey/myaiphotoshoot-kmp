@@ -3,7 +3,6 @@ package ai.create.photo.ui.article
 import ai.create.photo.data.supabase.model.UserGeneration
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolderSmall
-import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.generate.Prompt
 import androidx.compose.foundation.background
@@ -84,7 +83,7 @@ fun ArticleScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = state.post?.title ?: "",
+                        text = state.title,
                         maxLines = 1
                     )
                 },
@@ -124,11 +123,6 @@ fun ArticleScreen(
         }
     }
 
-    if (state.errorPopup != null) {
-        ErrorPopup(state.errorPopup) {
-            viewModel.hideErrorPopup()
-        }
-    }
 }
 
 @Composable
