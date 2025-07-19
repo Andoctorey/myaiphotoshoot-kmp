@@ -42,16 +42,22 @@ fun MainScreen(
     navController: NavHostController,
 ) {
     // Helper function for tab navigation with state preservation
-    fun navigateToTab(route: String) {
-        navController.navigate(route) {
-            // Pop up to the start destination but save state
-            popUpTo(navController.graph.findStartDestination().route!!) {
-                saveState = true
+    fun navigateToTab(route: String, currentDest: String?) {
+        // If we're on a parameterized route, pop back first then navigate
+        if (currentDest?.contains("/") == true) {
+            navController.popBackStack()
+            navController.navigateSingleTopTo(route)
+        } else {
+            navController.navigate(route) {
+                // Pop up to the start destination but save state
+                popUpTo(navController.graph.findStartDestination().route!!) {
+                    saveState = true
+                }
+                // Avoid multiple copies of the same destination
+                launchSingleTop = true
+                // Restore state when re-selecting a previously selected item
+                restoreState = true
             }
-            // Avoid multiple copies of the same destination
-            launchSingleTop = true
-            // Restore state when re-selecting a previously selected item
-            restoreState = true
         }
     }
     val state = viewModel.uiState
@@ -92,18 +98,18 @@ fun MainScreen(
                             }
 
                             is GalleryTab -> {
-                                navigateToTab(tab.route)
+                                navigateToTab(tab.route, currentDestination)
                             }
 
                             is BlogTab -> {
-                                navigateToTab(tab.route)
+                                navigateToTab(tab.route, currentDestination)
                             }
 
                             is SettingsTab -> {
                                 if (currentDestination?.startsWith(tab.route) == true) {
                                     viewModel.toggleResetSettingTab(true)
                                 } else {
-                                    navigateToTab(tab.route)
+                                    navigateToTab(tab.route, currentDestination)
                                 }
                             }
                         }
@@ -182,11 +188,6 @@ fun MainScreen(
                     },
                     prompt = state.putPrompt,
                 )
-                LaunchedEffect(state.putPrompt) {
-                    if (state.putPrompt != null) {
-                        viewModel.putPrompt(null)
-                    }
-                }
             }
 
             composable(
@@ -225,11 +226,6 @@ fun MainScreen(
                         } catch (e: Exception) {
                             Logger.e("Failed to load generation data for ID: $generationId", e)
                         }
-                    }
-                }
-                LaunchedEffect(state.putPrompt) {
-                    if (state.putPrompt != null) {
-                        viewModel.putPrompt(null)
                     }
                 }
             }
