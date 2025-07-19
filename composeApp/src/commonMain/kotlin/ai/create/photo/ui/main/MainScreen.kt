@@ -81,7 +81,12 @@ fun MainScreen(
                         }
                     },
                     label = { Text(stringResource(tab.label)) },
-                    selected = currentDestination?.startsWith(tab.route) == true,
+                    selected = when (tab) {
+                        is BlogTab -> currentDestination?.startsWith(tab.route) == true ||
+                                currentDestination?.startsWith(MainRoutes.ARTICLE) == true
+
+                        else -> currentDestination?.startsWith(tab.route) == true
+                    },
                     onClick = {
                         when (tab) {
                             is GenerateTab -> {
@@ -215,6 +220,7 @@ fun MainScreen(
                         viewModel.putPrompt(prompt)
                     },
                     onArticleClick = { postId ->
+                        getUrlHashManager().setHash("#${MainRoutes.BLOG}")
                         navController.navigate("${MainRoutes.ARTICLE}/$postId")
                     }
                 )
