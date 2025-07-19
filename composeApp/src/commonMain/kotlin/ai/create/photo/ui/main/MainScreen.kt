@@ -1,6 +1,7 @@
 package ai.create.photo.ui.main
 
-import ai.create.photo.platform.getUrlHashManager
+
+import ai.create.photo.data.supabase.SupabaseFunction
 import ai.create.photo.ui.article.ArticleScreen
 import ai.create.photo.ui.blog.BlogScreen
 import ai.create.photo.ui.compose.ErrorPopup
@@ -30,6 +31,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.savedstate.read
+import co.touchlab.kermit.Logger
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,28 +39,10 @@ import org.jetbrains.compose.resources.stringResource
 fun MainScreen(
     viewModel: MainViewModel = viewModel { MainViewModel() },
     navController: NavHostController,
-    initialPrompt: Prompt? = null,
-    pendingPromptState: PromptState = PromptState(),
-    currentGenerationId: String? = null,
-    onPromptCleared: () -> Unit = {},
 ) {
     val state = viewModel.uiState
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route
-
-    // Set initial prompt if provided
-    LaunchedEffect(initialPrompt) {
-        if (initialPrompt != null) {
-            viewModel.putPrompt(initialPrompt)
-        }
-    }
-
-    // Handle pending prompts from URL navigation
-    LaunchedEffect(pendingPromptState.version) {
-        if (pendingPromptState.prompt != null) {
-            viewModel.putPrompt(pendingPromptState.prompt)
-        }
-    }
 
     val tabs = listOf(GalleryTab, GenerateTab, BlogTab, SettingsTab)
 
@@ -90,36 +74,24 @@ fun MainScreen(
                     onClick = {
                         when (tab) {
                             is GenerateTab -> {
-                                // Use stored generation ID if available, otherwise navigate to main generate screen
-                                if (currentGenerationId != null) {
-                                    getUrlHashManager().setHash("#${MainRoutes.GENERATE}/$currentGenerationId")
-                                    navController.navigate("${MainRoutes.GENERATE}/$currentGenerationId")
-                                } else {
-                                    getUrlHashManager().setHash("#${MainRoutes.GENERATE}")
-                                    navController.navigateSingleTopTo(MainRoutes.GENERATE)
-                                }
+                                navController.navigateSingleTopTo(MainRoutes.GENERATE)
                             }
 
                             is GalleryTab -> {
-                                if (currentDestination?.startsWith(tab.route) != true) {
-                                    getUrlHashManager().setHash("#${MainRoutes.GALLERY}")
-                                    navController.navigateSingleTopTo(tab.route)
+                                navController.navigate(tab.route) {
+                                    popUpTo(0) { inclusive = true }
                                 }
                             }
 
                             is BlogTab -> {
-                                if (currentDestination?.startsWith(tab.route) != true) {
-                                    getUrlHashManager().setHash("#${MainRoutes.BLOG}")
-                                    navController.navigateSingleTopTo(tab.route)
-                                }
+                                navController.navigateSingleTopTo(tab.route)
                             }
 
                             is SettingsTab -> {
-                                if (currentDestination?.startsWith(tab.route) != true) {
-                                    getUrlHashManager().setHash("#${MainRoutes.SETTINGS}")
-                                    navController.navigateSingleTopTo(tab.route)
-                                } else {
+                                if (currentDestination?.startsWith(tab.route) == true) {
                                     viewModel.toggleResetSettingTab(true)
+                                } else {
+                                    navController.navigateSingleTopTo(tab.route)
                                 }
                             }
                         }
@@ -129,7 +101,6 @@ fun MainScreen(
         }
     ) {
         val trainAiModel = {
-            getUrlHashManager().setHash("#${MainRoutes.GALLERY}")
             viewModel.toggleOpenUploads(true)
             navController.navigateSingleTopTo(MainRoutes.GALLERY)
         }
@@ -141,7 +112,7 @@ fun MainScreen(
                 fadeIn(
                     animationSpec = tween(
                         durationMillis = 100,
-                        easing = LinearEasing
+                        easing = LinearEasing,
                     )
                 )
             },
@@ -149,7 +120,7 @@ fun MainScreen(
                 fadeOut(
                     animationSpec = tween(
                         durationMillis = 100,
-                        easing = LinearEasing
+                        easing = LinearEasing,
                     )
                 )
             },
@@ -159,10 +130,8 @@ fun MainScreen(
                     generationsInProgress = state.generationsInProgress,
                     openGenerateTab = { prompt ->
                         if (prompt?.generationId != null) {
-                            getUrlHashManager().setHash("#${MainRoutes.GENERATE}/${prompt.generationId}")
                             navController.navigate("${MainRoutes.GENERATE}/${prompt.generationId}")
                         } else {
-                            getUrlHashManager().setHash("#${MainRoutes.GENERATE}")
                             navController.navigateSingleTopTo(MainRoutes.GENERATE)
                         }
                         if (prompt != null) viewModel.putPrompt(prompt)
@@ -196,12 +165,10 @@ fun MainScreen(
                         )
                     },
                     openCreations = {
-                        getUrlHashManager().setHash("#${MainRoutes.GALLERY}")
                         navController.navigateSingleTopTo(MainRoutes.GALLERY)
                         viewModel.toggleOpenCreations(true)
                     },
                     prompt = state.putPrompt,
-                    onPromptCleared = onPromptCleared,
                 )
                 LaunchedEffect(state.putPrompt) {
                     if (state.putPrompt != null) {
@@ -226,13 +193,28 @@ fun MainScreen(
                         )
                     },
                     openCreations = {
-                        getUrlHashManager().setHash("#${MainRoutes.GALLERY}")
                         navController.navigateSingleTopTo(MainRoutes.GALLERY)
                         viewModel.toggleOpenCreations(true)
                     },
                     prompt = state.putPrompt,
-                    onPromptCleared = onPromptCleared,
                 )
+                LaunchedEffect(generationId) {
+                    if (generationId.isNotEmpty() && state.putPrompt?.generationId != generationId) {
+                        try {
+                            val generation = SupabaseFunction.getGeneration(generationId)
+                            if (generation != null) {
+                                val prompt = Prompt(
+                                    generationId = generation.id,
+                                    text = generation.prompt,
+                                    url = generation.imageUrl
+                                )
+                                viewModel.putPrompt(prompt)
+                            }
+                        } catch (e: Exception) {
+                            Logger.e("Failed to load generation data for ID: $generationId", e)
+                        }
+                    }
+                }
                 LaunchedEffect(state.putPrompt) {
                     if (state.putPrompt != null) {
                         viewModel.putPrompt(null)
@@ -243,16 +225,13 @@ fun MainScreen(
                 BlogScreen(
                     openGenerateTab = { prompt ->
                         if (prompt.generationId.isNotEmpty()) {
-                            getUrlHashManager().setHash("#${MainRoutes.GENERATE}/${prompt.generationId}")
                             navController.navigate("${MainRoutes.GENERATE}/${prompt.generationId}")
                         } else {
-                            getUrlHashManager().setHash("#${MainRoutes.GENERATE}")
                             navController.navigateSingleTopTo(MainRoutes.GENERATE)
                         }
                         viewModel.putPrompt(prompt)
                     },
                     onArticleClick = { postId ->
-                        getUrlHashManager().setHash("#${MainRoutes.BLOG}")
                         navController.navigate("${MainRoutes.ARTICLE}/$postId")
                     }
                 )
@@ -269,10 +248,8 @@ fun MainScreen(
                     },
                     openGenerateTab = { prompt ->
                         if (prompt.generationId.isNotEmpty()) {
-                            getUrlHashManager().setHash("#${MainRoutes.GENERATE}/${prompt.generationId}")
                             navController.navigate("${MainRoutes.GENERATE}/${prompt.generationId}")
                         } else {
-                            getUrlHashManager().setHash("#${MainRoutes.GENERATE}")
                             navController.navigateSingleTopTo(MainRoutes.GENERATE)
                         }
                         viewModel.putPrompt(prompt)
@@ -284,7 +261,6 @@ fun MainScreen(
                 SettingsScreen(
                     trainAiModel = trainAiModel,
                     openGenerateTab = {
-                        getUrlHashManager().setHash("#${MainRoutes.GENERATE}")
                         navController.navigateSingleTopTo(MainRoutes.GENERATE)
                     },
                     goToRootScreen = state.resetSettingTab
