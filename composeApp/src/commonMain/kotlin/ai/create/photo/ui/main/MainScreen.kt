@@ -1,6 +1,7 @@
 package ai.create.photo.ui.main
 
 import ai.create.photo.platform.getUrlHashManager
+import ai.create.photo.ui.article.ArticleScreen
 import ai.create.photo.ui.blog.BlogScreen
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.GenerationIcon
@@ -28,6 +29,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.savedstate.read
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -211,6 +213,21 @@ fun MainScreen(
                         getUrlHashManager().setHash("#${MainRoutes.GENERATE}")
                         navController.navigateSingleTopTo(MainRoutes.GENERATE)
                         viewModel.putPrompt(prompt)
+                    },
+                    onArticleClick = { postId ->
+                        navController.navigate("${MainRoutes.ARTICLE}/$postId")
+                    }
+                )
+            }
+
+            composable(
+                route = "${MainRoutes.ARTICLE}/{postId}",
+            ) { backStackEntry ->
+                val postId = backStackEntry.arguments!!.read { getString("postId") }
+                ArticleScreen(
+                    postId = postId,
+                    onBackClick = {
+                        navController.popBackStack()
                     }
                 )
             }

@@ -6,7 +6,7 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 @Serializable
-data class BlogPost @OptIn(ExperimentalTime::class) constructor(
+data class Article @OptIn(ExperimentalTime::class) constructor(
     @SerialName("id") val id: String,
     @SerialName("title") val title: String,
     @SerialName("content") val content: String,
@@ -14,19 +14,20 @@ data class BlogPost @OptIn(ExperimentalTime::class) constructor(
     @Serializable(with = InstantSerializer::class) @SerialName("created_at") val createdAt: Instant,
     @SerialName("meta_description") val metaDescription: String,
     @SerialName("featured_image_url") val featuredImageUrl: String? = null,
-    @SerialName("section_photos") val sectionPhotos: String? = null,
-    @SerialName("translations") val translations: Map<String, BlogTranslation>? = null
+    @SerialName("slug") val slug: String? = null,
+    @SerialName("section_photos") val sectionPhotos: Map<String, UserGeneration>? = null,
+    @SerialName("translations") val translations: Map<String, ArticleTranslation>? = null
 )
 
 @Serializable
-data class BlogTranslation(
+data class ArticleTranslation(
     @SerialName("title") val title: String,
     @SerialName("content") val content: String,
     @SerialName("meta_description") val metaDescription: String,
 )
 
 @Serializable
-data class BlogListItem @OptIn(ExperimentalTime::class) constructor(
+data class Blog @OptIn(ExperimentalTime::class) constructor(
     @SerialName("id") val id: String,
     @Serializable(with = InstantSerializer::class) @SerialName("created_at") val createdAt: Instant,
     @SerialName("title") val title: String,
@@ -35,8 +36,8 @@ data class BlogListItem @OptIn(ExperimentalTime::class) constructor(
 )
 
 @Serializable
-data class BlogPostsResponse(
-    @SerialName("posts") val posts: List<BlogListItem>,
+data class BlogsResponse(
+    @SerialName("posts") val posts: List<Blog>,
     @SerialName("total") val total: Int,
     @SerialName("page") val page: Int,
     @SerialName("limit") val limit: Int,

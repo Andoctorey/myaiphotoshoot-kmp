@@ -1,6 +1,6 @@
 package ai.create.photo.ui.blog
 
-import ai.create.photo.data.supabase.model.BlogListItem
+import ai.create.photo.data.supabase.model.Blog
 import ai.create.photo.data.supabase.model.UserGeneration
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolderSmall
@@ -61,6 +61,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun BlogScreen(
     viewModel: BlogsViewModel = viewModel { BlogsViewModel() },
     openGenerateTab: (Prompt) -> Unit,
+    onArticleClick: (String) -> Unit = {},
 ) {
     val state = viewModel.uiState
     Box(
@@ -88,7 +89,7 @@ fun BlogScreen(
                 loadNextPage = viewModel::loadMorePosts,
                 isRefreshing = state.isRefreshing,
                 onRefresh = viewModel::refresh,
-                onClick = {},
+                onClick = { post -> onArticleClick(post.id) },
                 generate = openGenerateTab,
             )
         }
@@ -104,14 +105,14 @@ fun BlogScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Posts(
-    articles: List<BlogListItem>,
+    articles: List<Blog>,
     listState: LazyListState,
     isLoadingNextPage: Boolean,
     pagingLimitReach: Boolean,
     loadNextPage: () -> Unit = {},
     isRefreshing: Boolean = false,
     onRefresh: () -> Unit,
-    onClick: (BlogListItem) -> Unit,
+    onClick: (Blog) -> Unit,
     generate: (Prompt) -> Unit,
 ) {
     PullToRefreshBoxNoDesktop(
@@ -177,8 +178,8 @@ private fun Posts(
 
 @Composable
 private fun Post(
-    post: BlogListItem,
-    onClick: (BlogListItem) -> Unit,
+    post: Blog,
+    onClick: (Blog) -> Unit,
     generate: (Prompt) -> Unit,
 ) {
     OutlinedCard(

@@ -19,6 +19,7 @@ object MainRoutes {
     const val GALLERY = "gallery"
     const val GENERATE = "generate"
     const val BLOG = "blog"
+    const val ARTICLE = "article"
     const val SETTINGS = "settings"
 }
 

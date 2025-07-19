@@ -1,6 +1,7 @@
 package ai.create.photo.data.supabase
 
-import ai.create.photo.data.supabase.model.BlogPostsResponse
+import ai.create.photo.data.supabase.model.Article
+import ai.create.photo.data.supabase.model.BlogsResponse
 import ai.create.photo.data.supabase.model.UserFile
 import ai.create.photo.data.supabase.model.UserGeneration
 import co.touchlab.kermit.Logger
@@ -141,7 +142,7 @@ object SupabaseFunction {
         page: Int = 1,
         limit: Int = 10,
         locale: String? = null
-    ): BlogPostsResponse = retryWithBackoff {
+    ): BlogsResponse = retryWithBackoff {
         Logger.i("getBlogPosts page: $page, limit: $limit, locale: $locale")
         val params = buildList {
             add("page=$page")
@@ -155,6 +156,25 @@ object SupabaseFunction {
         ) {
             method = HttpMethod.Get
         }
-        return@retryWithBackoff response.body<BlogPostsResponse>()
+        return@retryWithBackoff response.body<BlogsResponse>()
+    }
+
+    suspend fun getBlogPost(
+        id: String,
+        locale: String? = null
+    ): Article = retryWithBackoff {
+        Logger.i("getBlogPost id: $id, locale: $locale")
+        val params = buildList {
+            add("id=$id")
+            if (locale != null) add("locale=$locale")
+        }
+
+        val queryString = if (params.isNotEmpty()) "?${params.joinToString("&")}" else ""
+        val response = Supabase.supabase.functions.invoke(
+            function = "blog-post$queryString"
+        ) {
+            method = HttpMethod.Get
+        }
+        return@retryWithBackoff response.body<Article>()
     }
 }
