@@ -138,7 +138,8 @@ private fun ArticleContent(
 ) {
     val listState = rememberLazyGridState()
     val density = LocalDensity.current
-    val minSize = remember { with(density) { 420.toDp() } }
+    val width = 420
+    val minSize = remember { with(density) { (width - 20).toDp() } } // Same as PublicScreen
 
     LazyVerticalGrid(
         state = listState,
