@@ -22,7 +22,7 @@ kotlinx-coroutines = "1.10.2"
 ktorClientCio = "3.2.2"
 materialNavigation = "1.8.0-beta06"
 multidex = "2.0.1"
-supabase = "3.2.1"
+supabase = "3.2.2"
 
 [libraries]
 adaptive-layout = { module = "org.jetbrains.compose.material3.adaptive:adaptive-layout", version.ref = "adaptive" }
