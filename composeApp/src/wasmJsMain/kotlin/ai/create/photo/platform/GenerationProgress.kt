@@ -9,5 +9,5 @@ actual fun updateGenerationProgress(count: Int) {
         document.title = originalTitle
         return
     }
-    document.title = "$originalTitle ($count)"
+    document.title = "($count) $originalTitle"
 }
