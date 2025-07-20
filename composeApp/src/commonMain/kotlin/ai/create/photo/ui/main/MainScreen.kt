@@ -111,7 +111,7 @@ fun MainScreen(
     ) {
         val trainAiModel = {
             viewModel.toggleOpenUploads(true)
-            navController.navigateSingleTopTo(MainRoutes.GALLERY)
+            navigateToTab(MainRoutes.GALLERY)
         }
 
         NavHost(
@@ -174,7 +174,7 @@ fun MainScreen(
                         )
                     },
                     openCreations = {
-                        navController.navigateSingleTopTo(MainRoutes.GALLERY)
+                        navigateToTab(MainRoutes.GALLERY)
                         viewModel.toggleOpenCreations(true)
                     },
                     prompt = state.putPrompt,
@@ -200,7 +200,7 @@ fun MainScreen(
                         )
                     },
                     openCreations = {
-                        navController.navigateSingleTopTo(MainRoutes.GALLERY)
+                        navigateToTab(MainRoutes.GALLERY)
                         viewModel.toggleOpenCreations(true)
                     },
                     prompt = state.putPrompt,
