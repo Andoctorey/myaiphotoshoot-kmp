@@ -152,7 +152,7 @@ android {
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = gitVersionCode
-        versionName = "1.3.$gitVersionCode"
+        versionName = "1.4.$gitVersionCode"
     }
     packaging {
         resources {
