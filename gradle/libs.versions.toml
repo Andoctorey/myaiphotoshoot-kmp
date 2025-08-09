@@ -1,25 +1,25 @@
 [versions]
 adaptive = "1.1.2"
-agp = "8.11.1"
+agp = "8.12.0"
 android-minSdk = "26"
 android-targetSdk = "35"
 androidx-activityCompose = "1.10.1"
 androidx-lifecycle = "2.9.1"
-navigation-compose = "2.9.0-beta03"
+navigation-compose = "2.9.0-beta04"
 billingKtx = "8.0.0"
-coil = "3.2.0"
+coil = "3.3.0"
 # https://github.com/JetBrains/compose-multiplatform/releases
 compose-multiplatform = "1.8.2"
-crashlytics = "3.0.4"
+crashlytics = "3.0.6"
 deps = "0.52.0"
 filekitCompose = "0.8.8"
-firebase-bom = "33.16.0"
-firebasePerf = "1.4.2"
+firebase-bom = "34.1.0"
+firebasePerf = "2.0.1"
 googleServices = "4.4.3"
 kermit = "2.0.6"
 kotlin = "2.2.0"
 kotlinx-coroutines = "1.10.2"
-ktorClientCio = "3.2.2"
+ktorClientCio = "3.2.3"
 materialNavigation = "1.8.0-beta06"
 multidex = "2.0.1"
 supabase = "3.2.2"
@@ -39,8 +39,8 @@ coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" 
 coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
 filekit-compose = { module = "io.github.vinceglb:filekit-compose", version.ref = "filekitCompose" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
-firebase-analytics-ktx = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
-firebase-crashlytics-ktx = { group = "com.google.firebase", name = "firebase-crashlytics-ktx" }
+firebase-analytics-ktx = { group = "com.google.firebase", name = "firebase-analytics" }
+firebase-crashlytics-ktx = { group = "com.google.firebase", name = "firebase-crashlytics" }
 firebase-perf = { group = "com.google.firebase", name = "firebase-perf" }
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 kermit-crashlytics = { module = "co.touchlab:kermit-crashlytics", version.ref = "kermit" }
