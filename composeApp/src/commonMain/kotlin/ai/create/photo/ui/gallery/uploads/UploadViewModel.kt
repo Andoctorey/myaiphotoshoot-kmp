@@ -320,7 +320,7 @@ class UploadViewModel : AuthViewModel() {
 
         uiState = uiState.copy(
             trainingStatus = TrainingStatus.PROCESSING,
-            trainingTimeLeft = 150 * 1000L, // 2.5 minutes)
+            trainingTimeLeft = 210 * 1000L, // 3.5 minutes)
         )
 
         try {
@@ -377,7 +377,7 @@ class UploadViewModel : AuthViewModel() {
             }
         }
 
-        val timeToStartApiRequests = 30 * 1000L // 30 seconds
+        val timeToStartApiRequests = 90 * 1000L // seconds
         if (uiState.trainingStatus == TrainingStatus.PROCESSING) {
             if (uiState.trainingTimeLeft > timeToStartApiRequests) {
                 delay(uiState.trainingTimeLeft - timeToStartApiRequests)
