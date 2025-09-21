@@ -49,7 +49,7 @@ class GenerateViewModel : AuthViewModel() {
             loadingError = null
         )
         try {
-            var trainings = UserTrainingsRepository.getTrainings(userId).getOrThrow().map {
+            val trainings = UserTrainingsRepository.getTrainings(userId).getOrThrow().map {
                 GenerateUiState.Training(
                     id = it.id,
                     personDescription = it.personDescription,
