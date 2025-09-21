@@ -180,23 +180,34 @@ private fun Screen(
                     expanded = expanded,
                     items = items,
                     onItemClick = { item ->
-                        if (item is SettingsUiState.SocialItem) {
-                            social()
-                            return@SettingsItems
-                        } else if (item is SettingsUiState.SupportItem) {
-                            support()
-                            return@SettingsItems
-                        } else if (item is SettingsUiState.GooglePlayItem) {
-                            googlePlay()
-                            return@SettingsItems
-                        } else if (item is SettingsUiState.AppStoreItem) {
-                            appStore()
-                            return@SettingsItems
-                        }
-                        Logger.i("Navigate to: $item")
-                        onSaveDestination(item)
-                        scope.launch {
-                            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, item)
+                        when (item) {
+                            is SettingsUiState.SocialItem -> {
+                                social()
+                                return@SettingsItems
+                            }
+
+                            is SettingsUiState.SupportItem -> {
+                                support()
+                                return@SettingsItems
+                            }
+
+                            is SettingsUiState.GooglePlayItem -> {
+                                googlePlay()
+                                return@SettingsItems
+                            }
+
+                            is SettingsUiState.AppStoreItem -> {
+                                appStore()
+                                return@SettingsItems
+                            }
+
+                            else -> {
+                                Logger.i("Navigate to: $item")
+                                onSaveDestination(item)
+                                scope.launch {
+                                    navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, item)
+                                }
+                            }
                         }
                     },
                 )
