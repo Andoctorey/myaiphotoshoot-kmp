@@ -2,6 +2,7 @@ package ai.create.photo.platform
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import androidx.core.graphics.scale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
@@ -17,12 +18,7 @@ actual suspend fun resizeToWidth(
         val aspectRatio = originalBitmap.height.toFloat() / originalBitmap.width
         val scaledHeight = (targetWidth * aspectRatio).roundToInt()
 
-        val scaledBitmap = Bitmap.createScaledBitmap(
-            originalBitmap,
-            targetWidth,
-            scaledHeight,
-            true
-        )
+        val scaledBitmap = originalBitmap.scale(targetWidth, scaledHeight)
 
         val outputStream = ByteArrayOutputStream()
         scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
