@@ -266,7 +266,18 @@ class UploadViewModel : AuthViewModel() {
         }
         lastException?.let {
             Logger.e("All attempts to analyze photo failed for: $photoId", it)
-            throw lastException
+            uiState = uiState.copy(
+                photos = uiState.photos?.map { p ->
+                    if (p.id == photoId) {
+                        p.copy(analysisStatus = null)
+                    } else {
+                        p
+                    }
+                },
+                errorPopup = it
+            )
+            updateAnalysisStatus()
+            return
         }
 
     }
