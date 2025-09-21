@@ -1,8 +1,6 @@
 [versions]
 adaptive = "1.1.2"
 agp = "8.13.0"
-android-minSdk = "26"
-android-targetSdk = "36"
 androidx-activityCompose = "1.11.0"
 androidx-lifecycle = "2.9.4"
 navigation-compose = "2.9.0"
