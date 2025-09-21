@@ -103,8 +103,8 @@ class UploadViewModel : AuthViewModel() {
             uploadPhotoUseCase.invoke(userId, file).catch {
                 Logger.e("uploadPhotos failed", it)
                 uiState = uiState.copy(uploadProgress = 0, errorPopup = it)
-            }.collect {
-                val (file, status) = it
+            }.collect { result ->
+                val (file, status) = result
                 if (file != null) {
                     val currentPhotos = uiState.photos ?: emptyList()
                     val photoExists = currentPhotos.any { it.id == file.id }
