@@ -134,12 +134,12 @@ fun LoginScreen(
                 viewModel.hideErrorPopup()
             }
         }
-        if (state.dataDeletedPopup == true) {
+        if (state.dataDeletedPopup) {
             InfoPopup(stringResource(Res.string.data_deleted)) {
                 viewModel.hideDataDeletedPopup()
             }
         }
-        if (state.confirmDeletedPopup == true) {
+        if (state.confirmDeletedPopup) {
             ConfirmationPopup(
                 icon = Icons.Default.Delete,
                 message = stringResource(Res.string.confirm_data_delete),
