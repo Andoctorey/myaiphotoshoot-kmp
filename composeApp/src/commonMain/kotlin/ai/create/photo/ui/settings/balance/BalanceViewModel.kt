@@ -86,7 +86,7 @@ class BalanceViewModel : AuthViewModel() {
             onSuccess = {
                 uiState = uiState.copy(showBalanceUpdatedPopup = true)
                 viewModelScope.launch {
-                    (1..10).forEach {
+                    (1..10).forEach { _ ->
                         ProfilesRepository.loadProfile(userId)
                         delay(5000L) // Wait for profile to update
                     }
