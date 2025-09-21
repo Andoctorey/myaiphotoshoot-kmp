@@ -31,7 +31,7 @@ object UserGenerationsRepository {
         retryWithBackoff {
             Logger.i("getCreations, page: $page, pageSize: $pageSize")
             val from = ((page - 1) * pageSize).toLong()
-            val to = (from + pageSize - 1).toLong()
+            val to = (from + pageSize - 1)
             Supabase.supabase
                 .from(USER_GENERATIONS_TABLE)
                 .select(columns = Columns.list(UserGeneration.columns)) {
@@ -89,7 +89,7 @@ object UserGenerationsRepository {
         retryWithBackoff {
             Logger.i("getPublicGallery, sort: $sortOrder, page: $page, pageSize: $pageSize")
             val from = ((page - 1) * pageSize).toLong()
-            val to = (from + pageSize - 1).toLong()
+            val to = (from + pageSize - 1)
             Supabase.supabase
                 .from(USER_GENERATIONS_TABLE)
                 .select(columns = Columns.list(UserGeneration.columns)) {

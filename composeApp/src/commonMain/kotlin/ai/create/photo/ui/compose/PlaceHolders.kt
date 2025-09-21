@@ -51,7 +51,7 @@ fun Throwable.getFriendlyError() = when (this) {
     is IOException -> stringResource(Res.string.connection_error)
     is UnresolvedAddressException -> stringResource(Res.string.connection_error)
     is RestException -> {
-        var message = this.error.toString()
+        var message = this.error
         try {
             message = Json.decodeFromString<ErrorResponse>(message).error
         } catch (_: Exception) {
