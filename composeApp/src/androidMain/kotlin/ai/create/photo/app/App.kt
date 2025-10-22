@@ -1,5 +1,6 @@
 package ai.create.photo.app
 
+import ai.create.photo.data.logger.FilteredCrashlyticsLogWriter
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
@@ -7,7 +8,6 @@ import android.os.Bundle
 import androidx.multidex.MultiDexApplication
 import co.touchlab.kermit.ExperimentalKermitApi
 import co.touchlab.kermit.Logger
-import co.touchlab.kermit.crashlytics.CrashlyticsLogWriter
 
 class App : MultiDexApplication() {
 
@@ -30,7 +30,8 @@ class App : MultiDexApplication() {
     @OptIn(ExperimentalKermitApi::class)
     // https://kermit.touchlab.co/docs/crashreporting/CRASHLYTICS
     private fun initCrashlytics() {
-        Logger.addLogWriter(CrashlyticsLogWriter())
+        // Add filtered writer first to suppress expected network noise.
+        Logger.addLogWriter(FilteredCrashlyticsLogWriter())
     }
 
     private fun registerActivityLifecycleCallbacks() =
