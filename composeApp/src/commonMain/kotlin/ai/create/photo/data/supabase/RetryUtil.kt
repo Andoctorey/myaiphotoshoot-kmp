@@ -4,6 +4,7 @@ import co.touchlab.kermit.Logger
 import coil3.network.HttpException
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
+import io.ktor.client.network.sockets.ConnectTimeoutException
 import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -29,6 +30,7 @@ data class RetryConfig(
         RestException::class,
         HttpException::class,
         EOFException::class,
+        ConnectTimeoutException::class,
     )
 )
 

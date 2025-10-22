@@ -49,12 +49,10 @@ object SupabaseStorage {
     }
 
     suspend fun createSignedUrl(userId: String, filePath: String) =
-        Supabase.supabase.storage
-        .from(BUCKET)
-        .createSignedUrl(
-            path = "${userId}/$UPLOADS/${filePath}",
-            expiresIn = 3650.days,
-        )
+        Supabase.supabase.storage.from(BUCKET).createSignedUrl(
+                path = "${userId}/$UPLOADS/${filePath}",
+                expiresIn = 3650.days,
+            )
 
     suspend fun createTempSignedUrl(userId: String, filePath: String) =
         Supabase.supabase.storage
@@ -66,12 +64,16 @@ object SupabaseStorage {
 
     suspend fun deleteFile(path: String) {
         Logger.i("delete file from storage $path")
-        Supabase.supabase.storage.from(BUCKET).delete(path)
+        retryWithBackoff {
+            Supabase.supabase.storage.from(BUCKET).delete(path)
+        }
     }
 
     suspend fun deleteFiles(paths: List<String>) {
         Logger.i("delete files from storage ${paths.joinToString()}")
-        Supabase.supabase.storage.from(BUCKET).delete(paths)
+        retryWithBackoff {
+            Supabase.supabase.storage.from(BUCKET).delete(paths)
+        }
     }
 
     suspend fun deleteUserFiles(uid: String) {
