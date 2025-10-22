@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -99,7 +100,11 @@ private fun Tabs(
             SegmentedButton(
                 shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
                 onClick = { onClick(tab) },
-                selected = tab == selectedTab
+                selected = tab == selectedTab,
+                // todo revert color when lib is fixed
+                colors = SegmentedButtonDefaults.colors(
+                    inactiveContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                ),
             ) {
                 Text(
                     text = stringResource(tab.label),
