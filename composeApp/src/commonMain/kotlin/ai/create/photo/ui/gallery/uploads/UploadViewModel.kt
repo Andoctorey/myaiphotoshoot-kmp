@@ -321,11 +321,19 @@ class UploadViewModel : AuthViewModel() {
         )
 
         val userId = user?.id ?: return@launch
-        ProfilesRepository.loadProfile(userId)
-        val profile = ProfilesRepository.profile
-        if (profile != null && profile.balance < 3) {
-            uiState = uiState.copy(trainingStatus = null)
-            topUp()
+        try {
+            ProfilesRepository.loadProfile(userId)
+            val profile = ProfilesRepository.profile
+            if (profile != null && profile.balance < 3) {
+                uiState = uiState.copy(trainingStatus = null)
+                topUp()
+                return@launch
+            }
+        } catch (e: Exception) {
+            ensureActive()
+            if (!isAuthenticated) return@launch
+            Logger.e("loadProfile before training failed", e)
+            uiState = uiState.copy(trainingStatus = null, errorPopup = e)
             return@launch
         }
 
@@ -469,12 +477,18 @@ class UploadViewModel : AuthViewModel() {
             onSuccess = {
                 viewModelScope.launch {
                     repeat((1..10).count()) {
-                        ProfilesRepository.loadProfile(userId)
-                        if ((ProfilesRepository.profile?.balance ?: 0f) >= 3f) {
-                            trainAiModel()
-                            uiState =
-                                uiState.copy(toppingUp = false, showBalanceUpdatedPopup = true)
-                            return@launch
+                        try {
+                            ProfilesRepository.loadProfile(userId)
+                            if ((ProfilesRepository.profile?.balance ?: 0f) >= 3f) {
+                                trainAiModel()
+                                uiState =
+                                    uiState.copy(toppingUp = false, showBalanceUpdatedPopup = true)
+                                return@launch
+                            }
+                        } catch (e: Exception) {
+                            ensureActive()
+                            if (!isAuthenticated) return@launch
+                            Logger.w("Polling profile after top-up failed, will retry", e)
                         }
                         delay(5000L) // Wait for profile to update
                     }
