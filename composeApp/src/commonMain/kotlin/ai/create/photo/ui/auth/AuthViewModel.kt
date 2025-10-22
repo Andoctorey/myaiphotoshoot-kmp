@@ -48,7 +48,10 @@ abstract class AuthViewModel : ViewModel() {
                         onAuthenticated(emailChanged)
                     }
 
-                    is SessionStatus.NotAuthenticated -> SupabaseAuth.signInAnonymously()
+                    is SessionStatus.NotAuthenticated -> viewModelScope.launch {
+                        runCatching { SupabaseAuth.signInAnonymously() }
+                            .onFailure { Logger.w("Anonymous sign-in error (non-fatal)", it) }
+                    }
                     is SessionStatus.Initializing -> onAuthInitializing()
                     is SessionStatus.RefreshFailure -> {
                         val cause = it.cause
