@@ -2,6 +2,7 @@
   Cross-Origin-Embedder-Policy: require-corp
   Cross-Origin-Opener-Policy: same-origin
   Cache-Control: public, max-age=600, must-revalidate
+  X-Robots-Tag: noindex, nofollow, noarchive
 
 /*.wasm
   Content-Type: application/wasm
