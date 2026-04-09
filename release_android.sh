@@ -1,1 +1,1 @@
-./gradlew bundleRelease --stacktrace --console=plain
+./gradlew :androidApp:bundleRelease --stacktrace --console=plain

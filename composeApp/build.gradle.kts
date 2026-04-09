@@ -4,27 +4,28 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
-import java.io.FileInputStream
-import java.util.Properties
 
 val gitVersionCode =
     "git rev-list --all --count --full-history --no-max-parents HEAD".runCommand().toInt()
 
 plugins {
-    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.androidMultiplatformLibrary)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeMultiplatform)
-    alias(libs.plugins.crashlytics)
-    alias(libs.plugins.googleServices)
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.parcelize)
-    alias(libs.plugins.perf)
     alias(libs.plugins.serialization)
     alias(libs.plugins.versions)
 }
 
 kotlin {
-    androidTarget {
+    androidLibrary {
+        namespace = "ai.create.photo.shared"
+        compileSdk = 36
+        minSdk = 26
+        androidResources {
+            enable = true
+        }
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
@@ -73,14 +74,10 @@ kotlin {
     sourceSets {
 
         androidMain.dependencies {
-            implementation(compose.preview)
-            implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.multidex)
             implementation(libs.ktor.client.cio)
             implementation(project.dependencies.platform(libs.firebase.bom))
-            implementation(libs.firebase.analytics.ktx)
             implementation(libs.firebase.crashlytics.ktx)
-            implementation(libs.firebase.perf)
             implementation(libs.billing.ktx)
 
             // third-party
@@ -143,65 +140,8 @@ kotlin {
     }
 }
 
-android {
-    namespace = "ai.create.photo"
-    compileSdk = 36
-
-    defaultConfig {
-        applicationId = "com.myaiphotoshoot"
-        minSdk = 26
-        targetSdk = 36
-        versionCode = gitVersionCode
-        versionName = "1.4.$gitVersionCode"
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-
-    val keystorePropertiesFile = rootProject.file("signing.properties")
-    val keystoreProperties = Properties()
-    if (keystorePropertiesFile.exists()) {
-        keystoreProperties.load(FileInputStream(keystorePropertiesFile))
-    }
-    signingConfigs {
-        create("release") {
-            storeFile = file(keystoreProperties.getProperty("storeFile"))
-            storePassword = keystoreProperties.getProperty("storePassword")
-            keyAlias = keystoreProperties.getProperty("keyAlias")
-            keyPassword = keystoreProperties.getProperty("keyPassword")
-        }
-    }
-
-    buildTypes {
-        getByName("debug") {
-            signingConfig = signingConfigs.getByName("release")
-            versionNameSuffix = "-DEV"
-            isMinifyEnabled = false
-            isShrinkResources = false
-            isDebuggable = true
-            isJniDebuggable = false
-            manifestPlaceholders["enableCrashReporting"] = "false"
-        }
-        getByName("release") {
-            signingConfig = signingConfigs.getByName("release")
-            isMinifyEnabled = true
-            isShrinkResources = true
-            isDebuggable = false
-            isJniDebuggable = false
-            manifestPlaceholders["enableCrashReporting"] = "true"
-            proguardFiles("proguard-rules.pro")
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-}
-
 dependencies {
-    debugImplementation(compose.uiTooling)
+    androidRuntimeClasspath(compose.uiTooling)
 }
 
 compose.desktop {

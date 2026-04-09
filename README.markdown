@@ -107,9 +107,10 @@ generating professional-grade photos.
 ```
 my-ai-photo-shoot/
 ├── iosApp/                  # iOS-specific code
+├── androidApp/              # Android application entry module
 ├── composeApp/src           # Shared Compose Multiplatform code
 │   ├── commonMain/          # Platform-agnostic logic (UI, business logic)
-│   ├── androidMain/         # Android-specific implementations
+│   ├── androidMain/         # Android-specific actual implementations
 │   ├── desktopMain/         # Desktop-specific implementations
 │   ├── iosMain/             # iOS-specific implementations
 │   ├── wasmJsMain/          # Web/WASM-specific implementations
