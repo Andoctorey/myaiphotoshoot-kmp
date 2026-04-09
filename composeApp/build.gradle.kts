@@ -5,9 +5,6 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
-val gitVersionCode =
-    "git rev-list --all --count --full-history --no-max-parents HEAD".runCommand().toInt()
-
 plugins {
     alias(libs.plugins.androidMultiplatformLibrary)
     alias(libs.plugins.composeCompiler)
@@ -19,7 +16,7 @@ plugins {
 }
 
 kotlin {
-    androidLibrary {
+    android {
         namespace = "ai.create.photo.shared"
         compileSdk = 36
         minSdk = 26
@@ -54,17 +51,14 @@ kotlin {
     wasmJs {
         outputModuleName = project.name + "-wasm"
         browser {
-            val versionCode = gitVersionCode
             val rootDirPath = project.rootDir.path
             val projectDirPath = project.projectDir.path
             commonWebpackConfig {
-                outputFileName = "composeApp.js?v=$versionCode"
+                outputFileName = "composeApp.js"
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-                    static = (static ?: mutableListOf()).apply {
-                        // Serve sources to debug inside browser
-                        add(rootDirPath)
-                        add(projectDirPath)
-                    }
+                    // Serve sources to debug inside browser.
+                    static(rootDirPath)
+                    static(projectDirPath)
                 }
             }
         }
@@ -72,7 +66,6 @@ kotlin {
     }
 
     sourceSets {
-
         androidMain.dependencies {
             implementation(libs.androidx.multidex)
             implementation(libs.ktor.client.cio)
@@ -103,16 +96,15 @@ kotlin {
             implementation(libs.ktor.client.cio)
         }
 
-        // https://www.jetbrains.com/help/kotlin-multiplatform-dev/whats-new-compose-170.html#across-platforms
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.materialIconsExtended)
-            implementation(compose.material3)
-            implementation(compose.material3AdaptiveNavigationSuite)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.material.icons.extended)
+            implementation(libs.compose.material3)
+            implementation(libs.compose.material3.adaptive.navigation.suite)
+            implementation(libs.compose.ui)
+            implementation(libs.compose.components.resources)
+            implementation(libs.compose.components.ui.tooling.preview)
             implementation(libs.adaptive)
             implementation(libs.adaptive.layout)
             implementation(libs.adaptive.navigation)
@@ -141,7 +133,7 @@ kotlin {
 }
 
 dependencies {
-    androidRuntimeClasspath(compose.uiTooling)
+    androidRuntimeClasspath(libs.compose.ui.tooling)
 }
 
 compose.desktop {
@@ -178,27 +170,25 @@ val updateHtmlTimestamp by tasks.registering {
     val indexHtml = file("src/wasmJsMain/resources/index.html")
     inputs.file(indexHtml)
     outputs.file(indexHtml)
-    val versionCode = gitVersionCode
-
-    doFirst {
-        val updatedContent = indexHtml.readText()
+    doLast {
+        val versionCode = project.readGitVersionCodeOrDefault()
+        val originalContent = indexHtml.readText()
+        val updatedContent = originalContent
             .replace(Regex("""composeApp\.js\?v=\d+"""), "composeApp.js?v=$versionCode")
-        indexHtml.writeText(updatedContent)
+
+        if (updatedContent != originalContent) {
+            indexHtml.writeText(updatedContent)
+        }
     }
 }
 
-tasks.named("wasmJsProcessResources") {
+tasks.named("wasmJsProcessResources").configure {
     dependsOn(updateHtmlTimestamp)
 }
 
-fun String.runCommand(workingDir: File = file("./")): String {
-    val parts = this.split("\\s".toRegex())
-    val process = ProcessBuilder(*parts.toTypedArray())
-        .directory(workingDir)
-        .redirectOutput(ProcessBuilder.Redirect.PIPE)
-        .redirectError(ProcessBuilder.Redirect.PIPE)
-        .start()
-
-    process.waitFor(1, TimeUnit.MINUTES)
-    return process.inputStream.bufferedReader().readText().trim()
-}
+fun Project.readGitVersionCodeOrDefault(defaultValue: String = "0"): String =
+    runCatching {
+        providers.exec {
+            commandLine("git", "rev-list", "--all", "--count", "--full-history", "--no-max-parents", "HEAD")
+        }.standardOutput.asText.get().trim().ifBlank { defaultValue }
+    }.getOrDefault(defaultValue)
