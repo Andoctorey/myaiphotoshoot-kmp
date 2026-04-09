@@ -18,6 +18,7 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.util.network.UnresolvedAddressException
 import io.ktor.utils.io.core.Closeable
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -83,6 +84,7 @@ class SlackLogWriter : LogWriter(), Closeable {
                     }
                     delay(5000L)
                 } catch (e: Exception) {
+                    if (e is CancellationException) throw e
                     Logger.w("Failed to send error log to Slack: ${e.message}")
                 }
             }

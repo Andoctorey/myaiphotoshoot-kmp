@@ -3,6 +3,7 @@ package ai.create.photo.data.supabase.database
 import ai.create.photo.data.supabase.Supabase
 import ai.create.photo.data.supabase.model.UserTraining
 import ai.create.photo.data.supabase.retryWithBackoff
+import ai.create.photo.data.runCatchingCancellable
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
@@ -12,7 +13,7 @@ object UserTrainingsRepository {
 
     private const val USER_TRAININGS_TABLE = "user_trainings"
 
-    suspend fun getTrainings(userId: String): Result<List<UserTraining>> = runCatching {
+    suspend fun getTrainings(userId: String): Result<List<UserTraining>> = runCatchingCancellable {
         retryWithBackoff {
             Supabase.supabase
                 .from(USER_TRAININGS_TABLE)
@@ -30,7 +31,7 @@ object UserTrainingsRepository {
         }
     }
 
-    suspend fun getTraining(id: String): Result<UserTraining?> = runCatching {
+    suspend fun getTraining(id: String): Result<UserTraining?> = runCatchingCancellable {
         retryWithBackoff {
             Supabase.supabase
                 .from(USER_TRAININGS_TABLE)
@@ -47,7 +48,7 @@ object UserTrainingsRepository {
         }
     }
 
-    suspend fun getLatestTraining(userId: String): Result<UserTraining?> = runCatching {
+    suspend fun getLatestTraining(userId: String): Result<UserTraining?> = runCatchingCancellable {
         retryWithBackoff {
             Supabase.supabase
                 .from(USER_TRAININGS_TABLE)
@@ -66,7 +67,7 @@ object UserTrainingsRepository {
     }
 
     suspend fun updatePersonDescription(id: String, personDescription: String): Result<Unit> =
-        runCatching {
+        runCatchingCancellable {
             retryWithBackoff {
                 Supabase.supabase
                     .from(USER_TRAININGS_TABLE)

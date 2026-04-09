@@ -32,6 +32,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.savedstate.read
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.ensureActive
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -221,6 +222,7 @@ fun MainScreen(
                                 viewModel.putPrompt(prompt)
                             }
                         } catch (e: Exception) {
+                            ensureActive()
                             Logger.e("Failed to load generation data for ID: $generationId", e)
                         }
                     }

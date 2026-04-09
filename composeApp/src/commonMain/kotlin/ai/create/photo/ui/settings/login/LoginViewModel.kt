@@ -59,6 +59,7 @@ class LoginViewModel : AuthViewModel() {
                 try {
                     SupabaseFunction.deleteUser()
                 } catch (e: Exception) {
+                    ensureActive()
                     Logger.w("deleteUser failed", e)
                 }
             }

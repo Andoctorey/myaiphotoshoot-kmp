@@ -4,6 +4,7 @@ import ai.create.photo.data.supabase.Supabase.supabase
 import ai.create.photo.data.supabase.SupabaseStorage
 import ai.create.photo.data.supabase.model.UserFile
 import ai.create.photo.data.supabase.retryWithBackoff
+import ai.create.photo.data.runCatchingCancellable
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
@@ -16,7 +17,7 @@ object UserFilesRepository {
     suspend fun saveFile(
         userId: String,
         fileName: String
-    ): Result<UserFile> = runCatching {
+    ): Result<UserFile> = runCatchingCancellable {
         retryWithBackoff {
             val photoData = mapOf(
                 "user_id" to userId,
@@ -52,7 +53,7 @@ object UserFilesRepository {
         }
     }
 
-    suspend fun getInputPhotos(userId: String): Result<List<UserFile>> = runCatching {
+    suspend fun getInputPhotos(userId: String): Result<List<UserFile>> = runCatchingCancellable {
         retryWithBackoff {
             supabase
                 .from(USER_FILES_TABLE)

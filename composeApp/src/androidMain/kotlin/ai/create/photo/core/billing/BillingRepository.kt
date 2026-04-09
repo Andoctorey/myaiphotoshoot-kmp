@@ -1,6 +1,7 @@
 package ai.create.photo.core.billing
 
 import ai.create.photo.app.App
+import ai.create.photo.data.runCatchingCancellable
 import ai.create.photo.core.extention.toast
 import ai.create.photo.core.log.Warning
 import ai.create.photo.data.supabase.SupabaseFunction
@@ -24,16 +25,17 @@ import com.android.billingclient.api.consumePurchase
 import com.android.billingclient.api.queryProductDetails
 import com.android.billingclient.api.queryPurchasesAsync
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.getString
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.billing_service_unavailable
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 @SuppressLint("StaticFieldLeak")
 object BillingRepository : PurchasesUpdatedListener {
@@ -64,7 +66,7 @@ object BillingRepository : PurchasesUpdatedListener {
         activity: Activity, pricing: Pricing,
         onSuccess: () -> Unit, onFailure: (e: Throwable?) -> Unit
     ) =
-        runCatching {
+        runCatchingCancellable {
             this.onSuccess = onSuccess
             this.onFailure = onFailure
             initBillingClient(activity.applicationContext)
@@ -128,6 +130,7 @@ object BillingRepository : PurchasesUpdatedListener {
                         try {
                             processPurchases(this@apply)
                         } catch (e: Exception) {
+                            if (e is CancellationException) throw e
                             Logger.e("onPurchasesUpdated", e)
                             onFailure?.invoke(e)
                             withContext(Dispatchers.Main) {
@@ -144,6 +147,7 @@ object BillingRepository : PurchasesUpdatedListener {
                     try {
                         queryPurchases() // try to consume again
                     } catch (e: Exception) {
+                        if (e is CancellationException) throw e
                         Logger.e("onPurchasesUpdated", e)
                         onFailure?.invoke(e)
                         withContext(Dispatchers.Main) {
@@ -219,6 +223,7 @@ object BillingRepository : PurchasesUpdatedListener {
                         Logger.e("processPurchases", Warning("Failed to verify purchase: $product"))
                     }
                 } catch (e: Exception) {
+                    if (e is CancellationException) throw e
                     Logger.e("processPurchases", e)
                     hasFailure = true
                 }
@@ -245,10 +250,12 @@ object BillingRepository : PurchasesUpdatedListener {
         Security.verifyPurchase(API_KEY, purchase.originalJson, purchase.signature)
 }
 
-suspend fun BillingClient.connect(): BillingResult = suspendCoroutine { continuation ->
+suspend fun BillingClient.connect(): BillingResult = suspendCancellableCoroutine { continuation ->
+    val hasResumed = AtomicBoolean(false)
+    continuation.invokeOnCancellation {
+        hasResumed.set(true)
+    }
     startConnection(object : BillingClientStateListener {
-        val hasResumed = AtomicBoolean(false)
-
         override fun onBillingSetupFinished(billingResult: BillingResult) {
             if (hasResumed.compareAndSet(false, true)) {
                 continuation.resume(billingResult)

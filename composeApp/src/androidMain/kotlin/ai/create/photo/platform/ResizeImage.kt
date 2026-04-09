@@ -1,5 +1,6 @@
 package ai.create.photo.platform
 
+import ai.create.photo.data.runCatchingCancellable
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.core.graphics.scale
@@ -11,7 +12,7 @@ import kotlin.math.roundToInt
 actual suspend fun resizeToWidth(
     input: ByteArray,
     targetWidth: Int
-): Result<ByteArray> = runCatching {
+): Result<ByteArray> = runCatchingCancellable {
     withContext(Dispatchers.IO) {
         val originalBitmap = BitmapFactory.decodeByteArray(input, 0, input.size)
             ?: throw IllegalArgumentException("Unable to decode image from ByteArray")

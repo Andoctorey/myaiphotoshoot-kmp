@@ -2,6 +2,7 @@ package ai.create.photo.platform
 
 import ai.create.photo.data.supabase.SupabaseFunction
 import ai.create.photo.ui.settings.balance.Pricing
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -48,10 +49,10 @@ fun handlePurchaseCompletion(
             onFailure(Exception("Purchase verification failed"))
         }
     } catch (e: Exception) {
+        if (e is CancellationException) throw e
         onFailure(e)
     }
 }
-
 
 
 

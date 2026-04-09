@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 
 class ArticleViewModel : ViewModel() {
@@ -50,6 +51,7 @@ class ArticleViewModel : ViewModel() {
                 topics = topics
             )
         } catch (e: Exception) {
+            ensureActive()
             Logger.e("loadArticle failed for postId: $postId", e)
             uiState = uiState.copy(
                 isLoading = false,

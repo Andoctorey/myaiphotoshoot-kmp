@@ -1,5 +1,6 @@
 package ai.create.photo.platform
 
+import ai.create.photo.data.runCatchingCancellable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.awt.image.BufferedImage
@@ -11,7 +12,7 @@ import kotlin.math.roundToInt
 actual suspend fun resizeToWidth(
     input: ByteArray,
     targetWidth: Int
-): Result<ByteArray> = runCatching {
+): Result<ByteArray> = runCatchingCancellable {
     withContext(Dispatchers.IO) {
         val originalImage = ImageIO.read(ByteArrayInputStream(input))
         val scaledHeight =

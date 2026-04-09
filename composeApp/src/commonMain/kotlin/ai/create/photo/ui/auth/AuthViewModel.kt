@@ -3,6 +3,7 @@ package ai.create.photo.ui.auth
 import ai.create.photo.data.supabase.Supabase.supabase
 import ai.create.photo.data.supabase.SupabaseAuth
 import ai.create.photo.data.supabase.model.User
+import ai.create.photo.data.runCatchingCancellable
 import ai.create.photo.platform.logUserEmail
 import ai.create.photo.platform.logUserId
 import androidx.lifecycle.ViewModel
@@ -49,7 +50,7 @@ abstract class AuthViewModel : ViewModel() {
                     }
 
                     is SessionStatus.NotAuthenticated -> viewModelScope.launch {
-                        runCatching { SupabaseAuth.signInAnonymously() }
+                        runCatchingCancellable { SupabaseAuth.signInAnonymously() }
                             .onFailure { Logger.w("Anonymous sign-in error (non-fatal)", it) }
                     }
                     is SessionStatus.Initializing -> onAuthInitializing()
@@ -69,6 +70,7 @@ abstract class AuthViewModel : ViewModel() {
                 try {
                     supabase.auth.refreshSession(refreshToken!!)
                 } catch (e: Exception) {
+                    ensureActive()
                     Logger.e("Refresh session failed", e)
                 }
             }

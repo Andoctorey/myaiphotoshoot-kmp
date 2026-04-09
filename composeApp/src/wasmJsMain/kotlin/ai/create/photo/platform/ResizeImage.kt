@@ -1,5 +1,6 @@
 package ai.create.photo.platform
 
+import ai.create.photo.data.runCatchingCancellable
 import ai.create.photo.platform.resize.JsUint8Array
 import ai.create.photo.platform.resize.resizeImageToWidthJs
 import kotlinx.coroutines.await
@@ -8,7 +9,7 @@ import kotlin.Result
 actual suspend fun resizeToWidth(
     input: ByteArray,
     targetWidth: Int
-): Result<ByteArray> = runCatching {
+): Result<ByteArray> = runCatchingCancellable {
     val inputU8 = JsUint8Array(input.size)
     for (i in input.indices) {
         inputU8[i] = input[i].toInt()

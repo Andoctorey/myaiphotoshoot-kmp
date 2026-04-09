@@ -19,6 +19,7 @@ import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.storage.UploadStatus
 import io.github.vinceglb.filekit.core.PlatformFiles
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -248,6 +249,7 @@ class UploadViewModel : AuthViewModel() {
                 }
                 return
             } catch (e: Exception) {
+                if (e is CancellationException) throw e
                 attempt++
 
                 if (attempt <= maxRetries) {

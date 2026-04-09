@@ -5,6 +5,7 @@ import ai.create.photo.data.supabase.model.GenerationsFilter
 import ai.create.photo.data.supabase.model.GenerationsSort
 import ai.create.photo.data.supabase.model.UserGeneration
 import ai.create.photo.data.supabase.retryWithBackoff
+import ai.create.photo.data.runCatchingCancellable
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
@@ -27,7 +28,7 @@ object UserGenerationsRepository {
         page: Int,
         pageSize: Int,
         filter: GenerationsFilter,
-    ): Result<List<UserGeneration>> = runCatching {
+    ): Result<List<UserGeneration>> = runCatchingCancellable {
         retryWithBackoff {
             Logger.i("getCreations, page: $page, pageSize: $pageSize")
             val from = ((page - 1) * pageSize).toLong()
@@ -55,7 +56,7 @@ object UserGenerationsRepository {
         userId: String,
         latestCreatedAt: Instant?,
         filter: GenerationsFilter,
-    ): Result<List<UserGeneration>> = runCatching {
+    ): Result<List<UserGeneration>> = runCatchingCancellable {
         retryWithBackoff {
             Logger.i("getCreationsAfter $latestCreatedAt")
             Supabase.supabase
@@ -85,7 +86,7 @@ object UserGenerationsRepository {
         page: Int,
         pageSize: Int,
         sortOrder: GenerationsSort,
-    ): Result<List<UserGeneration>> = runCatching {
+    ): Result<List<UserGeneration>> = runCatchingCancellable {
         retryWithBackoff {
             Logger.i("getPublicGallery, sort: $sortOrder, page: $page, pageSize: $pageSize")
             val from = ((page - 1) * pageSize).toLong()
@@ -117,7 +118,7 @@ object UserGenerationsRepository {
 
     @OptIn(ExperimentalSerializationApi::class, ExperimentalTime::class)
     suspend fun getPublicGalleryAfter(latestCreatedAt: Instant): Result<List<UserGeneration>> =
-        runCatching {
+        runCatchingCancellable {
             retryWithBackoff {
                 Logger.i("getPublicGalleryAfter $latestCreatedAt")
                 Supabase.supabase
