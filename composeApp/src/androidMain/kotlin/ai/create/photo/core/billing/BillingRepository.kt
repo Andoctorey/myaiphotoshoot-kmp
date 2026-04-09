@@ -23,6 +23,7 @@ import com.android.billingclient.api.QueryPurchasesParams
 import com.android.billingclient.api.consumePurchase
 import com.android.billingclient.api.queryProductDetails
 import com.android.billingclient.api.queryPurchasesAsync
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -246,18 +247,16 @@ object BillingRepository : PurchasesUpdatedListener {
 
 suspend fun BillingClient.connect(): BillingResult = suspendCoroutine { continuation ->
     startConnection(object : BillingClientStateListener {
-        var isResumed = false
+        val hasResumed = AtomicBoolean(false)
 
         override fun onBillingSetupFinished(billingResult: BillingResult) {
-            if (!isResumed) {
-                isResumed = true
+            if (hasResumed.compareAndSet(false, true)) {
                 continuation.resume(billingResult)
             }
         }
 
         override fun onBillingServiceDisconnected() {
-            if (!isResumed) {
-                isResumed = true
+            if (hasResumed.compareAndSet(false, true)) {
                 continuation.resumeWithException(Exception("Service disconnected"))
             }
         }
