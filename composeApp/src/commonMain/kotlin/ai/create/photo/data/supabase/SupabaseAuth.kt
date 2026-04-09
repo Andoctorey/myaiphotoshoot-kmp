@@ -6,23 +6,27 @@ import io.github.jan.supabase.auth.OtpType
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.OTP
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.withContext
 
 object SupabaseAuth {
 
-    var signingIn: Boolean = false
+    private val signInMutex = Mutex()
 
     suspend fun signInAnonymously() {
-        if (signingIn) return
+        if (!signInMutex.tryLock()) return
         Logger.i("signInAnonymously")
-        signingIn = true
         try {
             val maxAttempts = 3
             var attempt = 0
             var lastError: Throwable? = null
             while (attempt < maxAttempts) {
                 try {
-                    supabase.auth.signInAnonymously()
+                    withContext(Dispatchers.Default) {
+                        supabase.auth.signInAnonymously()
+                    }
                     lastError = null
                     break
                 } catch (e: Throwable) {
@@ -38,28 +42,34 @@ object SupabaseAuth {
                 Logger.e("Anonymous sign-in failed after $maxAttempts attempts", lastError)
             }
         } finally {
-            signingIn = false
+            signInMutex.unlock()
         }
     }
 
     suspend fun signInWithEmailOtp(email: String) {
         Logger.i("signInWithEmailOtp $email")
-        supabase.auth.signInWith(OTP) {
-            this.email = email
+        withContext(Dispatchers.Default) {
+            supabase.auth.signInWith(OTP) {
+                this.email = email
+            }
         }
     }
 
     suspend fun verifyEmailOtp(email: String, code: String) {
         Logger.i("verifyEmailOtp $code")
-        supabase.auth.verifyEmailOtp(
-            type = OtpType.Email.EMAIL, email = email, token = code
-        )
+        withContext(Dispatchers.Default) {
+            supabase.auth.verifyEmailOtp(
+                type = OtpType.Email.EMAIL, email = email, token = code
+            )
+        }
     }
 
     suspend fun convertAnonymousUserToEmail(email: String) {
         Logger.i("convertAnonymousUserToEmail $email")
-        supabase.auth.updateUser {
-            this.email = email
+        withContext(Dispatchers.Default) {
+            supabase.auth.updateUser {
+                this.email = email
+            }
         }
     }
 }

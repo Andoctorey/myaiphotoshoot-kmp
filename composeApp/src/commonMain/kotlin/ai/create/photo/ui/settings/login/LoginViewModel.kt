@@ -10,8 +10,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
+import io.github.jan.supabase.auth.SignOutScope
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.exception.AuthRestException
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 
@@ -117,9 +119,7 @@ class LoginViewModel : AuthViewModel() {
     }
 
     fun logout() = viewModelScope.launch {
-        Logger.i("logout")
-        supabase.auth.signOut()
-        uiState = LoginUiState()
+        performLogout()
     }
 
     fun deleteAllData() = viewModelScope.launch {
@@ -130,8 +130,12 @@ class LoginViewModel : AuthViewModel() {
             uiState = uiState.copy(isLoading = true)
             SupabaseStorage.deleteUserFiles(userId)
             SupabaseFunction.deleteUser()
-            logout()
-            uiState = uiState.copy(dataDeletedPopup = true)
+            val logoutSucceeded = performLogout()
+            if (logoutSucceeded) {
+                uiState = uiState.copy(dataDeletedPopup = true)
+            } else {
+                uiState = uiState.copy(isLoading = false)
+            }
         } catch (e: Exception) {
             uiState = uiState.copy(isLoading = false)
             ensureActive()
@@ -151,5 +155,34 @@ class LoginViewModel : AuthViewModel() {
 
     fun resetOtpVerified() {
         uiState = uiState.copy(otpVerified = false)
+    }
+
+    private suspend fun performLogout(): Boolean {
+        Logger.i("logout")
+
+        val signOutFailed = try {
+            supabase.auth.signOut(SignOutScope.LOCAL)
+            false
+        } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
+            Logger.w("signOut failed, clearing local session", e)
+            true
+        }
+
+        var clearSessionFailed = false
+        if (signOutFailed) {
+            try {
+                supabase.auth.clearSession()
+            } catch (e: Exception) {
+                currentCoroutineContext().ensureActive()
+                Logger.e("clearSession failed", e)
+                clearSessionFailed = true
+                if (isAuthenticated) uiState = uiState.copy(errorPopup = e)
+            }
+        }
+
+        if (clearSessionFailed) return false
+        uiState = LoginUiState()
+        return true
     }
 }
