@@ -1,4 +1,12 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+import org.gradle.api.DefaultTask
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
+import org.gradle.api.tasks.TaskAction
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
@@ -166,29 +174,40 @@ tasks.withType<DependencyUpdatesTask> {
     reportfileName = "report"
 }
 
-val updateHtmlTimestamp by tasks.registering {
-    val indexHtml = file("src/wasmJsMain/resources/index.html")
-    inputs.file(indexHtml)
-    outputs.file(indexHtml)
-    doLast {
-        val versionCode = project.readGitVersionCodeOrDefault()
-        val originalContent = indexHtml.readText()
+val gitVersionCodeProvider = providers.exec {
+    commandLine("git", "rev-list", "--all", "--count", "--full-history", "--no-max-parents", "HEAD")
+    isIgnoreExitValue = true
+}.standardOutput.asText
+    .map { it.trim().ifBlank { "0" } }
+    .orElse("0")
+
+abstract class UpdateHtmlTimestampTask : DefaultTask() {
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val indexHtml: RegularFileProperty
+
+    @get:Input
+    abstract val gitVersionCode: Property<String>
+
+    @TaskAction
+    fun updateHtml() {
+        val versionCode = gitVersionCode.get()
+        val htmlFile = indexHtml.get().asFile
+        val originalContent = htmlFile.readText()
         val updatedContent = originalContent
             .replace(Regex("""composeApp\.js\?v=\d+"""), "composeApp.js?v=$versionCode")
 
         if (updatedContent != originalContent) {
-            indexHtml.writeText(updatedContent)
+            htmlFile.writeText(updatedContent)
         }
     }
+}
+
+val updateHtmlTimestamp by tasks.registering(UpdateHtmlTimestampTask::class) {
+    indexHtml.set(layout.projectDirectory.file("src/wasmJsMain/resources/index.html"))
+    gitVersionCode.set(gitVersionCodeProvider)
 }
 
 tasks.named("wasmJsProcessResources").configure {
     dependsOn(updateHtmlTimestamp)
 }
-
-fun Project.readGitVersionCodeOrDefault(defaultValue: String = "0"): String =
-    runCatching {
-        providers.exec {
-            commandLine("git", "rev-list", "--all", "--count", "--full-history", "--no-max-parents", "HEAD")
-        }.standardOutput.asText.get().trim().ifBlank { defaultValue }
-    }.getOrDefault(defaultValue)

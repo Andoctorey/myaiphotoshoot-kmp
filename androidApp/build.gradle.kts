@@ -2,8 +2,14 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.FileInputStream
 import java.util.Properties
 
-val gitVersionCode =
-    "git rev-list --all --count --full-history --no-max-parents HEAD".runCommand().toInt()
+val gitVersionCodeProvider = providers.exec {
+    commandLine("git", "rev-list", "--all", "--count", "--full-history", "--no-max-parents", "HEAD")
+    isIgnoreExitValue = true
+}.standardOutput.asText
+    .map { it.trim().toIntOrNull() ?: 1 }
+    .orElse(1)
+
+val gitVersionCode = gitVersionCodeProvider.get()
 
 plugins {
     alias(libs.plugins.androidApplication)
@@ -89,16 +95,4 @@ dependencies {
     implementation(libs.firebase.perf)
 
     debugImplementation(compose.uiTooling)
-}
-
-fun String.runCommand(workingDir: File = file("./")): String {
-    val parts = this.split("\\s".toRegex())
-    val process = ProcessBuilder(*parts.toTypedArray())
-        .directory(workingDir)
-        .redirectOutput(ProcessBuilder.Redirect.PIPE)
-        .redirectError(ProcessBuilder.Redirect.PIPE)
-        .start()
-
-    process.waitFor(1, TimeUnit.MINUTES)
-    return process.inputStream.bufferedReader().readText().trim()
 }
