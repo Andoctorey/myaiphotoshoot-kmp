@@ -1,7 +1,6 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.FileInputStream
 import java.util.Properties
-import java.util.concurrent.TimeUnit
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 val gitVersionCode =
     "git rev-list --all --count --full-history --no-max-parents HEAD".runCommand().toInt()
@@ -12,7 +11,6 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.crashlytics)
     alias(libs.plugins.googleServices)
-    alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.perf)
 }
 
