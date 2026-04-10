@@ -109,8 +109,19 @@ class UploadViewModel : AuthViewModel() {
         var completedFiles = 0
         for (file in files) {
             uploadPhotoUseCase.invoke(userId, file).catch {
-                Logger.e("uploadPhotos failed", it)
-                uiState = uiState.copy(uploadProgress = 0, errorPopup = it)
+                if (it is CancellationException) throw it
+                val uploadError = if (it.isExpectedMissingLocalFileIssue()) {
+                    Logger.w(
+                        "uploadPhotos skipped unavailable local file '${file.name}': ${it.message}"
+                    )
+                    IllegalStateException(
+                        "Cannot access one of the selected photos. Please pick it again."
+                    )
+                } else {
+                    Logger.e("uploadPhotos failed", it)
+                    it
+                }
+                uiState = uiState.copy(uploadProgress = 0, errorPopup = uploadError)
             }.collect { result ->
                 val (file, status) = result
                 if (file != null) {
@@ -499,4 +510,26 @@ class UploadViewModel : AuthViewModel() {
     fun hideBalanceUpdatedPopup() {
         uiState = uiState.copy(showBalanceUpdatedPopup = false)
     }
+}
+
+private val missingLocalFileMarkers = listOf(
+    "open failed: enoent",
+    "open failed: efault",
+    "no such file or directory",
+    "bad address",
+    "file not found",
+)
+
+private fun Throwable.isExpectedMissingLocalFileIssue(): Boolean {
+    var current: Throwable? = this
+    var depth = 0
+    while (current != null && depth < 8) {
+        val className = current::class.simpleName.orEmpty().lowercase()
+        val message = current.message.orEmpty().lowercase()
+        if ("filenotfoundexception" in className) return true
+        if (missingLocalFileMarkers.any { marker -> marker in message }) return true
+        current = current.cause
+        depth++
+    }
+    return false
 }
