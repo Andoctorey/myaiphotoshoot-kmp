@@ -28,8 +28,7 @@ class PublicViewModel : AuthViewModel() {
             uiState = uiState.copy(isLoading = false)
         }
         if (userChanged || uiState.photos.isEmpty()) {
-            loadProfile()
-            loadPublicGallery()
+            loadProfileAndPublicGallery(userChanged)
         }
     }
 
@@ -112,6 +111,41 @@ class PublicViewModel : AuthViewModel() {
         uiState = uiState.copy(errorPopup = null)
     }
 
+    private fun loadProfileAndPublicGallery(userChanged: Boolean) = viewModelScope.launch {
+        val userId = user?.id ?: return@launch
+        val defaultSort = try {
+            val profile = ProfilesRepository.loadProfile(userId)
+            val preferences = profile?.preferences
+            val publicTooltipShown = preferences?.publicTooltipShown != true
+            uiState = uiState.copy(showTooltipPopup = publicTooltipShown)
+            if (preferences?.firstTrainingCompleted == true) {
+                GenerationsSort.NEW
+            } else {
+                GenerationsSort.POPULAR
+            }
+        } catch (e: Exception) {
+            ensureActive()
+            if (!isAuthenticated) return@launch
+            Logger.e("loadProfile failed", e)
+            uiState = uiState.copy(errorPopup = e)
+            uiState.sort
+        }
+
+        val shouldReset = userChanged || uiState.sort != defaultSort || uiState.photos.isEmpty()
+        if (shouldReset) {
+            uiState = uiState.copy(
+                sort = defaultSort,
+                page = 1,
+                photos = emptyList(),
+                isRefreshing = false,
+                isLoadingNextPage = false,
+                pagingLimitReach = false,
+                isLoading = true,
+            )
+        }
+        loadPublicGallery()
+    }
+
     @OptIn(ExperimentalTime::class)
     fun addPhotoToPublicGallery(generations: List<UserGeneration>) {
         if (generations.isEmpty()) return
@@ -148,22 +182,6 @@ class PublicViewModel : AuthViewModel() {
                     Logger.e("toggleTooltipPopup failed", e)
                 }
             }
-        }
-    }
-
-    fun loadProfile() = viewModelScope.launch {
-        val userId = user?.id ?: return@launch
-
-        try {
-            val profile = ProfilesRepository.loadProfile(userId)
-            val preferences = profile?.preferences
-            val publicTooltipShown = preferences?.publicTooltipShown != true
-            if (publicTooltipShown) toggleTooltipPopup(true)
-        } catch (e: Exception) {
-            ensureActive()
-            if (!isAuthenticated) return@launch
-            Logger.e("loadProfile failed", e)
-            uiState = uiState.copy(errorPopup = e)
         }
     }
 
