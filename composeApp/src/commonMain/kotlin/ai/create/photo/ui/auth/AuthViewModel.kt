@@ -64,8 +64,7 @@ abstract class AuthViewModel : ViewModel() {
                     }
                     is SessionStatus.Initializing -> onAuthInitializing()
                     is SessionStatus.RefreshFailure -> {
-                        val cause = it.cause
-                        when (cause) {
+                        when (val cause = it.cause) {
                             is RefreshFailureCause.NetworkError -> throw cause.exception
                             is RefreshFailureCause.InternalServerError -> throw cause.exception
                         }
