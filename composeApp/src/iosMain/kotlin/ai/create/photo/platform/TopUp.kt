@@ -29,7 +29,6 @@ actual suspend fun topUpPlatform(
         ?: onFailure(IllegalStateException("TopUpProvider not set"))
 }
 
-@Suppress("unused")
 fun handlePurchaseCompletion(
     pricing: Pricing,
     receipt: String,
