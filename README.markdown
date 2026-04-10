@@ -88,7 +88,17 @@ generating professional-grade photos.
       }
       ```
 
-4. **Build and Run**:
+4. **Configure iOS Firebase (Required for analytics/crash reporting)**:
+    - Create `iosApp/iosApp/GoogleService-Info.plist` from your Firebase iOS app settings.
+    - You can start from the template:
+      ```bash
+      cp iosApp/iosApp/GoogleService-Info-Sample.plist iosApp/iosApp/GoogleService-Info.plist
+      ```
+    - Replace placeholder values in that file with your real Firebase values.
+    - This file is required for iOS builds; if it is missing or still contains placeholders,
+      Firebase setup fails at app startup.
+
+5. **Build and Run**:
     - **Android**: Open the project in Android Studio, sync Gradle, and run on an emulator or
       device.
     - **iOS**: Run in Android Studio. Or open the `iosApp` directory in Xcode and run on a simulator
@@ -98,7 +108,7 @@ generating professional-grade photos.
       ./gradlew wasmJsBrowserDevelopmentRun -t --quiet
       ```
 
-5. **Verify Setup**:
+6. **Verify Setup**:
     - Ensure the app connects to Supabase and Flux.1 APIs.
     - Test selfie uploads and photo generation.
 
