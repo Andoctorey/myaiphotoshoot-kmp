@@ -46,7 +46,7 @@ data class SettingsUiState(
 
     @Immutable
     @Parcelize
-    sealed class Item() : Parcelable
+    sealed class Item : Parcelable
 
     @Immutable
     @Parcelize
@@ -61,25 +61,25 @@ data class SettingsUiState(
 
     @Immutable
     @Parcelize
-    class LoginItem() : DetailedItem(Res.string.account, Icons.Default.AccountCircle), Parcelable
+    class LoginItem : DetailedItem(Res.string.account, Icons.Default.AccountCircle), Parcelable
 
     @Immutable
     @Parcelize
-    class BalanceItem() : DetailedItem(Res.string.top_up_pricing, Icons.Default.CreditCard),
+    class BalanceItem : DetailedItem(Res.string.top_up_pricing, Icons.Default.CreditCard),
         Parcelable
 
     @Immutable
     @Parcelize
-    class SupportItem() : DetailedItem(Res.string.support, Icons.AutoMirrored.Filled.Help),
+    class SupportItem : DetailedItem(Res.string.support, Icons.AutoMirrored.Filled.Help),
         Parcelable
 
     @Immutable
     @Parcelize
-    class GooglePlayItem() : DetailedItem(Res.string.google_play, Icons.Default.InstallMobile),
+    class GooglePlayItem : DetailedItem(Res.string.google_play, Icons.Default.InstallMobile),
         Parcelable
 
     @Immutable
     @Parcelize
-    class AppStoreItem() : DetailedItem(Res.string.app_store, Icons.Default.InstallMobile),
+    class AppStoreItem : DetailedItem(Res.string.app_store, Icons.Default.InstallMobile),
         Parcelable
 }
