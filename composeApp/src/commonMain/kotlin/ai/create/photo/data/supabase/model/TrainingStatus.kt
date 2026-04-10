@@ -5,6 +5,9 @@ import kotlinx.serialization.SerialName
 enum class TrainingStatus {
     @SerialName("failed")
     FAILED,
+
+    @SerialName("canceled")
+    CANCELED,
     @SerialName("processing")
     PROCESSING,
     @SerialName("succeeded")

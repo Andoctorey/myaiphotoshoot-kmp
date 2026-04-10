@@ -401,7 +401,9 @@ class UploadViewModel : AuthViewModel() {
             ensureActive()
             if (isAuthenticated) {
                 Logger.e("loadTraining failed", e)
-                uiState = uiState.copy(errorPopup = e)
+                uiState = uiState.copy(
+                    errorPopup = e,
+                )
             }
         }
 

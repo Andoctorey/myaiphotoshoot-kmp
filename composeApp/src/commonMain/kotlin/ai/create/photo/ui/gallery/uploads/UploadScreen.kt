@@ -420,7 +420,7 @@ private fun TrainModelFab(
             when (trainingStatus) {
                 TrainingStatus.SUCCEEDED -> generatePhotos()
                 TrainingStatus.PROCESSING -> onCreatingModelClick()
-                TrainingStatus.FAILED, null -> createModel()
+                TrainingStatus.FAILED, TrainingStatus.CANCELED, null -> createModel()
             }
         },
     ) {
@@ -483,7 +483,7 @@ private fun TrainModelFab(
                     }
                 }
 
-                TrainingStatus.FAILED, null -> {
+                TrainingStatus.FAILED, TrainingStatus.CANCELED, null -> {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Default.Memory,
