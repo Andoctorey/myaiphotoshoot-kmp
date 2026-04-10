@@ -13,12 +13,13 @@
     <string name="unknown_error">Something went wrong. Please try again.</string>
     <string name="train_ai_model">Train AI model</string>
     <string name="training_ai_model">Training AI model</string>
+    <string name="training_ai_model_elapsed">Training AI model (%1$s elapsed)</string>
     <string name="ai_model">Model</string>
     <string name="analyze_photos">Analyze photos</string>
     <string name="analyzing_photos">Analyzing photos (%1$s/%2$s)</string>
     <string name="delete_unsuitable_photos">Some of your selected photos may not be ideal for fine-tuning the AI model. For optimal results, consider removing these less suitable images.</string>
     <string name="generate_photo">Generate Photos</string>
-    <string name="creating_model_hint">This usually takes few minutes - you can close the app and come back later.</string>
+    <string name="creating_model_hint">This usually takes a few minutes, but may take longer when the queue is busy. You can close the app and come back later.</string>
     <string name="enhance_photo_accuracy">Enhance Photo Accuracy</string>
     <string name="photo_prompt">Photo prompt</string>
     <string name="account">Account</string>

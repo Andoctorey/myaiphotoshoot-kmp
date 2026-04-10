@@ -10,6 +10,7 @@
     <string name="unknown_error">何かが間違っています。もう一度お試しください。</string>
     <string name="train_ai_model">AIモデルをトレーニング</string>
     <string name="training_ai_model">AIモデルをトレーニング中</string>
+    <string name="training_ai_model_elapsed">AIモデルをトレーニング中（経過 %1$s）</string>
     <string name="ai_model">モデル</string>
     <string name="analyze_photos">写真を分析</string>
     <string name="analyzing_photos">写真を分析中 (%1$s/%2$s)</string>

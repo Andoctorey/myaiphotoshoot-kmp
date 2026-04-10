@@ -10,6 +10,7 @@
     <string name="unknown_error">Etwas ist schiefgelaufen. Bitte versuche es erneut.</string>
     <string name="train_ai_model">KI-Modell trainieren</string>
     <string name="training_ai_model">KI-Modell wird trainiert</string>
+    <string name="training_ai_model_elapsed">KI-Modell wird trainiert (%1$s vergangen)</string>
     <string name="ai_model">Modell</string>
     <string name="analyze_photos">Fotos analysieren</string>
     <string name="analyzing_photos">Fotos werden analysiert (%1$s/%2$s)</string>

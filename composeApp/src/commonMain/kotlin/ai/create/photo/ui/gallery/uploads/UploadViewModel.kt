@@ -29,6 +29,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlin.math.max
+import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -38,6 +39,8 @@ class UploadViewModel : AuthViewModel() {
         storage = SupabaseStorage,
         database = UserFilesRepository,
     )
+    private var trainingTimerJob: Job? = null
+    private var trainingPollingJob: Job? = null
 
     var uiState by mutableStateOf(UploadUiState())
         private set
@@ -349,11 +352,11 @@ class UploadViewModel : AuthViewModel() {
 
         uiState = uiState.copy(
             trainingStatus = TrainingStatus.PROCESSING,
-            trainingTimeLeft = 20 * 60 * 1000L,
+            trainingElapsedTimeMs = 0L,
         )
 
         try {
-            runTimer()
+            ensureTrainingTimerRunning()
             SupabaseFunction.trainAiModel()
             loadTraining()
         } catch (e: Exception) {
@@ -381,6 +384,7 @@ class UploadViewModel : AuthViewModel() {
             val userTraining =
                 UserTrainingsRepository.getLatestTraining(userId).getOrThrow()
             var trainingStatus = userTraining?.status
+            var trainingElapsedTimeMs = uiState.trainingElapsedTimeMs
             if (userTraining != null) {
                 val lastPhotoUploadDate =
                     uiState.photos?.firstOrNull()?.createdAt ?: Instant.DISTANT_FUTURE
@@ -389,11 +393,20 @@ class UploadViewModel : AuthViewModel() {
                     Logger.i("New photos uploaded after the last training")
                     trainingStatus = null
                 }
+                if (trainingStatus == TrainingStatus.PROCESSING) {
+                    trainingElapsedTimeMs =
+                        max(trainingElapsedTimeMs, elapsedSince(userTraining.createdAt))
+                }
             }
             Logger.i("latest training: $trainingStatus")
             uiState = uiState.copy(
                 isLoadingTraining = false,
                 trainingStatus = trainingStatus,
+                trainingElapsedTimeMs = if (trainingStatus == TrainingStatus.PROCESSING) {
+                    trainingElapsedTimeMs
+                } else {
+                    0L
+                },
                 loadingError = null,
             )
         } catch (e: Exception) {
@@ -407,29 +420,61 @@ class UploadViewModel : AuthViewModel() {
             }
         }
 
-        val timeToStartApiRequests = 90 * 1000L // seconds
         if (uiState.trainingStatus == TrainingStatus.PROCESSING) {
-            if (uiState.trainingTimeLeft > timeToStartApiRequests) {
-                delay(uiState.trainingTimeLeft - timeToStartApiRequests)
-            } else {
-                delay(5 * 1000)
+            ensureTrainingTimerRunning()
+            scheduleNextTrainingPoll()
+        } else {
+            cancelTrainingTimer()
+            cancelTrainingPolling()
+        }
+    }
+
+    private fun ensureTrainingTimerRunning() {
+        if (trainingTimerJob?.isActive == true) return
+        trainingTimerJob = viewModelScope.launch {
+            while (uiState.trainingStatus == TrainingStatus.PROCESSING) {
+                delay(1000L)
+                uiState =
+                    uiState.copy(trainingElapsedTimeMs = uiState.trainingElapsedTimeMs + 1000L)
             }
+        }
+    }
+
+    private fun cancelTrainingTimer() {
+        trainingTimerJob?.cancel()
+        trainingTimerJob = null
+    }
+
+    private fun cancelTrainingPolling() {
+        trainingPollingJob?.cancel()
+        trainingPollingJob = null
+    }
+
+    private fun scheduleNextTrainingPoll() {
+        if (trainingPollingJob?.isActive == true) return
+        trainingPollingJob = viewModelScope.launch {
+            delay(trainingPollingIntervalMs(uiState.trainingElapsedTimeMs))
             ensureActive()
+            trainingPollingJob = null
             if (!isAuthenticated) return@launch
             if (uiState.isLoadingPhotos) return@launch
             loadTraining()
         }
     }
 
-    fun runTimer(): Job = viewModelScope.launch {
-        if (uiState.trainingStatus != TrainingStatus.PROCESSING) return@launch
-        if (uiState.trainingTimeLeft <= 0L) {
-            uiState = uiState.copy(trainingTimeLeft = 0L)
-            return@launch
+    private fun trainingPollingIntervalMs(elapsedMs: Long): Long {
+        val fifteenMinutesMs = 15 * 60 * 1000L
+        val sixtyMinutesMs = 60 * 60 * 1000L
+        return when {
+            elapsedMs < fifteenMinutesMs -> 10 * 1000L
+            elapsedMs < sixtyMinutesMs -> 30 * 1000L
+            else -> 60 * 1000L
         }
-        delay(1000L)
-        uiState = uiState.copy(trainingTimeLeft = uiState.trainingTimeLeft - 1000L)
-        runTimer()
+    }
+
+    @OptIn(ExperimentalTime::class)
+    private fun elapsedSince(startedAt: Instant): Long {
+        return (Clock.System.now() - startedAt).inWholeMilliseconds.coerceAtLeast(0L)
     }
 
     fun onCreatingModelClick() {

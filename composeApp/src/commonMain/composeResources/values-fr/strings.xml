@@ -10,6 +10,7 @@
     <string name="unknown_error">Quelque chose s\'est mal passé. Veuillez réessayer.</string>
     <string name="train_ai_model">Entraîner le modèle IA</string>
     <string name="training_ai_model">Entraînement du modèle IA</string>
+    <string name="training_ai_model_elapsed">Entraînement du modèle IA (%1$s écoulé)</string>
     <string name="ai_model">Modèle</string>
     <string name="analyze_photos">Analyser les photos</string>
     <string name="analyzing_photos">Analyse des photos (%1$s/%2$s)</string>

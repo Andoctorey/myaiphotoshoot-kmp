@@ -99,6 +99,7 @@ import photocreateai.composeapp.generated.resources.thank_you_for_purchase
 import photocreateai.composeapp.generated.resources.topping_up
 import photocreateai.composeapp.generated.resources.train_ai_model
 import photocreateai.composeapp.generated.resources.training_ai_model
+import photocreateai.composeapp.generated.resources.training_ai_model_elapsed
 import photocreateai.composeapp.generated.resources.upload_guidelines
 import photocreateai.composeapp.generated.resources.upload_more_photos
 
@@ -176,7 +177,7 @@ fun UploadScreen(
                         modifier = Modifier.align(Alignment.BottomCenter)
                             .padding(bottom = buttonsBottomPadding).safeDrawingPadding(),
                         trainingStatus = state.trainingStatus,
-                        trainingTimeLeft = state.trainingTimeLeft,
+                        trainingElapsedTimeMs = state.trainingElapsedTimeMs,
                         createModel = { viewModel.checkBadPhotosAndToggleTrainAiModelPopup(true) },
                         onCreatingModelClick = viewModel::onCreatingModelClick,
                         generatePhotos = openGenerateTab,
@@ -407,7 +408,7 @@ private fun AnalyzePhotosFab(
 private fun TrainModelFab(
     modifier: Modifier = Modifier,
     trainingStatus: TrainingStatus?,
-    trainingTimeLeft: Long,
+    trainingElapsedTimeMs: Long,
     createModel: () -> Unit,
     onCreatingModelClick: () -> Unit,
     generatePhotos: () -> Unit,
@@ -470,12 +471,14 @@ private fun TrainModelFab(
                         )
                         Spacer(modifier = Modifier.width(16.dp))
                         Text(
-                            text = stringResource(Res.string.training_ai_model) + " " +
-                                    if (trainingTimeLeft > 0) {
-                                        "(${(trainingTimeLeft / 1000).toInt()}s)"
-                                    } else {
-                                        ""
-                                    },
+                            text = if (trainingElapsedTimeMs > 0) {
+                                stringResource(
+                                    Res.string.training_ai_model_elapsed,
+                                    formatElapsedDuration(trainingElapsedTimeMs),
+                                )
+                            } else {
+                                stringResource(Res.string.training_ai_model)
+                            },
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             fontSize = 14.sp,
@@ -502,6 +505,18 @@ private fun TrainModelFab(
                 }
             }
         }
+    }
+}
+
+private fun formatElapsedDuration(elapsedMs: Long): String {
+    val totalSeconds = elapsedMs / 1000L
+    val hours = totalSeconds / 3600L
+    val minutes = (totalSeconds % 3600L) / 60L
+    val seconds = totalSeconds % 60L
+    return when {
+        hours > 0L -> "${hours}h ${minutes}m"
+        minutes > 0L -> "${minutes}m ${seconds.toString().padStart(2, '0')}s"
+        else -> "${seconds}s"
     }
 }
 

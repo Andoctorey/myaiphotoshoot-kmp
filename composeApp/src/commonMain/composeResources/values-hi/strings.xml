@@ -10,6 +10,7 @@
     <string name="unknown_error">कुछ गलत हो गया। कृपया फिर से कोशिश करें।</string>
     <string name="train_ai_model">AI मॉडल ट्रेन करें</string>
     <string name="training_ai_model">AI मॉडल ट्रेनिंग</string>
+    <string name="training_ai_model_elapsed">AI मॉडल ट्रेनिंग (%1$s बीत चुका है)</string>
     <string name="ai_model">मॉडल</string>
     <string name="analyze_photos">तस्वीरों का विश्लेषण</string>
     <string name="analyzing_photos">तस्वीरों का विश्लेषण (%1$s/%2$s)</string>

@@ -10,6 +10,7 @@
     <string name="unknown_error">حدث خطأ ما. يرجى المحاولة مرة أخرى.</string>
     <string name="train_ai_model">تدريب نموذج الذكاء الاصطناعي</string>
     <string name="training_ai_model">تدريب نموذج الذكاء الاصطناعي</string>
+    <string name="training_ai_model_elapsed">تدريب نموذج الذكاء الاصطناعي (انقضى %1$s)</string>
     <string name="ai_model">النموذج</string>
     <string name="analyze_photos">تحليل الصور</string>
     <string name="analyzing_photos">تحليل الصور (%1$s/%2$s)</string>

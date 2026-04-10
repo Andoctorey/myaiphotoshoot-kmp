@@ -10,6 +10,7 @@
     <string name="unknown_error">出现错误。请重试。</string>
     <string name="train_ai_model">训练AI模型</string>
     <string name="training_ai_model">正在训练AI模型</string>
+    <string name="training_ai_model_elapsed">正在训练AI模型（已用时%1$s）</string>
     <string name="ai_model">模型</string>
     <string name="analyze_photos">分析照片</string>
     <string name="analyzing_photos">正在分析照片 (%1$s/%2$s)</string>

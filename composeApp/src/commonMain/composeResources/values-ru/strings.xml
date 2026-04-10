@@ -10,6 +10,7 @@
     <string name="unknown_error">Что-то пошло не так. Пожалуйста, попробуйте снова.</string>
     <string name="train_ai_model">Обучить ИИ модель</string>
     <string name="training_ai_model">Обучение ИИ модели</string>
+    <string name="training_ai_model_elapsed">Обучение ИИ модели (%1$s прошло)</string>
     <string name="ai_model">Модель</string>
     <string name="analyze_photos">Анализ фотографий</string>
     <string name="analyzing_photos">Анализ фотографий (%1$s/%2$s)</string>
