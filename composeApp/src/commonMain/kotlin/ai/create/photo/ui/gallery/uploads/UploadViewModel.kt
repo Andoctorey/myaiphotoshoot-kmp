@@ -4,6 +4,7 @@ import ai.create.photo.data.supabase.Supabase
 import ai.create.photo.data.supabase.SupabaseFunction
 import ai.create.photo.data.supabase.SupabaseStorage
 import ai.create.photo.data.supabase.SupabaseStorage.UPLOADS
+import ai.create.photo.data.supabase.isExpectedTransientNetworkIssue
 import ai.create.photo.data.supabase.database.ProfilesRepository
 import ai.create.photo.data.supabase.database.UserFilesRepository
 import ai.create.photo.data.supabase.database.UserTrainingsRepository
@@ -23,13 +24,11 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlin.math.max
-import kotlin.math.pow
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -206,7 +205,7 @@ class UploadViewModel : AuthViewModel() {
     }
 
     @OptIn(ExperimentalTime::class)
-    private suspend fun analyzePhoto(photoId: String, maxRetries: Int = 2) {
+    private suspend fun analyzePhoto(photoId: String) {
         uiState = uiState.copy(
             photos = uiState.photos?.map { photo ->
                 if (photo.id == photoId) {
@@ -221,53 +220,32 @@ class UploadViewModel : AuthViewModel() {
         Logger.i(uiState.toString())
         updateAnalysisStatus()
 
-        var attempt = 0
-        var lastException: Exception? = null
-
-        while (attempt <= maxRetries) {
-            try {
-                val file = SupabaseFunction.analyzePhoto(photoId)
-                uiState = uiState.copy(
-                    photos = uiState.photos?.map { photo ->
-                        if (photo.id == file.id) {
-                            photo.copy(
-                                analysis = file.analysis,
-                                analysisStatus = file.analysisStatus,
-                            )
-                        } else {
-                            photo
-                        }
+        try {
+            val file = SupabaseFunction.analyzePhoto(photoId)
+            uiState = uiState.copy(
+                photos = uiState.photos?.map { photo ->
+                    if (photo.id == file.id) {
+                        photo.copy(
+                            analysis = file.analysis,
+                            analysisStatus = file.analysisStatus,
+                        )
+                    } else {
+                        photo
                     }
-                )
-                uiState = uiState.copy(
-                    scrollToPosition = uiState.photos?.indexOfFirst { it.id == photoId },
-                    scrollToTop = false
-                )
-                updateAnalysisStatus()
-                if (attempt > 0) {
-                    Logger.i("Photo analysis succeeded on attempt ${attempt + 1} for: $photoId")
                 }
-                return
-            } catch (e: Exception) {
-                if (e is CancellationException) throw e
-                attempt++
-
-                if (attempt <= maxRetries) {
-                    val delayMs = (1000 * 2.0.pow(attempt - 1)).toLong()
-                    Logger.w("Photo analysis failed (attempt $attempt/${maxRetries + 1}) for: $photoId. Retrying in ${delayMs}ms. Error: ${e.message}")
-                    delay(delayMs)
-                    currentCoroutineContext().ensureActive()
-                } else {
-                    lastException = e
-                    Logger.e(
-                        "Photo analysis failed after ${maxRetries + 1} attempts for: $photoId. Final error: ${e.message}",
-                        e
-                    )
-                }
+            )
+            uiState = uiState.copy(
+                scrollToPosition = uiState.photos?.indexOfFirst { it.id == photoId },
+                scrollToTop = false
+            )
+            updateAnalysisStatus()
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
+            if (e.isExpectedTransientNetworkIssue()) {
+                Logger.w("Photo analysis failed for: $photoId. Network issue: ${e.message}")
+            } else {
+                Logger.e("Photo analysis failed for: $photoId", e)
             }
-        }
-        lastException?.let {
-            Logger.e("All attempts to analyze photo failed for: $photoId", it)
             uiState = uiState.copy(
                 photos = uiState.photos?.map { p ->
                     if (p.id == photoId) {
@@ -276,12 +254,10 @@ class UploadViewModel : AuthViewModel() {
                         p
                     }
                 },
-                errorPopup = it
+                errorPopup = e
             )
             updateAnalysisStatus()
-            return
         }
-
     }
 
     fun deleteUnsuitablePhotos() = viewModelScope.launch {
