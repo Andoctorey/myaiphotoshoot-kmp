@@ -168,6 +168,14 @@ class UploadViewModel : AuthViewModel() {
     }
 
     fun analyzePhotos(): Job = viewModelScope.launch {
+        if (awaitAuthenticatedUserId() == null) {
+            val error =
+                IllegalStateException("Authentication is still initializing. Please try again.")
+            Logger.w("analyzePhotos skipped: auth session is not ready")
+            uiState = uiState.copy(errorPopup = error)
+            return@launch
+        }
+
         updateAnalysisStatus()
         val notAnalyzedPhotos = uiState.photos?.filter { it.analysisStatus == null }
         if (notAnalyzedPhotos.isNullOrEmpty()) return@launch
@@ -214,6 +222,11 @@ class UploadViewModel : AuthViewModel() {
 
     @OptIn(ExperimentalTime::class)
     private suspend fun analyzePhoto(photoId: String) {
+        if (awaitAuthenticatedUserId() == null) {
+            Logger.w("analyzePhoto skipped: auth session is not ready, photoId=$photoId")
+            return
+        }
+
         uiState = uiState.copy(
             photos = uiState.photos?.map { photo ->
                 if (photo.id == photoId) {

@@ -4,8 +4,10 @@ import co.touchlab.kermit.Logger
 import coil3.network.HttpException
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
-import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.ktor.client.network.sockets.ConnectTimeoutException
+import io.ktor.client.network.sockets.SocketTimeoutException
+import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
@@ -13,7 +15,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.io.EOFException
 import kotlinx.io.IOException
-import java.net.SocketTimeoutException
 import kotlin.math.pow
 import kotlin.reflect.KClass
 import kotlin.time.Duration.Companion.milliseconds
@@ -159,6 +160,11 @@ suspend fun <T> retryWithBackoff(
             return operation()
         } catch (e: Throwable) {
             lastException = e
+
+            // Authentication/authorization failures are not transient and should not be retried.
+            if (e is UnauthorizedRestException) {
+                throw e
+            }
 
             // Don't retry if it's not a network-related exception
             if (!config.retryOnExceptions.any { it.isInstance(e) }) {
