@@ -82,6 +82,8 @@ private val missingResourceTextMarkers = listOf(
     "object not found",
 )
 
+private const val POSTGRES_FOREIGN_KEY_VIOLATION_CODE = "23503"
+
 private fun String.containsAny(markers: List<String>): Boolean = markers.any { it in this }
 
 private fun Throwable.networkDiagnosticText(maxDepth: Int = 8): String {
@@ -150,6 +152,13 @@ private fun Throwable.isExpectedMissingSignedObject(): Boolean {
     return SUPABASE_SIGNED_OBJECT_PATH in text && text.containsAny(missingResourceTextMarkers)
 }
 
+private fun Throwable.isMissingUserFilesForeignKeyViolation(): Boolean {
+    val text = networkDiagnosticText()
+    return "code: $POSTGRES_FOREIGN_KEY_VIOLATION_CODE" in text &&
+            "user_files_user_id_fkey" in text &&
+            "key is not present in table \"users\"" in text
+}
+
 fun Throwable.isExpectedTransientNetworkIssue(): Boolean {
     return classifyNetworkIssue() == NetworkIssueKind.TRANSIENT_TRANSPORT
 }
@@ -181,7 +190,10 @@ suspend fun <T> retryWithBackoff(
             lastException = e
 
             // Authentication/authorization failures are not transient and should not be retried.
-            if (e is UnauthorizedRestException || e.isExpectedMissingSignedObject()) {
+            if (e is UnauthorizedRestException ||
+                e.isExpectedMissingSignedObject() ||
+                e.isMissingUserFilesForeignKeyViolation()
+            ) {
                 throw e
             }
 
@@ -210,6 +222,8 @@ suspend fun <T> retryWithBackoff(
     lastException?.let {
         if (it.isExpectedTransientNetworkIssue()) {
             Logger.w("All retry attempts failed after ${config.maxRetries + 1} attempts: ${it.message}")
+        } else if (it.isMissingUserFilesForeignKeyViolation()) {
+            Logger.w("Request failed with non-retryable missing-user FK constraint: ${it.message}")
         } else {
             Logger.e("All retry attempts failed after ${config.maxRetries + 1} attempts", it)
         }
