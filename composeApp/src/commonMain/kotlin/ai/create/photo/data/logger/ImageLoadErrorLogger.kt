@@ -5,6 +5,8 @@ import coil3.network.HttpException
 
 private const val SIGNED_OBJECT_PATH = "/storage/v1/object/sign/"
 private const val BITMAP_FACTORY_NULL_BITMAP_MARKER = "bitmapfactory returned a null bitmap"
+private const val IMAGE_DECODER_CREATE_FAILED_MARKER = "failed to create image decoder"
+private const val IMAGE_DECODER_INPUT_ERROR_MARKER = "input contained an error"
 
 private fun Throwable?.isExpectedSupabaseSignedUrlImage4xx(): Boolean {
     if (this !is HttpException) return false
@@ -17,7 +19,11 @@ private fun Throwable?.isExpectedInvalidImagePayload(): Boolean {
     var depth = 0
     while (current != null && depth < 8) {
         val message = current.message.orEmpty().lowercase()
-        if (BITMAP_FACTORY_NULL_BITMAP_MARKER in message) {
+        if (
+            BITMAP_FACTORY_NULL_BITMAP_MARKER in message ||
+            IMAGE_DECODER_CREATE_FAILED_MARKER in message ||
+            IMAGE_DECODER_INPUT_ERROR_MARKER in message
+        ) {
             return true
         }
         current = current.cause
