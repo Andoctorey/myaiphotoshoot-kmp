@@ -70,6 +70,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -83,7 +84,6 @@ import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.add_your_photos
 import photocreateai.composeapp.generated.resources.add_your_photos_progress
@@ -105,6 +105,9 @@ import photocreateai.composeapp.generated.resources.upload_more_photos
 
 
 @Preview
+@Composable
+private fun UploadScreenPreview() = UploadScreen(openGenerateTab = {})
+
 @Composable
 fun UploadScreen(
     viewModel: UploadViewModel = viewModel { UploadViewModel() },
@@ -178,7 +181,7 @@ fun UploadScreen(
                             .padding(bottom = buttonsBottomPadding).safeDrawingPadding(),
                         trainingStatus = state.trainingStatus,
                         trainingElapsedTimeMs = state.trainingElapsedTimeMs,
-                        createModel = { viewModel.checkBadPhotosAndToggleTrainAiModelPopup(true) },
+                        createModel = viewModel::checkBadPhotosAndTrainAiModel,
                         onCreatingModelClick = viewModel::onCreatingModelClick,
                         generatePhotos = openGenerateTab,
                         isToppingUp = state.toppingUp,

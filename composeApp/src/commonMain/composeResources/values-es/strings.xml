@@ -52,10 +52,6 @@
     <string name="picture_to_prompt">Hacer una Foto Similar</string>
     <string name="translate">Traducir</string>
     <string name="cancel_popup">Cancelar</string>
-    <string name="steps">pasos</string>
-    <string name="minutes">minutos</string>
-    <string name="photos_required">Has subido %1$s fotos. Por favor agrega %2$s más para cumplir el requisito.</string>
-    <string name="cost_per_photo">luego $0.03 por foto</string>
     <string name="gallery_public_tab">Público</string>
     <string name="gallery_creations_tab">Creaciones</string>
     <string name="gallery_uploads_tab">Subidas</string>

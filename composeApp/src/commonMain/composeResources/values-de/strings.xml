@@ -52,10 +52,6 @@
     <string name="picture_to_prompt">Ähnliches Foto erstellen</string>
     <string name="translate">Übersetzen</string>
     <string name="cancel_popup">Abbrechen</string>
-    <string name="steps">Schritte</string>
-    <string name="minutes">Minuten</string>
-    <string name="photos_required">Du hast %1$s Fotos hochgeladen. Bitte füge %2$s weitere hinzu, um die Anforderung zu erfüllen.</string>
-    <string name="cost_per_photo">dann $0,03 pro Foto</string>
     <string name="gallery_public_tab">Öffentlich</string>
     <string name="gallery_creations_tab">Kreationen</string>
     <string name="gallery_uploads_tab">Hochgeladen</string>

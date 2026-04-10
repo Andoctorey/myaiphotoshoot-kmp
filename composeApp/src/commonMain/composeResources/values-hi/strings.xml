@@ -52,10 +52,6 @@
     <string name="picture_to_prompt">समान तस्वीर बनाएं</string>
     <string name="translate">अनुवाद</string>
     <string name="cancel_popup">रद्द करें</string>
-    <string name="steps">चरण</string>
-    <string name="minutes">मिनट</string>
-    <string name="photos_required">आपने %1$s तस्वीरें अपलोड की हैं। कृपया आवश्यकता पूरी करने के लिए %2$s और जोड़ें।</string>
-    <string name="cost_per_photo">फिर प्रति तस्वीर $0.03</string>
     <string name="gallery_public_tab">सार्वजनिक</string>
     <string name="gallery_creations_tab">रचनाएं</string>
     <string name="gallery_uploads_tab">अपलोड</string>

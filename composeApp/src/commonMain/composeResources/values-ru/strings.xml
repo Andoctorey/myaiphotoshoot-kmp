@@ -52,10 +52,6 @@
     <string name="picture_to_prompt">Создать похожее фото</string>
     <string name="translate">Перевести</string>
     <string name="cancel_popup">Отмена</string>
-    <string name="steps">шагов</string>
-    <string name="minutes">минут</string>
-    <string name="photos_required">Вы загрузили %1$s фотографий. Пожалуйста, добавьте еще %2$s для выполнения требований.</string>
-    <string name="cost_per_photo">затем $0.03 за фото</string>
     <string name="gallery_public_tab">Публичные</string>
     <string name="gallery_creations_tab">Мои работы</string>
     <string name="gallery_uploads_tab">Загруженные</string>

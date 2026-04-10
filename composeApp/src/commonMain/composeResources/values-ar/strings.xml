@@ -52,10 +52,6 @@
     <string name="picture_to_prompt">إنشاء صورة مشابهة</string>
     <string name="translate">ترجمة</string>
     <string name="cancel_popup">إلغاء</string>
-    <string name="steps">خطوات</string>
-    <string name="minutes">دقائق</string>
-    <string name="photos_required">لقد رفعت %1$s صورة. يرجى إضافة %2$s أخرى لتلبية المتطلبات.</string>
-    <string name="cost_per_photo">ثم $0.03 لكل صورة</string>
     <string name="gallery_public_tab">عام</string>
     <string name="gallery_creations_tab">الإبداعات</string>
     <string name="gallery_uploads_tab">المرفوعات</string>

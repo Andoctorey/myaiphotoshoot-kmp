@@ -52,10 +52,6 @@
     <string name="picture_to_prompt">制作相似照片</string>
     <string name="translate">翻译</string>
     <string name="cancel_popup">取消</string>
-    <string name="steps">步骤</string>
-    <string name="minutes">分钟</string>
-    <string name="photos_required">您已上传%1$s张照片。请再添加%2$s张以满足要求。</string>
-    <string name="cost_per_photo">然后每张照片$0.03</string>
     <string name="gallery_public_tab">公开</string>
     <string name="gallery_creations_tab">我的作品</string>
     <string name="gallery_uploads_tab">上传</string>

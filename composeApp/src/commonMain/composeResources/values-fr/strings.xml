@@ -52,10 +52,6 @@
     <string name="picture_to_prompt">Créer une photo similaire</string>
     <string name="translate">Traduire</string>
     <string name="cancel_popup">Annuler</string>
-    <string name="steps">étapes</string>
-    <string name="minutes">minutes</string>
-    <string name="photos_required">Vous avez téléchargé %1$s photos. Veuillez ajouter %2$s de plus pour répondre à l\'exigence.</string>
-    <string name="cost_per_photo">puis $0,03 par photo</string>
     <string name="gallery_public_tab">Public</string>
     <string name="gallery_creations_tab">Créations</string>
     <string name="gallery_uploads_tab">Téléchargements</string>

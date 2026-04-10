@@ -53,10 +53,6 @@
     <string name="picture_to_prompt">似た写真を作成</string>
     <string name="translate">翻訳</string>
     <string name="cancel_popup">キャンセル</string>
-    <string name="steps">ステップ</string>
-    <string name="minutes">分</string>
-    <string name="photos_required">%1$s枚の写真をアップロードしました。要件を満たすためにあと%2$s枚追加してください。</string>
-    <string name="cost_per_photo">その後1枚につき$0.03</string>
     <string name="gallery_public_tab">パブリック</string>
     <string name="gallery_creations_tab">作品</string>
     <string name="gallery_uploads_tab">アップロード</string>

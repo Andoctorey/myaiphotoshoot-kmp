@@ -505,14 +505,12 @@ class UploadViewModel : AuthViewModel() {
         uiState = uiState.copy(errorPopup = null, topUpErrorPopup = null)
     }
 
-    fun checkBadPhotosAndToggleTrainAiModelPopup(show: Boolean) {
-        if (show) {
-            val photos = uiState.photos ?: return
-            val hasBadPhotos = photos.any { it.analysisStatus == AnalysisStatus.DECLINED }
-            if (hasBadPhotos) {
-                toggleDeleteUnsuitablePhotosPopup(true)
-                return
-            }
+    fun checkBadPhotosAndTrainAiModel() {
+        val photos = uiState.photos ?: return
+        val hasBadPhotos = photos.any { it.analysisStatus == AnalysisStatus.DECLINED }
+        if (hasBadPhotos) {
+            toggleDeleteUnsuitablePhotosPopup(true)
+            return
         }
         trainAiModel()
     }
