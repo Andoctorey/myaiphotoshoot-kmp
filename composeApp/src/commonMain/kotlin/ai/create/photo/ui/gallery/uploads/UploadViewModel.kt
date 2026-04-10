@@ -4,10 +4,10 @@ import ai.create.photo.data.supabase.Supabase
 import ai.create.photo.data.supabase.SupabaseFunction
 import ai.create.photo.data.supabase.SupabaseStorage
 import ai.create.photo.data.supabase.SupabaseStorage.UPLOADS
-import ai.create.photo.data.supabase.isExpectedTransientNetworkIssue
 import ai.create.photo.data.supabase.database.ProfilesRepository
 import ai.create.photo.data.supabase.database.UserFilesRepository
 import ai.create.photo.data.supabase.database.UserTrainingsRepository
+import ai.create.photo.data.supabase.isExpectedTransientNetworkIssue
 import ai.create.photo.data.supabase.model.AnalysisStatus
 import ai.create.photo.data.supabase.model.TrainingStatus
 import ai.create.photo.platform.topUpPlatform
@@ -92,8 +92,16 @@ class UploadViewModel : AuthViewModel() {
     @OptIn(ExperimentalTime::class)
     fun uploadPhotos(files: PlatformFiles) = viewModelScope.launch {
         Logger.i("uploadPhotos: ${files.joinToString { it.name }}")
-        val userId = user?.id ?: return@launch
         if (files.isEmpty()) return@launch
+
+        val userId = awaitAuthenticatedUserId()
+        if (userId == null) {
+            val error =
+                IllegalStateException("Authentication is still initializing. Please try again.")
+            Logger.w("uploadPhotos skipped: auth session is not ready")
+            uiState = uiState.copy(uploadProgress = 0, errorPopup = error)
+            return@launch
+        }
 
         uiState = uiState.copy(uploadProgress = 1, errorPopup = null)
 

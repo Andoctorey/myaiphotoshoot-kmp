@@ -320,7 +320,13 @@ class GenerateViewModel : AuthViewModel() {
     }
 
     fun pictureToPrompt(file: PlatformFile) = viewModelScope.launch {
-        val userId = user?.id ?: return@launch
+        val userId = awaitAuthenticatedUserId()
+        if (userId == null) {
+            uiState = uiState.copy(
+                errorPopup = IllegalStateException("Authentication is still initializing. Please try again.")
+            )
+            return@launch
+        }
         Logger.i("pictureToPrompt: ${file.name}")
         uiState = uiState.copy(isLoadingPictureToPrompt = true)
         try {
