@@ -349,7 +349,7 @@ class UploadViewModel : AuthViewModel() {
 
         uiState = uiState.copy(
             trainingStatus = TrainingStatus.PROCESSING,
-            trainingTimeLeft = 210 * 1000L, // 3.5 minutes)
+            trainingTimeLeft = 20 * 60 * 1000L,
         )
 
         try {
