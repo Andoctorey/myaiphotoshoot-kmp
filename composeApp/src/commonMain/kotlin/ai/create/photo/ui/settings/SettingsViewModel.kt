@@ -79,19 +79,15 @@ class SettingsViewModel : AuthViewModel() {
         uiState = uiState.copy(currentDestination = currentDestination)
     }
 
-    fun support() = viewModelScope.launch {
+    fun support() {
         openUrl("https://myaiphotoshoot.com/en/support/")
     }
 
-    fun social() = viewModelScope.launch {
-        openUrl("https://x.com/andoctorey")
-    }
-
-    fun googlePlay() = viewModelScope.launch {
+    fun googlePlay() {
         openUrl("https://play.google.com/store/apps/details?id=com.myaiphotoshoot")
     }
 
-    fun appStore() = viewModelScope.launch {
+    fun appStore() {
         openUrl("https://apps.apple.com/app/id6744860178")
     }
 }

@@ -105,7 +105,6 @@ fun SettingsScreen(
                     savedDestination = state.currentDestination,
                     onSaveDestination = viewModel::saveDestination,
                     goToRootScreen = goToRootScreen,
-                    social = viewModel::social,
                     support = viewModel::support,
                     googlePlay = viewModel::googlePlay,
                     appStore = viewModel::appStore,
@@ -133,7 +132,6 @@ private fun Screen(
     savedDestination: Item?,
     onSaveDestination: (Item?) -> Unit,
     goToRootScreen: Boolean,
-    social: () -> Unit,
     support: () -> Unit,
     googlePlay: () -> Unit,
     appStore: () -> Unit,
@@ -181,11 +179,6 @@ private fun Screen(
                     items = items,
                     onItemClick = { item ->
                         when (item) {
-                            is SettingsUiState.SocialItem -> {
-                                social()
-                                return@SettingsItems
-                            }
-
                             is SettingsUiState.SupportItem -> {
                                 support()
                                 return@SettingsItems
@@ -346,7 +339,6 @@ fun SettingsDetails(
                         openGenerateTab = openGenerateTab,
                     )
 
-                    is SettingsUiState.SocialItem -> {}
                     is SettingsUiState.SupportItem -> {}
                     is SettingsUiState.GooglePlayItem -> {}
                     is SettingsUiState.AppStoreItem -> {}

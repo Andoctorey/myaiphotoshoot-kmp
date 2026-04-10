@@ -8,7 +8,6 @@ import ai.create.photo.platform.platform
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.InstallMobile
 import androidx.compose.runtime.Immutable
@@ -18,7 +17,6 @@ import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.account
 import photocreateai.composeapp.generated.resources.app_store
 import photocreateai.composeapp.generated.resources.google_play
-import photocreateai.composeapp.generated.resources.social
 import photocreateai.composeapp.generated.resources.support
 import photocreateai.composeapp.generated.resources.top_up_pricing
 
@@ -37,7 +35,6 @@ data class SettingsUiState(
     val items: List<Item> = buildList {
         add(LoginItem())
         add(BalanceItem())
-        add(SocialItem())
         add(SupportItem())
         if (platform().platform !in listOf(Platforms.ANDROID, Platforms.IOS)) {
             add(AppStoreItem())
@@ -69,11 +66,6 @@ data class SettingsUiState(
     @Immutable
     @Parcelize
     class BalanceItem() : DetailedItem(Res.string.top_up_pricing, Icons.Default.CreditCard),
-        Parcelable
-
-    @Immutable
-    @Parcelize
-    class SocialItem() : DetailedItem(Res.string.social, Icons.Default.Close),
         Parcelable
 
     @Immutable
