@@ -2,13 +2,20 @@
 
 package ai.create.photo.platform
 
-import kotlinx.cinterop.*
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.memScoped
+import kotlinx.cinterop.useContents
 import kotlinx.cinterop.usePinned
-import platform.CoreGraphics.*
-import platform.Foundation.*
-import platform.UIKit.*
+import platform.CoreGraphics.CGRectMake
+import platform.CoreGraphics.CGSizeMake
+import platform.Foundation.NSData
+import platform.Foundation.dataWithBytes
+import platform.UIKit.UIGraphicsBeginImageContextWithOptions
+import platform.UIKit.UIGraphicsEndImageContext
+import platform.UIKit.UIGraphicsGetImageFromCurrentImageContext
+import platform.UIKit.UIImage
+import platform.UIKit.UIImageJPEGRepresentation
 import platform.posix.memcpy
 
 actual suspend fun resizeToWidth(
@@ -62,7 +69,7 @@ actual suspend fun resizeToWidth(
     return Result.success(jpeg.toByteArray())
 }
 
-fun ByteArray.toNSData(): NSData? =
+fun ByteArray.toNSData(): NSData =
     memScoped {
         this@toNSData.usePinned { pinned ->
             NSData.dataWithBytes(pinned.addressOf(0), size.toULong())
