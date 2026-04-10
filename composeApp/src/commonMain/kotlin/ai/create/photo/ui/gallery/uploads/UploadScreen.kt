@@ -1,5 +1,6 @@
 package ai.create.photo.ui.gallery.uploads
 
+import ai.create.photo.data.logger.logImageLoadError
 import ai.create.photo.data.supabase.model.AnalysisStatus
 import ai.create.photo.data.supabase.model.TrainingStatus
 import ai.create.photo.platform.Platforms
@@ -591,7 +592,7 @@ private fun Photo(
                 contentScale = ContentScale.FillWidth,
                 onSuccess = { loaded = true },
                 onError = {
-                    Logger.e("error loading image ${photo.url}", it.result.throwable)
+                    logImageLoadError(photo.url, it.result.throwable)
                     error = it.result.throwable
                 },
             )

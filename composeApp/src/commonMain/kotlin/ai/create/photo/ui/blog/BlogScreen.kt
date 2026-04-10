@@ -2,6 +2,7 @@ package ai.create.photo.ui.blog
 
 import ai.create.photo.data.supabase.model.Blog
 import ai.create.photo.data.supabase.model.UserGeneration
+import ai.create.photo.data.logger.logImageLoadError
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolderSmall
 import ai.create.photo.ui.compose.ErrorPopup
@@ -48,7 +49,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import co.touchlab.kermit.Logger
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
@@ -247,7 +247,7 @@ private fun PhotoItem(
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.FillBounds,
             onError = {
-                Logger.e("error loading image ${photo.imageUrl}", it.result.throwable)
+                logImageLoadError(photo.imageUrl, it.result.throwable)
                 error = it.result.throwable
             }
         )

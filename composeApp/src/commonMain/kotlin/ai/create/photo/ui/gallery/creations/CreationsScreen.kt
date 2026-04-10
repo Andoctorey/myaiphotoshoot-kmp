@@ -2,6 +2,7 @@ package ai.create.photo.ui.gallery.creations
 
 import ai.create.photo.data.supabase.model.GenerationsFilter
 import ai.create.photo.data.supabase.model.UserGeneration
+import ai.create.photo.data.logger.logImageLoadError
 import ai.create.photo.platform.Platforms
 import ai.create.photo.platform.platform
 import ai.create.photo.platform.shareLink
@@ -81,7 +82,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import co.touchlab.kermit.Logger
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
@@ -371,7 +371,7 @@ private fun Photo(
                 contentScale = ContentScale.FillWidth,
                 onSuccess = { loaded = true },
                 onError = {
-                    Logger.e("error loading image ${photo.url}", it.result.throwable)
+                    logImageLoadError(photo.url, it.result.throwable)
                     error = it.result.throwable
                 },
             )

@@ -47,15 +47,21 @@ class LoginViewModel : AuthViewModel() {
 
     fun sendOtp() = viewModelScope.launch {
         Logger.i("sendOtp")
-        uiState = uiState.copy(isInvalidEmail = false, isSendingOtp = true, enterOtp = false)
-        if (!isValidEmail(uiState.emailToVerify)) {
+        val email = uiState.emailToVerify.trim()
+        uiState = uiState.copy(
+            emailToVerify = email,
+            isInvalidEmail = false,
+            isSendingOtp = true,
+            enterOtp = false,
+        )
+        if (!isValidEmail(email)) {
             uiState = uiState.copy(isInvalidEmail = true, isSendingOtp = false)
             return@launch
         }
 
         try {
             try {
-                SupabaseAuth.convertAnonymousUserToEmail(uiState.emailToVerify)
+                SupabaseAuth.convertAnonymousUserToEmail(email)
             } catch (e: AuthRestException) {
                 Logger.i("convertAnonymousUserToEmail", e)
                 try {
@@ -65,12 +71,17 @@ class LoginViewModel : AuthViewModel() {
                     Logger.w("deleteUser failed", e)
                 }
             }
-            SupabaseAuth.signInWithEmailOtp(uiState.emailToVerify)
+            SupabaseAuth.signInWithEmailOtp(email)
             uiState = uiState.copy(isSendingOtp = false, enterOtp = true)
         } catch (e: Exception) {
             uiState = uiState.copy(isSendingOtp = false)
             ensureActive()
             if (!isAuthenticated) return@launch
+            if (e is AuthRestException && isInvalidEmailFormatError(e)) {
+                Logger.w("sendOtp rejected due to invalid email format")
+                uiState = uiState.copy(isInvalidEmail = true)
+                return@launch
+            }
             Logger.e("sendOtp failed", e)
             uiState = uiState.copy(errorPopup = e)
         }
@@ -105,8 +116,14 @@ class LoginViewModel : AuthViewModel() {
     }
 
     private fun isValidEmail(email: String): Boolean {
-        val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()
+        // Require a domain with at least one dot segment and no empty labels (e.g. reject `a@.com`).
+        val emailRegex = "^[A-Za-z0-9+_.%-]+@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)+$".toRegex()
         return email.matches(emailRegex)
+    }
+
+    private fun isInvalidEmailFormatError(error: AuthRestException): Boolean {
+        val message = error.message.orEmpty().lowercase()
+        return "validation_failed" in message && "invalid format" in message
     }
 
     private fun isValidOtpCode(otp: String): Boolean {
