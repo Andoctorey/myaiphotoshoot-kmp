@@ -1,9 +1,9 @@
 package ai.create.photo.core.billing
 
 import ai.create.photo.app.App
-import ai.create.photo.data.runCatchingCancellable
 import ai.create.photo.core.extention.toast
 import ai.create.photo.core.log.Warning
+import ai.create.photo.data.runCatchingCancellable
 import ai.create.photo.data.supabase.SupabaseFunction
 import ai.create.photo.ui.settings.balance.Pricing
 import android.annotation.SuppressLint
@@ -24,7 +24,6 @@ import com.android.billingclient.api.QueryPurchasesParams
 import com.android.billingclient.api.consumePurchase
 import com.android.billingclient.api.queryProductDetails
 import com.android.billingclient.api.queryPurchasesAsync
-import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,6 +33,7 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.getString
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.billing_service_unavailable
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -71,15 +71,15 @@ object BillingRepository : PurchasesUpdatedListener {
             this.onFailure = onFailure
             initBillingClient(activity.applicationContext)
             val billingResult = billingClient.connect()
-            queryProductDetails()
-            queryPurchases()
             Logger.i("billingClient.connect() result: code ${billingResult.responseCode}, message: ${billingResult.debugMessage}")
             if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
                 val error =
                     "debugMessage: ${billingResult.debugMessage}, code: ${billingResult.responseCode}"
-                Logger.e("billingResultOk failed", Warning(error))
+                logBillingFailure("connect", billingResult, error)
                 throw Exception(getString(Res.string.billing_service_unavailable))
             }
+            queryProductDetails()
+            queryPurchases()
 
             Logger.i("startBillingFlow for $pricing, productDetailsList size: ${productDetailsList.size}")
             openBillingPopup(activity, pricing)
@@ -101,7 +101,7 @@ object BillingRepository : PurchasesUpdatedListener {
         if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
             val error =
                 "debugMessage: ${billingResult.debugMessage}, code: ${billingResult.responseCode}"
-            Logger.w("billingResultOk failed", Warning(error))
+            logBillingFailure("queryProductDetails", billingResult, error)
             throw Exception(getString(Res.string.billing_service_unavailable))
         }
         productDetailsList = response.productDetailsList ?: emptyList()
@@ -193,10 +193,18 @@ object BillingRepository : PurchasesUpdatedListener {
         if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
             val error =
                 "debugMessage: ${billingResult.debugMessage}, code: ${billingResult.responseCode}"
-            Logger.e("billingResultOk failed", Warning(error))
+            logBillingFailure("queryPurchases", billingResult, error)
             throw Exception(getString(Res.string.billing_service_unavailable))
         }
         processPurchases(response.purchasesList)
+    }
+
+    private fun logBillingFailure(operation: String, billingResult: BillingResult, error: String) {
+        if (billingResult.responseCode in transientBillingResponseCodes) {
+            Logger.w("billingResult failed for $operation: $error")
+            return
+        }
+        Logger.e("billingResult failed for $operation", Warning(error))
     }
 
     private suspend fun processPurchases(purchasesResult: List<Purchase>) {
@@ -248,6 +256,12 @@ object BillingRepository : PurchasesUpdatedListener {
 
     private fun isSignatureValid(purchase: Purchase) =
         Security.verifyPurchase(API_KEY, purchase.originalJson, purchase.signature)
+
+    private val transientBillingResponseCodes = setOf(
+        BillingClient.BillingResponseCode.SERVICE_DISCONNECTED,
+        BillingClient.BillingResponseCode.SERVICE_UNAVAILABLE,
+        BillingClient.BillingResponseCode.NETWORK_ERROR
+    )
 }
 
 suspend fun BillingClient.connect(): BillingResult = suspendCancellableCoroutine { continuation ->
