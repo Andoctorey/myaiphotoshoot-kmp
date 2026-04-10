@@ -3,6 +3,7 @@ package ai.create.photo.data.supabase
 import co.touchlab.kermit.Logger
 import coil3.network.HttpException
 import io.github.jan.supabase.exceptions.HttpRequestException
+import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.ktor.client.network.sockets.ConnectTimeoutException
@@ -42,9 +43,12 @@ data class RetryConfig(
 
 private enum class NetworkIssueKind {
     TRANSIENT_TRANSPORT,
+    EXPECTED_RESOURCE_MISSING,
     CANCELLED_REQUEST,
     OTHER,
 }
+
+private const val SUPABASE_SIGNED_OBJECT_PATH = "/storage/v1/object/sign/"
 
 private val transientTransportTextMarkers = listOf(
     "connection reset by peer",
@@ -73,6 +77,11 @@ private val cancelledRequestTextMarkers = listOf(
     "request canceled due to",
 )
 
+private val missingResourceTextMarkers = listOf(
+    "not_found",
+    "object not found",
+)
+
 private fun String.containsAny(markers: List<String>): Boolean = markers.any { it in this }
 
 private fun Throwable.networkDiagnosticText(maxDepth: Int = 8): String {
@@ -89,6 +98,10 @@ private fun Throwable.networkDiagnosticText(maxDepth: Int = 8): String {
 }
 
 private fun Throwable.classifyNetworkIssue(): NetworkIssueKind {
+    if (isExpectedMissingSignedObject()) {
+        return NetworkIssueKind.EXPECTED_RESOURCE_MISSING
+    }
+
     if (this is HttpRequestException) {
         val message = this.message.orEmpty().lowercase()
         val hasSupabaseEndpoint =
@@ -131,6 +144,12 @@ private fun Throwable.classifyNetworkIssue(): NetworkIssueKind {
     return NetworkIssueKind.OTHER
 }
 
+private fun Throwable.isExpectedMissingSignedObject(): Boolean {
+    if (this !is NotFoundRestException) return false
+    val text = networkDiagnosticText()
+    return SUPABASE_SIGNED_OBJECT_PATH in text && text.containsAny(missingResourceTextMarkers)
+}
+
 fun Throwable.isExpectedTransientNetworkIssue(): Boolean {
     return classifyNetworkIssue() == NetworkIssueKind.TRANSIENT_TRANSPORT
 }
@@ -162,7 +181,7 @@ suspend fun <T> retryWithBackoff(
             lastException = e
 
             // Authentication/authorization failures are not transient and should not be retried.
-            if (e is UnauthorizedRestException) {
+            if (e is UnauthorizedRestException || e.isExpectedMissingSignedObject()) {
                 throw e
             }
 
