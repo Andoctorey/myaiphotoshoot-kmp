@@ -13,10 +13,12 @@ actual fun openUrl(url: String) {
             addCategory(Intent.CATEGORY_BROWSABLE)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
-        val packageManager = context.packageManager
-        val browserPackage = findBrowserPackage(packageManager)
-        if (browserPackage != null) {
-            intent.setPackage(browserPackage)
+        if (shouldForceBrowserForUrl(url)) {
+            val packageManager = context.packageManager
+            val browserPackage = findBrowserPackage(packageManager)
+            if (browserPackage != null) {
+                intent.setPackage(browserPackage)
+            }
         }
         context.startActivity(intent)
     } catch (e: Exception) {
@@ -24,6 +26,15 @@ actual fun openUrl(url: String) {
         Toast.makeText(context, "Please open $url", Toast.LENGTH_LONG).show()
     }
 
+}
+
+private fun shouldForceBrowserForUrl(url: String): Boolean {
+    val uri = runCatching { url.toUri() }.getOrNull() ?: return false
+    val host = uri.host?.lowercase() ?: return false
+    if (host !in setOf("myaiphotoshoot.com", "www.myaiphotoshoot.com")) return false
+    val path = uri.path?.lowercase() ?: return false
+    return path == "/support" || path.startsWith("/support/") ||
+            path.endsWith("/support") || path.contains("/support/")
 }
 
 @Suppress("DEPRECATION")
@@ -36,7 +47,7 @@ private fun findBrowserPackage(
         .makeMainSelectorActivity(Intent.ACTION_MAIN, Intent.CATEGORY_APP_BROWSER)
         .resolveActivity(packageManager)
         ?.packageName
-        ?.takeIf { it != myPackageName }
+        ?.takeIf { it != myPackageName && isLaunchableBrowserPackage(packageManager, it) }
     if (defaultBrowserPackage != null) return defaultBrowserPackage
 
     val genericBrowserIntent = Intent(Intent.ACTION_VIEW, "https://www.google.com".toUri()).apply {
@@ -49,4 +60,15 @@ private fun findBrowserPackage(
         .mapNotNull { it.activityInfo?.packageName }
         .distinct()
         .firstOrNull { it != myPackageName }
+}
+
+private fun isLaunchableBrowserPackage(
+    packageManager: PackageManager,
+    packageName: String,
+): Boolean {
+    val webIntent = Intent(Intent.ACTION_VIEW, "https://www.google.com".toUri()).apply {
+        addCategory(Intent.CATEGORY_BROWSABLE)
+        setPackage(packageName)
+    }
+    return webIntent.resolveActivity(packageManager) != null
 }
