@@ -1,5 +1,4 @@
 package ai.create.photo.ui.compose
-
 import ai.create.photo.data.supabase.model.ErrorResponse
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.jan.supabase.exceptions.HttpRequestException
@@ -30,11 +30,14 @@ import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.connection_error
 
-@Preview
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
+@Composable
+private fun LoadingPlaceholderPreview() {
+    LoadingPlaceholder()
+}
 @Composable
 fun LoadingPlaceholder(modifier: Modifier = Modifier) {
     CircularProgressIndicator(
@@ -43,7 +46,6 @@ fun LoadingPlaceholder(modifier: Modifier = Modifier) {
         strokeWidth = 4.dp,
     )
 }
-
 @Composable
 // ai.create.photo.data.logger.SlackLogWriter.log
 fun Throwable.getFriendlyError() = when (this) {
@@ -58,11 +60,14 @@ fun Throwable.getFriendlyError() = when (this) {
         }
         message
     }
-
     else -> this.message.toString()
 }
 
-@Preview
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
+@Composable
+private fun ErrorMessagePlaceHolderPreview() {
+    ErrorMessagePlaceHolder(errorMessage = IllegalStateException("Preview error"))
+}
 @Composable
 fun ErrorMessagePlaceHolder(errorMessage: Throwable) {
     Column(
@@ -94,7 +99,6 @@ fun ErrorMessagePlaceHolder(errorMessage: Throwable) {
         )
     }
 }
-
 @Composable
 fun ErrorMessagePlaceHolderSmall(errorMessage: Throwable) {
     Column(
@@ -112,7 +116,6 @@ fun ErrorMessagePlaceHolderSmall(errorMessage: Throwable) {
             tint = MaterialTheme.colorScheme.error,
         )
         Spacer(modifier = Modifier.height(4.dp))
-
         BasicText(
             text = errorMessage.getFriendlyError(),
             autoSize = TextAutoSize.StepBased(

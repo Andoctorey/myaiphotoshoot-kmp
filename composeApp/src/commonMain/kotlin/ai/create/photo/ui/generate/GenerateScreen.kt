@@ -1,11 +1,11 @@
 package ai.create.photo.ui.generate
-
 import ai.create.photo.platform.Platforms
 import ai.create.photo.platform.platform
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.GenerationIcon
 import ai.create.photo.ui.compose.LoadingPlaceholder
+import ai.create.photo.ui.theme.AppTheme
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
@@ -52,11 +52,11 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -80,6 +80,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -90,8 +91,8 @@ import coil3.request.crossfade
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
+import io.github.vinceglb.filekit.core.PlatformFile
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.ai_model
 import photocreateai.composeapp.generated.resources.enhance_photo_accuracy
@@ -105,9 +106,44 @@ import photocreateai.composeapp.generated.resources.surprise_me
 import photocreateai.composeapp.generated.resources.train_ai_model
 import photocreateai.composeapp.generated.resources.translate
 
+@OptIn(ExperimentalLayoutApi::class)
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
+@Composable
+private fun GenerateScreenPreview() = AppTheme {
+    GenerateScreenContent(
+        state = GenerateUiState(
+            isLoading = false,
+            trainings = listOf(
+                GenerateUiState.Training(
+                    id = "preview_training",
+                    personDescription = "Young woman with curly hair and warm smile",
+                )
+            ),
+            selectedTrainingId = "preview_training",
+            userPrompt = "Cinematic portrait in soft golden-hour light",
+            showOpenCreations = true,
+        ),
+        trainAiModel = {},
+        openCreations = {},
+        generationsInProgress = 2,
+        onSelectTraining = {},
+        onToggleSettings = {},
+        onPersonDescriptionChanged = {},
+        onRefreshPersonDescription = {},
+        onPhotosToGenerateChanged = {},
+        onEnhancePrompt = {},
+        onTranslate = {},
+        onPictureToPrompt = {},
+        onSurpriseMe = {},
+        onPromptChanged = {},
+        onHistoryClicked = {},
+        onGenerate = {},
+        onPromptCleared = {},
+        onHideErrorPopup = {},
+    )
+}
 
 @OptIn(ExperimentalLayoutApi::class)
-@Preview
 @Composable
 fun GenerateScreen(
     viewModel: GenerateViewModel = viewModel { GenerateViewModel() },
@@ -119,14 +155,61 @@ fun GenerateScreen(
     onPromptCleared: () -> Unit = {},
 ) {
     val state = viewModel.uiState
-
     LaunchedEffect(Unit) {
         if (!state.isLoading) {
             viewModel.loadTrainings()
             viewModel.hideOpenCreations()
         }
     }
+    GenerateScreenContent(
+        state = state,
+        trainAiModel = trainAiModel,
+        openCreations = openCreations,
+        generationsInProgress = generationsInProgress,
+        onSelectTraining = { training -> viewModel.selectTraining(training, saveInDb = true) },
+        onToggleSettings = viewModel::toggleSettings,
+        onPersonDescriptionChanged = viewModel::onPersonDescriptionChanged,
+        onRefreshPersonDescription = { viewModel.onRefreshPersonDescription() },
+        onPhotosToGenerateChanged = viewModel::onPhotosToGenerateChanged,
+        onEnhancePrompt = { viewModel.enhancePrompt() },
+        onTranslate = { viewModel.translate() },
+        onPictureToPrompt = { file -> viewModel.pictureToPrompt(file) },
+        onSurpriseMe = { viewModel.surpriseMe() },
+        onPromptChanged = viewModel::onUserPromptChanged,
+        onHistoryClicked = viewModel::onHistoryClicked,
+        onGenerate = { viewModel.prepareToGenerate(onGenerate, trainAiModel) },
+        onPromptCleared = onPromptCleared,
+        onHideErrorPopup = viewModel::hideErrorPopup,
+    )
+    LaunchedEffect(prompt?.text) {
+        if (prompt != null) {
+            viewModel.setPredefinedPrompt(prompt)
+        }
+    }
+}
 
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun GenerateScreenContent(
+    state: GenerateUiState,
+    trainAiModel: () -> Unit,
+    openCreations: () -> Unit,
+    generationsInProgress: Int,
+    onSelectTraining: (GenerateUiState.Training) -> Unit,
+    onToggleSettings: () -> Unit,
+    onPersonDescriptionChanged: (String) -> Unit,
+    onRefreshPersonDescription: () -> Unit,
+    onPhotosToGenerateChanged: (Int) -> Unit,
+    onEnhancePrompt: () -> Unit,
+    onTranslate: () -> Unit,
+    onPictureToPrompt: (PlatformFile) -> Unit,
+    onSurpriseMe: () -> Unit,
+    onPromptChanged: (String) -> Unit,
+    onHistoryClicked: () -> Unit,
+    onGenerate: () -> Unit,
+    onPromptCleared: () -> Unit,
+    onHideErrorPopup: () -> Unit,
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
@@ -138,7 +221,6 @@ fun GenerateScreen(
             ErrorMessagePlaceHolder(state.loadingError)
         } else {
             Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
-
             val hasSoftKeyboard = remember {
                 platform().platform in listOf(
                     Platforms.ANDROID,
@@ -146,7 +228,6 @@ fun GenerateScreen(
                     Platforms.WEB_MOBILE
                 )
             }
-
             if (state.promptBgUrl != null) {
                 var loaded by remember { mutableStateOf(false) }
                 AsyncImage(
@@ -166,7 +247,6 @@ fun GenerateScreen(
                     )
                 }
             }
-
             val scrollState = rememberScrollState()
             Column(
                 modifier = Modifier.widthIn(max = 600.dp).fillMaxSize().animateContentSize()
@@ -174,8 +254,6 @@ fun GenerateScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = if (hasSoftKeyboard) Arrangement.SpaceBetween else Arrangement.SpaceAround
             ) {
-
-                // top of the screen
                 Card(
                     modifier = Modifier.systemBarsPadding().padding(8.dp),
                     border = if (state.showSettings) BorderStroke(
@@ -198,17 +276,13 @@ fun GenerateScreen(
                                         .padding(top = 12.dp),
                                     trainings = state.trainings,
                                     selectedTraining = state.trainings.find { it.id == state.selectedTrainingId },
-                                    selectTraining = {
-                                        viewModel.selectTraining(
-                                            it, saveInDb = true
-                                        )
-                                    },
+                                    selectTraining = onSelectTraining,
                                     trainAiModel = trainAiModel,
                                 )
                                 IconButton(
                                     modifier = Modifier.align(Alignment.CenterEnd)
                                         .padding(top = 8.dp, start = 8.dp, end = 8.dp),
-                                    onClick = viewModel::toggleSettings,
+                                    onClick = onToggleSettings,
                                 ) {
                                     Icon(
                                         imageVector = if (state.showSettings) Icons.Default.Close else Icons.Default.Settings,
@@ -217,7 +291,6 @@ fun GenerateScreen(
                                     )
                                 }
                             }
-
                             Crossfade(targetState = state.showSettings) { showSettings ->
                                 if (showSettings) {
                                     Column(
@@ -225,22 +298,18 @@ fun GenerateScreen(
                                         verticalArrangement = Arrangement.Center
                                     ) {
                                         Spacer(modifier = Modifier.height(8.dp))
-
                                         if (state.personDescription.isNotEmpty()) {
                                             EnhancePhotoAccuracy(
                                                 personDescription = state.personDescription,
-                                                onPersonDescriptionChanged = viewModel::onPersonDescriptionChanged,
+                                                onPersonDescriptionChanged = onPersonDescriptionChanged,
                                                 isLoadingPersonDescription = state.isLoadingPersonDescription,
-                                                onRefreshPersonDescription = viewModel::onRefreshPersonDescription,
+                                                onRefreshPersonDescription = onRefreshPersonDescription,
                                             )
                                         }
-
                                         Spacer(modifier = Modifier.height(16.dp))
-
                                         PhotosToGenerate(state.photosToGenerateX100) {
-                                            viewModel.onPhotosToGenerateChanged(it)
+                                            onPhotosToGenerateChanged(it)
                                         }
-
                                         Spacer(modifier = Modifier.height(12.dp))
                                     }
                                 }
@@ -248,8 +317,6 @@ fun GenerateScreen(
                         }
                     }
                 }
-
-                // middle of the screen
                 FlowRow(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)
                         .animateContentSize(),
@@ -261,7 +328,6 @@ fun GenerateScreen(
                             verticalArrangement = Arrangement.spacedBy(16.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
-
                             if (state.promptBgUrl == null) {
                                 AsyncImage(
                                     modifier = Modifier.fillMaxWidth(),
@@ -273,7 +339,6 @@ fun GenerateScreen(
                                     contentScale = ContentScale.FillWidth,
                                 )
                             }
-
                             CreateAiModelButton(
                                 modifier = Modifier.padding(horizontal = 4.dp),
                                 bgImageShown = state.promptBgUrl != null,
@@ -281,49 +346,44 @@ fun GenerateScreen(
                             )
                         }
                     }
-
                     if (!state.trainings.isNullOrEmpty()) {
-
                         if (state.userPrompt.isNotEmpty()) {
                             EnhancePromptButton(
                                 modifier = Modifier.padding(horizontal = 4.dp),
                                 isLoading = state.isEnhancingPrompt,
-                                onClick = viewModel::enhancePrompt,
+                                onClick = onEnhancePrompt,
                             )
                         }
-
                         if (state.userPrompt.isNotEmpty()) {
                             TranslateButton(
                                 modifier = Modifier.padding(horizontal = 4.dp).fillMaxWidth(),
                                 show = state.showTranslateButton,
                                 isTranslating = state.isTranslating,
-                                onClick = viewModel::translate,
+                                onClick = onTranslate,
                             )
                         }
-
                         if (state.userPrompt.isEmpty()) {
-                            val launcher = rememberFilePickerLauncher(
+                            val pictureToPromptLauncher = rememberFilePickerLauncher(
                                 title = stringResource(Res.string.picture_to_prompt),
                                 type = PickerType.Image,
-                                mode = PickerMode.Single
+                                mode = PickerMode.Single,
                             ) { file ->
                                 if (file == null) return@rememberFilePickerLauncher
-                                viewModel.pictureToPrompt(file)
+                                onPictureToPrompt(file)
                             }
                             PictureToPromptButton(
                                 modifier = Modifier.padding(horizontal = 4.dp),
                                 isLoading = state.isLoadingPictureToPrompt,
-                                onClick = { launcher.launch() })
+                                onClick = { pictureToPromptLauncher.launch() }
+                            )
                         }
-
                         if (state.userPrompt.isEmpty() || state.surpriseMePrompt) {
                             SurpriseMeButton(
                                 modifier = Modifier.padding(horizontal = 4.dp),
                                 isLoading = state.isLoadingSurpriseMe,
-                                onClick = viewModel::surpriseMe
+                                onClick = onSurpriseMe
                             )
                         }
-
                         if (state.showOpenCreations) {
                             OpenCreationsButton(
                                 modifier = Modifier.padding(horizontal = 4.dp),
@@ -333,8 +393,6 @@ fun GenerateScreen(
                         }
                     }
                 }
-
-                // bottom of the screen
                 var previousText by remember { mutableStateOf("") }
                 LaunchedEffect(state.userPrompt) {
                     if (state.userPrompt.count { it == '\n' } > previousText.count { it == '\n' }) {
@@ -342,36 +400,26 @@ fun GenerateScreen(
                     }
                     previousText = state.userPrompt
                 }
-
                 PhotoPrompt(
                     prompt = state.userPrompt,
                     onPromptChanged = { newPrompt ->
-                        viewModel.onUserPromptChanged(newPrompt)
-                        // If prompt is cleared manually, clear the cache
+                        onPromptChanged(newPrompt)
                         if (newPrompt.isEmpty() && state.userPrompt.isNotEmpty()) {
                             onPromptCleared()
                         }
                     },
-                    onHistoryClicked = viewModel::onHistoryClicked,
-                    onGenerate = { viewModel.prepareToGenerate(onGenerate, trainAiModel) })
-            }
-        }
-
-        if (state.errorPopup != null) {
-            ErrorPopup(state.errorPopup) {
-                viewModel.hideErrorPopup()
-            }
-        }
-
-        LaunchedEffect(prompt?.text) {
-            if (prompt != null) {
-                viewModel.setPredefinedPrompt(prompt)
+                    onHistoryClicked = onHistoryClicked,
+                    onGenerate = onGenerate,
+                )
             }
         }
     }
+    if (state.errorPopup != null) {
+        ErrorPopup(state.errorPopup) {
+            onHideErrorPopup()
+        }
+    }
 }
-
-
 @Composable
 private fun EnhancePhotoAccuracy(
     personDescription: String, onPersonDescriptionChanged: (String) -> Unit,
@@ -414,7 +462,6 @@ private fun EnhancePhotoAccuracy(
         )
     )
 }
-
 @Composable
 private fun PhotoPrompt(
     prompt: String,
@@ -481,7 +528,6 @@ private fun PhotoPrompt(
         },
     )
 }
-
 @Composable
 private fun CreateAiModelButton(modifier: Modifier, bgImageShown: Boolean, onClick: () -> Unit) {
     OutlinedButton(modifier = modifier, onClick = onClick) {
@@ -499,7 +545,6 @@ private fun CreateAiModelButton(modifier: Modifier, bgImageShown: Boolean, onCli
         )
     }
 }
-
 @Composable
 private fun EnhancePromptButton(modifier: Modifier, isLoading: Boolean, onClick: () -> Unit) {
     Box(contentAlignment = Alignment.Center) {
@@ -525,7 +570,6 @@ private fun EnhancePromptButton(modifier: Modifier, isLoading: Boolean, onClick:
         }
     }
 }
-
 @Composable
 private fun OpenCreationsButton(
     modifier: Modifier, generationsInProgress: Int, onClick: () -> Unit
@@ -539,7 +583,6 @@ private fun OpenCreationsButton(
         )
     }
 }
-
 @Composable
 private fun PictureToPromptButton(modifier: Modifier, isLoading: Boolean, onClick: () -> Unit) {
     Box(contentAlignment = Alignment.Center) {
@@ -565,7 +608,6 @@ private fun PictureToPromptButton(modifier: Modifier, isLoading: Boolean, onClic
         }
     }
 }
-
 @Composable
 private fun TranslateButton(
     modifier: Modifier, show: Boolean, isTranslating: Boolean, onClick: () -> Unit
@@ -598,7 +640,6 @@ private fun TranslateButton(
         }
     }
 }
-
 @Composable
 private fun SurpriseMeButton(modifier: Modifier, isLoading: Boolean, onClick: () -> Unit) {
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
@@ -625,7 +666,6 @@ private fun SurpriseMeButton(modifier: Modifier, isLoading: Boolean, onClick: ()
         }
     }
 }
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Trainings(
@@ -682,7 +722,6 @@ private fun Trainings(
         }
     }
 }
-
 @Composable
 private fun PhotosToGenerate(photosToGenerate: Int, onPhotosToGenerateChanged: (Int) -> Unit) {
     Column(

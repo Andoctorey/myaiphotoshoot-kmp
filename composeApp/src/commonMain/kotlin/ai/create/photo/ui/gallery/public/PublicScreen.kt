@@ -1,8 +1,7 @@
 package ai.create.photo.ui.gallery.public
-
+import ai.create.photo.data.logger.logImageLoadError
 import ai.create.photo.data.supabase.model.GenerationsSort
 import ai.create.photo.data.supabase.model.UserGeneration
-import ai.create.photo.data.logger.logImageLoadError
 import ai.create.photo.platform.Platforms
 import ai.create.photo.platform.platform
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
@@ -56,6 +55,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
@@ -64,15 +64,28 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import kotlinx.coroutines.flow.distinctUntilChanged
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.newest_sort_order
 import photocreateai.composeapp.generated.resources.popular_sort_order
 import photocreateai.composeapp.generated.resources.upload_tooltip_popup_message
 import photocreateai.composeapp.generated.resources.upload_tooltip_popup_title
 
-
-@Preview
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
+@Composable
+private fun PublicScreenPreview() = PublicScreenContent(
+    state = PublicUiState(
+        isLoading = false,
+        sort = GenerationsSort.POPULAR,
+    ),
+    generate = {},
+    onLoadLatestSortedByNew = {},
+    onLoadNextPage = {},
+    onRefresh = {},
+    onToggleSortMenu = {},
+    onSort = {},
+    onHideErrorPopup = {},
+    onToggleTooltipPopup = {},
+)
 @Composable
 fun PublicScreen(
     viewModel: PublicViewModel = viewModel { PublicViewModel() },
@@ -83,23 +96,44 @@ fun PublicScreen(
     onRemovedPhotosFromPublicGallery: () -> Unit,
 ) {
     val state = viewModel.uiState
-
-    if (state.sort == GenerationsSort.NEW) {
-        LaunchedEffect(Unit) {
-            viewModel.loadLatestPublicGallerySortedByNew(silent = true)
-        }
-    }
-
     if (addPhotosToPublicGallery.isNotEmpty()) {
         viewModel.addPhotoToPublicGallery(addPhotosToPublicGallery)
         onAddedPhotosToPublicGallery()
     }
-
     if (removePhotosFromPublicGallery.isNotEmpty()) {
         viewModel.removePhotoFromPublicGallery(removePhotosFromPublicGallery)
         onRemovedPhotosFromPublicGallery()
     }
+    PublicScreenContent(
+        state = state,
+        generate = generate,
+        onLoadLatestSortedByNew = { viewModel.loadLatestPublicGallerySortedByNew(silent = true) },
+        onLoadNextPage = viewModel::loadPublicGallery,
+        onRefresh = viewModel::onRefreshPublicGallery,
+        onToggleSortMenu = viewModel::toggleSortDropDownMenu,
+        onSort = viewModel::sort,
+        onHideErrorPopup = viewModel::hideErrorPopup,
+        onToggleTooltipPopup = viewModel::toggleTooltipPopup,
+    )
+}
 
+@Composable
+private fun PublicScreenContent(
+    state: PublicUiState,
+    generate: (Prompt) -> Unit,
+    onLoadLatestSortedByNew: () -> Unit,
+    onLoadNextPage: () -> Unit,
+    onRefresh: () -> Unit,
+    onToggleSortMenu: (Boolean) -> Unit,
+    onSort: (GenerationsSort) -> Unit,
+    onHideErrorPopup: () -> Unit,
+    onToggleTooltipPopup: (Boolean) -> Unit,
+) {
+    if (state.sort == GenerationsSort.NEW) {
+        LaunchedEffect(Unit) {
+            onLoadLatestSortedByNew()
+        }
+    }
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
@@ -114,13 +148,12 @@ fun PublicScreen(
                 photos = state.photos,
                 listState = state.listState,
                 isLoadingNextPage = state.isLoadingNextPage,
-                loadNextPage = viewModel::loadPublicGallery,
+                loadNextPage = onLoadNextPage,
                 isRefreshing = state.isRefreshing,
-                onRefresh = viewModel::onRefreshPublicGallery,
+                onRefresh = onRefresh,
                 pagingLimitReach = state.pagingLimitReach,
                 onClick = { generate(Prompt(generationId = it.id, text = it.prompt, url = it.url)) }
             )
-
             Box(
                 modifier = Modifier.align(Alignment.BottomEnd)
                     .padding(bottom = 80.dp, end = 24.dp)
@@ -128,31 +161,28 @@ fun PublicScreen(
             ) {
                 SortButton(
                     showDropDown = state.showSortDropDownMenu,
-                    onToggleMenu = { viewModel.toggleSortDropDownMenu(it) },
+                    onToggleMenu = onToggleSortMenu,
                     sort = state.sort,
-                    onSort = { viewModel.sort(it) },
+                    onSort = onSort,
                 )
             }
         }
     }
-
     if (state.errorPopup != null) {
         ErrorPopup(state.errorPopup) {
-            viewModel.hideErrorPopup()
+            onHideErrorPopup()
         }
     }
-
     if (state.showTooltipPopup) {
         InfoPopup(
             icon = Icons.Default.Stars,
             title = stringResource(Res.string.upload_tooltip_popup_title),
             message = stringResource(Res.string.upload_tooltip_popup_message),
         ) {
-            viewModel.toggleTooltipPopup(false)
+            onToggleTooltipPopup(false)
         }
     }
 }
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Photos(
@@ -188,7 +218,6 @@ private fun Photos(
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
             }
-
             items(photos.size, key = { photos[it].id }) { item ->
                 Box(
                     modifier = Modifier
@@ -205,7 +234,6 @@ private fun Photos(
                     )
                 }
             }
-
             if (isLoadingNextPage && !pagingLimitReach) {
                 item {
                     Box(
@@ -216,13 +244,11 @@ private fun Photos(
                     }
                 }
             }
-
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.systemBars))
             }
         }
     }
-
     val photosCount = photos.size
     if (!isLoadingNextPage && !pagingLimitReach) {
         LaunchedEffect(listState, photosCount) {
@@ -237,7 +263,6 @@ private fun Photos(
         }
     }
 }
-
 @Composable
 private fun Photo(
     photo: PublicUiState.Photo,
@@ -247,12 +272,10 @@ private fun Photo(
 ) {
     var loaded by remember { mutableStateOf(false) }
     if (!loaded && doNotLoad) return
-
     var error by remember { mutableStateOf<Throwable?>(null) }
     error?.let {
         ErrorMessagePlaceHolderSmall(it)
     }
-
     AsyncImage(
         modifier = Modifier.fillMaxSize().clickable { onClick(photo) },
         model = ImageRequest.Builder(LocalPlatformContext.current)
@@ -268,7 +291,6 @@ private fun Photo(
         },
     )
 }
-
 @Composable
 fun SortButton(
     showDropDown: Boolean,
@@ -284,7 +306,6 @@ fun SortButton(
             contentDescription = Icons.Default.AddAPhoto.name,
         )
     }
-
     DropdownMenu(
         expanded = showDropDown,
         onDismissRequest = { onToggleMenu(false) },

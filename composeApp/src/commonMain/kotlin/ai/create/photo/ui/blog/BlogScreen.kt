@@ -1,14 +1,14 @@
 package ai.create.photo.ui.blog
-
+import ai.create.photo.data.logger.logImageLoadError
 import ai.create.photo.data.supabase.model.Blog
 import ai.create.photo.data.supabase.model.UserGeneration
-import ai.create.photo.data.logger.logImageLoadError
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolderSmall
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.compose.PullToRefreshBoxNoDesktop
 import ai.create.photo.ui.generate.Prompt
+import ai.create.photo.ui.theme.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -54,9 +55,46 @@ import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import kotlinx.coroutines.flow.distinctUntilChanged
-import org.jetbrains.compose.ui.tooling.preview.Preview
+import kotlin.time.Clock
 
-@Preview
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
+@Composable
+private fun BlogScreenPreview() = AppTheme {
+    val previewGeneration = UserGeneration(
+        id = "preview_generation",
+        createdAt = Clock.System.now(),
+        prompt = "Studio portrait with soft window light",
+        imageUrl = "https://picsum.photos/420",
+        fileId = null,
+        isPublic = true,
+    )
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        BlogScreenContent(
+            state = BlogUiState(
+                isLoading = false,
+                posts = listOf(
+                    Blog(
+                        id = "preview",
+                        createdAt = Clock.System.now(),
+                        title = "How to get better AI portraits",
+                        metaDescription = "Preview description",
+                        sectionPhotos = mapOf("cover" to previewGeneration),
+                    )
+                ),
+            ),
+            openGenerateTab = {},
+            onArticleClick = {},
+            onResetScrollToTop = {},
+            onLoadNextPage = {},
+            onRefresh = {},
+            onHideErrorPopup = {},
+        )
+    }
+}
 @Composable
 fun BlogScreen(
     viewModel: BlogsViewModel = viewModel { BlogsViewModel() },
@@ -64,6 +102,27 @@ fun BlogScreen(
     onArticleClick: (String) -> Unit = {},
 ) {
     val state = viewModel.uiState
+    BlogScreenContent(
+        state = state,
+        openGenerateTab = openGenerateTab,
+        onArticleClick = onArticleClick,
+        onResetScrollToTop = viewModel::resetScrollToTop,
+        onLoadNextPage = viewModel::loadMorePosts,
+        onRefresh = viewModel::refresh,
+        onHideErrorPopup = viewModel::hideErrorPopup,
+    )
+}
+
+@Composable
+private fun BlogScreenContent(
+    state: BlogUiState,
+    openGenerateTab: (Prompt) -> Unit,
+    onArticleClick: (String) -> Unit,
+    onResetScrollToTop: () -> Unit,
+    onLoadNextPage: () -> Unit,
+    onRefresh: () -> Unit,
+    onHideErrorPopup: () -> Unit,
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
@@ -78,30 +137,27 @@ fun BlogScreen(
                 if (state.scrollToTop && state.listState.firstVisibleItemIndex > 1) {
                     state.listState.animateScrollToItem(0)
                 }
-                viewModel.resetScrollToTop()
+                onResetScrollToTop()
             }
-
             Posts(
                 articles = state.posts,
                 listState = state.listState,
                 isLoadingNextPage = state.isLoadingNextPage,
                 pagingLimitReach = state.pagingLimitReach,
-                loadNextPage = viewModel::loadMorePosts,
+                loadNextPage = onLoadNextPage,
                 isRefreshing = state.isRefreshing,
-                onRefresh = viewModel::refresh,
+                onRefresh = onRefresh,
                 onClick = { post -> onArticleClick(post.id) },
                 generate = openGenerateTab,
             )
         }
     }
-
     if (state.errorPopup != null) {
         ErrorPopup(state.errorPopup) {
-            viewModel.hideErrorPopup()
+            onHideErrorPopup()
         }
     }
 }
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Posts(
@@ -119,7 +175,6 @@ private fun Posts(
         isRefreshing = isRefreshing,
         onRefresh = onRefresh,
     ) {
-
         LazyColumn(
             state = listState,
             modifier = Modifier.fillMaxSize(),
@@ -129,7 +184,6 @@ private fun Posts(
             item {
                 Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
             }
-
             items(articles.size, key = { articles[it].id }) { item ->
                 Box(
                     modifier = Modifier
@@ -143,7 +197,6 @@ private fun Posts(
                     )
                 }
             }
-
             if (isLoadingNextPage && !pagingLimitReach) {
                 item {
                     Box(
@@ -154,13 +207,11 @@ private fun Posts(
                     }
                 }
             }
-
             item {
                 Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.systemBars))
             }
         }
     }
-
     val articlesLoaded = articles.size
     if (!isLoadingNextPage && !pagingLimitReach) {
         LaunchedEffect(listState, articlesLoaded) {
@@ -175,7 +226,6 @@ private fun Posts(
         }
     }
 }
-
 @Composable
 private fun Post(
     post: Blog,
@@ -199,12 +249,10 @@ private fun Post(
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-
             val photos = post.sectionPhotos.values.toList()
             if (photos.isNotEmpty()) {
                 val density = LocalDensity.current
                 val size = remember { with(density) { 420.toDp() } }
-
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     contentPadding = PaddingValues(horizontal = 4.dp)
@@ -217,7 +265,6 @@ private fun Post(
         }
     }
 }
-
 @Composable
 private fun PhotoItem(
     photo: UserGeneration,
@@ -228,7 +275,6 @@ private fun PhotoItem(
     error?.let {
         ErrorMessagePlaceHolderSmall(it)
     }
-
     Box(
         modifier = Modifier
             .size(size)

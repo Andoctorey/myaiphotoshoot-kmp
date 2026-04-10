@@ -1,7 +1,6 @@
 package ai.create.photo.ui.article
-
-import ai.create.photo.data.supabase.model.UserGeneration
 import ai.create.photo.data.logger.logImageLoadError
+import ai.create.photo.data.supabase.model.UserGeneration
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolderSmall
 import ai.create.photo.ui.compose.LoadingPlaceholder
@@ -49,6 +48,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -56,17 +56,23 @@ import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
-
-@Preview
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
-private fun ArticleScreenPreview() = ArticleScreen(
-    postId = "preview",
+private fun ArticleScreenPreview() = ArticleScreenContent(
+    state = ArticleUiState(
+        isLoading = false,
+        title = "Article preview",
+        topics = listOf(
+            PhotoTopic(
+                title = "Preview topic",
+                description = "How generated photos can help with this use case.",
+            )
+        )
+    ),
     onBackClick = {},
-    openGenerateTab = {}
+    openGenerateTab = {},
 )
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArticleScreen(
@@ -76,11 +82,23 @@ fun ArticleScreen(
     viewModel: ArticleViewModel = viewModel { ArticleViewModel() }
 ) {
     val state = viewModel.uiState
-
     LaunchedEffect(postId) {
         viewModel.loadArticle(postId)
     }
+    ArticleScreenContent(
+        state = state,
+        onBackClick = onBackClick,
+        openGenerateTab = openGenerateTab,
+    )
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ArticleScreenContent(
+    state: ArticleUiState,
+    onBackClick: () -> Unit,
+    openGenerateTab: (Prompt) -> Unit,
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -120,11 +138,9 @@ fun ArticleScreen(
                 state.isLoading -> {
                     LoadingPlaceholder()
                 }
-
                 state.loadingError != null -> {
                     ErrorMessagePlaceHolder(state.loadingError)
                 }
-
                 state.topics.isNotEmpty() -> {
                     ArticleContent(
                         topics = state.topics,
@@ -134,9 +150,7 @@ fun ArticleScreen(
             }
         }
     }
-
 }
-
 @Composable
 private fun ArticleContent(
     topics: List<PhotoTopic>,
@@ -146,7 +160,6 @@ private fun ArticleContent(
     val density = LocalDensity.current
     val width = 420
     val minSize = remember { with(density) { (width - 20).toDp() } } // Same as PublicScreen
-
     LazyVerticalGrid(
         state = listState,
         modifier = Modifier.fillMaxSize(),
@@ -159,7 +172,6 @@ private fun ArticleContent(
             item(span = { GridItemSpan(maxLineSpan) }) {
                 TopicHeader(topic = topic)
             }
-
             topic.photos.forEach { photo ->
                 item {
                     PhotoItem(
@@ -168,18 +180,15 @@ private fun ArticleContent(
                     )
                 }
             }
-
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Spacer(Modifier.height(24.dp))
             }
         }
-
         item(span = { GridItemSpan(maxLineSpan) }) {
             Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.systemBars))
         }
     }
 }
-
 @Composable
 private fun TopicHeader(topic: PhotoTopic) {
     Column(
@@ -194,7 +203,6 @@ private fun TopicHeader(topic: PhotoTopic) {
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
         )
-
         if (topic.description.isNotEmpty()) {
             Text(
                 text = topic.description,
@@ -205,7 +213,6 @@ private fun TopicHeader(topic: PhotoTopic) {
         }
     }
 }
-
 @Composable
 private fun PhotoItem(
     photo: UserGeneration,
@@ -215,7 +222,6 @@ private fun PhotoItem(
     error?.let {
         ErrorMessagePlaceHolderSmall(it)
     }
-
     Box(
         modifier = Modifier
             .fillMaxWidth()

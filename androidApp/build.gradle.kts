@@ -85,14 +85,11 @@ android {
 
 dependencies {
     implementation(projects.composeApp)
-    implementation(compose.foundation)
-    implementation(compose.preview)
+    implementation(libs.compose.foundation)
     implementation(libs.androidx.activity.compose)
     implementation(libs.filekit.compose)
     implementation(project.dependencies.platform(libs.firebase.bom))
     implementation(libs.firebase.analytics.ktx)
     implementation(libs.firebase.crashlytics.ktx)
     implementation(libs.firebase.perf)
-
-    debugImplementation(compose.uiTooling)
 }

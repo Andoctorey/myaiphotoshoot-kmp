@@ -1,5 +1,4 @@
 package ai.create.photo.ui.settings
-
 import ai.create.photo.ui.compose.ErrorMessagePlaceHolder
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
@@ -47,6 +46,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
@@ -56,12 +56,31 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.balance
 
-
-@Preview
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
+@Composable
+private fun SettingsScreenPreview() = SettingsScreenContent(
+    state = SettingsUiState(
+        isLoading = false,
+        items = listOf(
+            SettingsUiState.LoginItem(),
+            SettingsUiState.BalanceItem(),
+            SettingsUiState.SupportItem(),
+        ),
+        email = "preview@myaiphotoshoot.com",
+        balance = "$9.99",
+    ),
+    trainAiModel = {},
+    openGenerateTab = {},
+    goToRootScreen = false,
+    onSaveDestination = {},
+    support = {},
+    googlePlay = {},
+    appStore = {},
+    onHideErrorPopup = {},
+)
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel = viewModel { SettingsViewModel() },
@@ -69,26 +88,48 @@ fun SettingsScreen(
     openGenerateTab: () -> Unit,
     goToRootScreen: Boolean,
 ) {
+    val state = viewModel.uiState
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.loadProfile()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+    SettingsScreenContent(
+        state = state,
+        trainAiModel = trainAiModel,
+        openGenerateTab = openGenerateTab,
+        goToRootScreen = goToRootScreen,
+        onSaveDestination = viewModel::saveDestination,
+        support = viewModel::support,
+        googlePlay = viewModel::googlePlay,
+        appStore = viewModel::appStore,
+        onHideErrorPopup = viewModel::hideErrorPopup,
+    )
+}
+
+@Composable
+private fun SettingsScreenContent(
+    state: SettingsUiState,
+    trainAiModel: () -> Unit,
+    openGenerateTab: () -> Unit,
+    goToRootScreen: Boolean,
+    onSaveDestination: (Item?) -> Unit,
+    support: () -> Unit,
+    googlePlay: () -> Unit,
+    appStore: () -> Unit,
+    onHideErrorPopup: () -> Unit,
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
-        val state = viewModel.uiState
-
-        val lifecycleOwner = LocalLifecycleOwner.current
-        DisposableEffect(lifecycleOwner) {
-            val observer = LifecycleEventObserver { _, event ->
-                if (event == Lifecycle.Event.ON_RESUME) {
-                    viewModel.loadProfile()
-                }
-            }
-
-            lifecycleOwner.lifecycle.addObserver(observer)
-            onDispose {
-                lifecycleOwner.lifecycle.removeObserver(observer)
-            }
-        }
-
         if (state.isLoading) {
             Spacer(modifier = Modifier.height(20.dp))
             LoadingPlaceholder()
@@ -103,25 +144,23 @@ fun SettingsScreen(
                     isBalanceLoading = state.isBalanceLoading,
                     items = state.items,
                     savedDestination = state.currentDestination,
-                    onSaveDestination = viewModel::saveDestination,
+                    onSaveDestination = onSaveDestination,
                     goToRootScreen = goToRootScreen,
-                    support = viewModel::support,
-                    googlePlay = viewModel::googlePlay,
-                    appStore = viewModel::appStore,
+                    support = support,
+                    googlePlay = googlePlay,
+                    appStore = appStore,
                     trainAiModel = trainAiModel,
                     openGenerateTab = openGenerateTab,
                 )
             }
         }
-
         if (state.errorPopup != null) {
             ErrorPopup(state.errorPopup) {
-                viewModel.hideErrorPopup()
+                onHideErrorPopup()
             }
         }
     }
 }
-
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 private fun Screen(
@@ -140,20 +179,17 @@ private fun Screen(
 ) {
     val navigator = rememberListDetailPaneScaffoldNavigator<Item>()
     var hasNavigated by remember { mutableStateOf(false) }
-
     LaunchedEffect(savedDestination, hasNavigated) {
         if (savedDestination != null && !hasNavigated) {
             Logger.i("Navigate to savedDestination: $savedDestination")
             when (savedDestination) {
                 is SettingsUiState.DetailedItem ->
                     navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, savedDestination)
-
                 is SettingsUiState.SpacerItem -> {}
             }
             hasNavigated = true
         }
     }
-
     LaunchedEffect(goToRootScreen) {
         if (goToRootScreen) {
             onSaveDestination(null)
@@ -162,7 +198,6 @@ private fun Screen(
             }
         }
     }
-
     val scope = rememberCoroutineScope()
     val expanded = navigator.scaffoldValue.primary == PaneAdaptedValue.Expanded
             && navigator.scaffoldValue.secondary == PaneAdaptedValue.Expanded
@@ -183,17 +218,14 @@ private fun Screen(
                                 support()
                                 return@SettingsItems
                             }
-
                             is SettingsUiState.GooglePlayItem -> {
                                 googlePlay()
                                 return@SettingsItems
                             }
-
                             is SettingsUiState.AppStoreItem -> {
                                 appStore()
                                 return@SettingsItems
                             }
-
                             else -> {
                                 Logger.i("Navigate to: $item")
                                 onSaveDestination(item)
@@ -231,7 +263,6 @@ private fun Screen(
         },
     )
 }
-
 @Composable
 fun SettingsItems(
     email: String?,
@@ -253,9 +284,7 @@ fun SettingsItems(
                     is SettingsUiState.SpacerItem -> {
                         Spacer(modifier = Modifier.height(24.dp))
                     }
-
                     is SettingsUiState.DetailedItem -> {
-
                         OutlinedButton(
                             onClick = { onItemClick(item) },
                         ) {
@@ -271,19 +300,16 @@ fun SettingsItems(
                                     contentDescription = item.icon.name,
                                 )
                             }
-
                             Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
                             Text(
                                 text = when (item) {
                                     is SettingsUiState.LoginItem -> email
                                         ?.takeIf { it.isNotBlank() }
                                         ?: stringResource(item.nameRes)
-
                                     is SettingsUiState.BalanceItem ->
                                         stringResource(Res.string.balance, balance)
                                             .takeIf { balance != "0" }
                                             ?: stringResource(item.nameRes)
-
                                     else -> stringResource(item.nameRes)
                                 },
                                 fontSize = 16.sp,
@@ -295,8 +321,6 @@ fun SettingsItems(
         }
     }
 }
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsDetails(
@@ -332,13 +356,11 @@ fun SettingsDetails(
             ) {
                 when (item) {
                     is SettingsUiState.LoginItem -> LoginScreen(onBackClick = onBackClick)
-
                     is SettingsUiState.BalanceItem -> BalanceScreen(
                         onBackClick = onBackClick,
                         trainAiModel = trainAiModel,
                         openGenerateTab = openGenerateTab,
                     )
-
                     is SettingsUiState.SupportItem -> {}
                     is SettingsUiState.GooglePlayItem -> {}
                     is SettingsUiState.AppStoreItem -> {}

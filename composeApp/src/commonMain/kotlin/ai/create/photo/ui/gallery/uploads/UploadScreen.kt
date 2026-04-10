@@ -1,5 +1,4 @@
 package ai.create.photo.ui.gallery.uploads
-
 import ai.create.photo.data.logger.logImageLoadError
 import ai.create.photo.data.supabase.model.AnalysisStatus
 import ai.create.photo.data.supabase.model.TrainingStatus
@@ -12,6 +11,7 @@ import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.InfoPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.compose.TopUpErrorPopup
+import ai.create.photo.ui.theme.AppTheme
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -82,6 +82,7 @@ import coil3.request.crossfade
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
+import io.github.vinceglb.filekit.core.PlatformFiles
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
 import photocreateai.composeapp.generated.resources.Res
@@ -103,15 +104,82 @@ import photocreateai.composeapp.generated.resources.training_ai_model_elapsed
 import photocreateai.composeapp.generated.resources.upload_guidelines
 import photocreateai.composeapp.generated.resources.upload_more_photos
 
-
-@Preview
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
-private fun UploadScreenPreview() = UploadScreen(openGenerateTab = {})
-
+private fun UploadScreenPreview() = AppTheme {
+    UploadScreenContent(
+        state = UploadUiState(
+            isLoadingPhotos = false,
+            photos = emptyList(),
+            uploadProgress = 0,
+        ),
+        openGenerateTab = {},
+        onUploadPhotos = {},
+        onDeletePhoto = {},
+        onResetScrollToTop = {},
+        onResetScrollToPosition = {},
+        onAnalyzePhotos = {},
+        onCheckBadPhotosAndTrainAiModel = {},
+        onCreatingModelClick = {},
+        onToggleDeleteUnsuitablePhotosPopup = {},
+        onHideUploadMorePhotosPopup = {},
+        onHideDeleteSomePhotosPopup = {},
+        onHideCreatingModelClick = {},
+        onHideErrorPopup = {},
+        onTopUp = {},
+        onDeleteUnsuitablePhotos = {},
+        onTrainAiModel = {},
+        onHideBalanceUpdatedPopup = {},
+    )
+}
 @Composable
 fun UploadScreen(
     viewModel: UploadViewModel = viewModel { UploadViewModel() },
     openGenerateTab: () -> Unit,
+) {
+    val state = viewModel.uiState
+    UploadScreenContent(
+        state = state,
+        openGenerateTab = openGenerateTab,
+        onUploadPhotos = { files -> viewModel.uploadPhotos(files) },
+        onDeletePhoto = { photo -> viewModel.deletePhoto(photo) },
+        onResetScrollToTop = viewModel::resetScrollToTop,
+        onResetScrollToPosition = viewModel::resetScrollToPosition,
+        onAnalyzePhotos = { viewModel.analyzePhotos() },
+        onCheckBadPhotosAndTrainAiModel = viewModel::checkBadPhotosAndTrainAiModel,
+        onCreatingModelClick = viewModel::onCreatingModelClick,
+        onToggleDeleteUnsuitablePhotosPopup = viewModel::toggleDeleteUnsuitablePhotosPopup,
+        onHideUploadMorePhotosPopup = viewModel::hideUploadMorePhotosPopup,
+        onHideDeleteSomePhotosPopup = viewModel::hideDeleteSomePhotosPopup,
+        onHideCreatingModelClick = viewModel::hideCreatingModelClick,
+        onHideErrorPopup = viewModel::hideErrorPopup,
+        onTopUp = { viewModel.topUp() },
+        onDeleteUnsuitablePhotos = { viewModel.deleteUnsuitablePhotos() },
+        onTrainAiModel = { viewModel.trainAiModel() },
+        onHideBalanceUpdatedPopup = viewModel::hideBalanceUpdatedPopup,
+    )
+}
+
+@Composable
+private fun UploadScreenContent(
+    state: UploadUiState,
+    openGenerateTab: () -> Unit,
+    onUploadPhotos: (PlatformFiles) -> Unit,
+    onDeletePhoto: (UploadUiState.Photo) -> Unit,
+    onResetScrollToTop: () -> Unit,
+    onResetScrollToPosition: () -> Unit,
+    onAnalyzePhotos: () -> Unit,
+    onCheckBadPhotosAndTrainAiModel: () -> Unit,
+    onCreatingModelClick: () -> Unit,
+    onToggleDeleteUnsuitablePhotosPopup: (Boolean) -> Unit,
+    onHideUploadMorePhotosPopup: () -> Unit,
+    onHideDeleteSomePhotosPopup: () -> Unit,
+    onHideCreatingModelClick: () -> Unit,
+    onHideErrorPopup: () -> Unit,
+    onTopUp: () -> Unit,
+    onDeleteUnsuitablePhotos: () -> Unit,
+    onTrainAiModel: () -> Unit,
+    onHideBalanceUpdatedPopup: () -> Unit,
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -123,11 +191,8 @@ fun UploadScreen(
             mode = PickerMode.Multiple()
         ) { files ->
             if (files == null) return@rememberFilePickerLauncher
-            viewModel.uploadPhotos(files)
+            onUploadPhotos(files)
         }
-
-        val state = viewModel.uiState
-
         if (state.isLoadingPhotos) {
             Spacer(modifier = Modifier.height(20.dp))
             LoadingPlaceholder()
@@ -141,7 +206,7 @@ fun UploadScreen(
                     state.listState.animateScrollToItem(0)
                     Logger.i("scrolling to top")
                 }
-                viewModel.resetScrollToTop()
+                onResetScrollToTop()
             }
             LaunchedEffect(state.scrollToPosition) {
                 if (state.scrollToPosition != null) {
@@ -149,7 +214,7 @@ fun UploadScreen(
                         Logger.i("scrolling to position: ${state.scrollToPosition}")
                         state.listState.animateScrollToItem(state.scrollToPosition)
                     }
-                    viewModel.resetScrollToPosition()
+                    onResetScrollToPosition()
                 }
             }
             val hideDeletePhotoButton = state.trainingStatus == TrainingStatus.PROCESSING
@@ -157,10 +222,9 @@ fun UploadScreen(
                 photos = state.photos,
                 listState = state.listState,
                 hideDeletePhotoButton = hideDeletePhotoButton,
-                onDelete = viewModel::deletePhoto,
+                onDelete = onDeletePhoto,
             )
         }
-
         val buttonsBottomPadding = 94.dp
         if (!state.isLoadingPhotos && state.photos != null) {
             val isUploading = state.uploadProgress in 1 until 100
@@ -173,7 +237,7 @@ fun UploadScreen(
                             .padding(bottom = buttonsBottomPadding).safeDrawingPadding(),
                         analyzingPhotos = state.analyzingPhotos,
                         totalPhotos = state.photos.size,
-                        onClick = viewModel::analyzePhotos,
+                        onClick = onAnalyzePhotos,
                     )
                 } else {
                     TrainModelFab(
@@ -181,8 +245,8 @@ fun UploadScreen(
                             .padding(bottom = buttonsBottomPadding).safeDrawingPadding(),
                         trainingStatus = state.trainingStatus,
                         trainingElapsedTimeMs = state.trainingElapsedTimeMs,
-                        createModel = viewModel::checkBadPhotosAndTrainAiModel,
-                        onCreatingModelClick = viewModel::onCreatingModelClick,
+                        createModel = onCheckBadPhotosAndTrainAiModel,
+                        onCreatingModelClick = onCreatingModelClick,
                         generatePhotos = openGenerateTab,
                         isToppingUp = state.toppingUp,
                     )
@@ -200,14 +264,13 @@ fun UploadScreen(
                         )
                     }
                 }
-
                 val hasBadPhotos = state.photos.any { it.analysisStatus == AnalysisStatus.DECLINED }
                 if (hasBadPhotos && state.trainingStatus != TrainingStatus.PROCESSING) {
                     SmallFloatingActionButton(
                         modifier = Modifier.align(Alignment.BottomStart)
                             .padding(bottom = buttonsBottomPadding, start = 24.dp)
                             .safeDrawingPadding(),
-                        onClick = { viewModel.toggleDeleteUnsuitablePhotosPopup(true) },
+                        onClick = { onToggleDeleteUnsuitablePhotosPopup(true) },
                     ) {
                         Icon(
                             imageVector = Icons.Default.CleaningServices,
@@ -225,63 +288,55 @@ fun UploadScreen(
                 )
             }
         }
-
         if (state.showUploadMorePhotosPopup) {
             InfoPopup(stringResource(Res.string.upload_more_photos)) {
-                viewModel.hideUploadMorePhotosPopup()
+                onHideUploadMorePhotosPopup()
             }
         }
-
         if (state.showDeleteSomePhotosPopup) {
             InfoPopup(stringResource(Res.string.delete_some_photos)) {
-                viewModel.hideDeleteSomePhotosPopup()
+                onHideDeleteSomePhotosPopup()
             }
         }
-
         if (state.showTrainingAiModelPopup) {
             InfoPopup(stringResource(Res.string.creating_model_hint)) {
-                viewModel.hideCreatingModelClick()
+                onHideCreatingModelClick()
             }
         }
-
         if (state.errorPopup != null) {
             ErrorPopup(state.errorPopup) {
-                viewModel.hideErrorPopup()
+                onHideErrorPopup()
             }
         }
-
         if (state.topUpErrorPopup != null) {
             TopUpErrorPopup(
                 state.topUpErrorPopup,
-                onDismiss = { viewModel.hideErrorPopup() },
+                onDismiss = { onHideErrorPopup() },
                 onTopUp = {
-                    viewModel.hideErrorPopup()
-                    viewModel.topUp()
+                    onHideErrorPopup()
+                    onTopUp()
                 })
         }
-
         if (state.deleteUnsuitablePhotosPopup) {
             ConfirmationPopup(
                 icon = Icons.Default.Delete,
                 message = stringResource(Res.string.delete_unsuitable_photos),
                 confirmButton = stringResource(Res.string.delete),
                 dismissButton = stringResource(Res.string.proceed),
-                onConfirm = viewModel::deleteUnsuitablePhotos,
+                onConfirm = onDeleteUnsuitablePhotos,
                 onDismiss = {
-                    viewModel.toggleDeleteUnsuitablePhotosPopup(false)
-                    viewModel.trainAiModel()
+                    onToggleDeleteUnsuitablePhotosPopup(false)
+                    onTrainAiModel()
                 },
             )
         }
-
         if (state.showBalanceUpdatedPopup) {
             InfoPopup(stringResource(Res.string.thank_you_for_purchase)) {
-                viewModel.hideBalanceUpdatedPopup()
+                onHideBalanceUpdatedPopup()
             }
         }
     }
 }
-
 @Composable
 private fun Placeholder(modifier: Modifier = Modifier) {
     Column(
@@ -294,13 +349,11 @@ private fun Placeholder(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-
         Text(
             text = stringResource(Res.string.upload_guidelines),
             fontSize = 16.sp,
             textAlign = TextAlign.Center,
         )
-
         AsyncImage(
             modifier = Modifier.fillMaxWidth(),
             model = ImageRequest.Builder(LocalPlatformContext.current)
@@ -312,7 +365,6 @@ private fun Placeholder(modifier: Modifier = Modifier) {
         )
     }
 }
-
 @Composable
 private fun AddPhotosFab(
     modifier: Modifier = Modifier,
@@ -354,7 +406,6 @@ private fun AddPhotosFab(
         }
     }
 }
-
 @Composable
 private fun AnalyzePhotosFab(
     modifier: Modifier = Modifier,
@@ -406,7 +457,6 @@ private fun AnalyzePhotosFab(
         }
     }
 }
-
 @Composable
 private fun TrainModelFab(
     modifier: Modifier = Modifier,
@@ -446,7 +496,6 @@ private fun TrainModelFab(
             }
         } else {
             when (trainingStatus) {
-
                 TrainingStatus.SUCCEEDED -> {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
@@ -464,7 +513,6 @@ private fun TrainModelFab(
                         )
                     }
                 }
-
                 TrainingStatus.PROCESSING -> {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         CircularProgressIndicator(
@@ -488,7 +536,6 @@ private fun TrainModelFab(
                         )
                     }
                 }
-
                 TrainingStatus.FAILED, TrainingStatus.CANCELED, null -> {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
@@ -510,7 +557,6 @@ private fun TrainModelFab(
         }
     }
 }
-
 private fun formatElapsedDuration(elapsedMs: Long): String {
     val totalSeconds = elapsedMs / 1000L
     val hours = totalSeconds / 3600L
@@ -522,7 +568,6 @@ private fun formatElapsedDuration(elapsedMs: Long): String {
         else -> "${seconds}s"
     }
 }
-
 @Composable
 private fun Photos(
     photos: List<UploadUiState.Photo>,
@@ -530,14 +575,12 @@ private fun Photos(
     hideDeletePhotoButton: Boolean,
     onDelete: (UploadUiState.Photo) -> Unit,
 ) {
-
     val optimizedVersion = remember {
         platform().platform in listOf(
             Platforms.WEB_MOBILE,
             Platforms.WEB_DESKTOP,
         )
     }
-
     LazyVerticalStaggeredGrid(
         state = listState,
         modifier = Modifier.fillMaxSize(),
@@ -548,7 +591,6 @@ private fun Photos(
         item(span = StaggeredGridItemSpan.FullLine) {
             Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
         }
-
         items(photos.size, key = { photos[it].id }) { item ->
             Box(
                 modifier = Modifier
@@ -564,13 +606,11 @@ private fun Photos(
                 )
             }
         }
-
         item {
             Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.systemBars))
         }
     }
 }
-
 @Composable
 private fun Photo(
     photo: UploadUiState.Photo,
@@ -584,7 +624,6 @@ private fun Photo(
     error?.let {
         ErrorMessagePlaceHolderSmall(it)
     }
-
     if (optimizedVersion) {
         LaunchedEffect(photo.url) {
             delay(1000L)
@@ -593,9 +632,7 @@ private fun Photo(
     } else {
         showImage = true
     }
-
     var showAnalysis by remember { mutableStateOf(true) }
-
     Box(
         modifier = Modifier.fillMaxWidth().then(if (loaded) Modifier else Modifier.aspectRatio(1f))
     ) {
@@ -615,7 +652,6 @@ private fun Photo(
                 },
             )
         }
-
         if (loaded && !hideDeletePhotoButton) {
             IconButton(
                 onClick = { onDelete(photo) },
@@ -633,8 +669,6 @@ private fun Photo(
                 )
             }
         }
-
-
         if (loaded && photo.analysisStatus != null) {
             IconButton(
                 onClick = { showAnalysis = !showAnalysis },
@@ -657,7 +691,6 @@ private fun Photo(
                 )
             }
         }
-
         if (loaded && showAnalysis && !photo.analysis.isNullOrEmpty()) {
             Text(
                 modifier = Modifier.fillMaxWidth()

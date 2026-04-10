@@ -1,8 +1,7 @@
 package ai.create.photo.ui.gallery.creations
-
+import ai.create.photo.data.logger.logImageLoadError
 import ai.create.photo.data.supabase.model.GenerationsFilter
 import ai.create.photo.data.supabase.model.UserGeneration
-import ai.create.photo.data.logger.logImageLoadError
 import ai.create.photo.platform.Platforms
 import ai.create.photo.platform.platform
 import ai.create.photo.platform.shareLink
@@ -79,6 +78,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -90,7 +90,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.all_filter
 import photocreateai.composeapp.generated.resources.cancel
@@ -105,9 +104,37 @@ import photocreateai.composeapp.generated.resources.make_public
 import photocreateai.composeapp.generated.resources.prompt
 import photocreateai.composeapp.generated.resources.public_filter
 import photocreateai.composeapp.generated.resources.share
+import kotlin.time.Clock
 
-
-@Preview
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
+@Composable
+private fun CreationsScreenPreview() = CreationsScreenContent(
+    state = CreationsUiState(
+        isLoading = false,
+        photos = listOf(
+            CreationsUiState.Photo(
+                id = "preview",
+                createdAt = Clock.System.now(),
+                url = "https://example.com/preview.jpg",
+                prompt = "Portrait photo preview",
+                fileId = null,
+                isPublic = false,
+            )
+        ),
+    ),
+    generate = {},
+    addPhotoToPublicGallery = {},
+    removePhotoFromPublicGallery = {},
+    onRefresh = {},
+    onResetScrollToTop = {},
+    onLoadNextPage = {},
+    onTogglePublic = { _, _ -> },
+    onDownload = {},
+    onDelete = {},
+    onToggleFilterMenu = {},
+    onFilter = {},
+    onHideErrorPopup = {},
+)
 @Composable
 fun CreationsScreen(
     viewModel: CreationsViewModel = viewModel { CreationsViewModel() },
@@ -125,8 +152,40 @@ fun CreationsScreen(
             viewModel.refreshCreations(silent = true)
         }
     }
-
     val state = viewModel.uiState
+    CreationsScreenContent(
+        state = state,
+        generate = generate,
+        addPhotoToPublicGallery = addPhotoToPublicGallery,
+        removePhotoFromPublicGallery = removePhotoFromPublicGallery,
+        onRefresh = { viewModel.refreshCreations() },
+        onResetScrollToTop = viewModel::resetScrollToTop,
+        onLoadNextPage = viewModel::loadCreations,
+        onTogglePublic = viewModel::togglePublic,
+        onDownload = viewModel::downloadGeneratedPhoto,
+        onDelete = viewModel::delete,
+        onToggleFilterMenu = viewModel::toggleFilterDropDownMenu,
+        onFilter = viewModel::filter,
+        onHideErrorPopup = viewModel::hideErrorPopup,
+    )
+}
+
+@Composable
+private fun CreationsScreenContent(
+    state: CreationsUiState,
+    generate: (Prompt?) -> Unit,
+    addPhotoToPublicGallery: (UserGeneration) -> Unit,
+    removePhotoFromPublicGallery: (String) -> Unit,
+    onRefresh: () -> Unit,
+    onResetScrollToTop: () -> Unit,
+    onLoadNextPage: () -> Unit,
+    onTogglePublic: (CreationsUiState.Photo, () -> Unit) -> Unit,
+    onDownload: (CreationsUiState.Photo) -> Unit,
+    onDelete: (CreationsUiState.Photo) -> Unit,
+    onToggleFilterMenu: (Boolean) -> Unit,
+    onFilter: (GenerationsFilter) -> Unit,
+    onHideErrorPopup: () -> Unit,
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
@@ -145,17 +204,16 @@ fun CreationsScreen(
                 if (state.scrollToTop && state.listState.firstVisibleItemIndex > 1) {
                     state.listState.animateScrollToItem(0)
                 }
-                viewModel.resetScrollToTop()
+                onResetScrollToTop()
             }
-
             Photos(
                 photos = state.photos,
                 listState = state.listState,
                 isLoadingNextPage = state.isLoadingNextPage,
                 pagingLimitReach = state.pagingLimitReach,
-                loadNextPage = viewModel::loadCreations,
+                loadNextPage = onLoadNextPage,
                 isRefreshing = state.isRefreshing,
-                onRefresh = viewModel::refreshCreations,
+                onRefresh = onRefresh,
                 onPhotoClick = {
                     generate(
                         Prompt(
@@ -166,7 +224,7 @@ fun CreationsScreen(
                     )
                 },
                 onTogglePublic = {
-                    viewModel.togglePublic(it) {
+                    onTogglePublic(it) {
                         if (it.isPublic) {
                             removePhotoFromPublicGallery(it.id)
                         } else {
@@ -174,11 +232,10 @@ fun CreationsScreen(
                         }
                     }
                 },
-                onDownload = viewModel::downloadGeneratedPhoto,
-                onDelete = viewModel::delete,
+                onDownload = onDownload,
+                onDelete = onDelete,
                 onPrompt = generate,
             )
-
             Box(
                 modifier = Modifier.align(Alignment.BottomEnd)
                     .padding(bottom = 80.dp, end = 24.dp)
@@ -186,21 +243,19 @@ fun CreationsScreen(
             ) {
                 Filter(
                     showDropDown = state.showFilterDropDownMenu,
-                    onToggleMenu = { viewModel.toggleFilterDropDownMenu(it) },
+                    onToggleMenu = onToggleFilterMenu,
                     filter = state.filter,
-                    onFilter = { viewModel.filter(it) },
+                    onFilter = onFilter,
                 )
             }
         }
     }
-
     if (state.errorPopup != null) {
         ErrorPopup(state.errorPopup) {
-            viewModel.hideErrorPopup()
+            onHideErrorPopup()
         }
     }
 }
-
 @Composable
 private fun Placeholder(modifier: Modifier = Modifier, onClick: () -> Unit) {
     Column(
@@ -213,7 +268,6 @@ private fun Placeholder(modifier: Modifier = Modifier, onClick: () -> Unit) {
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-
         AsyncImage(
             modifier = Modifier.fillMaxWidth(),
             model = ImageRequest.Builder(LocalPlatformContext.current)
@@ -223,7 +277,6 @@ private fun Placeholder(modifier: Modifier = Modifier, onClick: () -> Unit) {
             contentDescription = stringResource(Res.string.generate_photo),
             contentScale = ContentScale.FillWidth,
         )
-
         OutlinedButton(modifier = modifier, onClick = onClick) {
             val icon = Icons.Default.Brush
             Icon(
@@ -240,7 +293,6 @@ private fun Placeholder(modifier: Modifier = Modifier, onClick: () -> Unit) {
         }
     }
 }
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Photos(
@@ -261,14 +313,12 @@ private fun Photos(
         isRefreshing = isRefreshing,
         onRefresh = onRefresh,
     ) {
-
         val optimizedVersion = remember {
             platform().platform in listOf(
                 Platforms.WEB_MOBILE,
                 Platforms.WEB_DESKTOP,
             )
         }
-
         LazyVerticalGrid(
             state = listState,
             modifier = Modifier.fillMaxSize(),
@@ -279,7 +329,6 @@ private fun Photos(
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
             }
-
             items(photos.size, key = { photos[it].id }) { item ->
                 Box(
                     modifier = Modifier
@@ -298,7 +347,6 @@ private fun Photos(
                     )
                 }
             }
-
             if (isLoadingNextPage && !pagingLimitReach) {
                 item {
                     Box(
@@ -309,13 +357,11 @@ private fun Photos(
                     }
                 }
             }
-
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.systemBars))
             }
         }
     }
-
     val photosCount = photos.size
     if (!isLoadingNextPage && !pagingLimitReach) {
         LaunchedEffect(listState, photosCount) {
@@ -330,7 +376,6 @@ private fun Photos(
         }
     }
 }
-
 @Composable
 private fun Photo(
     photo: CreationsUiState.Photo,
@@ -347,7 +392,6 @@ private fun Photo(
     error?.let {
         ErrorMessagePlaceHolderSmall(it)
     }
-
     if (optimizedVersion) {
         LaunchedEffect(photo.url) {
             delay(1000L)
@@ -356,7 +400,6 @@ private fun Photo(
     } else {
         showImage = true
     }
-
     Box(
         modifier = Modifier.fillMaxWidth().then(if (loaded) Modifier else Modifier.aspectRatio(1f))
     ) {
@@ -376,7 +419,6 @@ private fun Photo(
                 },
             )
         }
-
         if (loaded) {
             PhotoDropMenu(
                 modifier = Modifier.align(Alignment.TopEnd),
@@ -390,7 +432,6 @@ private fun Photo(
         }
     }
 }
-
 @Composable
 private fun PhotoDropMenu(
     modifier: Modifier,
@@ -404,7 +445,6 @@ private fun PhotoDropMenu(
     var expanded by remember { mutableStateOf(false) }
     var showConfirmDeletePopup by remember { mutableStateOf(false) }
     var isDownloaded by remember { mutableStateOf(false) }
-
     Box(
         modifier = modifier
             .padding(8.dp)
@@ -413,7 +453,6 @@ private fun PhotoDropMenu(
         IconButton(onClick = { expanded = !expanded }) {
             Icon(Icons.Default.MoreVert, contentDescription = Icons.Default.MoreVert.name)
         }
-
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
@@ -439,7 +478,6 @@ private fun PhotoDropMenu(
                     onDownload(photo)
                 }
             )
-
             val copyLinkInsteadOfShare =
                 remember { platform().platform !in listOf(Platforms.ANDROID, Platforms.IOS) }
             var linkCopied by remember { mutableStateOf(false) }
@@ -472,7 +510,6 @@ private fun PhotoDropMenu(
                     onShare(photo)
                 },
             )
-
             DropdownMenuItem(
                 text = {
                     Text(
@@ -495,7 +532,6 @@ private fun PhotoDropMenu(
                     onTogglePublic(photo)
                 }
             )
-
             DropdownMenuItem(
                 text = {
                     Text(
@@ -514,7 +550,6 @@ private fun PhotoDropMenu(
                     onPrompt(Prompt(generationId = photo.id, text = photo.prompt, url = photo.url))
                 }
             )
-
             DropdownMenuItem(
                 text = {
                     Text(
@@ -533,7 +568,6 @@ private fun PhotoDropMenu(
                     showConfirmDeletePopup = true
                 }
             )
-
             if (showConfirmDeletePopup) {
                 ConfirmationPopup(
                     icon = Icons.Default.Delete,
@@ -547,7 +581,6 @@ private fun PhotoDropMenu(
         }
     }
 }
-
 @Composable
 fun Filter(
     showDropDown: Boolean,
@@ -563,7 +596,6 @@ fun Filter(
             contentDescription = Icons.Default.AddAPhoto.name,
         )
     }
-
     DropdownMenu(
         expanded = showDropDown,
         onDismissRequest = { onToggleMenu(false) },
