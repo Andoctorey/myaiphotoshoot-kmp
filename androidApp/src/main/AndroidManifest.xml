@@ -32,14 +32,12 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
 
-                <data
-                    android:host="myaiphotoshoot.com"
-                    android:pathPrefix="/"
-                    android:scheme="https" />
-                <data
-                    android:host="www.myaiphotoshoot.com"
-                    android:pathPrefix="/"
-                    android:scheme="https" />
+                <data android:scheme="https" />
+                <data android:host="myaiphotoshoot.com" />
+                <data android:pathPrefix="/" />
+                <data android:scheme="https" />
+                <data android:host="www.myaiphotoshoot.com" />
+                <data android:pathPrefix="/" />
             </intent-filter>
         </activity>
     </application>
