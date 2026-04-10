@@ -18,12 +18,8 @@ class UploadPhotoUseCase(
         flow {
             val resized = resizeToWidth(file.readBytes()).getOrThrow()
 
-            // Convert WebP filename to JPEG if needed
-            val finalFileName = if (file.name.lowercase().endsWith(".webp")) {
-                file.name.dropLast(5) + ".jpg"
-            } else {
-                file.name
-            }
+            // Normalize unsupported storage key characters to avoid Supabase InvalidKey errors.
+            val finalFileName = toStorageSafeFileName(file.name)
 
             var successfulStatus: UploadStatus? = null
             storage.uploadPhoto(userId, finalFileName, resized)
@@ -43,6 +39,42 @@ class UploadPhotoUseCase(
 
             emit(UploadResponse(userFile, successfulStatus))
         }
+}
+
+private val nonAlphanumericUnderscoreDash = Regex("[^A-Za-z0-9_-]")
+private val multiUnderscore = Regex("_+")
+
+private fun sanitizeNamePart(value: String): String {
+    return value
+        .replace(nonAlphanumericUnderscoreDash, "_")
+        .replace(multiUnderscore, "_")
+        .trim('_')
+}
+
+private fun toStorageSafeFileName(originalName: String): String {
+    val normalized = originalName.trim().ifBlank { "upload.jpg" }
+    val converted = if (normalized.lowercase().endsWith(".webp")) {
+        normalized.dropLast(5) + ".jpg"
+    } else {
+        normalized
+    }
+
+    val dotIndex = converted.lastIndexOf('.')
+    val rawBase = if (dotIndex > 0) converted.substring(0, dotIndex) else converted
+    val rawExt = if (dotIndex > 0 && dotIndex < converted.lastIndex) {
+        converted.substring(dotIndex + 1)
+    } else {
+        "jpg"
+    }
+
+    val base = sanitizeNamePart(rawBase).ifBlank { "upload" }
+    val ext = sanitizeNamePart(rawExt).ifBlank { "jpg" }
+    val sanitized = "$base.$ext"
+
+    if (sanitized == converted) return sanitized
+
+    val suffix = converted.hashCode().toUInt().toString(16).take(8)
+    return "${base}_$suffix.$ext"
 }
 
 data class UploadResponse(
