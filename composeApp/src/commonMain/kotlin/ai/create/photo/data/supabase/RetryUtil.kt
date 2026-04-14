@@ -191,6 +191,7 @@ suspend fun <T> retryWithBackoff(
 
             // Authentication/authorization failures are not transient and should not be retried.
             if (e is UnauthorizedRestException ||
+                e is NotFoundRestException ||
                 e.isExpectedMissingSignedObject() ||
                 e.isMissingUserFilesForeignKeyViolation()
             ) {

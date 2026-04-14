@@ -22,11 +22,10 @@ import io.github.jan.supabase.storage.UploadStatus
 import io.github.vinceglb.filekit.core.PlatformFiles
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlin.math.max
 import kotlin.time.Clock
@@ -39,6 +38,7 @@ class UploadViewModel : AuthViewModel() {
         storage = SupabaseStorage,
         database = UserFilesRepository,
     )
+    private val analyzePhotoJobs = mutableMapOf<String, Job>()
     private var trainingTimerJob: Job? = null
     private var trainingPollingJob: Job? = null
 
@@ -51,6 +51,7 @@ class UploadViewModel : AuthViewModel() {
 
     override fun onAuthenticated(userChanged: Boolean) {
         if (userChanged) {
+            cancelAllAnalyzePhotoJobs()
             uiState = UploadUiState()
         }
         loadPhotos()
@@ -141,7 +142,7 @@ class UploadViewModel : AuthViewModel() {
                                 analysisStatus = file.analysisStatus,
                             )
                         )
-                        viewModelScope.launch { analyzePhoto(file.id) }
+                        launchAnalyzePhoto(file.id)
                     }
                 }
 
@@ -170,6 +171,7 @@ class UploadViewModel : AuthViewModel() {
         val updatedPhotos = photos.filter { it.id != photo.id }
         uiState = uiState.copy(photos = updatedPhotos)
         try {
+            cancelAnalyzePhoto(photo.id)
             SupabaseStorage.deleteFile("${user?.id}/$UPLOADS/${photo.name}")
             UserFilesRepository.deleteFile(photo.id)
         } catch (e: Exception) {
@@ -196,20 +198,12 @@ class UploadViewModel : AuthViewModel() {
         try {
             if (Supabase.LOCAL) {
                 notAnalyzedPhotos.forEach { photo ->
-                    analyzePhoto(photo.id)
+                    launchAnalyzePhoto(photo.id).join()
                     updateAnalysisStatus()
                 }
             } else {
-                val analysisJobs = notAnalyzedPhotos.map { photo ->
-                    async {
-                        try {
-                            analyzePhoto(photo.id)
-                        } finally {
-                            updateAnalysisStatus()
-                        }
-                    }
-                }
-                analysisJobs.awaitAll()
+                val analysisJobs = notAnalyzedPhotos.map { photo -> launchAnalyzePhoto(photo.id) }
+                analysisJobs.joinAll()
             }
             loadPhotos()
         } catch (e: Exception) {
@@ -303,6 +297,7 @@ class UploadViewModel : AuthViewModel() {
             photos = photos.filter { it.analysisStatus != AnalysisStatus.DECLINED })
         val badPhotos = photos.filter { it.analysisStatus == AnalysisStatus.DECLINED }
         try {
+            badPhotos.forEach { cancelAnalyzePhoto(it.id) }
             UserFilesRepository.deleteFiles(badPhotos.map { it.id })
             SupabaseStorage.deleteFiles(badPhotos.map { "${user?.id}/$UPLOADS/${it.name}" })
             loadPhotos()
@@ -313,6 +308,39 @@ class UploadViewModel : AuthViewModel() {
             Logger.e("Delete unsuitable photos failed", e)
             uiState = uiState.copy(photos = photos)
         }
+    }
+
+    private fun launchAnalyzePhoto(photoId: String): Job {
+        val existingJob = analyzePhotoJobs[photoId]
+        if (existingJob != null) {
+            if (existingJob.isActive) return existingJob
+            analyzePhotoJobs.remove(photoId)
+        }
+
+        val analysisJob = viewModelScope.launch {
+            try {
+                analyzePhoto(photoId)
+            } finally {
+                analyzePhotoJobs.remove(photoId)
+            }
+        }
+        analyzePhotoJobs[photoId] = analysisJob
+        return analysisJob
+    }
+
+    private suspend fun cancelAnalyzePhoto(photoId: String) {
+        val analysisJob = analyzePhotoJobs.remove(photoId) ?: return
+        if (analysisJob.isActive) {
+            Logger.i("Cancelling in-flight analysis for deleted photo: $photoId")
+            analysisJob.cancel()
+        }
+        analysisJob.join()
+    }
+
+    private fun cancelAllAnalyzePhotoJobs() {
+        if (analyzePhotoJobs.isEmpty()) return
+        analyzePhotoJobs.values.forEach { it.cancel() }
+        analyzePhotoJobs.clear()
     }
 
     fun trainAiModel(): Job = viewModelScope.launch {
