@@ -4,6 +4,10 @@
     <string name="tab_blog">博客</string>
     <string name="tab_settings">设置</string>
     <string name="back_button">返回</string>
+    <string name="select_photo_source">添加自拍照</string>
+    <string name="select_photo_source_hint">为了获得更好的训练效果，请从照片库中选择你最好的照片。你也可以现在拍一张新的自拍照。</string>
+    <string name="gallery">照片库</string>
+    <string name="camera">拍一张自拍</string>
     <string name="connection_error">连接出现问题。请检查网络连接后重试。</string>
     <string name="upload_more_photos">请至少上传 10 张自拍照，以开始训练您的 AI 模型。</string>
     <string name="delete_some_photos">自拍照太多了！为获得最佳效果，请保留不超过 20 张照片。</string>

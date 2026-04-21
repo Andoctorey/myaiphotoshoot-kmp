@@ -4,6 +4,10 @@
     <string name="tab_blog">المدونة</string>
     <string name="tab_settings">الإعدادات</string>
     <string name="back_button">رجوع</string>
+    <string name="select_photo_source">أضف صور السيلفي الخاصة بك</string>
+    <string name="select_photo_source_hint">للحصول على أفضل نتائج التدريب، اختر أفضل صورك من مكتبة الصور. ويمكنك أيضاً التقاط صورة سيلفي جديدة الآن.</string>
+    <string name="gallery">مكتبة الصور</string>
+    <string name="camera">التقط صورة سيلفي</string>
     <string name="connection_error">حدثت مشكلة في الاتصال. يُرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.</string>
     <string name="upload_more_photos">يُرجى إضافة 10 صور سيلفي على الأقل لبدء تدريب نموذج الذكاء الاصطناعي الخاص بك.</string>
     <string name="delete_some_photos">عدد صور السيلفي كبير جداً! للحصول على أفضل النتائج، احتفظ بما لا يزيد على 20 صورة.</string>

@@ -17,6 +17,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -48,15 +50,20 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ImageSearch
 import androidx.compose.material.icons.filled.Memory
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.ThumbDown
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -90,12 +97,16 @@ import photocreateai.composeapp.generated.resources.add_your_photos
 import photocreateai.composeapp.generated.resources.add_your_photos_progress
 import photocreateai.composeapp.generated.resources.analyze_photos
 import photocreateai.composeapp.generated.resources.analyzing_photos
+import photocreateai.composeapp.generated.resources.camera
 import photocreateai.composeapp.generated.resources.creating_model_hint
 import photocreateai.composeapp.generated.resources.delete
 import photocreateai.composeapp.generated.resources.delete_some_photos
 import photocreateai.composeapp.generated.resources.delete_unsuitable_photos
+import photocreateai.composeapp.generated.resources.gallery
 import photocreateai.composeapp.generated.resources.generate_photo
 import photocreateai.composeapp.generated.resources.proceed
+import photocreateai.composeapp.generated.resources.select_photo_source
+import photocreateai.composeapp.generated.resources.select_photo_source_hint
 import photocreateai.composeapp.generated.resources.thank_you_for_purchase
 import photocreateai.composeapp.generated.resources.topping_up
 import photocreateai.composeapp.generated.resources.train_ai_model
@@ -180,11 +191,14 @@ private fun UploadScreenContent(
     onDeleteUnsuitablePhotos: () -> Unit,
     onTrainAiModel: () -> Unit,
     onHideBalanceUpdatedPopup: () -> Unit,
+    onTakeSelfies: () -> Unit = {},
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
+        val supportsCameraCapture = platform().platform in setOf(Platforms.ANDROID, Platforms.IOS)
+        var showUploadSourcePopup by remember { mutableStateOf(false) }
         val launcher = rememberFilePickerLauncher(
             title = stringResource(Res.string.add_your_photos),
             type = PickerType.Image,
@@ -256,7 +270,10 @@ private fun UploadScreenContent(
                         modifier = Modifier.align(Alignment.BottomEnd)
                             .padding(bottom = buttonsBottomPadding, end = 24.dp)
                             .safeDrawingPadding(),
-                        onClick = { launcher.launch() },
+                        onClick = {
+                            if (supportsCameraCapture) showUploadSourcePopup = true
+                            else launcher.launch()
+                        },
                     ) {
                         Icon(
                             imageVector = Icons.Default.AddAPhoto,
@@ -284,9 +301,25 @@ private fun UploadScreenContent(
                         .padding(bottom = buttonsBottomPadding).safeDrawingPadding(),
                     uploadProgress = state.uploadProgress,
                     uploaded = state.photos.size,
-                    onClick = { launcher.launch() },
+                    onClick = {
+                        if (supportsCameraCapture) showUploadSourcePopup = true
+                        else launcher.launch()
+                    },
                 )
             }
+        }
+        if (showUploadSourcePopup) {
+            UploadSourcePopup(
+                onGallery = {
+                    showUploadSourcePopup = false
+                    launcher.launch()
+                },
+                onCamera = {
+                    showUploadSourcePopup = false
+                    onTakeSelfies()
+                },
+                onDismiss = { showUploadSourcePopup = false },
+            )
         }
         if (state.showUploadMorePhotosPopup) {
             InfoPopup(stringResource(Res.string.upload_more_photos)) {
@@ -406,6 +439,76 @@ private fun AddPhotosFab(
         }
     }
 }
+
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
+@Composable
+private fun UploadSourcePopupPreview() = AppTheme {
+    UploadSourcePopup(onGallery = {}, onCamera = {}, onDismiss = {})
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun UploadSourcePopup(
+    onGallery: () -> Unit,
+    onCamera: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 24.dp, end = 24.dp, bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Text(
+                text = stringResource(Res.string.select_photo_source),
+                style = MaterialTheme.typography.headlineSmall,
+            )
+            Text(
+                text = stringResource(Res.string.select_photo_source_hint),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            UploadSourceActions(
+                onGallery = onGallery,
+                onCamera = onCamera,
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun UploadSourceActions(
+    onGallery: () -> Unit,
+    onCamera: () -> Unit,
+) {
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        FilledTonalButton(onClick = onGallery) {
+            Icon(
+                imageVector = Icons.Default.PhotoLibrary,
+                contentDescription = stringResource(Res.string.gallery),
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(stringResource(Res.string.gallery))
+        }
+        FilledTonalButton(onClick = onCamera) {
+            Icon(
+                imageVector = Icons.Default.PhotoCamera,
+                contentDescription = stringResource(Res.string.camera),
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(stringResource(Res.string.camera))
+        }
+    }
+}
+
 @Composable
 private fun AnalyzePhotosFab(
     modifier: Modifier = Modifier,

@@ -4,6 +4,10 @@
     <string name="tab_blog">ब्लॉग</string>
     <string name="tab_settings">सेटिंग्स</string>
     <string name="back_button">वापस</string>
+    <string name="select_photo_source">अपनी सेल्फी जोड़ें</string>
+    <string name="select_photo_source_hint">बेहतर ट्रेनिंग नतीजों के लिए, अपनी लाइब्रेरी से अपनी सबसे अच्छी फ़ोटो चुनें। आप अभी नई सेल्फी भी ले सकते हैं।</string>
+    <string name="gallery">फ़ोटो लाइब्रेरी</string>
+    <string name="camera">सेल्फी लें</string>
     <string name="connection_error">कनेक्ट होने में समस्या आ रही है। कृपया अपना इंटरनेट कनेक्शन जाँचें और फिर से कोशिश करें।</string>
     <string name="upload_more_photos">अपने AI मॉडल की ट्रेनिंग शुरू करने के लिए कृपया कम से कम 10 सेल्फी अपलोड करें।</string>
     <string name="delete_some_photos">बहुत ज़्यादा सेल्फी! बेहतर नतीजों के लिए 20 से ज़्यादा फोटो न रखें।</string>

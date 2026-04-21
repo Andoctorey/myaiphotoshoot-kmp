@@ -6,6 +6,10 @@
     <string name="back_button">Back</string>
     <string name="add_your_photos_progress">Upload Selfies (%1$s/20)</string>
     <string name="add_your_photos">Upload Selfies</string>
+    <string name="select_photo_source">Add your selfies</string>
+    <string name="select_photo_source_hint">For the best training results, choose your best photos from your library. You can also take a new selfie now.</string>
+    <string name="gallery">Photo Library</string>
+    <string name="camera">Take a Selfie</string>
     <string name="upload_guidelines">Upload 10–20 varied selfies\n(Portrait mode recommended)\nor other favorite photos of yourself.</string>
     <string name="connection_error">We're having trouble connecting. Please check your internet connection and try again.</string>
     <string name="upload_more_photos">Please upload at least 10 selfies to start training your AI model.</string>

@@ -4,6 +4,10 @@
     <string name="tab_blog">Блог</string>
     <string name="tab_settings">Настройки</string>
     <string name="back_button">Назад</string>
+    <string name="select_photo_source">Добавьте свои селфи</string>
+    <string name="select_photo_source_hint">Для лучших результатов обучения выберите лучшие фото из своей медиатеки. Вы также можете сделать новое селфи прямо сейчас.</string>
+    <string name="gallery">Галерея</string>
+    <string name="camera">Сделать селфи</string>
     <string name="connection_error">Не удается подключиться. Проверьте интернет-соединение и попробуйте снова.</string>
     <string name="upload_more_photos">Загрузите не менее 10 селфи, чтобы начать обучение ИИ-модели.</string>
     <string name="delete_some_photos">Слишком много селфи! Для лучшего результата оставьте не более 20 фото.</string>

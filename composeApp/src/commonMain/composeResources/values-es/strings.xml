@@ -4,6 +4,10 @@
     <string name="tab_blog">Blog</string>
     <string name="tab_settings">Configuración</string>
     <string name="back_button">Atrás</string>
+    <string name="select_photo_source">Añade tus selfies</string>
+    <string name="select_photo_source_hint">Para obtener los mejores resultados de entrenamiento, elige tus mejores fotos de tu biblioteca. También puedes hacerte un selfie nuevo ahora.</string>
+    <string name="gallery">Biblioteca de fotos</string>
+    <string name="camera">Hacer un selfie</string>
     <string name="connection_error">Tenemos problemas de conexión. Revisa tu conexión a internet e inténtalo de nuevo.</string>
     <string name="upload_more_photos">Sube al menos 10 selfies para empezar a entrenar tu modelo de IA.</string>
     <string name="delete_some_photos">¡Demasiados selfies! Para obtener los mejores resultados, no subas más de 20 fotos.</string>
