@@ -793,13 +793,21 @@ private fun Photo(
             }
         }
         if (loaded && photo.analysisStatus != null) {
+            val buttonBackgroundColor = when (photo.analysisStatus) {
+                AnalysisStatus.DECLINED -> MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.85f)
+                else -> MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
+            }
+            val iconTint = when (photo.analysisStatus) {
+                AnalysisStatus.DECLINED -> MaterialTheme.colorScheme.onErrorContainer
+                else -> MaterialTheme.colorScheme.onSurface
+            }
             IconButton(
                 onClick = { showAnalysis = !showAnalysis },
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .padding(8.dp)
                     .background(
-                        MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+                        buttonBackgroundColor,
                         shape = CircleShape
                     )
             ) {
@@ -811,6 +819,7 @@ private fun Photo(
                 Icon(
                     imageVector = image,
                     contentDescription = image.name,
+                    tint = iconTint,
                 )
             }
         }
