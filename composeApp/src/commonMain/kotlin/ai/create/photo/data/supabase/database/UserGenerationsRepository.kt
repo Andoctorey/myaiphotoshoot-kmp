@@ -1,16 +1,16 @@
 package ai.create.photo.data.supabase.database
 
+import ai.create.photo.data.runCatchingCancellable
 import ai.create.photo.data.supabase.Supabase
 import ai.create.photo.data.supabase.model.GenerationsFilter
 import ai.create.photo.data.supabase.model.GenerationsSort
 import ai.create.photo.data.supabase.model.UserGeneration
 import ai.create.photo.data.supabase.retryWithBackoff
-import ai.create.photo.data.runCatchingCancellable
+import ai.create.photo.platform.saveGeneratedPhoto
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Order
-import io.github.vinceglb.filekit.core.FileKit
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.readRawBytes
@@ -153,7 +153,7 @@ object UserGenerationsRepository {
 
     suspend fun downloadGeneratedPhoto(id: String, photoUrl: String) {
         val bytes = HttpClient().get(photoUrl).readRawBytes()
-        FileKit.saveFile(bytes = bytes, baseName = id, extension = "jpg")
+        saveGeneratedPhoto(bytes = bytes, baseName = id, extension = "jpg")
     }
 
     suspend fun setPublic(photoId: String, public: Boolean) {

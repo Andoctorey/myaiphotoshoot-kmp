@@ -157,6 +157,7 @@ class CreationsViewModel : AuthViewModel() {
             ensureActive()
             if (!isAuthenticated) return@launch
             Logger.e("downloadGeneratedPhoto failed", e)
+            uiState = uiState.copy(errorPopup = e)
         }
     }
 

@@ -9,6 +9,7 @@
     <string name="gallery">फ़ोटो लाइब्रेरी</string>
     <string name="camera">सेल्फी लें</string>
     <string name="camera_permission_settings_toast">यहाँ सेल्फी लेने के लिए सेटिंग्स में कैमरा एक्सेस की अनुमति दें।</string>
+    <string name="photo_permission_settings_toast">डाउनलोड की गई इमेज सेव करने के लिए सेटिंग्स में फ़ोटो एक्सेस की अनुमति दें।</string>
     <string name="close_camera">कैमरा बंद करें</string>
     <string name="selfie_guidance_no_face">अपना चेहरा फ्रेम में लाएँ</string>
     <string name="selfie_guidance_multiple_faces">फ्रेम में सिर्फ एक चेहरा रखें</string>

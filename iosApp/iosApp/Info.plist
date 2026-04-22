@@ -30,6 +30,8 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Camera access lets you take selfies for AI training.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Photos access lets you save your generated images to your library.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -9,6 +9,7 @@
     <string name="gallery">Галерея</string>
     <string name="camera">Сделать селфи</string>
     <string name="camera_permission_settings_toast">Разрешите доступ к камере в настройках, чтобы делать селфи в приложении.</string>
+    <string name="photo_permission_settings_toast">Разрешите доступ к Фото в настройках, чтобы сохранять загруженные изображения.</string>
     <string name="close_camera">Закрыть камеру</string>
     <string name="selfie_guidance_no_face">Покажите лицо в кадре</string>
     <string name="selfie_guidance_multiple_faces">Оставьте в кадре только одно лицо</string>

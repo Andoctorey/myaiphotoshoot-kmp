@@ -9,6 +9,7 @@
     <string name="gallery">Fotomediathek</string>
     <string name="camera">Selfie aufnehmen</string>
     <string name="camera_permission_settings_toast">Erlaube den Zugriff auf die Kamera in den Einstellungen, um in der App Selfies aufzunehmen.</string>
+    <string name="photo_permission_settings_toast">Erlaube in den Einstellungen den Zugriff auf Fotos, um heruntergeladene Bilder zu speichern.</string>
     <string name="close_camera">Kamera schließen</string>
     <string name="selfie_guidance_no_face">Bring dein Gesicht ins Bild</string>
     <string name="selfie_guidance_multiple_faces">Halte nur ein Gesicht im Bild</string>

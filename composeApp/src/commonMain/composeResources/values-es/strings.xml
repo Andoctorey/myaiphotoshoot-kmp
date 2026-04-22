@@ -9,6 +9,7 @@
     <string name="gallery">Biblioteca de fotos</string>
     <string name="camera">Hacer un selfie</string>
     <string name="camera_permission_settings_toast">Permite el acceso a la cámara en Ajustes para hacer selfies en la app.</string>
+    <string name="photo_permission_settings_toast">Permite el acceso a Fotos en Ajustes para guardar las imágenes descargadas.</string>
     <string name="close_camera">Cerrar cámara</string>
     <string name="selfie_guidance_no_face">Pon tu cara en el encuadre</string>
     <string name="selfie_guidance_multiple_faces">Mantén solo una cara en el encuadre</string>

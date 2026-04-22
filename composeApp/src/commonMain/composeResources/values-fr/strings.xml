@@ -9,6 +9,7 @@
     <string name="gallery">Photothèque</string>
     <string name="camera">Prendre un selfie</string>
     <string name="camera_permission_settings_toast">Autorisez l’accès à l’appareil photo dans les réglages pour prendre des selfies dans l’app.</string>
+    <string name="photo_permission_settings_toast">Autorisez l’accès aux photos dans les réglages pour enregistrer les images téléchargées.</string>
     <string name="close_camera">Fermer l’appareil photo</string>
     <string name="selfie_guidance_no_face">Placez votre visage dans le cadre</string>
     <string name="selfie_guidance_multiple_faces">Gardez un seul visage dans le cadre</string>

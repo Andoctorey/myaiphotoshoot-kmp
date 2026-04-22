@@ -36,8 +36,24 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		557BF2132DE0344C0040A51A /* Utils */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Utils; sourceTree = "<group>"; };
-		557E9CE12DB4EBFD002D15D0 /* Payments */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Payments; sourceTree = "<group>"; };
+		557BF2132DE0344C0040A51A /* Utils */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		557E9CE12DB4EBFD002D15D0 /* Payments */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = Payments;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -385,7 +401,7 @@
 				CURRENT_PROJECT_VERSION = 24;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
-				DEVELOPMENT_TEAM = V2PLAZ9ZF5;
+				DEVELOPMENT_TEAM = "${TEAM_ID}";
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -420,7 +436,7 @@
 				CURRENT_PROJECT_VERSION = 24;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
-				DEVELOPMENT_TEAM = V2PLAZ9ZF5;
+				DEVELOPMENT_TEAM = "${TEAM_ID}";
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

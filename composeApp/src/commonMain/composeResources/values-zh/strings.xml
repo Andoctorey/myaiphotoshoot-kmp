@@ -9,6 +9,7 @@
     <string name="gallery">照片库</string>
     <string name="camera">拍一张自拍</string>
     <string name="camera_permission_settings_toast">请在设置中允许访问相机，以便在应用中拍摄自拍。</string>
+    <string name="photo_permission_settings_toast">请在设置中允许访问照片，以保存下载的图片。</string>
     <string name="close_camera">关闭相机</string>
     <string name="selfie_guidance_no_face">请让脸进入画面</string>
     <string name="selfie_guidance_multiple_faces">画面中只保留一张脸</string>

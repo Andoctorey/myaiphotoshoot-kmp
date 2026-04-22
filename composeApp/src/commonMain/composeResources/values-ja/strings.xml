@@ -9,6 +9,7 @@
     <string name="gallery">フォトライブラリ</string>
     <string name="camera">セルフィーを撮る</string>
     <string name="camera_permission_settings_toast">ここでセルフィーを撮るには、設定でカメラへのアクセスを許可してください。</string>
+    <string name="photo_permission_settings_toast">ダウンロードした画像を保存するには、設定で写真へのアクセスを許可してください。</string>
     <string name="close_camera">カメラを閉じる</string>
     <string name="selfie_guidance_no_face">顔が見える位置に移動してください</string>
     <string name="selfie_guidance_multiple_faces">顔は1人だけ写してください</string>

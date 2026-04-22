@@ -9,6 +9,7 @@
     <string name="gallery">مكتبة الصور</string>
     <string name="camera">التقط صورة سيلفي</string>
     <string name="camera_permission_settings_toast">اسمح بالوصول إلى الكاميرا من الإعدادات لالتقاط صور السيلفي داخل التطبيق.</string>
+    <string name="photo_permission_settings_toast">اسمح بالوصول إلى الصور من الإعدادات لحفظ الصور التي تم تنزيلها.</string>
     <string name="close_camera">إغلاق الكاميرا</string>
     <string name="selfie_guidance_no_face">أظهر وجهك داخل الإطار</string>
     <string name="selfie_guidance_multiple_faces">اجعل وجهاً واحداً فقط داخل الإطار</string>

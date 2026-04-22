@@ -11,6 +11,7 @@
     <string name="gallery">Photo Library</string>
     <string name="camera">Take a Selfie</string>
     <string name="camera_permission_settings_toast">Allow camera access in Settings to take selfies here.</string>
+    <string name="photo_permission_settings_toast">Allow Photos access in Settings to save downloaded images.</string>
     <string name="close_camera">Close camera</string>
     <string name="selfie_guidance_no_face">Bring your face into view</string>
     <string name="selfie_guidance_multiple_faces">Keep only one face in frame</string>
