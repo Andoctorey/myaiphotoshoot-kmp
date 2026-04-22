@@ -145,7 +145,7 @@ actual fun SelfieCameraCapture(
         completedVarietyGoals.fold(0) { mask, goal -> mask or goal.mask }
     }
     val displayCount = (uploadedCount + pendingCapturedCount).coerceAtMost(targetCount)
-    val hasReachedTarget = uploadedCount >= targetCount
+    val hasFilledSession = displayCount >= targetCount
     val topMessageRes = guidance.message.labelRes()
     val closeLabel = stringResource(Res.string.close_camera)
     val currentOnDismiss by rememberUpdatedState(onDismiss)
@@ -253,9 +253,9 @@ actual fun SelfieCameraCapture(
         }
     }
 
-    LaunchedEffect(hasReachedTarget) {
-        if (hasReachedTarget) {
-            Logger.i("ios selfie target reached uploaded=$uploadedCount target=$targetCount")
+    LaunchedEffect(hasFilledSession) {
+        if (hasFilledSession) {
+            Logger.i("ios selfie session filled shown=$displayCount uploaded=$uploadedCount target=$targetCount")
             currentOnDismiss()
         }
     }
@@ -264,7 +264,7 @@ actual fun SelfieCameraCapture(
         permissionState == CameraPermissionState.AUTHORIZED &&
                 guidance.canCapture &&
                 !captureInFlight &&
-                !hasReachedTarget &&
+                !hasFilledSession &&
                 cameraController.isReadyToCapture()
 
     Surface(
