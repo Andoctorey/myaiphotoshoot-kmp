@@ -12,7 +12,10 @@ import ai.create.photo.ui.compose.InfoPopup
 import ai.create.photo.ui.compose.LoadingPlaceholder
 import ai.create.photo.ui.compose.TopUpErrorPopup
 import ai.create.photo.ui.theme.AppTheme
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -65,6 +68,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SmallFloatingActionButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -112,6 +116,7 @@ import photocreateai.composeapp.generated.resources.topping_up
 import photocreateai.composeapp.generated.resources.train_ai_model
 import photocreateai.composeapp.generated.resources.training_ai_model
 import photocreateai.composeapp.generated.resources.training_ai_model_elapsed
+import photocreateai.composeapp.generated.resources.upload_first_training_hint
 import photocreateai.composeapp.generated.resources.upload_guidelines
 import photocreateai.composeapp.generated.resources.upload_more_photos
 
@@ -147,12 +152,14 @@ private fun UploadScreenPreview() = AppTheme {
 fun UploadScreen(
     viewModel: UploadViewModel = viewModel { UploadViewModel() },
     openGenerateTab: () -> Unit,
+    showFirstTrainingHint: Boolean = false,
 ) {
     val state = viewModel.uiState
     var showSelfieCamera by remember { mutableStateOf(false) }
     var selfieCameraError by remember { mutableStateOf<Throwable?>(null) }
     UploadScreenContent(
         state = state,
+        showFirstTrainingHint = showFirstTrainingHint,
         openGenerateTab = openGenerateTab,
         onUploadPhotos = { files -> viewModel.uploadPhotos(files) },
         onDeletePhoto = { photo -> viewModel.deletePhoto(photo) },
@@ -194,6 +201,7 @@ fun UploadScreen(
 @Composable
 private fun UploadScreenContent(
     state: UploadUiState,
+    showFirstTrainingHint: Boolean = false,
     openGenerateTab: () -> Unit,
     onUploadPhotos: (PlatformFiles) -> Unit,
     onDeletePhoto: (UploadUiState.Photo) -> Unit,
@@ -213,6 +221,24 @@ private fun UploadScreenContent(
     onHideBalanceUpdatedPopup: () -> Unit,
     onTakeSelfies: () -> Unit = {},
 ) {
+    var showInitialHintToast by remember { mutableStateOf(false) }
+    var initialHintShown by remember { mutableStateOf(false) }
+    val canShowInitialHint =
+        showFirstTrainingHint &&
+                !state.isLoadingPhotos &&
+                state.trainingStatus != TrainingStatus.PROCESSING
+    LaunchedEffect(canShowInitialHint) {
+        if (canShowInitialHint && !initialHintShown) {
+            initialHintShown = true
+            showInitialHintToast = true
+        }
+    }
+    LaunchedEffect(showInitialHintToast) {
+        if (showInitialHintToast) {
+            delay(2400L)
+            showInitialHintToast = false
+        }
+    }
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
@@ -388,6 +414,33 @@ private fun UploadScreenContent(
                 onHideBalanceUpdatedPopup()
             }
         }
+        AnimatedVisibility(
+            visible = showInitialHintToast,
+            modifier = Modifier.align(Alignment.TopCenter)
+                .safeDrawingPadding()
+                .padding(horizontal = 24.dp, vertical = 16.dp),
+            enter = fadeIn(),
+            exit = fadeOut(),
+        ) {
+            UploadHintToast(message = stringResource(Res.string.upload_first_training_hint))
+        }
+    }
+}
+
+@Composable
+private fun UploadHintToast(message: String) {
+    Surface(
+        color = MaterialTheme.colorScheme.inverseSurface,
+        contentColor = MaterialTheme.colorScheme.inverseOnSurface,
+        shape = RoundedCornerShape(16.dp),
+        shadowElevation = 8.dp,
+    ) {
+        Text(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            text = message,
+            fontSize = 14.sp,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 @Composable

@@ -27,6 +27,7 @@
     <string name="selfie_variety_close_up">Nahaufnahme</string>
     <string name="selfie_variety_upper_body">Oberkörper</string>
     <string name="selfie_variety_more_variety">Mehr Vielfalt</string>
+    <string name="upload_first_training_hint">Tippe unten auf „Selfies hochladen“, füge 10 Selfies hinzu und starte.</string>
     <string name="connection_error">Verbindungsproblem. Bitte überprüfe deine Internetverbindung und versuche es erneut.</string>
     <string name="upload_more_photos">Bitte lade mindestens 10 Selfies hoch, um mit dem Training deines KI-Modells zu beginnen.</string>
     <string name="delete_some_photos">Zu viele Selfies! Für die besten Ergebnisse solltest du nicht mehr als 20 Fotos behalten.</string>

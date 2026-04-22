@@ -27,6 +27,7 @@
     <string name="selfie_variety_close_up">Gros plan</string>
     <string name="selfie_variety_upper_body">Buste</string>
     <string name="selfie_variety_more_variety">Plus de variété</string>
+    <string name="upload_first_training_hint">Touchez « Télécharger des selfies » ci-dessous pour ajouter 10 selfies et commencer.</string>
     <string name="connection_error">Problème de connexion. Veuillez vérifier votre connexion Internet et réessayer.</string>
     <string name="upload_more_photos">Veuillez ajouter au moins 10 selfies pour commencer l’entraînement de votre modèle IA.</string>
     <string name="delete_some_photos">Trop de selfies ! Pour de meilleurs résultats, gardez au maximum 20 photos.</string>

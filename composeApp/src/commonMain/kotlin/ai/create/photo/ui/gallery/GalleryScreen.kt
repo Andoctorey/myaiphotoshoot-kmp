@@ -45,6 +45,7 @@ fun GalleryScreen(
     generationsInProgress: Int,
     openGenerateTab: (Prompt?) -> Unit,
     openUploads: Boolean = false,
+    showUploadHint: Boolean = false,
     openCreations: Boolean = false,
 ) {
     val state = viewModel.uiState
@@ -70,6 +71,7 @@ fun GalleryScreen(
 
                 Tab.UPLOADS -> UploadScreen(
                     openGenerateTab = { openGenerateTab(null) },
+                    showFirstTrainingHint = showUploadHint && state.firstTrainingCompleted == false,
                 )
             }
         },

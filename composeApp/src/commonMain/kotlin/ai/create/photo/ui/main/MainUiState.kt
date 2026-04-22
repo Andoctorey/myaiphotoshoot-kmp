@@ -9,6 +9,7 @@ data class MainUiState(
 
     val generationsInProgress: Int = 0,
     val openUploads: Boolean = false,
+    val showUploadHint: Boolean = false,
     val openCreations: Boolean = false,
     val putPrompt: Prompt? = null,
     val resetSettingTab: Boolean = false

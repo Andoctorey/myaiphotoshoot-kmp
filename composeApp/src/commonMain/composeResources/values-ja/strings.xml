@@ -27,6 +27,7 @@
     <string name="selfie_variety_close_up">アップ</string>
     <string name="selfie_variety_upper_body">上半身</string>
     <string name="selfie_variety_more_variety">もっとバリエーション</string>
+    <string name="upload_first_training_hint">始めるには、下の「セルフィーをアップロード」をタップしてセルフィーを10枚追加してください。</string>
     <string name="connection_error">接続に問題があります。インターネット接続を確認して、もう一度お試しください。</string>
     <string name="upload_more_photos">AIモデルの学習を開始するには、少なくとも10枚のセルフィーをアップロードしてください。</string>
     <string name="delete_some_photos">セルフィーが多すぎます。最適な結果を得るには、写真は20枚以下にしてください。</string>

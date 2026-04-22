@@ -27,6 +27,7 @@
     <string name="selfie_variety_close_up">近景</string>
     <string name="selfie_variety_upper_body">上半身</string>
     <string name="selfie_variety_more_variety">更多变化</string>
+    <string name="upload_first_training_hint">点击下方“上传自拍照”，添加 10 张自拍照即可开始。</string>
     <string name="connection_error">连接出现问题。请检查网络连接后重试。</string>
     <string name="upload_more_photos">请至少上传 10 张自拍照，以开始训练您的 AI 模型。</string>
     <string name="delete_some_photos">自拍照太多了！为获得最佳效果，请保留不超过 20 张照片。</string>

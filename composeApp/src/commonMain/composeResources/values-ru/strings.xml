@@ -27,6 +27,7 @@
     <string name="selfie_variety_close_up">Крупный план</string>
     <string name="selfie_variety_upper_body">По пояс</string>
     <string name="selfie_variety_more_variety">Больше разнообразия</string>
+    <string name="upload_first_training_hint">Нажмите кнопку «Загрузить селфи» внизу экрана, добавьте 10 селфи и начните.</string>
     <string name="connection_error">Не удается подключиться. Проверьте интернет-соединение и попробуйте снова.</string>
     <string name="upload_more_photos">Загрузите не менее 10 селфи, чтобы начать обучение ИИ-модели.</string>
     <string name="delete_some_photos">Слишком много селфи! Для лучшего результата оставьте не более 20 фото.</string>

@@ -27,6 +27,7 @@
     <string name="selfie_variety_close_up">Primer plano</string>
     <string name="selfie_variety_upper_body">Medio cuerpo</string>
     <string name="selfie_variety_more_variety">Más variedad</string>
+    <string name="upload_first_training_hint">Toca «Subir selfies» abajo para añadir 10 selfies y empezar.</string>
     <string name="connection_error">Tenemos problemas de conexión. Revisa tu conexión a internet e inténtalo de nuevo.</string>
     <string name="upload_more_photos">Sube al menos 10 selfies para empezar a entrenar tu modelo de IA.</string>
     <string name="delete_some_photos">¡Demasiados selfies! Para obtener los mejores resultados, no subas más de 20 fotos.</string>

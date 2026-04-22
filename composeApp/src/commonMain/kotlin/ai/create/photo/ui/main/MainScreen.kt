@@ -111,6 +111,11 @@ fun MainScreen(
         }
     ) {
         val trainAiModel = {
+            viewModel.toggleOpenUploads(true, showUploadHint = true)
+            navigateToTab(MainRoutes.GALLERY)
+        }
+
+        val openUploads = {
             viewModel.toggleOpenUploads(true)
             navigateToTab(MainRoutes.GALLERY)
         }
@@ -147,6 +152,7 @@ fun MainScreen(
                         if (prompt != null) viewModel.putPrompt(prompt)
                     },
                     openUploads = state.openUploads,
+                    showUploadHint = state.showUploadHint,
                     openCreations = state.openCreations,
                 )
 
@@ -266,7 +272,7 @@ fun MainScreen(
 
             composable<SettingsTab> {
                 SettingsScreen(
-                    trainAiModel = trainAiModel,
+                    trainAiModel = openUploads,
                     openGenerateTab = {
                         navController.navigateSingleTopTo(MainRoutes.GENERATE)
                     },

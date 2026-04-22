@@ -27,6 +27,7 @@
     <string name="selfie_variety_close_up">क्लोज़-अप</string>
     <string name="selfie_variety_upper_body">अपर बॉडी</string>
     <string name="selfie_variety_more_variety">और विविधता</string>
+    <string name="upload_first_training_hint">शुरू करने के लिए नीचे \"सेल्फी अपलोड करें\" पर टैप करें और 10 सेल्फी जोड़ें।</string>
     <string name="connection_error">कनेक्ट होने में समस्या आ रही है। कृपया अपना इंटरनेट कनेक्शन जाँचें और फिर से कोशिश करें।</string>
     <string name="upload_more_photos">अपने AI मॉडल की ट्रेनिंग शुरू करने के लिए कृपया कम से कम 10 सेल्फी अपलोड करें।</string>
     <string name="delete_some_photos">बहुत ज़्यादा सेल्फी! बेहतर नतीजों के लिए 20 से ज़्यादा फोटो न रखें।</string>

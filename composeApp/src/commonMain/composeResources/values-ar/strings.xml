@@ -27,6 +27,7 @@
     <string name="selfie_variety_close_up">لقطة قريبة</string>
     <string name="selfie_variety_upper_body">الجزء العلوي</string>
     <string name="selfie_variety_more_variety">مزيد من التنوع</string>
+    <string name="upload_first_training_hint">اضغط على «رفع صور السيلفي» بالأسفل وأضف 10 صور سيلفي للبدء.</string>
     <string name="connection_error">حدثت مشكلة في الاتصال. يُرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.</string>
     <string name="upload_more_photos">يُرجى إضافة 10 صور سيلفي على الأقل لبدء تدريب نموذج الذكاء الاصطناعي الخاص بك.</string>
     <string name="delete_some_photos">عدد صور السيلفي كبير جداً! للحصول على أفضل النتائج، احتفظ بما لا يزيد على 20 صورة.</string>

@@ -67,8 +67,11 @@ class MainViewModel : AuthViewModel() {
         uiState = uiState.copy(errorPopup = null)
     }
 
-    fun toggleOpenUploads(openUploads: Boolean) {
-        uiState = uiState.copy(openUploads = openUploads)
+    fun toggleOpenUploads(openUploads: Boolean, showUploadHint: Boolean = false) {
+        uiState = uiState.copy(
+            openUploads = openUploads,
+            showUploadHint = if (openUploads) showUploadHint else false,
+        )
     }
 
     fun putPrompt(prompt: Prompt?) {

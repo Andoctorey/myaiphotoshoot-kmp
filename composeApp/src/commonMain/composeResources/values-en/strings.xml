@@ -30,6 +30,7 @@
     <string name="selfie_variety_upper_body">Upper body</string>
     <string name="selfie_variety_more_variety">More variety</string>
     <string name="upload_guidelines">Upload 10–20 varied selfies\n(Portrait mode recommended)\nor other favorite photos of yourself.</string>
+    <string name="upload_first_training_hint">Tap “Upload Selfies” below to add 10 selfies and get started.</string>
     <string name="connection_error">We're having trouble connecting. Please check your internet connection and try again.</string>
     <string name="upload_more_photos">Please upload at least 10 selfies to start training your AI model.</string>
     <string name="delete_some_photos">Too many selfies! For the best results, keep no more than 20 photos.</string>
