@@ -211,10 +211,9 @@ actual fun SelfieCameraCapture(
         }
     }
     val displayCount = (uploadedCount + pendingCapturedCount).coerceAtMost(targetCount)
-    val hasFilledSession = displayCount >= targetCount
     val hasReachedTarget = uploadedCount >= targetCount
     val canCapturePhoto =
-        imageCapture != null && guidance.canCapture && !captureInFlight && !hasFilledSession
+        imageCapture != null && guidance.canCapture && !captureInFlight && !hasReachedTarget
     val topMessageRes = guidance.message.labelRes()
     LaunchedEffect(hasReachedTarget) {
         if (hasReachedTarget) {
