@@ -29,9 +29,7 @@ actual suspend fun resizeToWidth(
         return Result.failure(IllegalArgumentException("Target width must be > 0."))
     }
 
-    val data = input.toNSData() ?: return Result.failure(
-        IllegalArgumentException("Unable to convert input ByteArray to NSData.")
-    )
+    val data = input.toNSData()
     val originalImage = UIImage(data = data)
 
     val originalWidth = originalImage.size.useContents { this.width }

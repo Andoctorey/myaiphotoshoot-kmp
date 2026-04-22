@@ -68,7 +68,14 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
             implementation(libs.androidx.multidex)
+            implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.exifinterface)
+            implementation(libs.camera.camera2)
+            implementation(libs.camera.core)
+            implementation(libs.camera.lifecycle)
+            implementation(libs.camera.view)
             implementation(libs.ktor.client.cio)
+            implementation(libs.mlkit.face.detection)
             implementation(project.dependencies.platform(libs.firebase.bom))
             implementation(libs.firebase.crashlytics.ktx)
             implementation(libs.billing.ktx)

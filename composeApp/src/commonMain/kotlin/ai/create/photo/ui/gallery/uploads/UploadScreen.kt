@@ -149,6 +149,8 @@ fun UploadScreen(
     openGenerateTab: () -> Unit,
 ) {
     val state = viewModel.uiState
+    var showSelfieCamera by remember { mutableStateOf(false) }
+    var selfieCameraError by remember { mutableStateOf<Throwable?>(null) }
     UploadScreenContent(
         state = state,
         openGenerateTab = openGenerateTab,
@@ -168,7 +170,25 @@ fun UploadScreen(
         onDeleteUnsuitablePhotos = { viewModel.deleteUnsuitablePhotos() },
         onTrainAiModel = { viewModel.trainAiModel() },
         onHideBalanceUpdatedPopup = viewModel::hideBalanceUpdatedPopup,
+        onTakeSelfies = {
+            selfieCameraError = null
+            showSelfieCamera = true
+        },
     )
+    if (showSelfieCamera) {
+        SelfieCameraCapture(
+            uploadedCount = state.photos?.size ?: 0,
+            targetCount = 20,
+            onDismiss = { showSelfieCamera = false },
+            onPhotosCaptured = { files -> viewModel.uploadPhotos(files) },
+            onError = { selfieCameraError = it },
+        )
+    }
+    if (selfieCameraError != null) {
+        ErrorPopup(selfieCameraError!!) {
+            selfieCameraError = null
+        }
+    }
 }
 
 @Composable
@@ -197,7 +217,7 @@ private fun UploadScreenContent(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
-        val supportsCameraCapture = platform().platform in setOf(Platforms.ANDROID, Platforms.IOS)
+        val supportsCameraCapture = supportsSelfieCameraCapture()
         var showUploadSourcePopup by remember { mutableStateOf(false) }
         val launcher = rememberFilePickerLauncher(
             title = stringResource(Res.string.add_your_photos),
