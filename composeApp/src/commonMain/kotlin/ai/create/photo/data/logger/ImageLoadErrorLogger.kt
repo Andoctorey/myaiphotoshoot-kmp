@@ -1,5 +1,6 @@
 package ai.create.photo.data.logger
 
+import ai.create.photo.data.supabase.isExpectedNetworkNoise
 import co.touchlab.kermit.Logger
 import coil3.network.HttpException
 
@@ -48,6 +49,11 @@ fun logImageLoadError(url: String, throwable: Throwable?) {
 
     if (expectedInvalidImagePayload) {
         Logger.w("ignored invalid image payload: $url")
+        return
+    }
+
+    if (isRemoteUrl && throwable?.isExpectedNetworkNoise() == true) {
+        Logger.w("ignored transient image load failure: $url")
         return
     }
 
