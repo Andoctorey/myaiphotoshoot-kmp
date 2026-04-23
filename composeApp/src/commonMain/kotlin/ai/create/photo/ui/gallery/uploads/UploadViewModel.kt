@@ -28,8 +28,8 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlin.math.max
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -41,7 +41,7 @@ class UploadViewModel : AuthViewModel() {
         storage = SupabaseStorage,
         database = UserFilesRepository,
     )
-    private val uploadMutex = Mutex()
+    private val uploadSemaphore = Semaphore(permits = 3)
     private val analyzePhotoJobs = mutableMapOf<String, Job>()
     private var trainingTimerJob: Job? = null
     private var trainingPollingJob: Job? = null
@@ -111,7 +111,7 @@ class UploadViewModel : AuthViewModel() {
             return@launch
         }
 
-        uploadMutex.withLock {
+        uploadSemaphore.withPermit {
             uiState = uiState.copy(uploadProgress = 1, errorPopup = null)
 
             val totalFiles = files.size
