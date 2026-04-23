@@ -49,6 +49,7 @@ private enum class NetworkIssueKind {
 }
 
 private const val SUPABASE_SIGNED_OBJECT_PATH = "/storage/v1/object/sign/"
+private const val ANALYZE_SELFIE_FUNCTION_PATH = "/functions/v1/analyze-selfie"
 
 private val transientTransportTextMarkers = listOf(
     "connection reset by peer",
@@ -87,6 +88,11 @@ private val missingResourceTextMarkers = listOf(
     "object not found",
 )
 
+private val missingAnalyzeSelfieFileMarkers = listOf(
+    "file with id",
+    "not found",
+)
+
 private const val POSTGRES_FOREIGN_KEY_VIOLATION_CODE = "23503"
 private const val INSUFFICIENT_FUNDS_MARKER = "insufficient funds"
 
@@ -106,7 +112,7 @@ private fun Throwable.networkDiagnosticText(maxDepth: Int = 8): String {
 }
 
 private fun Throwable.classifyNetworkIssue(): NetworkIssueKind {
-    if (isExpectedMissingSignedObject()) {
+    if (isExpectedMissingSignedObject() || isExpectedMissingAnalyzeSelfieFile()) {
         return NetworkIssueKind.EXPECTED_RESOURCE_MISSING
     }
 
@@ -158,6 +164,11 @@ private fun Throwable.isExpectedMissingSignedObject(): Boolean {
     return SUPABASE_SIGNED_OBJECT_PATH in text && text.containsAny(missingResourceTextMarkers)
 }
 
+private fun Throwable.isExpectedMissingAnalyzeSelfieFile(): Boolean {
+    val text = networkDiagnosticText()
+    return ANALYZE_SELFIE_FUNCTION_PATH in text && text.containsAny(missingAnalyzeSelfieFileMarkers)
+}
+
 private fun Throwable.isMissingUserFilesForeignKeyViolation(): Boolean {
     val text = networkDiagnosticText()
     return "code: $POSTGRES_FOREIGN_KEY_VIOLATION_CODE" in text &&
@@ -171,6 +182,10 @@ fun Throwable.isInsufficientFundsError(): Boolean {
 
 fun Throwable.isExpectedTransientNetworkIssue(): Boolean {
     return classifyNetworkIssue() == NetworkIssueKind.TRANSIENT_TRANSPORT
+}
+
+fun Throwable.isExpectedMissingResourceIssue(): Boolean {
+    return classifyNetworkIssue() == NetworkIssueKind.EXPECTED_RESOURCE_MISSING
 }
 
 fun Throwable.isExpectedNetworkNoise(): Boolean {
@@ -203,6 +218,7 @@ suspend fun <T> retryWithBackoff(
             if (e is UnauthorizedRestException ||
                 e is NotFoundRestException ||
                 e.isExpectedMissingSignedObject() ||
+                e.isExpectedMissingAnalyzeSelfieFile() ||
                 e.isMissingUserFilesForeignKeyViolation() ||
                 e.isInsufficientFundsError()
             ) {
@@ -234,6 +250,8 @@ suspend fun <T> retryWithBackoff(
     lastException?.let {
         if (it.isExpectedTransientNetworkIssue()) {
             Logger.w("All retry attempts failed after ${config.maxRetries + 1} attempts: ${it.message}")
+        } else if (it.isExpectedMissingResourceIssue()) {
+            Logger.w("Request failed for missing resource: ${it.message}")
         } else if (it.isMissingUserFilesForeignKeyViolation()) {
             Logger.w("Request failed with non-retryable missing-user FK constraint: ${it.message}")
         } else {

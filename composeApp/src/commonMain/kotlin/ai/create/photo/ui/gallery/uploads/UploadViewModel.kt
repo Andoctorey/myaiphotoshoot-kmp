@@ -7,6 +7,7 @@ import ai.create.photo.data.supabase.SupabaseStorage.UPLOADS
 import ai.create.photo.data.supabase.database.ProfilesRepository
 import ai.create.photo.data.supabase.database.UserFilesRepository
 import ai.create.photo.data.supabase.database.UserTrainingsRepository
+import ai.create.photo.data.supabase.isExpectedMissingResourceIssue
 import ai.create.photo.data.supabase.isExpectedTransientNetworkIssue
 import ai.create.photo.data.supabase.isInsufficientFundsError
 import ai.create.photo.data.supabase.model.AnalysisStatus
@@ -282,6 +283,8 @@ class UploadViewModel : AuthViewModel() {
             if (e is CancellationException) throw e
             if (e.isExpectedTransientNetworkIssue()) {
                 Logger.w("Photo analysis failed for: $photoId. Network issue: ${e.message}")
+            } else if (e.isExpectedMissingResourceIssue()) {
+                Logger.w("Photo analysis skipped for missing file: $photoId")
             } else {
                 Logger.e("Photo analysis failed for: $photoId", e)
             }
@@ -293,7 +296,7 @@ class UploadViewModel : AuthViewModel() {
                         p
                     }
                 },
-                errorPopup = e
+                errorPopup = if (e.isExpectedMissingResourceIssue()) null else e
             )
             updateAnalysisStatus()
         }
