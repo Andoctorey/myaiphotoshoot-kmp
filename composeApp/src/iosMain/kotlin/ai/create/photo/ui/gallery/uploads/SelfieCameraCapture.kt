@@ -139,6 +139,7 @@ actual fun SelfieCameraCapture(
     var acknowledgedUploadedCount by remember { mutableIntStateOf(uploadedCount) }
     var captureInFlight by remember { mutableStateOf(false) }
     var assessment by remember { mutableStateOf<SelfieFrameAssessment?>(null) }
+    var captureAssessmentSnapshot by remember { mutableStateOf<SelfieFrameAssessment?>(null) }
     var completedVarietyGoals by remember { mutableStateOf(emptySet<SelfieVarietyGoal>()) }
     val guidance = remember(assessment) { assessSelfieFrame(assessment) }
     val completedVarietyMask = remember(completedVarietyGoals) {
@@ -160,12 +161,15 @@ actual fun SelfieCameraCapture(
             onCaptureSaved = { file ->
                 captureInFlight = false
                 pendingCapturedCount++
-                completedVarietyGoals = completedVarietyGoals + classifySelfieVariety(assessment)
+                completedVarietyGoals =
+                    completedVarietyGoals + classifySelfieVariety(captureAssessmentSnapshot)
+                captureAssessmentSnapshot = null
                 Logger.i("ios selfie capture saved pending=$pendingCapturedCount uploaded=$uploadedCount goals=${completedVarietyGoals.size}")
                 currentOnPhotosCaptured(listOf(file))
             },
             onCaptureFailed = { throwable ->
                 captureInFlight = false
+                captureAssessmentSnapshot = null
                 Logger.e("Failed to capture iOS selfie photo", throwable)
                 currentOnError(throwable)
             },
@@ -359,6 +363,7 @@ actual fun SelfieCameraCapture(
                     onClick = {
                         if (!canCapturePhoto) return@ShutterButtonIos
                         Logger.i("ios selfie capture requested shown=$displayCount uploaded=$uploadedCount pending=$pendingCapturedCount")
+                        captureAssessmentSnapshot = assessment
                         captureInFlight = true
                         cameraController.capturePhoto()
                     },
@@ -431,7 +436,6 @@ private fun SelfieVarietyChipsIos(
 ) {
     val supportedGoals = remember {
         listOf(
-            SelfieVarietyGoal.FACE_FORWARD,
             SelfieVarietyGoal.LOOK_UP,
             SelfieVarietyGoal.LOOK_DOWN,
             SelfieVarietyGoal.LEFT_SIDE,
@@ -828,7 +832,7 @@ private fun toAssessment(
         faceOffsetX = ((faceCenterX - 0.5f) / 0.5f),
         faceOffsetY = ((faceCenterYFromTop - 0.46f) / 0.5f),
         brightness = brightness,
-        headPitch = radiansToDegrees(primaryFace.pitch?.doubleValue ?: 0.0),
+        headPitch = -radiansToDegrees(primaryFace.pitch?.doubleValue ?: 0.0),
         headYaw = radiansToDegrees(primaryFace.yaw?.doubleValue ?: 0.0),
         headRoll = radiansToDegrees(primaryFace.roll?.doubleValue ?: 0.0),
         smileProbability = null,

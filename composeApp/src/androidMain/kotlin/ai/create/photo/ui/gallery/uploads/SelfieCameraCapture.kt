@@ -187,6 +187,7 @@ actual fun SelfieCameraCapture(
     var pendingCapturedCount by remember { mutableIntStateOf(0) }
     var acknowledgedUploadedCount by remember { mutableIntStateOf(uploadedCount) }
     var assessment by remember { mutableStateOf<SelfieFrameAssessment?>(null) }
+    var captureAssessmentSnapshot by remember { mutableStateOf<SelfieFrameAssessment?>(null) }
     var completedVarietyGoals by remember { mutableStateOf(emptySet<SelfieVarietyGoal>()) }
     val guidance = remember(assessment) { assessSelfieFrame(assessment) }
     val nextVarietyGoal =
@@ -353,6 +354,8 @@ actual fun SelfieCameraCapture(
                         val capture = imageCapture ?: return@shutterClick
                         if (!canCapturePhoto) return@shutterClick
                         Logger.i("selfie capture requested shown=$displayCount uploaded=$uploadedCount pending=$pendingCapturedCount")
+                        val assessmentSnapshot = assessment
+                        captureAssessmentSnapshot = assessmentSnapshot
                         captureInFlight = true
                         captureSelfiePhoto(
                             shutterFeedback = shutterFeedback,
@@ -362,7 +365,10 @@ actual fun SelfieCameraCapture(
                                 captureInFlight = false
                                 pendingCapturedCount++
                                 completedVarietyGoals =
-                                    completedVarietyGoals + classifySelfieVariety(assessment)
+                                    completedVarietyGoals + classifySelfieVariety(
+                                        captureAssessmentSnapshot
+                                    )
+                                captureAssessmentSnapshot = null
                                 Logger.i(
                                     "selfie capture saved pending=$pendingCapturedCount uploaded=$uploadedCount goals=${completedVarietyGoals.size}"
                                 )
@@ -370,6 +376,7 @@ actual fun SelfieCameraCapture(
                             },
                             onFailure = {
                                 captureInFlight = false
+                                captureAssessmentSnapshot = null
                                 Logger.e("Failed to capture selfie photo", it)
                                 onError(it)
                             },

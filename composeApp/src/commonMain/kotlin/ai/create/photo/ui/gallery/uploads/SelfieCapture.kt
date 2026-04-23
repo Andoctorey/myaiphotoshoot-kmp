@@ -100,6 +100,7 @@ fun SelfieGuidanceMessage.labelRes(): StringResource = when (this) {
 fun classifySelfieVariety(frame: SelfieFrameAssessment?): Set<SelfieVarietyGoal> {
     if (frame == null || frame.faceCount != 1) return emptySet()
     val goals = linkedSetOf<SelfieVarietyGoal>()
+    val isStrongSidePose = kotlin.math.abs(frame.headYaw) >= 20f
     when {
         frame.smileProbability != null && frame.smileProbability >= 0.82f -> goals += SelfieVarietyGoal.LAUGH
         frame.smileProbability != null && frame.smileProbability >= 0.5f -> goals += SelfieVarietyGoal.SMILE
@@ -111,9 +112,7 @@ fun classifySelfieVariety(frame: SelfieFrameAssessment?): Set<SelfieVarietyGoal>
             goals += SelfieVarietyGoal.SERIOUS
         }
     }
-    if (kotlin.math.abs(frame.headYaw) <= 16f &&
-        kotlin.math.abs(frame.headRoll) <= 12f
-    ) {
+    if (!isStrongSidePose && kotlin.math.abs(frame.headRoll) <= 16f) {
         goals += SelfieVarietyGoal.FACE_FORWARD
     }
     if (frame.headPitch >= 8f && kotlin.math.abs(frame.headYaw) <= 18f) {
