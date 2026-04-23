@@ -7,6 +7,7 @@ import ai.create.photo.data.supabase.SupabaseStorage.UPLOADS
 import ai.create.photo.data.supabase.database.ProfilesRepository
 import ai.create.photo.data.supabase.database.UserFilesRepository
 import ai.create.photo.data.supabase.database.UserTrainingsRepository
+import ai.create.photo.data.supabase.isExpectedAuthInitializationIssue
 import ai.create.photo.data.supabase.isExpectedMissingResourceIssue
 import ai.create.photo.data.supabase.isExpectedTransientNetworkIssue
 import ai.create.photo.data.supabase.isInsufficientFundsError
@@ -118,6 +119,7 @@ class UploadViewModel : AuthViewModel() {
             val totalFiles = files.size
             var completedFiles = 0
             for (file in files) {
+                var shouldAbortRemainingUploads = false
                 uploadPhotoUseCase.invoke(userId, file).catch {
                     if (it is CancellationException) throw it
                     val uploadError = if (it.isExpectedMissingLocalFileIssue()) {
@@ -127,6 +129,10 @@ class UploadViewModel : AuthViewModel() {
                         IllegalStateException(
                             "Cannot access one of the selected photos. Please pick it again."
                         )
+                    } else if (it.isExpectedAuthInitializationIssue()) {
+                        shouldAbortRemainingUploads = true
+                        Logger.w("uploadPhotos skipped until auth session is ready: ${it.message}")
+                        IllegalStateException("Authentication is still initializing. Please try again.")
                     } else if (it.isExpectedTransientNetworkIssue()) {
                         Logger.w("uploadPhotos failed for '${file.name}'. Network issue: ${it.message}")
                         it
@@ -173,6 +179,7 @@ class UploadViewModel : AuthViewModel() {
                         }
                     }
                 }
+                if (shouldAbortRemainingUploads) break
             }
         }
     }

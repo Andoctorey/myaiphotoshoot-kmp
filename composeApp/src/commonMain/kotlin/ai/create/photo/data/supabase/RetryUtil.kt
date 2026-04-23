@@ -44,11 +44,13 @@ data class RetryConfig(
 private enum class NetworkIssueKind {
     TRANSIENT_TRANSPORT,
     EXPECTED_RESOURCE_MISSING,
+    EXPECTED_AUTH_ISSUE,
     CANCELLED_REQUEST,
     OTHER,
 }
 
 private const val SUPABASE_SIGNED_OBJECT_PATH = "/storage/v1/object/sign/"
+private const val SUPABASE_STORAGE_OBJECT_PATH = "/storage/v1/object/"
 private const val ANALYZE_SELFIE_FUNCTION_PATH = "/functions/v1/analyze-selfie"
 
 private val transientTransportTextMarkers = listOf(
@@ -95,6 +97,7 @@ private val missingAnalyzeSelfieFileMarkers = listOf(
 
 private const val POSTGRES_FOREIGN_KEY_VIOLATION_CODE = "23503"
 private const val INSUFFICIENT_FUNDS_MARKER = "insufficient funds"
+private const val ROW_LEVEL_SECURITY_MARKER = "row-level security policy"
 
 private fun String.containsAny(markers: List<String>): Boolean = markers.any { it in this }
 
@@ -114,6 +117,10 @@ private fun Throwable.networkDiagnosticText(maxDepth: Int = 8): String {
 private fun Throwable.classifyNetworkIssue(): NetworkIssueKind {
     if (isExpectedMissingSignedObject() || isExpectedMissingAnalyzeSelfieFile()) {
         return NetworkIssueKind.EXPECTED_RESOURCE_MISSING
+    }
+
+    if (isExpectedAuthInitializationIssue()) {
+        return NetworkIssueKind.EXPECTED_AUTH_ISSUE
     }
 
     if (this is HttpRequestException) {
@@ -176,6 +183,11 @@ private fun Throwable.isMissingUserFilesForeignKeyViolation(): Boolean {
             "key is not present in table \"users\"" in text
 }
 
+fun Throwable.isExpectedAuthInitializationIssue(): Boolean {
+    val text = networkDiagnosticText()
+    return SUPABASE_STORAGE_OBJECT_PATH in text && ROW_LEVEL_SECURITY_MARKER in text
+}
+
 fun Throwable.isInsufficientFundsError(): Boolean {
     return networkDiagnosticText().contains(INSUFFICIENT_FUNDS_MARKER)
 }
@@ -186,6 +198,10 @@ fun Throwable.isExpectedTransientNetworkIssue(): Boolean {
 
 fun Throwable.isExpectedMissingResourceIssue(): Boolean {
     return classifyNetworkIssue() == NetworkIssueKind.EXPECTED_RESOURCE_MISSING
+}
+
+fun Throwable.isExpectedAuthIssue(): Boolean {
+    return classifyNetworkIssue() == NetworkIssueKind.EXPECTED_AUTH_ISSUE
 }
 
 fun Throwable.isExpectedNetworkNoise(): Boolean {
@@ -219,6 +235,7 @@ suspend fun <T> retryWithBackoff(
                 e is NotFoundRestException ||
                 e.isExpectedMissingSignedObject() ||
                 e.isExpectedMissingAnalyzeSelfieFile() ||
+                e.isExpectedAuthInitializationIssue() ||
                 e.isMissingUserFilesForeignKeyViolation() ||
                 e.isInsufficientFundsError()
             ) {
@@ -252,6 +269,8 @@ suspend fun <T> retryWithBackoff(
             Logger.w("All retry attempts failed after ${config.maxRetries + 1} attempts: ${it.message}")
         } else if (it.isExpectedMissingResourceIssue()) {
             Logger.w("Request failed for missing resource: ${it.message}")
+        } else if (it.isExpectedAuthIssue()) {
+            Logger.w("Request failed before authenticated session was ready: ${it.message}")
         } else if (it.isMissingUserFilesForeignKeyViolation()) {
             Logger.w("Request failed with non-retryable missing-user FK constraint: ${it.message}")
         } else {
