@@ -111,17 +111,23 @@ fun classifySelfieVariety(frame: SelfieFrameAssessment?): Set<SelfieVarietyGoal>
             goals += SelfieVarietyGoal.SERIOUS
         }
     }
-    when {
-        kotlin.math.abs(frame.headYaw) <= 8f &&
-                kotlin.math.abs(frame.headPitch) <= 10f &&
-                kotlin.math.abs(frame.headRoll) <= 8f -> {
-            goals += SelfieVarietyGoal.FACE_FORWARD
-        }
-
-        frame.headPitch >= 10f -> goals += SelfieVarietyGoal.LOOK_UP
-        frame.headPitch <= -10f -> goals += SelfieVarietyGoal.LOOK_DOWN
-        frame.headYaw <= -18f -> goals += SelfieVarietyGoal.LEFT_SIDE
-        frame.headYaw >= 18f -> goals += SelfieVarietyGoal.RIGHT_SIDE
+    if (kotlin.math.abs(frame.headYaw) <= 12f &&
+        kotlin.math.abs(frame.headPitch) <= 14f &&
+        kotlin.math.abs(frame.headRoll) <= 10f
+    ) {
+        goals += SelfieVarietyGoal.FACE_FORWARD
+    }
+    if (frame.headPitch >= 8f && kotlin.math.abs(frame.headYaw) <= 18f) {
+        goals += SelfieVarietyGoal.LOOK_UP
+    }
+    if (frame.headPitch <= -8f && kotlin.math.abs(frame.headYaw) <= 18f) {
+        goals += SelfieVarietyGoal.LOOK_DOWN
+    }
+    if (frame.headYaw <= -16f) {
+        goals += SelfieVarietyGoal.LEFT_SIDE
+    }
+    if (frame.headYaw >= 16f) {
+        goals += SelfieVarietyGoal.RIGHT_SIDE
     }
     when {
         frame.largestFaceRatio >= 0.27f -> goals += SelfieVarietyGoal.CLOSE_UP
