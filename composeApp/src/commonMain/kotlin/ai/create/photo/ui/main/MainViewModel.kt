@@ -128,6 +128,11 @@ class MainViewModel : AuthViewModel() {
         )
     }
 
+    fun topUpFromError() {
+        uiState = uiState.copy(errorPopup = null, topUpErrorPopup = null)
+        topUp()
+    }
+
     private fun updateGenerationsInProgress(progress: Int) {
         uiState = uiState.copy(generationsInProgress = progress)
         updateGenerationProgress(progress)

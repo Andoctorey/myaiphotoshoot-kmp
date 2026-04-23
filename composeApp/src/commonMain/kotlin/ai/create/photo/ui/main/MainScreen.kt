@@ -296,10 +296,7 @@ fun MainScreen(
         TopUpErrorPopup(
             state.topUpErrorPopup,
             onDismiss = { viewModel.hideErrorPopup() },
-            onTopUp = {
-                viewModel.hideErrorPopup()
-                viewModel.topUp()
-            }
+            onTopUp = { viewModel.topUpFromError() }
         )
     }
 

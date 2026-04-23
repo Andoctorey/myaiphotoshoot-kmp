@@ -145,6 +145,8 @@ actual fun SelfieCameraCapture(
     val completedVarietyMask = remember(completedVarietyGoals) {
         completedVarietyGoals.fold(0) { mask, goal -> mask or goal.mask }
     }
+    // Keep the session progress optimistic so capture flow stays fast; failed uploads can leave the
+    // backend count below target, and that tradeoff is intentional for this camera UX.
     val displayCount = (uploadedCount + pendingCapturedCount).coerceAtMost(targetCount)
     val hasFilledSession = displayCount >= targetCount
     val topMessageRes = guidance.message.labelRes()

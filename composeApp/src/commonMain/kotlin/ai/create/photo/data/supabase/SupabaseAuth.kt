@@ -106,8 +106,6 @@ private suspend fun <T> withNormalizedAuthErrors(
 }
 
 private fun Throwable.isMalformedAuthErrorResponse(): Boolean {
-    if (this !is IllegalArgumentException) return false
-
     var current: Throwable? = this
     var depth = 0
     while (current != null && depth < 8) {

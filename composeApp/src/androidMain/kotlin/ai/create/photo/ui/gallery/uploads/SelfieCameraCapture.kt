@@ -211,6 +211,8 @@ actual fun SelfieCameraCapture(
             Logger.i("selfie uploads acknowledged delta=$uploadedDelta uploaded=$uploadedCount pending=$pendingCapturedCount")
         }
     }
+    // Keep the session progress optimistic so capture flow stays fast; failed uploads can leave the
+    // backend count below target, and that tradeoff is intentional for this camera UX.
     val displayCount = (uploadedCount + pendingCapturedCount).coerceAtMost(targetCount)
     val hasFilledSession = displayCount >= targetCount
     val canCapturePhoto =
