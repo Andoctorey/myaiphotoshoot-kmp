@@ -70,11 +70,13 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -95,6 +97,7 @@ import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
 import io.github.vinceglb.filekit.core.PlatformFiles
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import photocreateai.composeapp.generated.resources.Res
 import photocreateai.composeapp.generated.resources.add_your_photos
@@ -244,14 +247,31 @@ private fun UploadScreenContent(
         contentAlignment = Alignment.Center,
     ) {
         val supportsCameraCapture = supportsSelfieCameraCapture()
+        val shouldUseUploadSourcePopup = supportsCameraCapture
         var showUploadSourcePopup by remember { mutableStateOf(false) }
+        var pendingUploadSourceAction by remember { mutableStateOf<UploadSourceAction?>(null) }
         val launcher = rememberFilePickerLauncher(
             title = stringResource(Res.string.add_your_photos),
             type = PickerType.Image,
-            mode = PickerMode.Multiple()
+            mode = PickerMode.Multiple(),
         ) { files ->
             if (files == null) return@rememberFilePickerLauncher
             onUploadPhotos(files)
+        }
+        val launchUploadSourceSelector = {
+            pendingUploadSourceAction = null
+            if (shouldUseUploadSourcePopup) showUploadSourcePopup = true
+            else launcher.launch()
+        }
+        LaunchedEffect(showUploadSourcePopup, pendingUploadSourceAction) {
+            val action = pendingUploadSourceAction ?: return@LaunchedEffect
+            if (!showUploadSourcePopup) {
+                pendingUploadSourceAction = null
+                when (action) {
+                    UploadSourceAction.Gallery -> launcher.launch()
+                    UploadSourceAction.Camera -> onTakeSelfies()
+                }
+            }
         }
         if (state.isLoadingPhotos) {
             Spacer(modifier = Modifier.height(20.dp))
@@ -316,10 +336,7 @@ private fun UploadScreenContent(
                         modifier = Modifier.align(Alignment.BottomEnd)
                             .padding(bottom = buttonsBottomPadding, end = 24.dp)
                             .safeDrawingPadding(),
-                        onClick = {
-                            if (supportsCameraCapture) showUploadSourcePopup = true
-                            else launcher.launch()
-                        },
+                        onClick = launchUploadSourceSelector,
                     ) {
                         Icon(
                             imageVector = Icons.Default.AddAPhoto,
@@ -347,22 +364,15 @@ private fun UploadScreenContent(
                         .padding(bottom = buttonsBottomPadding).safeDrawingPadding(),
                     uploadProgress = state.uploadProgress,
                     uploaded = state.photos.size,
-                    onClick = {
-                        if (supportsCameraCapture) showUploadSourcePopup = true
-                        else launcher.launch()
-                    },
+                    onClick = launchUploadSourceSelector,
                 )
             }
         }
         if (showUploadSourcePopup) {
             UploadSourcePopup(
-                onGallery = {
-                    showUploadSourcePopup = false
-                    launcher.launch()
-                },
-                onCamera = {
-                    showUploadSourcePopup = false
-                    onTakeSelfies()
+                showCamera = supportsCameraCapture,
+                onActionSelected = { action ->
+                    pendingUploadSourceAction = action
                 },
                 onDismiss = { showUploadSourcePopup = false },
             )
@@ -516,18 +526,43 @@ private fun AddPhotosFab(
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
 private fun UploadSourcePopupPreview() = AppTheme {
-    UploadSourcePopup(onGallery = {}, onCamera = {}, onDismiss = {})
+    UploadSourcePopup(showCamera = true, onActionSelected = {}, onDismiss = {})
+}
+
+private enum class UploadSourceAction {
+    Gallery,
+    Camera,
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun UploadSourcePopup(
-    onGallery: () -> Unit,
-    onCamera: () -> Unit,
+    showCamera: Boolean,
+    onActionSelected: (UploadSourceAction) -> Unit,
     onDismiss: () -> Unit,
 ) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val coroutineScope = rememberCoroutineScope()
+    var selectionInProgress by remember { mutableStateOf(false) }
+
+    fun hideThen(action: UploadSourceAction) {
+        if (selectionInProgress) return
+        selectionInProgress = true
+        coroutineScope.launch {
+            sheetState.hide()
+            onDismiss()
+            onActionSelected(action)
+        }
+    }
+
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
+        onDismissRequest = {
+            coroutineScope.launch {
+                sheetState.hide()
+                onDismiss()
+            }
+        },
+        sheetState = sheetState,
     ) {
         Column(
             modifier = Modifier
@@ -545,8 +580,10 @@ private fun UploadSourcePopup(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             UploadSourceActions(
-                onGallery = onGallery,
-                onCamera = onCamera,
+                showCamera = showCamera,
+                enabled = !selectionInProgress,
+                onGallery = { hideThen(UploadSourceAction.Gallery) },
+                onCamera = { hideThen(UploadSourceAction.Camera) },
             )
         }
     }
@@ -555,6 +592,8 @@ private fun UploadSourcePopup(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun UploadSourceActions(
+    showCamera: Boolean,
+    enabled: Boolean,
     onGallery: () -> Unit,
     onCamera: () -> Unit,
 ) {
@@ -563,7 +602,10 @@ private fun UploadSourceActions(
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        FilledTonalButton(onClick = onGallery) {
+        FilledTonalButton(
+            onClick = onGallery,
+            enabled = enabled,
+        ) {
             Icon(
                 imageVector = Icons.Default.PhotoLibrary,
                 contentDescription = stringResource(Res.string.gallery),
@@ -571,13 +613,18 @@ private fun UploadSourceActions(
             Spacer(modifier = Modifier.width(8.dp))
             Text(stringResource(Res.string.gallery))
         }
-        FilledTonalButton(onClick = onCamera) {
-            Icon(
-                imageVector = Icons.Default.PhotoCamera,
-                contentDescription = stringResource(Res.string.camera),
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(stringResource(Res.string.camera))
+        if (showCamera) {
+            FilledTonalButton(
+                onClick = onCamera,
+                enabled = enabled,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.PhotoCamera,
+                    contentDescription = stringResource(Res.string.camera),
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(stringResource(Res.string.camera))
+            }
         }
     }
 }
