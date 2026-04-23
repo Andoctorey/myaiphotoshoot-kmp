@@ -111,9 +111,8 @@ fun classifySelfieVariety(frame: SelfieFrameAssessment?): Set<SelfieVarietyGoal>
             goals += SelfieVarietyGoal.SERIOUS
         }
     }
-    if (kotlin.math.abs(frame.headYaw) <= 12f &&
-        kotlin.math.abs(frame.headPitch) <= 20f &&
-        kotlin.math.abs(frame.headRoll) <= 10f
+    if (kotlin.math.abs(frame.headYaw) <= 16f &&
+        kotlin.math.abs(frame.headRoll) <= 12f
     ) {
         goals += SelfieVarietyGoal.FACE_FORWARD
     }
