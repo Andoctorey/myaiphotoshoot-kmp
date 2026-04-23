@@ -42,7 +42,13 @@ object SupabaseAuth {
                 }
             }
             if (lastError != null) {
-                Logger.e("Anonymous sign-in failed after $maxAttempts attempts", lastError)
+                if (lastError.isExpectedTransientNetworkIssue()) {
+                    Logger.w(
+                        "Anonymous sign-in failed after $maxAttempts attempts due to network issue: ${lastError.message}"
+                    )
+                } else {
+                    Logger.e("Anonymous sign-in failed after $maxAttempts attempts", lastError)
+                }
             }
         } finally {
             signInMutex.unlock()
