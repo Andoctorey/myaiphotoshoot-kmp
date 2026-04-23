@@ -6,6 +6,8 @@ import ai.create.photo.ui.article.ArticleScreen
 import ai.create.photo.ui.blog.BlogScreen
 import ai.create.photo.ui.compose.ErrorPopup
 import ai.create.photo.ui.compose.GenerationIcon
+import ai.create.photo.ui.compose.InfoPopup
+import ai.create.photo.ui.compose.TopUpErrorPopup
 import ai.create.photo.ui.gallery.GalleryScreen
 import ai.create.photo.ui.generate.GenerateScreen
 import ai.create.photo.ui.generate.Prompt
@@ -34,6 +36,8 @@ import androidx.savedstate.read
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.ensureActive
 import org.jetbrains.compose.resources.stringResource
+import photocreateai.composeapp.generated.resources.Res
+import photocreateai.composeapp.generated.resources.thank_you_for_purchase
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -285,6 +289,23 @@ fun MainScreen(
     if (state.errorPopup != null) {
         ErrorPopup(state.errorPopup) {
             viewModel.hideErrorPopup()
+        }
+    }
+
+    if (state.topUpErrorPopup != null) {
+        TopUpErrorPopup(
+            state.topUpErrorPopup,
+            onDismiss = { viewModel.hideErrorPopup() },
+            onTopUp = {
+                viewModel.hideErrorPopup()
+                viewModel.topUp()
+            }
+        )
+    }
+
+    if (state.showBalanceUpdatedPopup) {
+        InfoPopup(stringResource(Res.string.thank_you_for_purchase)) {
+            viewModel.hideBalanceUpdatedPopup()
         }
     }
 

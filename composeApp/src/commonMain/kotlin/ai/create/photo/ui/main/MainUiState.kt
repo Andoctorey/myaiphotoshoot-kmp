@@ -6,6 +6,8 @@ import androidx.compose.runtime.Immutable
 @Immutable
 data class MainUiState(
     val errorPopup: Throwable? = null,
+    val topUpErrorPopup: Throwable? = null,
+    val showBalanceUpdatedPopup: Boolean = false,
 
     val generationsInProgress: Int = 0,
     val openUploads: Boolean = false,

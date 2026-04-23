@@ -83,6 +83,7 @@ private val missingResourceTextMarkers = listOf(
 )
 
 private const val POSTGRES_FOREIGN_KEY_VIOLATION_CODE = "23503"
+private const val INSUFFICIENT_FUNDS_MARKER = "insufficient funds"
 
 private fun String.containsAny(markers: List<String>): Boolean = markers.any { it in this }
 
@@ -159,6 +160,10 @@ private fun Throwable.isMissingUserFilesForeignKeyViolation(): Boolean {
             "key is not present in table \"users\"" in text
 }
 
+fun Throwable.isInsufficientFundsError(): Boolean {
+    return networkDiagnosticText().contains(INSUFFICIENT_FUNDS_MARKER)
+}
+
 fun Throwable.isExpectedTransientNetworkIssue(): Boolean {
     return classifyNetworkIssue() == NetworkIssueKind.TRANSIENT_TRANSPORT
 }
@@ -193,7 +198,8 @@ suspend fun <T> retryWithBackoff(
             if (e is UnauthorizedRestException ||
                 e is NotFoundRestException ||
                 e.isExpectedMissingSignedObject() ||
-                e.isMissingUserFilesForeignKeyViolation()
+                e.isMissingUserFilesForeignKeyViolation() ||
+                e.isInsufficientFundsError()
             ) {
                 throw e
             }

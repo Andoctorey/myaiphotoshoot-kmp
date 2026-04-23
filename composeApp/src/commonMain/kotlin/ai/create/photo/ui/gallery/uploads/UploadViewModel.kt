@@ -8,6 +8,7 @@ import ai.create.photo.data.supabase.database.ProfilesRepository
 import ai.create.photo.data.supabase.database.UserFilesRepository
 import ai.create.photo.data.supabase.database.UserTrainingsRepository
 import ai.create.photo.data.supabase.isExpectedTransientNetworkIssue
+import ai.create.photo.data.supabase.isInsufficientFundsError
 import ai.create.photo.data.supabase.model.AnalysisStatus
 import ai.create.photo.data.supabase.model.TrainingStatus
 import ai.create.photo.platform.topUpPlatform
@@ -392,7 +393,7 @@ class UploadViewModel : AuthViewModel() {
             ensureActive()
             if (!isAuthenticated) return@launch
             Logger.e("trainAiModel failed", e)
-            uiState = if (e.message?.contains("Insufficient funds") == true) {
+            uiState = if (e.isInsufficientFundsError()) {
                 uiState.copy(topUpErrorPopup = e)
             } else {
                 uiState.copy(errorPopup = e)
