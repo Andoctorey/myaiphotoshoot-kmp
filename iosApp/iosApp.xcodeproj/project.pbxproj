@@ -405,6 +405,7 @@
 					"-ObjC",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_ID)$(DEVELOPMENT_TEAM)";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.myaiphotoshoot;
 				PRODUCT_NAME = "${APP_NAME}";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
@@ -444,6 +445,7 @@
 					"-ObjC",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_ID)$(DEVELOPMENT_TEAM)";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.myaiphotoshoot;
 				PRODUCT_NAME = "${APP_NAME}";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;

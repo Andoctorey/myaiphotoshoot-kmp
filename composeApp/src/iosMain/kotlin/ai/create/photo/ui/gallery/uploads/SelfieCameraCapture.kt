@@ -82,7 +82,6 @@ import platform.AVFoundation.AVLayerVideoGravityResizeAspectFill
 import platform.AVFoundation.AVMediaTypeVideo
 import platform.AVFoundation.authorizationStatusForMediaType
 import platform.AVFoundation.requestAccessForMediaType
-import platform.AudioToolbox.AudioServicesPlaySystemSound
 import platform.CoreGraphics.CGRectZero
 import platform.CoreMedia.CMSampleBufferGetImageBuffer
 import platform.CoreMedia.CMSampleBufferRef
@@ -800,7 +799,6 @@ private class IosSelfieCameraController(
             impactFeedbackGenerator.impactOccurred()
             impactFeedbackGenerator.prepare()
         }
-        AudioServicesPlaySystemSound(1108u)
     }
 }
 
