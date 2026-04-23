@@ -134,7 +134,7 @@ fun classifySelfieVariety(frame: SelfieFrameAssessment?): Set<SelfieVarietyGoal>
     return goals
 }
 
-fun nextSelfieVarietyGoal(completed: Set<SelfieVarietyGoal>): SelfieVarietyGoal? =
+fun nextSelfieVarietyGoal(completed: Set<SelfieVarietyGoal>): SelfieVarietyGoal =
     requiredSelfieVarietyGoals().firstOrNull { it !in completed } ?: SelfieVarietyGoal.MORE_VARIETY
 
 fun requiredSelfieVarietyGoals(): List<SelfieVarietyGoal> = listOf(

@@ -157,10 +157,10 @@ class LoginViewModel : AuthViewModel() {
             SupabaseStorage.deleteUserFiles(userId)
             SupabaseFunction.deleteUser()
             val logoutSucceeded = performLogout()
-            if (logoutSucceeded) {
-                uiState = uiState.copy(dataDeletedPopup = true)
+            uiState = if (logoutSucceeded) {
+                uiState.copy(dataDeletedPopup = true)
             } else {
-                uiState = uiState.copy(isLoading = false)
+                uiState.copy(isLoading = false)
             }
         } catch (e: Exception) {
             uiState = uiState.copy(isLoading = false)

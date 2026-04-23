@@ -17,7 +17,6 @@ import platform.UIKit.UIImage
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-@Suppress("UNUSED_PARAMETER")
 actual suspend fun saveGeneratedPhoto(
     bytes: ByteArray,
     baseName: String,

@@ -520,6 +520,7 @@ private data class SelfieVarietyChipState(
     val isNext: Boolean,
 )
 
+@ExperimentalGetImage
 private fun buildImageAnalysis(
     detector: FaceDetector,
     executor: ExecutorService,
