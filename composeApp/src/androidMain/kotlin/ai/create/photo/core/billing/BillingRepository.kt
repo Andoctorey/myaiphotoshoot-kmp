@@ -200,7 +200,7 @@ object BillingRepository : PurchasesUpdatedListener {
     }
 
     private fun logBillingFailure(operation: String, billingResult: BillingResult, error: String) {
-        if (billingResult.responseCode in transientBillingResponseCodes) {
+        if (billingResult.responseCode in expectedBillingResponseCodes) {
             Logger.w("billingResult failed for $operation: $error")
             return
         }
@@ -257,7 +257,8 @@ object BillingRepository : PurchasesUpdatedListener {
     private fun isSignatureValid(purchase: Purchase) =
         Security.verifyPurchase(API_KEY, purchase.originalJson, purchase.signature)
 
-    private val transientBillingResponseCodes = setOf(
+    private val expectedBillingResponseCodes = setOf(
+        BillingClient.BillingResponseCode.BILLING_UNAVAILABLE,
         BillingClient.BillingResponseCode.SERVICE_DISCONNECTED,
         BillingClient.BillingResponseCode.SERVICE_UNAVAILABLE,
         BillingClient.BillingResponseCode.NETWORK_ERROR
