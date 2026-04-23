@@ -67,6 +67,11 @@ private val transientTransportTextMarkers = listOf(
     "failed to parse http response",
     "connect timeout",
     "socket timeout",
+    "the internet connection appears to be offline",
+    "nsurlerrordomain code=-1009",
+    "no network route",
+    "unsatisfied (no network route)",
+    "network connection was lost",
 )
 
 private val cancelledRequestTextMarkers = listOf(

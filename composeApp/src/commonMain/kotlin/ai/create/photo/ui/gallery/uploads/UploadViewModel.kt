@@ -126,6 +126,9 @@ class UploadViewModel : AuthViewModel() {
                         IllegalStateException(
                             "Cannot access one of the selected photos. Please pick it again."
                         )
+                    } else if (it.isExpectedTransientNetworkIssue()) {
+                        Logger.w("uploadPhotos failed for '${file.name}'. Network issue: ${it.message}")
+                        it
                     } else {
                         Logger.e("uploadPhotos failed", it)
                         it
