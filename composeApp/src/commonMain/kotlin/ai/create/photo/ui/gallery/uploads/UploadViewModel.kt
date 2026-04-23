@@ -28,6 +28,8 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlin.math.max
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -39,6 +41,7 @@ class UploadViewModel : AuthViewModel() {
         storage = SupabaseStorage,
         database = UserFilesRepository,
     )
+    private val uploadMutex = Mutex()
     private val analyzePhotoJobs = mutableMapOf<String, Job>()
     private var trainingTimerJob: Job? = null
     private var trainingPollingJob: Job? = null
@@ -108,58 +111,61 @@ class UploadViewModel : AuthViewModel() {
             return@launch
         }
 
-        uiState = uiState.copy(uploadProgress = 1, errorPopup = null)
+        uploadMutex.withLock {
+            uiState = uiState.copy(uploadProgress = 1, errorPopup = null)
 
-        val totalFiles = files.size
-        var completedFiles = 0
-        for (file in files) {
-            uploadPhotoUseCase.invoke(userId, file).catch {
-                if (it is CancellationException) throw it
-                val uploadError = if (it.isExpectedMissingLocalFileIssue()) {
-                    Logger.w(
-                        "uploadPhotos skipped unavailable local file '${file.name}': ${it.message}"
-                    )
-                    IllegalStateException(
-                        "Cannot access one of the selected photos. Please pick it again."
-                    )
-                } else {
-                    Logger.e("uploadPhotos failed", it)
-                    it
-                }
-                uiState = uiState.copy(uploadProgress = 0, errorPopup = uploadError)
-            }.collect { result ->
-                val (file, status) = result
-                if (file != null) {
-                    val currentPhotos = uiState.photos ?: emptyList()
-                    val photoExists = currentPhotos.any { it.id == file.id }
-                    if (!photoExists) {
-                        uiState = uiState.copy(
-                            photos = (uiState.photos ?: emptyList()) + UploadUiState.Photo(
-                                id = file.id,
-                                name = file.fileName,
-                                url = file.signedUrl,
-                                createdAt = file.createdAt,
-                                analysis = file.analysis,
-                                analysisStatus = file.analysisStatus,
-                            )
+            val totalFiles = files.size
+            var completedFiles = 0
+            for (file in files) {
+                uploadPhotoUseCase.invoke(userId, file).catch {
+                    if (it is CancellationException) throw it
+                    val uploadError = if (it.isExpectedMissingLocalFileIssue()) {
+                        Logger.w(
+                            "uploadPhotos skipped unavailable local file '${file.name}': ${it.message}"
                         )
-                        launchAnalyzePhoto(file.id)
+                        IllegalStateException(
+                            "Cannot access one of the selected photos. Please pick it again."
+                        )
+                    } else {
+                        Logger.e("uploadPhotos failed", it)
+                        it
                     }
-                }
-
-                when (status) {
-                    is UploadStatus.Progress -> {
-                        val currentFileProgress =
-                            status.totalBytesSend.toFloat() / status.contentLength * 100
-                        val overallProgress =
-                            (((completedFiles) + currentFileProgress / 100) / totalFiles) * 100
-                        uiState = uiState.copy(uploadProgress = max(overallProgress.toInt() - 5, 1))
+                    uiState = uiState.copy(uploadProgress = 0, errorPopup = uploadError)
+                }.collect { result ->
+                    val (file, status) = result
+                    if (file != null) {
+                        val currentPhotos = uiState.photos ?: emptyList()
+                        val photoExists = currentPhotos.any { it.id == file.id }
+                        if (!photoExists) {
+                            uiState = uiState.copy(
+                                photos = (uiState.photos ?: emptyList()) + UploadUiState.Photo(
+                                    id = file.id,
+                                    name = file.fileName,
+                                    url = file.signedUrl,
+                                    createdAt = file.createdAt,
+                                    analysis = file.analysis,
+                                    analysisStatus = file.analysisStatus,
+                                )
+                            )
+                            launchAnalyzePhoto(file.id)
+                        }
                     }
 
-                    is UploadStatus.Success -> {
-                        completedFiles++
-                        if (completedFiles == totalFiles) {
-                            uiState = uiState.copy(uploadProgress = 100)
+                    when (status) {
+                        is UploadStatus.Progress -> {
+                            val currentFileProgress =
+                                status.totalBytesSend.toFloat() / status.contentLength * 100
+                            val overallProgress =
+                                (((completedFiles) + currentFileProgress / 100) / totalFiles) * 100
+                            uiState =
+                                uiState.copy(uploadProgress = max(overallProgress.toInt() - 5, 1))
+                        }
+
+                        is UploadStatus.Success -> {
+                            completedFiles++
+                            if (completedFiles == totalFiles) {
+                                uiState = uiState.copy(uploadProgress = 100)
+                            }
                         }
                     }
                 }

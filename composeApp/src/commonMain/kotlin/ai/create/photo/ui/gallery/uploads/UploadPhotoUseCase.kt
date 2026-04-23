@@ -1,8 +1,10 @@
 package ai.create.photo.ui.gallery.uploads
 
+import ai.create.photo.data.supabase.RetryConfig
 import ai.create.photo.data.supabase.SupabaseStorage
 import ai.create.photo.data.supabase.database.UserFilesRepository
 import ai.create.photo.data.supabase.model.UserFile
+import ai.create.photo.data.supabase.retryWithBackoff
 import ai.create.photo.platform.resizeToWidth
 import io.github.jan.supabase.storage.UploadStatus
 import io.github.vinceglb.filekit.core.PlatformFile
@@ -14,6 +16,12 @@ class UploadPhotoUseCase(
     private val database: UserFilesRepository
 ) {
 
+    private val uploadRetryConfig = RetryConfig(
+        maxRetries = 3,
+        initialDelayMs = 1_000,
+        maxDelayMs = 8_000,
+    )
+
     fun invoke(userId: String, file: PlatformFile): Flow<UploadResponse> =
         flow {
             val resized = resizeToWidth(file.readBytes()).getOrThrow()
@@ -21,23 +29,27 @@ class UploadPhotoUseCase(
             // Normalize unsupported storage key characters to avoid Supabase InvalidKey errors.
             val finalFileName = toStorageSafeFileName(file.name)
 
-            var successfulStatus: UploadStatus? = null
-            storage.uploadPhoto(userId, finalFileName, resized)
-                .collect { status ->
-                    if (status is UploadStatus.Success) {
-                        successfulStatus = status
-                    } else {
-                        emit(UploadResponse(uploadStatus = status))
+            var successfulStatus: UploadStatus.Success? = null
+            retryWithBackoff(config = uploadRetryConfig) {
+                successfulStatus = null
+                storage.uploadPhoto(userId, finalFileName, resized)
+                    .collect { status ->
+                        if (status is UploadStatus.Success) {
+                            successfulStatus = status
+                        } else {
+                            emit(UploadResponse(uploadStatus = status))
+                        }
                     }
-                }
+                successfulStatus ?: error("File path is null after upload")
+            }
 
-            val fileName = (successfulStatus as? UploadStatus.Success)?.response?.path
-                ?: throw Exception("File path is null after upload")
+            val fileName = successfulStatus?.response?.path
+                ?: error("File path is null after upload")
             val userFile = database.saveFile(userId, fileName).onFailure {
                 throw it
             }.getOrThrow()
 
-            emit(UploadResponse(userFile, successfulStatus))
+            emit(UploadResponse(userFile, successfulStatus!!))
         }
 }
 
