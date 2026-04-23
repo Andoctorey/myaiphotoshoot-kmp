@@ -1,5 +1,6 @@
 package ai.create.photo.ui.settings.login
 
+import ai.create.photo.data.supabase.ExpectedAuthFailureException
 import ai.create.photo.data.supabase.Supabase.supabase
 import ai.create.photo.data.supabase.SupabaseAuth
 import ai.create.photo.data.supabase.SupabaseFunction
@@ -82,7 +83,11 @@ class LoginViewModel : AuthViewModel() {
                 uiState = uiState.copy(isInvalidEmail = true)
                 return@launch
             }
-            Logger.e("sendOtp failed", e)
+            if (e is ExpectedAuthFailureException) {
+                Logger.w("sendOtp failed: ${e.message}")
+            } else {
+                Logger.e("sendOtp failed", e)
+            }
             uiState = uiState.copy(errorPopup = e)
         }
     }
@@ -110,7 +115,11 @@ class LoginViewModel : AuthViewModel() {
             uiState = uiState.copy(isVerifyingOtp = false)
             ensureActive()
             if (!isAuthenticated) return@launch
-            Logger.e("verifyOtp failed", e)
+            if (e is ExpectedAuthFailureException) {
+                Logger.w("verifyOtp failed: ${e.message}")
+            } else {
+                Logger.e("verifyOtp failed", e)
+            }
             uiState = uiState.copy(errorPopup = e)
         }
     }

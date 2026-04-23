@@ -10,6 +10,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
+import org.jetbrains.compose.resources.getString
+import photocreateai.composeapp.generated.resources.Res
+import photocreateai.composeapp.generated.resources.unknown_error
 
 object SupabaseAuth {
 
@@ -48,28 +51,67 @@ object SupabaseAuth {
 
     suspend fun signInWithEmailOtp(email: String) {
         Logger.i("signInWithEmailOtp $email")
-        withContext(Dispatchers.Default) {
-            supabase.auth.signInWith(OTP) {
-                this.email = email
+        withNormalizedAuthErrors("signInWithEmailOtp") {
+            withContext(Dispatchers.Default) {
+                supabase.auth.signInWith(OTP) {
+                    this.email = email
+                }
             }
         }
     }
 
     suspend fun verifyEmailOtp(email: String, code: String) {
         Logger.i("verifyEmailOtp $code")
-        withContext(Dispatchers.Default) {
-            supabase.auth.verifyEmailOtp(
-                type = OtpType.Email.EMAIL, email = email, token = code
-            )
+        withNormalizedAuthErrors("verifyEmailOtp") {
+            withContext(Dispatchers.Default) {
+                supabase.auth.verifyEmailOtp(
+                    type = OtpType.Email.EMAIL, email = email, token = code
+                )
+            }
         }
     }
 
     suspend fun convertAnonymousUserToEmail(email: String) {
         Logger.i("convertAnonymousUserToEmail $email")
-        withContext(Dispatchers.Default) {
-            supabase.auth.updateUser {
-                this.email = email
+        withNormalizedAuthErrors("convertAnonymousUserToEmail") {
+            withContext(Dispatchers.Default) {
+                supabase.auth.updateUser {
+                    this.email = email
+                }
             }
         }
     }
+}
+
+class ExpectedAuthFailureException(message: String) : IllegalStateException(message)
+
+private suspend fun <T> withNormalizedAuthErrors(
+    operation: String,
+    block: suspend () -> T
+): T = try {
+    block()
+} catch (error: Throwable) {
+    if (error is CancellationException) throw error
+    if (error.isMalformedAuthErrorResponse()) {
+        Logger.w("Supabase auth returned malformed error response during $operation", error)
+        throw ExpectedAuthFailureException(getString(Res.string.unknown_error))
+    }
+    throw error
+}
+
+private fun Throwable.isMalformedAuthErrorResponse(): Boolean {
+    if (this !is IllegalArgumentException) return false
+
+    var current: Throwable? = this
+    var depth = 0
+    while (current != null && depth < 8) {
+        val className = current::class.simpleName.orEmpty().lowercase()
+        val message = current.message.orEmpty().lowercase()
+        if ("illegalargumentexception" in className && "is not a jsonobject" in message) {
+            return true
+        }
+        current = current.cause
+        depth++
+    }
+    return false
 }
