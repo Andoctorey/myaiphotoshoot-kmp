@@ -28,12 +28,12 @@ kotlin {
 
 android {
     namespace = "ai.create.photo"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.myaiphotoshoot"
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 37
         versionCode = gitVersionCode
         versionName = "1.4.$gitVersionCode"
     }
