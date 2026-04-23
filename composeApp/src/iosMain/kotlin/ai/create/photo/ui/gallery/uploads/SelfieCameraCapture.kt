@@ -568,15 +568,19 @@ private class IosSelfieCameraController(
     AVCapturePhotoCaptureDelegateProtocol,
     AVCaptureVideoDataOutputSampleBufferDelegateProtocol {
 
-    val previewView = UIView(frame = CGRectZero.readValue()).apply {
-        backgroundColor = UIColor.blackColor
-    }
-
     private val session = AVCaptureSession().apply {
         sessionPreset = AVCaptureSessionPresetPhoto
     }
     private val previewLayer = AVCaptureVideoPreviewLayer(session = session).apply {
         videoGravity = AVLayerVideoGravityResizeAspectFill
+    }
+    val previewView = object : UIView(frame = CGRectZero.readValue()) {
+        override fun layoutSubviews() {
+            super.layoutSubviews()
+            syncPreviewLayer(this)
+        }
+    }.apply {
+        backgroundColor = UIColor.blackColor
     }
     private val photoOutput = AVCapturePhotoOutput()
     private val videoOutput = AVCaptureVideoDataOutput()
@@ -594,6 +598,10 @@ private class IosSelfieCameraController(
     fun isReadyToCapture(): Boolean = isConfigured && isRunning
 
     fun attachPreview(view: UIView) {
+        syncPreviewLayer(view)
+    }
+
+    private fun syncPreviewLayer(view: UIView) {
         if (previewLayer.superlayer != view.layer) {
             previewLayer.removeFromSuperlayer()
             view.layer.addSublayer(previewLayer)
